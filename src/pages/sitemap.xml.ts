@@ -1,8 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFreeze } from '../utils/fixtures';
 
-const site = 'https://billionaire-watcher.pages.dev';
-
 export const GET: APIRoute = () => {
   const freezePersons = getFreeze();
   
@@ -19,7 +17,7 @@ export const GET: APIRoute = () => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(({ loc, priority }) => `  <url>
-    <loc>${site}${loc}</loc>
+    <loc>${loc}</loc>
     <priority>${priority}</priority>
   </url>`).join('\n')}
 </urlset>`;
