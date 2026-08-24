@@ -80,6 +80,27 @@ describe('Metodologia Page', () => {
     it('should have Referências section with citations', () => {
       expect(builtHtml).toMatch(/Referências|referências/);
     });
+
+    it('should have shared locator citationMap (body markers match footer entries)', () => {
+      // This tightens the test beyond "some [n] exists"
+      // Ensures published body sentences have matching citation markers and footer entries
+      const hasReferencesSection = /<h2[^>]*>.*?Referências.*?<\/h2>/i.test(builtHtml);
+      expect(hasReferencesSection).toBe(true);
+      
+      // Check that citation markers exist and reference footer
+      const markerMatches = builtHtml.match(/\[(\d+)\]/g) || [];
+      expect(markerMatches.length).toBeGreaterThan(0);
+      
+      // Each marker should have a footer citation with matching number
+      const citationNumbers = markerMatches.map(m => parseInt(m.replace(/[\[\]]/g, '')));
+      const uniqueNumbers = [...new Set(citationNumbers)];
+      
+      for (const num of uniqueNumbers) {
+        // Check footer has id="citation-N"
+        const footerPattern = new RegExp(`id=["']citation-${num}["']`);
+        expect(footerPattern.test(builtHtml)).toBe(true);
+      }
+    });
   });
 
   describe('Test 3: Required methodology topics are present', () => {
@@ -92,16 +113,14 @@ describe('Metodologia Page', () => {
       expect(builtHtml).toMatch(/6\.404|Art\. 116|artigo 116/i);
     });
 
-    it('should clarify RF edges are labeled sócio (not dono/UBO)', () => {
+    it('should clarify RF edges are labeled sócio (nunca dono)', () => {
       // Must explicitly state that RF partner edges are labeled "sócio"
       // Not just pass because "Quadro de Sócios" contains the substring
       expect(builtHtml).toMatch(/rotulad[ao]s?\s+como\s+sócio/i);
       expect(builtHtml).toMatch(/QSA|Quadro de Sócios/i);
       expect(builtHtml).toMatch(/IN.*RFB.*2\.119|Instrução Normativa.*2\.119/i);
-      // The methodology can mention UBO to clarify what we DON'T use
-      // but should not use "dono" as a label
-      const mentionsDono = /\bdono\b/i.test(builtHtml);
-      expect(mentionsDono).toBe(false);
+      // Should say "nunca como dono" (negation is OK per PM)
+      expect(builtHtml).toMatch(/nunca\s+como\s+dono/i);
     });
 
     it('should mention visible hole when controller unknown', () => {
@@ -128,25 +147,49 @@ describe('Metodologia Page', () => {
       expect(builtHtml).toMatch(/TSE|doações|volume/i);
     });
 
-    it('should mention SOE (União/Estado/Município not person)', () => {
+    it('should mention SOE skip PF (União/Estado/Município, no CEO/ministro as controlador)', () => {
       expect(builtHtml).toMatch(/União|Estado|Município/i);
       expect(builtHtml).toMatch(/estatal/i);
+      expect(builtHtml).toMatch(/CEO|ministro/i);
     });
 
     it('should mention foreign companies and CEO not default controller', () => {
       expect(builtHtml).toMatch(/estrangeira/i);
       expect(builtHtml).toMatch(/CEO|subsidiária/i);
     });
+
+    it('should mention Hoffmann-Lange 2007 (not 1980)', () => {
+      expect(builtHtml).toMatch(/Hoffmann-Lange.*2007/i);
+      expect(builtHtml).not.toMatch(/Hoffmann-Lange.*1980/i);
+    });
+
+    it('should state protocol date (not past tense "foi realizado")', () => {
+      expect(builtHtml).toMatch(/4.*outubro.*2026|outubro.*2026/i);
+      expect(builtHtml).not.toMatch(/foi realizado|freeze foi/i);
+    });
+
+    it('should state aresta da Receita é sócio, nunca dono', () => {
+      expect(builtHtml).toMatch(/aresta.*Receita|sócio/i);
+      expect(builtHtml).toMatch(/br_me_cnpj\.socios/i);
+    });
   });
 
   describe('Test 4: Voice guidelines - forbidden patterns', () => {
-    it('should NOT have pipeline jargon (RSS, LLM, UniqueEvent, candidato_forbes, etc.)', () => {
+    it('should NOT have forbidden tokens (freeze, candidato_forbes, UBO)', () => {
+      // English "freeze" is forbidden
+      expect(builtHtml).not.toMatch(/\bfreeze\b/i);
+      // CSV jargon
+      expect(builtHtml).not.toMatch(/candidato_forbes/i);
+      expect(builtHtml).not.toMatch(/skip_soe/i);
+      // UBO is NEVER list token - even in rejection sentences
+      expect(builtHtml).not.toMatch(/\bUBO\b/);
+    });
+
+    it('should NOT have pipeline jargon (RSS, LLM, UniqueEvent, etc.)', () => {
       expect(builtHtml).not.toMatch(/\bRSS\b/);
       expect(builtHtml).not.toMatch(/\bLLM\b/);
       expect(builtHtml).not.toMatch(/UniqueEvent/i);
       expect(builtHtml).not.toMatch(/extrai campos com IA/i);
-      expect(builtHtml).not.toMatch(/candidato_forbes/i);
-      expect(builtHtml).not.toMatch(/skip_soe/i);
     });
 
     it('should NOT have Wikipedia identity lead', () => {
@@ -165,11 +208,11 @@ describe('Metodologia Page', () => {
       expect(builtHtml).not.toMatch(/\b\d{11}\b/);
     });
 
-    it('should NOT use "dono" as RF partner label', () => {
-      // "dono" should not appear in methodology
-      // UBO can be mentioned in methodology to clarify what's NOT available
-      const hasDono = /\bdono\b/i.test(builtHtml);
-      expect(hasDono).toBe(false);
+    it('should NOT use "dono" as positive RF partner label', () => {
+      // "dono" can appear in negation ("nunca como dono") but not as positive label
+      // Check it's only in negation context
+      const hasDonoPositive = /rotulad[ao]s?\s+como\s+dono|é\s+dono|são\s+donos/i.test(builtHtml);
+      expect(hasDonoPositive).toBe(false);
     });
 
     it('should NOT have unsourced value adjectives', () => {

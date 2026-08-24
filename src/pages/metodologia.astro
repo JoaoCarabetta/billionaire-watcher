@@ -34,12 +34,13 @@ const positionalDoorFacts = [
   getFactById('metod-fre-listed'),
   getFactById('metod-qsa-unlisted'),
   getFactById('metod-qsa-socio-label'),
-  getFactById('metod-qsa-no-ubo'),
+  getFactById('metod-qsa-no-beneficiario'),
   getFactById('metod-visible-hole')
 ].filter(Boolean) as Fact[];
 
 const scopeFacts = [
-  getFactById('metod-soe-not-person'),
+  getFactById('metod-soe-skip-pf'),
+  getFactById('metod-soe-no-ceo'),
   getFactById('metod-foreign-ceo-not-controller'),
   getFactById('metod-foreign-included')
 ].filter(Boolean) as Fact[];
@@ -48,8 +49,8 @@ const forbesFacts = [
   getFactById('metod-forbes-safety-net')
 ].filter(Boolean) as Fact[];
 
-const freezeDateFacts = [
-  getFactById('metod-freeze-date')
+const protocolDateFacts = [
+  getFactById('metod-protocol-date')
 ].filter(Boolean) as Fact[];
 
 const rejectedMethodsFacts = [
@@ -158,7 +159,7 @@ const rejectedMethodsFacts = [
 
       <section class="methodology-content">
         <h2>Data de Referência</h2>
-        {freezeDateFacts.map((fact) => (
+        {protocolDateFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
