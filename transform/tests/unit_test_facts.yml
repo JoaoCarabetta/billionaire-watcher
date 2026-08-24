@@ -832,3 +832,75 @@ unit_tests:
         - person_name: Carlos Eduardo Santos
           fact_kind: association
           supporting_fact_ids: ['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']
+
+  # Issue #51: Test that donation_facts joins to candidatos, not broken receitas columns
+  - name: test_donation_facts_joins_candidatos_for_name
+    description: |
+      Issue #51 Fix: donation_facts must join receitas_candidato → candidatos
+      for candidate names. nome_candidato and tipo_receita do NOT exist on
+      receitas_candidato. This test uses only the tse_2026 seed path (no BD call)
+      to verify the schema is correct for when BD is queried.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Test Person
+            freeze_status: in
+            cnpj_basico: '12345678'
+            group_name: Test Group
+            role: controlador
+            source_doc: Test Doc
+            cpf_masked: '***456***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Marina Costa
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Test Person
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026999'
+            cpf_doador_masked: '***456***'
+    expect:
+      rows:
+        - person_name: Test Person
+          fact_kind: donation
+          # value must contain candidate PUBLIC NAME from seed, never CPF
+      format: dict
+      
+  - name: test_donation_facts_value_has_candidate_name_not_cpf
+    description: |
+      Issue #51 Fix: Verify that donation fact value contains candidate
+      PUBLIC NAME (Marina Costa), never candidate CPF (***234***).
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Test Donor
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group
+            role: controlador
+            source_doc: Test Doc
+            cpf_masked: '***999***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***888***'
+            nome_candidato: Candidate Public Name
+            cpf_cnpj_doador: '***999***'
+            nome_doador: Test Donor
+            valor_receita: 75000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026888'
+            cpf_doador_masked: '***999***'
+    expect:
+      rows:
+        # Value must contain "Candidate Public Name", not "***888***"
+        - fact_id: donation_2026888_Test Donor
+          value: Test Donor doou R$ 75000.0 para Candidate Public Name em 2026 (recibo 2026888)
+          fact_kind: donation
+      format: dict

@@ -31,6 +31,7 @@ tse_2026 as (
 
 -- Closed cycles from BD br_tse_eleicoes (2014, 2018, 2022)
 -- NOTE: In unit tests, use seed/fixture only. No live BD call.
+-- FIX #51: Join receitas_candidato → candidatos for nome_candidato (doesn't exist on receitas)
 tse_closed_cycles as (
     {% if target.name == 'test' %}
     -- Unit tests: empty CTE (no live BD calls in tests)
@@ -45,21 +46,24 @@ tse_closed_cycles as (
         cast(null as string) as numero_recibo_eleitoral
     where false
     {% else %}
-    -- Production: query BD for closed cycles
+    -- Production: query BD for closed cycles with candidatos join
     select
-        ano,
-        nome_candidato,
-        nome_doador,
-        cpf_cnpj_doador as cpf_doador_masked,
-        valor_receita,
-        tipo_receita,
-        fonte_receita,
-        numero_recibo_eleitoral
-    from {{ source('br_tse_eleicoes', 'receitas_candidato') }}
-    where ano in (2014, 2018, 2022)
-      and fonte_receita = 'Pessoa física' -- PF only
-      and numero_recibo_eleitoral is not null
-      and nome_candidato is not null -- Must have candidate name for public facts
+        r.ano,
+        coalesce(c.nome, c.nome_urna) as nome_candidato,
+        r.nome_doador,
+        r.cpf_cnpj_doador as cpf_doador_masked,
+        r.valor_receita,
+        cast(null as string) as tipo_receita, -- Not available on receitas_candidato
+        r.fonte_receita,
+        r.numero_recibo_eleitoral
+    from {{ source('br_tse_eleicoes', 'receitas_candidato') }} r
+    inner join {{ source('br_tse_eleicoes', 'candidatos') }} c
+        on r.ano = c.ano
+        and r.sequencial_candidato = c.sequencial
+    where r.ano in (2014, 2018, 2022)
+      and r.fonte_receita = 'Pessoa física' -- PF only
+      and r.numero_recibo_eleitoral is not null
+      and coalesce(c.nome, c.nome_urna) is not null -- Must have candidate name for public facts
     {% endif %}
 ),
 

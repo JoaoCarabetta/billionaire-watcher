@@ -75,23 +75,40 @@ sources:
     schema: br_tse_eleicoes
     tables:
       - name: receitas_candidato
-        description: TSE candidate receipts (donations), partitioned by ano
+        description: |
+          TSE candidate receipts (donations), partitioned by ano.
+          FIX #51: nome_candidato and tipo_receita do NOT exist on this table.
+          Join to candidatos for candidate names.
         columns:
           - name: ano
             description: Election year
-          - name: cpf_candidato
-            description: Candidate CPF (masked in BD, full in live TSE - NOT FOR PUBLIC FACTS)
-          - name: nome_candidato
-            description: Candidate name (public field)
+          - name: sequencial_candidato
+            description: Candidate sequential ID (join key to candidatos.sequencial)
           - name: cpf_cnpj_doador
             description: Donor CPF or CNPJ (masked)
           - name: nome_doador
             description: Donor name
           - name: valor_receita
             description: Receipt amount
-          - name: tipo_receita
-            description: Receipt type
           - name: fonte_receita
-            description: Receipt source
+            description: Receipt source (e.g., "Pessoa física")
           - name: numero_recibo_eleitoral
             description: Electoral receipt number (unique identifier)
+            
+      - name: candidatos
+        description: |
+          TSE candidates by year.
+          Join target for receitas_candidato to get candidate PUBLIC names.
+        columns:
+          - name: ano
+            description: Election year
+          - name: sequencial
+            description: Candidate sequential ID (join key from receitas_candidato.sequencial_candidato)
+          - name: nome
+            description: Candidate full name (PUBLIC, use in value/fact_id)
+          - name: nome_urna
+            description: Candidate ballot name (PUBLIC, use in value/fact_id)
+          - name: numero
+            description: Candidate number
+          - name: cpf
+            description: Candidate CPF (NEVER use in value/fact_id, matching only)
