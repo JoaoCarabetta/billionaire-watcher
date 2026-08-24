@@ -71,11 +71,11 @@ Real `dbt run` in `billionairewatcher.billionaire_watcher` on 2026-08-24:
 | controlador_tipo | freeze_status | row_count | group_count | notes |
 |-----------------|---------------|-----------|-------------|-------|
 | listed | in | 95 | 9 | Same 9 groups with named PF controllers |
-| listed | hole | 27 | 27 | **FIXED**: At most one hole per group, only if zero named PF |
+| listed | hole | 18 | 18 | **FIXED**: 27 listed groups − 9 with named PF = 18 hole-only groups |
 | foreign | hole | 19 | 19 | One hole per foreign group (no change) |
 | unlisted | hole | 3 | 3 | One hole per unlisted group (no change) |
 | soe | skip_soe | 1 | 1 | Petrobras (no change) |
-| **TOTAL** | | **145** | **50** | |
+| **TOTAL** | | **136** | **50** | |
 
 **Locked grain per group:**
 - One path per top-50 group (50 total)
@@ -83,7 +83,7 @@ Real `dbt run` in `billionairewatcher.billionaire_watcher` on 2026-08-24:
 - `hole`: at most ONE row per group, and ONLY if that group has zero named PF
 - `skip_soe`: one row (Petrobras)
 
-Groups with both 'in' and 'hole' rows (like WEG with 133 hole + 44 in) was the bug. After fix: groups emit either 'in' rows XOR one 'hole' row XOR one 'skip_soe' row.
+Groups with both 'in' and 'hole' rows (like WEG with 133 hole + 44 in) was the bug. After fix: the 9 groups with named PF emit ONLY 'in' rows (XOR); the remaining 18 listed groups emit one 'hole' row each.
 
 ### Forbes Safety-Net (Issue #26)
 
@@ -91,7 +91,7 @@ Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_st
 
 **Input Source:** The `forbes_billionaires_brazil_nexus` seed is **FIXTURE DATA ONLY** for testing Forbes safety-net logic. It does NOT contain real Forbes billionaires, actual USD wealth estimates, or live Forbes data. Do NOT use this seed as a live Forbes extract.
 
-**CRITICAL - Production Exclusion:** The `forbes_billionaires_brazil_nexus` and `tse_donations_2026` seeds are **DISABLED in production** via `enabled: "{{ target.name in ['test', 'ci', 'dev'] }}"` in `seeds/schema.yml`. These seeds are test fixtures only and must NEVER be loaded into the `billionairewatcher` warehouse. Running `dbt seed` on a production target will skip these files. Unit tests use the CSVs as fixtures without loading them to BigQuery.
+**CRITICAL - Production Exclusion:** The `forbes_billionaires_brazil_nexus` and `tse_donations_2026` seeds are **DISABLED on the warehouse target** (dev) and prod via `enabled: "{{ target.name in ['test', 'ci'] }}"` in `seeds/schema.yml`. The warehouse profile uses target name `dev` (see `profiles.yml.example`), which is excluded. Only test/ci targets may seed these fixtures. These seeds must NEVER be loaded into the `billionairewatcher` warehouse. Unit tests use the CSVs as fixtures without loading them to BigQuery.
 
 **Add ONLY if ALL of:**
 - On Forbes World's Billionaires (seed/fixture, not live scrape)
