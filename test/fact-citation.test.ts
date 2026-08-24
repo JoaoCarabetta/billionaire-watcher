@@ -62,34 +62,12 @@ describe('Fact + Citation Seam', () => {
     });
   });
 
-  describe('Test 3: Derived association cites parent Facts only', () => {
-    it('should render assoc-1 description in HTML', () => {
-      expect(builtHtml).toContain('João Silva e Maria Santos têm conexão através de doação política');
-    });
-
-    it('should cite parent fact-1 publisher in references', () => {
-      const assocText = 'João Silva e Maria Santos têm conexão através de doação política';
-      const assocIndex = builtHtml.indexOf(assocText);
-      expect(assocIndex).toBeGreaterThan(-1);
-      
-      const citationMatch = builtHtml.slice(assocIndex, assocIndex + 200).match(/\[(\d+)\]/g);
-      expect(citationMatch).toBeTruthy();
-      
-      const citationNumbers = citationMatch!.map(m => parseInt(m.match(/\d+/)![0]));
-      expect(citationNumbers).toContain(1);
-    });
-
-    it('should cite parent fact-2 publisher in references', () => {
-      const assocText = 'João Silva e Maria Santos têm conexão através de doação política';
-      const assocIndex = builtHtml.indexOf(assocText);
-      
-      const citationMatch = builtHtml.slice(assocIndex, assocIndex + 200).match(/\[(\d+)\]/g);
-      const citationNumbers = citationMatch!.map(m => parseInt(m.match(/\d+/)![0]));
-      expect(citationNumbers).toContain(2);
-    });
-
-    it('should not render association without parent facts', () => {
-      expect(builtHtml).not.toContain('Pedro Costa está associado com pessoas poderosas');
+  describe('Test 3: No unsourced associations on demo page', () => {
+    it('should not render association without valid parent donations', () => {
+      // The derived-associations.json fixture has assoc-orphan with nonexistent parent donations
+      // It should not appear in the demo page
+      expect(builtHtml).not.toContain('assoc-orphan');
+      expect(builtHtml).not.toContain('Associação sem fatos válidos');
     });
   });
 

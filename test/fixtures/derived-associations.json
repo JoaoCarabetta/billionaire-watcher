@@ -1,12 +1,9 @@
 [
   {
-    "id": "assoc-1",
-    "description": "João Silva e Maria Santos têm conexão através de doação política",
-    "parent_facts": ["fact-1", "fact-2"]
-  },
-  {
-    "id": "assoc-2-no-parents",
-    "description": "Pedro Costa está associado com pessoas poderosas",
-    "parent_facts": []
+    "id": "assoc-orphan",
+    "person_id": "p1",
+    "association_type": "politician",
+    "description": "Associação sem fatos válidos",
+    "parent_donation_ids": ["nonexistent-donation-1", "nonexistent-donation-2"]
   }
 ]

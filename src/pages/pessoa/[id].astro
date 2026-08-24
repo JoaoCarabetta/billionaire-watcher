@@ -2,6 +2,7 @@
 import FactWithCitation from '../../components/FactWithCitation.astro';
 import RFPartnerEdge from '../../components/RFPartnerEdge.astro';
 import CVMFREControl from '../../components/CVMFREControl.astro';
+import DerivedAssociation from '../../components/DerivedAssociation.astro';
 import Citations from '../../components/Citations.astro';
 import { 
   getFreeze, 
@@ -9,6 +10,7 @@ import {
   getRFPartnerEdgesByPersonId,
   getCVMFREControlsByPersonId,
   getDonationsByPersonId,
+  getDerivedAssociationsByPersonId,
   getCandidateByCpf,
   formatCurrency,
   redactCPF
@@ -33,6 +35,7 @@ const identityFacts = getIdentityFactsByPersonId(person.person_id);
 const rfPartnerEdges = getRFPartnerEdgesByPersonId(person.person_id);
 const cvmFreControls = getCVMFREControlsByPersonId(person.person_id);
 const donations = getDonationsByPersonId(person.person_id);
+const associations = getDerivedAssociationsByPersonId(person.person_id);
 
 // Find name fact for title, or fallback to freeze CSV name as index chrome
 const nameFact = identityFacts.find(f => f.field === 'nome');
@@ -265,6 +268,15 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
               );
             })}
           </div>
+        </section>
+      )}
+
+      {associations.length > 0 && (
+        <section>
+          <h2>Associações</h2>
+          {associations.map((association) => (
+            <DerivedAssociation association={association} citationMap={citationMap} />
+          ))}
         </section>
       )}
 
