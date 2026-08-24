@@ -25,23 +25,28 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dbt-bigquery
-        run: pip install dbt-bigquery==1.8.2
+      - name: Install dbt-bigquery and dbt-duckdb
+        run: |
+          pip install dbt-bigquery==1.8.2
+          pip install dbt-duckdb
 
       - name: Create CI profiles.yml
         run: |
           mkdir -p $HOME/.dbt
           cat > $HOME/.dbt/profiles.yml << 'EOF'
           billionaire_watcher:
-            target: ci
+            target: dev
             outputs:
-              ci:
+              dev:
                 type: bigquery
-                method: anonymous
+                method: oauth
                 project: dummy-project
                 dataset: dummy_dataset
                 location: US
                 threads: 1
+              ci:
+                type: duckdb
+                path: ":memory:"
           EOF
 
       - name: Install dbt packages
@@ -56,11 +61,4 @@ jobs:
 
       - name: Run dbt unit tests
         working-directory: transform
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-        run: |
-          echo "=== Running dbt unit tests ==="
-          dbt test --select test_type:unit || {
-            echo "=== Unit tests failed, checking logs ==="
-            exit 1
-          }
+        run: dbt test --select test_type:unit --target ci
