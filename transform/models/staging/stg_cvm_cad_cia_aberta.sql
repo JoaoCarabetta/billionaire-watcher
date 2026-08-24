@@ -8,7 +8,7 @@ with source as (
 
 cleaned as (
     select
-        lpad(regexp_replace(cast(CNPJ_CIA as string), '[^0-9]', '', 'g'), 14, '0') as CNPJ_CIA,
+        lpad(regexp_replace(cast(CNPJ_CIA as string), '[^0-9]', ''), 14, '0') as CNPJ_CIA,
         cast(DENOM_SOCIAL as string) as DENOM_SOCIAL,
         cast(DENOM_COMERC as string) as DENOM_COMERC,
         cast(DT_REG as date) as DT_REG,

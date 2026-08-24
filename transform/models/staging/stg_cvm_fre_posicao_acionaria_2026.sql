@@ -8,7 +8,7 @@ with source as (
 
 cleaned as (
     select
-        lpad(regexp_replace(cast(CNPJ_Companhia as string), '[^0-9]', '', 'g'), 14, '0') as CNPJ_Companhia,
+        lpad(regexp_replace(cast(CNPJ_Companhia as string), '[^0-9]', ''), 14, '0') as CNPJ_Companhia,
         cast(Data_Referencia as date) as Data_Referencia,
         cast(Versao as int64) as Versao,
         cast(ID_Documento as int64) as ID_Documento,

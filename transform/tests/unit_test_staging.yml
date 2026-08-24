@@ -153,7 +153,7 @@ unit_tests:
         format: sql
         rows: |
           select
-            '02.916.265/0001-60' as CNPJ_Companhia,
+            '02916265000160' as CNPJ_Companhia,
             '2025-12-31' as Data_Referencia,
             1 as Versao,
             123456 as ID_Documento,
@@ -196,7 +196,7 @@ unit_tests:
         format: sql
         rows: |
           select
-            '02.916.265/0001-60' as CNPJ_CIA,
+            '02916265000160' as CNPJ_CIA,
             'JBS SA' as DENOM_SOCIAL,
             'JBS' as DENOM_COMERC,
             '2007-04-02' as DT_REG,
