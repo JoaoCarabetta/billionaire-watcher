@@ -1,0 +1,155 @@
+[
+  {
+    "id": "metod-ranking-source",
+    "value": "A porta de entrada para grupos é o ranking Valor 1000 2025, que ordena empresas por receita líquida consolidada do exercício fiscal de 2024.",
+    "source": {
+      "publisher": "Valor Econômico",
+      "locator": "https://infograficos.valor.globo.com/valor1000/2025",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-positional-door",
+    "value": "A porta de entrada para pessoas físicas usa o conceito de acionista controlador conforme Lei 6.404/1976 Art. 116.",
+    "source": {
+      "publisher": "Presidência da República",
+      "locator": "https://www.planalto.gov.br/ccivil_03/leis/l6404consol.htm",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-positional-method",
+    "value": "O método posicional identifica elites por posições em organizações estratégicas (Hoffmann-Lange 2007, pp. 910–914).",
+    "source": {
+      "publisher": "Hoffmann-Lange, U. (2007). Methods of Elite Identification, pp. 910–914",
+      "locator": "https://doi.org/10.1002/9780470996645.ch41",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-fre-listed",
+    "value": "Para empresas de capital aberto, consultar o Formulário de Referência (FRE) seção 6.1, que identifica o acionista controlador.",
+    "source": {
+      "publisher": "CVM - Comissão de Valores Mobiliários",
+      "locator": "https://www.gov.br/cvm/pt-br/assuntos/regulados/companhias/informacoes-periodicas-e-eventuais/formulario-de-referencia",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-qsa-unlisted",
+    "value": "Para empresas de capital fechado, consultar o Quadro de Sócios e Administradores (QSA) da Receita Federal.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-qsa-socio-label",
+    "value": "A aresta da Receita Federal é rotulada como sócio, nunca como dono (fonte Receita Federal / Base dos Dados).",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-qsa-no-beneficiario",
+    "value": "O QSA registra vínculos societários conforme Instrução Normativa RFB 2.119/2022, mas o e-BEF (beneficiário final) não é público.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-visible-hole",
+    "value": "Quando o controlador não é identificado nas fontes públicas, o dossiê apresenta lacuna visível em vez de inferência.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-soe-skip-pf",
+    "value": "Quando a União, Estado ou Município consta como acionista controlador, a empresa é identificada como estatal e não gera dossiê de pessoa física porque ente federativo não é pessoa natural.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-soe-no-ceo",
+    "value": "CEO ou ministro de estatal não é tratado como controlador pessoa física.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-foreign-ceo-not-controller",
+    "value": "O CEO brasileiro de subsidiária não é tratado como controlador padrão quando a sede de controle está no exterior.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-foreign-included",
+    "value": "Empresas estrangeiras ranqueadas no Valor 1000 são incluídas quando identificado controlador pessoa física.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-forbes-safety-net",
+    "value": "A lista Forbes serve como rede de segurança para revisão manual de candidatos não capturados pelo método posicional, não como fonte primária de controle.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-protocol-date",
+    "value": "O protocolo estabelece 4 de outubro de 2026 como data de referência.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-reject-interlocks",
+    "value": "Interlocks de conselho são rejeitados como proxy de propriedade porque identificam conexões entre elites, não controle acionário (Useem 1979, p. 555).",
+    "source": {
+      "publisher": "Useem, M. (1979). The Social Organization of the American Business Elite",
+      "locator": "https://doi.org/10.2307/2094593",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-reject-wikipedia-forbes",
+    "value": "Wikipedia e Forbes são rejeitados como fontes primárias porque não documentam cadeia de controle acionário.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-reject-tse-volume",
+    "value": "Volume de doações TSE é rejeitado como critério de elite porque doação política não determina propriedade empresarial.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  }
+]

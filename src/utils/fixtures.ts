@@ -6,6 +6,7 @@ import rfPartnerEdgesData from '../../test/fixtures/rf-partner-edges.json';
 import cvmFreControlData from '../../test/fixtures/cvm-fre-control.json';
 import donationsData from '../../test/fixtures/donations.json';
 import candidatesData from '../../test/fixtures/candidates.json';
+import methodologyFactsData from '../../test/fixtures/methodology-facts.json';
 import fs from 'fs';
 import path from 'path';
 
@@ -234,4 +235,8 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
   // Replace non-breaking spaces with regular spaces for consistent testing
   return formatted.replace(/\u00A0/g, ' ');
+}
+
+export function getMethodologyFacts(): Fact[] {
+  return methodologyFactsData.filter(fact => fact.source !== undefined);
 }
