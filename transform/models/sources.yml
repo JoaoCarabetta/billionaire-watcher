@@ -49,7 +49,7 @@ sources:
   - name: gcs_cvm
     description: CVM files on GCS (latin-1, semicolon-delimited)
     database: billionairewatcher
-    schema: billionaire_watcher_staging_external
+    schema: billionaire_watcher_raw
     tables:
       - name: fre_posicao_acionaria_2026
         description: CVM FRE shareholder position 2026 (external table from GCS)
