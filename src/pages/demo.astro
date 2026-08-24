@@ -1,0 +1,84 @@
+---
+import FactWithCitation from '../components/FactWithCitation.astro';
+import DerivedAssociation from '../components/DerivedAssociation.astro';
+import Citations from '../components/Citations.astro';
+import { getFacts, getDerivedAssociations } from '../utils/fixtures';
+
+const facts = getFacts();
+const associations = getDerivedAssociations();
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Citation Seam</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        color: #1a1a1a;
+      }
+      
+      section {
+        margin: 2rem 0;
+      }
+      
+      section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #1a1a1a;
+      }
+      
+      a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Citation Seam Demo</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>Fatos Verificados</h2>
+        {facts.map((fact, index) => (
+          <FactWithCitation fact={fact} citationNumber={index + 1} />
+        ))}
+      </section>
+
+      {associations.length > 0 && (
+        <section>
+          <h2>Associações Derivadas</h2>
+          {associations.map((association) => (
+            <DerivedAssociation association={association} factsStartIndex={0} />
+          ))}
+        </section>
+      )}
+
+      <Citations facts={facts} />
+    </main>
+  </body>
+</html>
