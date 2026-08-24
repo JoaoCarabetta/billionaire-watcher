@@ -1,0 +1,24 @@
+[
+  {
+    "cpf": "555.666.777-88",
+    "name": "Carlos Rodrigues",
+    "numero": "1234",
+    "in_freeze": false,
+    "wikipedia_url": "https://pt.wikipedia.org/wiki/Carlos_Rodrigues_(político)",
+    "tse_url": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2022/2/BR/555666777-88"
+  },
+  {
+    "cpf": "777.888.999-00",
+    "name": "Fernanda Almeida",
+    "numero": "5678",
+    "in_freeze": false,
+    "tse_url": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2020/2/BR/777888999-00"
+  },
+  {
+    "cpf": "123.456.789-00",
+    "name": "João Silva",
+    "numero": null,
+    "in_freeze": true,
+    "person_id": "p1"
+  }
+]

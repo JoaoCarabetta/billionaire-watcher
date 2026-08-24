@@ -7,7 +7,11 @@ import {
   getFreeze, 
   getIdentityFactsByPersonId,
   getRFPartnerEdgesByPersonId,
-  getCVMFREControlsByPersonId
+  getCVMFREControlsByPersonId,
+  getDonationsByPersonId,
+  getCandidateByCpf,
+  formatCurrency,
+  redactCPF
 } from '../../utils/fixtures';
 import type { Person, Source } from '../../types';
 
@@ -28,6 +32,7 @@ const { person } = Astro.props;
 const identityFacts = getIdentityFactsByPersonId(person.person_id);
 const rfPartnerEdges = getRFPartnerEdgesByPersonId(person.person_id);
 const cvmFreControls = getCVMFREControlsByPersonId(person.person_id);
+const donations = getDonationsByPersonId(person.person_id);
 
 // Find name fact for title, or fallback to freeze CSV name as index chrome
 const nameFact = identityFacts.find(f => f.field === 'nome');
@@ -41,7 +46,8 @@ let nextCitationNumber = 1;
 const allSources: Source[] = [
   ...identityFacts.filter(f => f.source).map(f => f.source!),
   ...rfPartnerEdges.filter(e => e.source).map(e => e.source),
-  ...cvmFreControls.filter(c => c.source).map(c => c.source)
+  ...cvmFreControls.filter(c => c.source).map(c => c.source),
+  ...donations.map(d => d.source)
 ];
 
 // Assign numbers to unique sources by first appearance
@@ -129,6 +135,45 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
         color: #856404;
         margin-top: 0.5rem;
       }
+      
+      .donations-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .donation-item {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-left: 3px solid #28a745;
+        border-radius: 2px;
+      }
+      
+      .donation-vehicle {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+      }
+      
+      .donation-details {
+        font-size: 1rem;
+      }
+      
+      .donation-amount {
+        font-weight: 600;
+        color: #28a745;
+      }
+      
+      .donation-cycle {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      
+      .citation-marker {
+        color: #0066cc;
+        font-weight: bold;
+        margin-left: 0.1em;
+      }
     </style>
   </head>
   <body>
@@ -181,6 +226,44 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
           <h2>Controle Acionário</h2>
           <div class="missing-control">
             Informações sobre controle acionário não identificadas nos registros públicos da CVM (Formulário de Referência).
+          </div>
+        </section>
+      )}
+
+      {donations.length > 0 && (
+        <section>
+          <h2>Doações Políticas</h2>
+          <div class="donations-list">
+            {donations.map((donation) => {
+              const candidate = getCandidateByCpf(donation.candidate_cpf);
+              const citationNumber = getCitationNumber(donation.source);
+              
+              return (
+                <div class="donation-item">
+                  {donation.donor_type === 'cnpj' && (
+                    <p class="donation-vehicle">
+                      Via: <strong>{donation.donor_name}</strong>
+                    </p>
+                  )}
+                  <p class="donation-details">
+                    <span class="donation-amount">{formatCurrency(donation.amount)}</span>
+                    {' para '}
+                    {candidate?.in_freeze && candidate.person_id ? (
+                      <a href={`/pessoa/${candidate.person_id}`}>{redactCPF(donation.candidate_name)}</a>
+                    ) : candidate?.wikipedia_url ? (
+                      <a href={candidate.wikipedia_url} target="_blank" rel="noopener noreferrer">{redactCPF(donation.candidate_name)}</a>
+                    ) : candidate?.tse_url ? (
+                      <a href={candidate.tse_url} target="_blank" rel="noopener noreferrer">{redactCPF(donation.candidate_name)}</a>
+                    ) : (
+                      <span>{redactCPF(donation.candidate_name)}</span>
+                    )}
+                    {' '}
+                    <span class="donation-cycle">({donation.cycle})</span>
+                    <sup class="citation-marker">[{citationNumber}]</sup>
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
