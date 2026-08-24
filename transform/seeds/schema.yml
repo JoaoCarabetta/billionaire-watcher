@@ -37,3 +37,53 @@ seeds:
         description: 8-digit CNPJ base (STRING with leading zeros)
         tests:
           - not_null
+          
+  - name: forbes_billionaires_brazil_nexus
+    description: |
+      Forbes World's Billionaires with Brazil-operations nexus (FIXTURE/SEED ONLY, NOT LIVE FORBES DATA).
+      Test data for Forbes safety-net logic. Does not contain real Forbes billionaires or actual USD wealth estimates.
+      Safety-net AFTER positional freeze. Add as candidato_forbes + freeze_status=review when:
+      - On Forbes World's Billionaires list
+      - Brazil-operations nexus = true
+      - cnpj_basico is NOT NULL (identified Brazil-operating group)
+      - NOT already in positional freeze
+      - Documentable control of Brazil-operating group (group MAY be outside top-50)
+      Do NOT add celebrities/athletes unless they control a Brazil-operating group.
+      GAP-FORBES-BR-URL: no separate Forbes Brazil methodology URL; global list + Brazil-nexus filter.
+    config:
+      column_types:
+        person_name: STRING
+        forbes_year: INT64
+        estimated_wealth_usd_billions: FLOAT64
+        brazil_operations_nexus: BOOLEAN
+        control_doc_available: BOOLEAN
+        cnpj_basico: STRING
+        notes: STRING
+        source_doc: STRING
+    columns:
+      - name: person_name
+        description: Natural person name from Forbes list (FIXTURE TEST DATA, not real names)
+        tests:
+          - not_null
+      - name: forbes_year
+        description: Forbes list year
+        tests:
+          - not_null
+      - name: estimated_wealth_usd_billions
+        description: Forbes estimated wealth in USD billions (FIXTURE TEST DATA, not real estimates)
+      - name: brazil_operations_nexus
+        description: Has Brazil-operations nexus (required=true to add; must also have cnpj_basico)
+        tests:
+          - not_null
+      - name: control_doc_available
+        description: Control document available (does NOT auto-promote to freeze_status=in even when true)
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: 8-digit CNPJ base of controlled group (STRING with leading zeros; REQUIRED to add Forbes row, may be null for excluded cases)
+      - name: notes
+        description: Notes about the Forbes candidate (must use Forbes formula, not "o bilionário X")
+        tests:
+          - not_null
+      - name: source_doc
+        description: Source document citation

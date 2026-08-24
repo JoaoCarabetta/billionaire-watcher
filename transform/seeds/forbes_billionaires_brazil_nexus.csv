@@ -1,0 +1,7 @@
+person_name,forbes_year,estimated_wealth_usd_billions,brazil_operations_nexus,control_doc_available,cnpj_basico,notes,source_doc
+Test Forbes Person,2026,5.0,true,false,11111111,Consta da lista Forbes 2026 (fixture for testing).,Forbes 2026 fixture
+Forbes With Control Doc,2026,10.0,true,true,22222222,Consta da lista Forbes 2026 com controle documentado (fixture).,Forbes 2026 fixture; FRE 6.1 fixture
+Celebrity Athlete,2026,1.0,false,false,,Celebrity athlete. No documentable control. (fixture for exclusion test),Forbes 2026 fixture
+Already In Freeze,2026,8.0,true,true,33333333,Consta da lista Forbes 2026 (fixture for duplicate test).,Forbes 2026 fixture
+Forbes Person Clean,2026,6.0,true,false,44444444,Consta da lista Forbes 2026 com patrimônio estimado (fixture).,Forbes 2026 fixture
+Forbes Nexus No CNPJ,2026,8.5,true,false,,Consta da lista Forbes 2026. Brazil-nexus via investments but no documentable control of identified Brazil-operating group (fixture for Saverin-style exclusion test).,Forbes 2026 fixture

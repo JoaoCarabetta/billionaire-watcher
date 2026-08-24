@@ -47,7 +47,33 @@ Freeze walk models implementing grupo × pessoa natural × papel per issue #22 s
 | `int_freeze_soe` | SOE groups with skip_soe status | cnpj_basico |
 | `int_freeze_unlisted_rf` | Unlisted controllers from RF QSA | (cnpj_basico, person_name) |
 | `int_freeze_foreign_hq` | Foreign HQ groups (hole unless publicly named) | cnpj_basico |
-| `freeze_persons` | Final freeze table | (group_rank, person_name, role) |
+| `freeze_persons` | Final freeze table (positional freeze) | (group_rank, person_name, role) |
+| `int_forbes_candidates` | Forbes safety-net candidates | person_name |
+| `freeze_persons_with_forbes` | Final freeze + Forbes safety-net | (group_rank, person_name, role) |
+
+### Forbes Safety-Net (Issue #26)
+
+Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_status=review` AFTER the positional freeze. Forbes rows are ADDITIVE on top of `freeze_persons`.
+
+**Input Source:** The `forbes_billionaires_brazil_nexus` seed is **FIXTURE DATA ONLY** for testing Forbes safety-net logic. It does NOT contain real Forbes billionaires, actual USD wealth estimates, or live Forbes data. Do NOT use this seed as a live Forbes extract.
+
+**Add ONLY if ALL of:**
+- On Forbes World's Billionaires (seed/fixture, not live scrape)
+- Brazil-operations nexus = true
+- cnpj_basico is NOT NULL (identified Brazil-operating group; group MAY be outside top-50)
+- NOT already in positional freeze
+- Documentable control of Brazil-operating group
+
+**Do NOT add:**
+- Celebrities/athletes without group control
+- Dispersed family fortunes
+- Monarchs/office-tied wealth
+- Wikipedia names without control documentation
+- Brazil-nexus without identified cnpj_basico (Saverin-style: nexus but no documentable group control)
+
+**No auto-promotion:** Models do NOT auto-promote to `freeze_status=in` even when control_doc is available. Humans promote after review.
+
+**GAP-FORBES-BR-URL:** No separate Forbes Brazil methodology URL exists. The global Forbes World's Billionaires list is used with a Brazil-nexus filter applied in the fixture/seed.
 
 **Key Constraints:**
 - LISTED: Walk FRE 6.1 Acionista_Controlador=S to natural persons
