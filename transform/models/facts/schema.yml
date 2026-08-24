@@ -1,0 +1,182 @@
+version: 2
+
+models:
+  - name: int_match_freeze_to_control_edges
+    description: |
+      Match freeze persons to control-chain CNPJs from RF socios.
+      Maps freeze_persons_with_forbes → RF edges.
+      DO NOT name-only add people. DO NOT scan full Brazil RF.
+      Only matches persons already in freeze with cnpj_basico.
+    columns:
+      - name: person_name
+        description: Natural person name from freeze
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: control_edge_id
+        description: Unique identifier for control edge
+        tests:
+          - not_null
+
+  - name: identity_facts
+    description: |
+      Identity facts for freeze persons (name, role, group affiliation).
+      One fact per identity field per person.
+      Published facts ONLY for freeze_status=in.
+    columns:
+      - name: fact_id
+        description: Unique identifier for the fact
+        tests:
+          - not_null
+          - unique
+      - name: person_name
+        description: Natural person name
+        tests:
+          - not_null
+      - name: fact_kind
+        description: Must be 'identity' for identity facts
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['identity']
+      - name: source_locator
+        description: Source document locator (never null)
+        tests:
+          - not_null
+      - name: cpf_masked
+        description: Masked CPF only (no full CPF)
+    tests:
+      - dbt_utils.expression_is_true:
+          name: identity_facts_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+      - dbt_utils.expression_is_true:
+          name: identity_facts_no_bilionario_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
+
+  - name: control_edge_facts
+    description: |
+      Control edge facts from RF partner relationships.
+      One fact per control relationship (person → company).
+      Published facts ONLY for freeze_status=in.
+    columns:
+      - name: fact_id
+        description: Unique identifier for the fact
+        tests:
+          - not_null
+          - unique
+      - name: person_name
+        description: Natural person name
+        tests:
+          - not_null
+      - name: fact_kind
+        description: Must be 'control_edge' for control edge facts
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['control_edge']
+      - name: source_locator
+        description: Source document locator (never null)
+        tests:
+          - not_null
+      - name: edge_label
+        description: Edge type (never dono/UBO)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['acionista_controlador', 'socio', 'administrador', null]
+    tests:
+      - dbt_utils.expression_is_true:
+          name: control_edge_no_dono_or_ubo
+          config:
+            severity: error
+          arguments:
+            expression: "edge_label not in ('dono', 'UBO', 'ubo', 'Dono')"
+      - dbt_utils.expression_is_true:
+          name: control_edge_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+      - dbt_utils.expression_is_true:
+          name: control_edge_no_bilionario_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
+
+  - name: published_facts
+    description: |
+      Union of all published facts (identity + control edges).
+      ONLY freeze_status=in persons. review/hole/skip_soe/candidato_forbes do NOT publish.
+      
+      TDD SEAMS (must fail if violated):
+      1. fact_id unique
+      2. source_locator not_null
+      3. relationship: every published fact's person is in freeze with freeze_status=in
+      4. review / hole / skip_soe / candidato_forbes produce zero published facts
+      5. no edge_label/value dono or UBO
+      6. no full CPF in fact columns/values
+      7. no "o bilionário" / "o bilionário X" in fact values
+    columns:
+      - name: fact_id
+        description: Unique identifier for the fact
+        tests:
+          - not_null
+          - unique
+      - name: person_id
+        description: Person identifier (same as person_name from freeze)
+        tests:
+          - not_null
+      - name: fact_kind
+        description: Fact type (identity | control_edge)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['identity', 'control_edge']
+      - name: value
+        description: Fact value/claim (no "o bilionário X")
+        tests:
+          - not_null
+      - name: source_publisher
+        description: Source publisher name
+        tests:
+          - not_null
+      - name: source_locator
+        description: Source document locator (never null)
+        tests:
+          - not_null
+      - name: source_retrieved_at
+        description: Source retrieval timestamp
+        tests:
+          - not_null
+      - name: cpf_masked
+        description: Masked CPF only (no full CPF)
+    tests:
+      - dbt_utils.expression_is_true:
+          name: published_facts_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+      - dbt_utils.expression_is_true:
+          name: published_facts_no_bilionario_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
+      - dbt_utils.expression_is_true:
+          name: published_facts_no_dono_or_ubo_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%dono%' and value not like '%UBO%' and value not like '%Dono%'"

@@ -2,6 +2,7 @@ target/
 dbt_packages/
 logs/
 profiles.yml
+.user.yml
 *.pyc
 __pycache__/
 .DS_Store
