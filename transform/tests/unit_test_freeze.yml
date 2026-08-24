@@ -477,6 +477,335 @@ unit_tests:
           person_name: 'João Silva'
           cpf_masked: '***123456**'
 
+  # WALK BUG FIX: Listed group with PF controllers must not emit holes
+  - name: test_freeze_listed_no_hole_when_pf_exists
+    description: |
+      WALK BUG FIX: A listed group that has PF controllers (freeze_status=in)
+      must NOT also emit hole rows. Each group emits either:
+      - One or more 'in' rows (one per named PF), OR
+      - Exactly one 'hole' row (if zero named PF).
+      A group with 44 'in' rows must not also have 133 'hole' rows (WEG counterexample).
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 41
+            empresa: 'WEG'
+            razao_social: 'WEG S.A.'
+            cnpj_basico: '84429695'
+            cnpj_full: '84429695000111'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          # Named PF controller 1
+          - CNPJ_Companhia: '84429695000111'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'WEG S.A.'
+            ID_Acionista: 100
+            Acionista: 'Controller PF 1'
+            Tipo_Pessoa_Acionista: 'PF'
+            CPF_CNPJ_Acionista: '***111111**'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 500
+            Percentual_Acao_Ordinaria_Circulacao: 25.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 500
+            Percentual_Total_Acoes_Circulacao: 25.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SC'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'S'
+          # Named PF controller 2
+          - CNPJ_Companhia: '84429695000111'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'WEG S.A.'
+            ID_Acionista: 101
+            Acionista: 'Controller PF 2'
+            Tipo_Pessoa_Acionista: 'PF'
+            CPF_CNPJ_Acionista: '***222222**'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 500
+            Percentual_Acao_Ordinaria_Circulacao: 25.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 500
+            Percentual_Total_Acoes_Circulacao: 25.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SC'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'S'
+          # PJ controller without named PF (would be a hole in old logic)
+          - CNPJ_Companhia: '84429695000111'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'WEG S.A.'
+            ID_Acionista: 200
+            Acionista: 'Controller PJ'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '12345678000100'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 200
+            Percentual_Acao_Ordinaria_Circulacao: 10.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 200
+            Percentual_Total_Acoes_Circulacao: 10.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SC'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'N'
+    expect:
+      rows:
+        # Should emit exactly 2 'in' rows (the named PFs)
+        - group_rank: 41
+          person_name: 'Controller PF 1'
+          freeze_status: 'in'
+          hole: false
+        - group_rank: 41
+          person_name: 'Controller PF 2'
+          freeze_status: 'in'
+          hole: false
+        # Should NOT emit any hole rows because this group has named PFs
+
+  # WALK BUG FIX: Listed group with zero PF emits exactly one hole
+  - name: test_freeze_listed_one_hole_when_zero_pf
+    description: |
+      WALK BUG FIX: A listed group with zero named PF controllers
+      emits exactly ONE hole row, even if FRE has multiple PJ controller lines.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 29
+            empresa: 'Equatorial'
+            razao_social: 'Equatorial S.A.'
+            cnpj_basico: '03220438'
+            cnpj_full: '03220438000173'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          # Multiple PJ controllers without named PF
+          - CNPJ_Companhia: '03220438000173'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'Equatorial S.A.'
+            ID_Acionista: 300
+            Acionista: 'PJ Controller 1'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '11111111000100'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 300
+            Percentual_Acao_Ordinaria_Circulacao: 30.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 300
+            Percentual_Total_Acoes_Circulacao: 30.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'MA'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'N'
+          - CNPJ_Companhia: '03220438000173'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'Equatorial S.A.'
+            ID_Acionista: 301
+            Acionista: 'PJ Controller 2'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '22222222000100'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 200
+            Percentual_Acao_Ordinaria_Circulacao: 20.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 200
+            Percentual_Total_Acoes_Circulacao: 20.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'MA'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'N'
+    expect:
+      rows:
+        # Should emit exactly ONE hole row, not two
+        - group_rank: 29
+          person_name: null
+          freeze_status: 'hole'
+          hole: true
+
+  # UNION ALL typing fix: freeze_persons compiles with typed NULLs
+  - name: test_freeze_persons_union_all_typed_nulls
+    description: |
+      UNION ALL TYPING FIX: freeze_persons UNION ALL must compile without BigQuery.
+      All NULL columns must be explicitly typed to avoid untyped NULL errors.
+      Test that all four arms (listed, soe, unlisted, foreign) union correctly.
+    model: freeze_persons
+    given:
+      - input: ref('int_freeze_listed_controllers')
+        rows:
+          - group_rank: 1
+            group_name: 'Listed Test'
+            cnpj_basico: '11111111'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: true
+            soe_flag: false
+            controlador_tipo: 'listed'
+            person_name: 'Person A'
+            role: 'controlador'
+            edge_label: 'acionista_controlador'
+            acordo_acionistas: null
+            source_doc: 'CVM FRE 2026'
+            fre_item: '6.1'
+            hole: false
+            cpf_masked: '***111111**'
+            freeze_status: 'in'
+            notes: 'Listed test'
+      - input: ref('int_freeze_soe')
+        rows:
+          - group_rank: 2
+            group_name: 'SOE Test'
+            cnpj_basico: '22222222'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: true
+            soe_flag: true
+            controlador_tipo: 'soe'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'Carta Anual'
+            fre_item: null
+            hole: false
+            cpf_masked: null
+            freeze_status: 'skip_soe'
+            notes: 'Federal SOE'
+      - input: ref('int_freeze_unlisted_rf')
+        rows:
+          - group_rank: 3
+            group_name: 'Unlisted Test'
+            cnpj_basico: '33333333'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: false
+            soe_flag: false
+            controlador_tipo: 'unlisted'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'RF QSA'
+            fre_item: null
+            hole: true
+            cpf_masked: null
+            freeze_status: 'hole'
+            notes: 'Unlisted hole'
+      - input: ref('int_freeze_foreign_hq')
+        rows:
+          - group_rank: 4
+            group_name: 'Foreign Test'
+            cnpj_basico: '44444444'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: false
+            soe_flag: false
+            controlador_tipo: 'foreign'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'Valor'
+            fre_item: null
+            hole: true
+            cpf_masked: null
+            freeze_status: 'hole'
+            notes: 'Foreign HQ'
+    expect:
+      rows:
+        - group_rank: 1
+          person_name: 'Person A'
+          freeze_status: 'in'
+        - group_rank: 2
+          person_name: null
+          freeze_status: 'skip_soe'
+        - group_rank: 3
+          person_name: null
+          freeze_status: 'hole'
+        - group_rank: 4
+          person_name: null
+          freeze_status: 'hole'
+
+
   # SEAM 7: cnpj_basico is 8-char STRING (leading zeros)
   - name: test_freeze_cnpj_basico_leading_zeros
     description: |
