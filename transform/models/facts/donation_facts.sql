@@ -15,7 +15,7 @@ with freeze_persons as (
 tse_2026 as (
     select
         ano,
-        cpf_candidato,
+        nome_candidato,
         nome_doador,
         cpf_doador_masked,
         valor_receita,
@@ -26,6 +26,7 @@ tse_2026 as (
     where ano = 2026
       and fonte_receita = 'Pessoa física' -- PF only (PJ banned since 2016)
       and numero_recibo_eleitoral is not null -- Must have receipt number for source_locator
+      and nome_candidato is not null -- Must have candidate name for public facts
 ),
 
 -- Closed cycles from BD br_tse_eleicoes (2014, 2018, 2022)
@@ -35,7 +36,7 @@ tse_closed_cycles as (
     -- Unit tests: empty CTE (no live BD calls in tests)
     select
         cast(null as int64) as ano,
-        cast(null as string) as cpf_candidato,
+        cast(null as string) as nome_candidato,
         cast(null as string) as nome_doador,
         cast(null as string) as cpf_doador_masked,
         cast(null as float64) as valor_receita,
@@ -47,7 +48,7 @@ tse_closed_cycles as (
     -- Production: query BD for closed cycles
     select
         ano,
-        cpf_candidato,
+        nome_candidato,
         nome_doador,
         cpf_cnpj_doador as cpf_doador_masked,
         valor_receita,
@@ -58,6 +59,7 @@ tse_closed_cycles as (
     where ano in (2014, 2018, 2022)
       and fonte_receita = 'Pessoa física' -- PF only
       and numero_recibo_eleitoral is not null
+      and nome_candidato is not null -- Must have candidate name for public facts
     {% endif %}
 ),
 
@@ -75,7 +77,7 @@ matched_donations as (
         f.cnpj_basico,
         f.group_name,
         d.ano,
-        d.cpf_candidato,
+        d.nome_candidato,
         d.nome_doador,
         d.valor_receita,
         d.tipo_receita,
@@ -99,9 +101,9 @@ donation_facts_base as (
             person_name,
             ' doou R$ ',
             cast(valor_receita as string),
-            ' para candidato (CPF ',
-            cpf_candidato,
-            ') em ',
+            ' para ',
+            nome_candidato,
+            ' em ',
             cast(ano as string),
             ' (recibo ',
             numero_recibo_eleitoral,

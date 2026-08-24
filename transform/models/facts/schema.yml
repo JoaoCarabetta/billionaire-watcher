@@ -186,7 +186,9 @@ models:
       5. no edge_label/value dono or UBO
       6. no full CPF in fact columns/values
       7. no "o bilionário" / "o bilionário X" in fact values
-      8. association without supporting fact_ids does NOT emit
+      8. no candidate CPF in value or fact_id
+      9. association without supporting fact_ids does NOT emit
+      10. association publishes on both freeze persons (two rows per association)
     columns:
       - name: fact_id
         description: Unique identifier for the fact
@@ -205,7 +207,7 @@ models:
               arguments:
                 values: ['identity', 'control_edge', 'donation', 'association']
       - name: value
-        description: Fact value/claim (no "o bilionário X")
+        description: Fact value/claim (no "o bilionário X", no candidate CPF)
         tests:
           - not_null
       - name: source_publisher
@@ -222,6 +224,8 @@ models:
           - not_null
       - name: cpf_masked
         description: Masked CPF only (no full CPF)
+      - name: supporting_fact_ids
+        description: Array of fact_ids that support this association (null for identity/control/donation)
     tests:
       - dbt_utils.expression_is_true:
           name: published_facts_no_full_cpf

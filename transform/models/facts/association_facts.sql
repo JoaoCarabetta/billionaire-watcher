@@ -26,10 +26,10 @@ donation_facts as (
     select
         fact_id,
         person_name,
-        -- Extract candidate CPF and year from source_locator
+        -- Extract year from source_locator
         -- Format: "TSE Receitas Candidato {ano} recibo {numero_recibo_eleitoral}"
         regexp_extract(source_locator, r'TSE Receitas Candidato (\d{4})') as ano,
-        -- Extract receipt to join back to seed for candidate CPF
+        -- Extract receipt to join back to seed for candidate name
         regexp_extract(source_locator, r'recibo (\S+)') as numero_recibo_eleitoral
     from {{ ref('donation_facts') }}
     where source_locator like 'TSE Receitas%'
@@ -41,7 +41,7 @@ donation_facts_enriched as (
         d.fact_id,
         d.person_name,
         d.ano,
-        t.cpf_candidato
+        t.nome_candidato
     from donation_facts d
     inner join {{ ref('tse_donations_2026') }} t
         on d.numero_recibo_eleitoral = t.numero_recibo_eleitoral
@@ -72,25 +72,51 @@ co_donation_pairs as (
         d1.person_name as person1,
         d2.person_name as person2,
         d1.ano,
-        d1.cpf_candidato,
+        d1.nome_candidato,
         array_agg(d1.fact_id order by d1.fact_id) as person1_fact_ids,
         array_agg(d2.fact_id order by d2.fact_id) as person2_fact_ids
     from donation_facts_enriched d1
     inner join donation_facts_enriched d2
-        on d1.cpf_candidato = d2.cpf_candidato
+        on d1.nome_candidato = d2.nome_candidato
         and d1.ano = d2.ano
         and d1.person_name < d2.person_name -- Avoid duplicates, ensure ordering
     inner join freeze_persons f1 on d1.person_name = f1.person_name
     inner join freeze_persons f2 on d2.person_name = f2.person_name
-    group by d1.person_name, d2.person_name, d1.ano, d1.cpf_candidato
+    group by d1.person_name, d2.person_name, d1.ano, d1.nome_candidato
     having count(*) > 0 -- Must have at least one donation fact each
 ),
 
 -- Union shared control and co-donation associations
+-- Each association publishes TWO rows (one for each person)
+-- fact_id includes person_name to ensure uniqueness
 shared_control_associations as (
+    -- Person1's row
     select
-        concat('association_shared_control_', person1, '_', person2, '_', cnpj_basico) as fact_id,
+        concat('association_shared_control_', person1, '_', person2, '_', cnpj_basico, '_for_', person1) as fact_id,
         person1 as person_name,
+        'association' as fact_kind,
+        concat(
+            person1,
+            ' e ',
+            person2,
+            ' compartilham controle de empresa CNPJ ',
+            cnpj_basico
+        ) as value,
+        'Billionaire Watcher (derived)' as source_publisher,
+        concat(
+            'Derived from control facts: ',
+            array_to_string(array_concat(person1_fact_ids, person2_fact_ids), ', ')
+        ) as source_locator,
+        null as source_retrieved_at,
+        array_concat(person1_fact_ids, person2_fact_ids) as supporting_fact_ids
+    from shared_control_pairs
+    
+    union all
+    
+    -- Person2's row (different fact_id, same supporting_fact_ids)
+    select
+        concat('association_shared_control_', person1, '_', person2, '_', cnpj_basico, '_for_', person2) as fact_id,
+        person2 as person_name,
         'association' as fact_kind,
         concat(
             person1,
@@ -110,17 +136,43 @@ shared_control_associations as (
 ),
 
 co_donation_associations as (
+    -- Person1's row
     select
-        concat('association_co_donation_', person1, '_', person2, '_', ano, '_', cpf_candidato) as fact_id,
+        concat('association_co_donation_', person1, '_', person2, '_', ano, '_', nome_candidato, '_for_', person1) as fact_id,
         person1 as person_name,
         'association' as fact_kind,
         concat(
             person1,
             ' e ',
             person2,
-            ' doaram para o mesmo candidato (CPF ',
-            cpf_candidato,
-            ') em ',
+            ' doaram para ',
+            nome_candidato,
+            ' em ',
+            ano
+        ) as value,
+        'Billionaire Watcher (derived)' as source_publisher,
+        concat(
+            'Derived from donation facts: ',
+            array_to_string(array_concat(person1_fact_ids, person2_fact_ids), ', ')
+        ) as source_locator,
+        null as source_retrieved_at,
+        array_concat(person1_fact_ids, person2_fact_ids) as supporting_fact_ids
+    from co_donation_pairs
+    
+    union all
+    
+    -- Person2's row (different fact_id, same supporting_fact_ids)
+    select
+        concat('association_co_donation_', person1, '_', person2, '_', ano, '_', nome_candidato, '_for_', person2) as fact_id,
+        person2 as person_name,
+        'association' as fact_kind,
+        concat(
+            person1,
+            ' e ',
+            person2,
+            ' doaram para ',
+            nome_candidato,
+            ' em ',
             ano
         ) as value,
         'Billionaire Watcher (derived)' as source_publisher,

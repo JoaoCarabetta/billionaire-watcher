@@ -13,7 +13,8 @@ with identity_facts as (
         source_retrieved_at,
         cpf_masked,
         cnpj_basico,
-        group_name
+        group_name,
+        cast(null as array<string>) as supporting_fact_ids
     from {{ ref('identity_facts') }}
 ),
 
@@ -28,7 +29,8 @@ control_edge_facts as (
         source_retrieved_at,
         cpf_masked,
         cnpj_basico,
-        group_name
+        group_name,
+        cast(null as array<string>) as supporting_fact_ids
     from {{ ref('control_edge_facts') }}
 ),
 
@@ -43,7 +45,8 @@ donation_facts as (
         source_retrieved_at,
         cpf_masked,
         cnpj_basico,
-        group_name
+        group_name,
+        cast(null as array<string>) as supporting_fact_ids
     from {{ ref('donation_facts') }}
 ),
 
@@ -58,7 +61,8 @@ association_facts as (
         source_retrieved_at,
         cpf_masked,
         cnpj_basico,
-        group_name
+        group_name,
+        supporting_fact_ids
     from {{ ref('association_facts') }}
 ),
 
@@ -82,7 +86,8 @@ select
     cast(source_retrieved_at as string) as source_retrieved_at,
     cpf_masked,
     cnpj_basico,
-    group_name
+    group_name,
+    supporting_fact_ids
 from all_facts
 -- Final assertion: fact_id must be unique and source must exist
 where fact_id is not null

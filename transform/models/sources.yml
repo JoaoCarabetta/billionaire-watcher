@@ -80,7 +80,9 @@ sources:
           - name: ano
             description: Election year
           - name: cpf_candidato
-            description: Candidate CPF (masked)
+            description: Candidate CPF (masked in BD, full in live TSE - NOT FOR PUBLIC FACTS)
+          - name: nome_candidato
+            description: Candidate name (public field)
           - name: cpf_cnpj_doador
             description: Donor CPF or CNPJ (masked)
           - name: nome_doador

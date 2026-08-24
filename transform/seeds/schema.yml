@@ -98,6 +98,7 @@ seeds:
       column_types:
         ano: INT64
         cpf_candidato: STRING
+        nome_candidato: STRING
         cpf_cnpj_doador: STRING
         nome_doador: STRING
         valor_receita: FLOAT64
@@ -111,7 +112,11 @@ seeds:
         tests:
           - not_null
       - name: cpf_candidato
-        description: Candidate CPF (masked)
+        description: Candidate CPF (masked, NOT FOR PUBLIC FACTS - use nome_candidato)
+        tests:
+          - not_null
+      - name: nome_candidato
+        description: Candidate name (public field for facts)
         tests:
           - not_null
       - name: cpf_cnpj_doador
