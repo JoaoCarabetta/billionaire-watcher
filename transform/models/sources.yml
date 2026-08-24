@@ -1,0 +1,70 @@
+version: 2
+
+sources:
+  - name: br_me_cnpj
+    description: Base dos Dados - Receita Federal CNPJ tables
+    database: basedosdados
+    schema: br_me_cnpj
+    tables:
+      - name: socios
+        description: RF CNPJ sócios (partners), partitioned by data
+        columns:
+          - name: data
+            description: Partition date
+          - name: cnpj_basico
+            description: 8-digit CNPJ base (STRING with leading zeros)
+          - name: tipo
+            description: Partner type (PJ/PF)
+          - name: nome
+            description: Partner name
+          - name: documento
+            description: CPF or CNPJ (masked per BD)
+          - name: qualificacao
+            description: Partner qualification code
+          
+      - name: empresas
+        description: RF CNPJ empresas (companies), partitioned by data
+        columns:
+          - name: data
+            description: Partition date
+          - name: cnpj_basico
+            description: 8-digit CNPJ base (STRING with leading zeros)
+          - name: razao_social
+            description: Company legal name
+          - name: natureza_juridica
+            description: Legal nature code
+          - name: capital_social
+            description: Share capital
+          
+      - name: estabelecimentos
+        description: RF CNPJ estabelecimentos (establishments), partitioned by data
+        columns:
+          - name: data
+            description: Partition date
+          - name: cnpj_basico
+            description: 8-digit CNPJ base (STRING with leading zeros)
+          - name: cnpj
+            description: 14-digit full CNPJ (STRING with leading zeros)
+
+  - name: gcs_cvm
+    description: CVM files on GCS (latin-1, semicolon-delimited)
+    database: billionairewatcher
+    schema: billionaire_watcher_staging_external
+    tables:
+      - name: fre_posicao_acionaria_2026
+        description: CVM FRE shareholder position 2026 (external table from GCS)
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_posicao_acionaria_2026.csv
+            encoding: ISO-8859-1
+            field_delimiter: ";"
+            skip_leading_rows: 1
+          
+      - name: cad_cia_aberta
+        description: CVM registered listed companies (external table from GCS)
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
+            encoding: ISO-8859-1
+            field_delimiter: ";"
+            skip_leading_rows: 1

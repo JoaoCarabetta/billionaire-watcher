@@ -1,0 +1,14 @@
+# Example dbt profiles.yml for billionaire_watcher
+# Copy this to ~/.dbt/profiles.yml and fill in your GCP credentials
+
+billionaire_watcher:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: billionairewatcher
+      dataset: billionaire_watcher
+      location: US
+      threads: 4
+      timeout_seconds: 300

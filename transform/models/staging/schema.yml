@@ -1,0 +1,164 @@
+version: 2
+
+models:
+  - name: stg_rf_socios
+    description: |
+      RF CNPJ sócios (partners) staging model.
+      Restricted to freeze-chain CNPJs and partition date 2026-01-11.
+      
+      CRITICAL: RF partner edges represent sócio relationships, NEVER dono/UBO.
+      The RF QSA does not compute beneficial ownership. Any dono/UBO interpretation
+      must be derived from other sources (e.g., CVM FRE 6.1), not inferred from
+      this table. Do not add edge_label or similar fields that could introduce
+      UBO assumptions.
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: data
+        description: Partition date (2026-01-11 for this freeze)
+        tests:
+          - not_null
+      - name: tipo
+        description: Partner type (PJ=legal entity, PF=natural person)
+      - name: documento
+        description: CPF or CNPJ (masked per Base dos Dados). DO NOT expand masked CPFs.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+          arguments:
+            combination_of_columns:
+              - cnpj_basico
+              - tipo
+              - nome
+              - documento
+
+  - name: stg_rf_empresas
+    description: |
+      RF CNPJ empresas (companies) staging model.
+      Restricted to freeze-chain CNPJs and partition date 2026-01-11.
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+          - unique
+      - name: data
+        description: Partition date (2026-01-11 for this freeze)
+        tests:
+          - not_null
+      - name: razao_social
+        description: Company legal name
+        tests:
+          - not_null
+
+  - name: stg_rf_estabelecimentos
+    description: |
+      RF CNPJ estabelecimentos (establishments) staging model.
+      Restricted to freeze-chain CNPJs and partition date 2026-01-11.
+    columns:
+      - name: cnpj
+        description: 14-digit full CNPJ (STRING with leading zeros)
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: data
+        description: Partition date (2026-01-11 for this freeze)
+        tests:
+          - not_null
+
+  - name: stg_group_flags
+    description: |
+      Top-50 billionaire watcher group flags.
+      Source: data/valor1000-2025/top50-flags.csv
+      
+      cnpj_basico is 8-digit STRING with leading zeros.
+      cnpj_full is 14-digit STRING with leading zeros (full CNPJ for listed issuers).
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros, e.g., '02916265' for JBS)
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_full
+        description: 14-digit full CNPJ (STRING with leading zeros, e.g., '02916265000160')
+      - name: rank_2024
+        description: Valor 1000 2024 ranking position
+        tests:
+          - not_null
+          - unique
+      - name: empresa
+        description: Company name (Valor brand)
+        tests:
+          - not_null
+      - name: razao_social
+        description: Legal name (razão social)
+
+  - name: stg_cvm_fre_posicao_acionaria_2026
+    description: |
+      CVM FRE shareholder position 2026.
+      Source: GCS gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_posicao_acionaria_2026.csv
+      
+      CNPJ_Companhia is 14-digit STRING (full CNPJ of listed issuer), not 8-digit.
+      CPF_CNPJ fields may contain masked CPFs. DO NOT expand masked CPFs for HTML output.
+    columns:
+      - name: CNPJ_Companhia
+        description: 14-digit full CNPJ of listed company (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: Data_Referencia
+        description: Reference date for this shareholder position
+        tests:
+          - not_null
+      - name: ID_Acionista
+        description: Shareholder ID
+        tests:
+          - not_null
+      - name: CPF_CNPJ_Acionista
+        description: |
+          CPF or CNPJ of shareholder (may be masked).
+          DO NOT expand masked CPFs. No full CPF on any field intended for HTML.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+          arguments:
+            combination_of_columns:
+              - CNPJ_Companhia
+              - Data_Referencia
+              - ID_Acionista
+
+  - name: stg_cvm_cad_cia_aberta
+    description: |
+      CVM registered listed companies (cadastro).
+      Source: GCS gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
+      
+      CNPJ_CIA is 14-digit STRING (full CNPJ of listed issuer), not 8-digit.
+    columns:
+      - name: CNPJ_CIA
+        description: 14-digit full CNPJ of listed company (STRING with leading zeros)
+        tests:
+          - not_null
+          - unique
+      - name: CD_CVM
+        description: CVM registration code
+        tests:
+          - not_null
+          - unique
+      - name: DENOM_SOCIAL
+        description: Legal name (denominação social)
+        tests:
+          - not_null
+      - name: SIT
+        description: Registration status (ATIVO, CANCELADA)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ATIVO', 'CANCELADA']
