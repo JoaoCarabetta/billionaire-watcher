@@ -14,7 +14,11 @@ with identity_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('identity_facts') }}
 ),
 
@@ -30,7 +34,11 @@ control_edge_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('control_edge_facts') }}
 ),
 
@@ -46,7 +54,11 @@ donation_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('donation_facts') }}
 ),
 

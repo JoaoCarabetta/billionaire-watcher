@@ -9,13 +9,19 @@ unit_tests:
   model: published_facts
   given:
   - input: ref('identity_facts')
-    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_name,\n            'identity' as fact_kind,\n            'Maria Santos' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '33000167' as cnpj_basico,\n            'Petrobras' as group_name"
+    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'Maria Santos' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '33000167' as cnpj_basico,\n            'Petrobras' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: "select\n            'fact_003' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_003' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'socio' as edge_label"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
     format: sql
   expect:
-    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_id\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_id\n          union all\n          select\n            'fact_003' as fact_id,\n            'João Silva' as person_id"
+    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_id,\n            'identity' as fact_kind,\n            'Maria Santos' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '33000167' as cnpj_basico,\n            'Petrobras' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_003' as fact_id,\n            'João Silva' as person_id,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
     format: sql
 - name: test_published_facts_source_not_null
   description: 'Seam 2: source_locator must never be null.
@@ -26,13 +32,19 @@ unit_tests:
   model: published_facts
   given:
   - input: ref('identity_facts')
-    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
     format: sql
   expect:
-    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_id,\n            'CVM FRE 2026' as source_locator"
+    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
     format: sql
 - name: test_identity_facts_only_freeze_status_in
   description: 'Seam 3: Every published fact''s person must be in freeze with freeze_status=in.
@@ -56,13 +68,19 @@ unit_tests:
   model: published_facts
   given:
   - input: ref('identity_facts')
-    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
     format: sql
   expect:
-    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_id"
+    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
     format: sql
 - name: test_control_edge_facts_no_dono_or_ubo
   description: 'Seam 5: No edge_label dono or UBO in control edge facts.
@@ -87,13 +105,19 @@ unit_tests:
   model: published_facts
   given:
   - input: ref('identity_facts')
-    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
     format: sql
   expect:
-    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_id,\n            '***456***' as cpf_masked"
+    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
     format: sql
 - name: test_published_facts_no_bilionario_phrase
   description: 'Seam 7: No "o bilionário" or "o bilionário X" in fact values.
@@ -102,13 +126,19 @@ unit_tests:
   model: published_facts
   given:
   - input: ref('identity_facts')
-    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: "select\n            'fact_control_clean' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            '2026-08-24' as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            'fact_control_clean' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'socio' as edge_label"
     format: sql
+  - input: ref('donation_facts')
+    format: sql
+    fixture: empty_donation_facts
+  - input: ref('association_facts')
+    format: sql
+    fixture: empty_association_facts
   expect:
-    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as value\n          union all\n          select\n            'fact_control_clean' as fact_id,\n            'João Silva é sócio de JBS' as value"
+    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_control_clean' as fact_id,\n            'João Silva' as person_id,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
     format: sql
 - name: test_identity_facts_no_controla_sentence
   description: 'PM Review: Identity facts must output raw fields only.
