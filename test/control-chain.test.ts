@@ -101,30 +101,54 @@ describe('Tracer: Control Chain (RF sócios + CVM FRE)', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // Find the RF partner section
+      // Find the RF partner section - must exist
       const rfSectionMatch = html.match(/<section[^>]*>[\s\S]*?empresas\s+e\s+sócios[\s\S]*?<\/section>/i);
+      expect(rfSectionMatch, 'RF section must exist in dossier').toBeTruthy();
       
-      if (rfSectionMatch) {
-        const rfSection = rfSectionMatch[0];
-        
-        // Within RF section, should not have "controlador" or "UBO" labels
-        expect(rfSection).not.toMatch(/controlador(?!a)/i); // allow "controladora" as company name
-        expect(rfSection).not.toMatch(/UBO/i);
-        expect(rfSection).not.toMatch(/beneficial owner/i);
-      }
+      const rfSection = rfSectionMatch![0];
+      
+      // Within RF section, must have "sócio" labels
+      expect(rfSection).toContain('sócio');
+      
+      // Within RF section, must NOT have "controlador", "UBO", or "dono" labels
+      expect(rfSection).not.toMatch(/\bcontrolador\b/i);
+      expect(rfSection).not.toMatch(/\bUBO\b/);
+      expect(rfSection).not.toMatch(/\bdono\b/i);
     });
 
     it('should not use "dono" for RF edges', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // Check RF partner section specifically
+      // Check RF partner section specifically - must exist
       const rfSectionMatch = html.match(/<section[^>]*>[\s\S]*?empresas\s+e\s+sócios[\s\S]*?<\/section>/i);
+      expect(rfSectionMatch, 'RF section must exist in dossier').toBeTruthy();
       
-      if (rfSectionMatch) {
-        const rfSection = rfSectionMatch[0];
-        expect(rfSection).not.toMatch(/\bdono\b/i);
-      }
+      const rfSection = rfSectionMatch![0];
+      expect(rfSection).not.toMatch(/\bdono\b/i);
+    });
+
+    it('should always display literal "sócio" even if fixture has UBO/controlador', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // p1 has an RF edge with relationship="UBO" in fixtures
+      // Must still display "sócio" in the HTML
+      const rfSectionMatch = html.match(/<section[^>]*>[\s\S]*?empresas\s+e\s+sócios[\s\S]*?<\/section>/i);
+      expect(rfSectionMatch, 'RF section must exist in dossier').toBeTruthy();
+      
+      const rfSection = rfSectionMatch![0];
+      
+      // Should have "Tech Investimentos S.A." (the company with UBO in fixture)
+      expect(rfSection).toContain('Tech Investimentos S.A.');
+      
+      // But must display "sócio", not "UBO"
+      const techInvestimentosContext = html.slice(
+        html.indexOf('Tech Investimentos S.A.'),
+        html.indexOf('Tech Investimentos S.A.') + 200
+      );
+      expect(techInvestimentosContext).toContain('sócio');
+      expect(techInvestimentosContext).not.toContain('UBO');
     });
   });
 
