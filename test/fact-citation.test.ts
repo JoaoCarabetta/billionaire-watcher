@@ -57,13 +57,29 @@ describe('Fact + Citation Seam', () => {
   });
 
   describe('Test 3: Derived association cites parent Facts only', () => {
-    it('should render derived association with parent fact citations', () => {
-      const hasAssociation = builtHtml.includes('João Silva e Maria Santos têm conexão');
-      if (hasAssociation) {
-        const hasParentCitation = builtHtml.includes('fact-1') || 
-                                 builtHtml.includes('Receita Federal');
-        expect(hasParentCitation).toBe(true);
-      }
+    it('should render assoc-1 description in HTML', () => {
+      expect(builtHtml).toContain('João Silva e Maria Santos têm conexão através de doação política');
+    });
+
+    it('should cite parent fact-1 publisher in references', () => {
+      const assocText = 'João Silva e Maria Santos têm conexão através de doação política';
+      const assocIndex = builtHtml.indexOf(assocText);
+      expect(assocIndex).toBeGreaterThan(-1);
+      
+      const citationMatch = builtHtml.slice(assocIndex, assocIndex + 200).match(/\[(\d+)\]/g);
+      expect(citationMatch).toBeTruthy();
+      
+      const citationNumbers = citationMatch!.map(m => parseInt(m.match(/\d+/)![0]));
+      expect(citationNumbers).toContain(1);
+    });
+
+    it('should cite parent fact-2 publisher in references', () => {
+      const assocText = 'João Silva e Maria Santos têm conexão através de doação política';
+      const assocIndex = builtHtml.indexOf(assocText);
+      
+      const citationMatch = builtHtml.slice(assocIndex, assocIndex + 200).match(/\[(\d+)\]/g);
+      const citationNumbers = citationMatch!.map(m => parseInt(m.match(/\d+/)![0]));
+      expect(citationNumbers).toContain(2);
     });
 
     it('should not render association without parent facts', () => {
@@ -76,16 +92,28 @@ describe('Fact + Citation Seam', () => {
       expect(builtHtml).toContain('Ana Lima é controladora da DEF Holdings');
     });
 
-    it('should not contain full CPF digits in HTML', () => {
+    it('should not contain fact-4 CPF field in HTML', () => {
       expect(builtHtml).not.toContain('123.456.789-00');
       expect(builtHtml).not.toContain('12345678900');
+    });
+
+    it('should redact CPF from fact-5 value string', () => {
+      expect(builtHtml).toContain('Carlos Mendes');
+      expect(builtHtml).toContain('GHI Investimentos');
+      expect(builtHtml).not.toContain('987.654.321-00');
+      expect(builtHtml).not.toContain('98765432100');
     });
   });
 
   describe('Test 5: Unsourced prose is not in HTML', () => {
-    it('should not contain unsourced LLM/prose text', () => {
+    it('should not contain unsourced LLM/prose text from fixture', () => {
       expect(builtHtml).not.toContain('texto inventado por IA');
       expect(builtHtml).not.toContain('narrativa especulativa');
+    });
+
+    it('should not contain hardcoded editorial prose without citations', () => {
+      expect(builtHtml).not.toContain('dossiês HTML gerados de dados públicos');
+      expect(builtHtml).not.toContain('Arquivo cívico');
     });
   });
 });

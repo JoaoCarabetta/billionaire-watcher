@@ -30,5 +30,14 @@
       "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
       "retrieved_at": "2026-08-24"
     }
+  },
+  {
+    "id": "fact-5-cpf-in-value",
+    "value": "Carlos Mendes (CPF 987.654.321-00) é sócio da GHI Investimentos",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
+      "retrieved_at": "2026-08-24"
+    }
   }
 ]
