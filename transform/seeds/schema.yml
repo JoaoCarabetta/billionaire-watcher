@@ -1,0 +1,39 @@
+version: 2
+
+seeds:
+  - name: freeze_cnpj_basicos
+    description: Freeze-chain CNPJ basicos (8-digit, zero-padded STRING) for top-50 billionaire watcher targets
+    config:
+      column_types:
+        cnpj_basico: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ base with leading zeros preserved (STRING)
+        tests:
+          - not_null
+          - unique
+          
+  - name: top50_flags_seed
+    description: Top-50 billionaire watcher group flags from Valor 1000 2025
+    config:
+      column_types:
+        rank_2024: INT64
+        empresa: STRING
+        razao_social: STRING
+        cnpj_basico: STRING
+        cnpj_full: STRING
+        listed_flag: STRING
+        listed_source: STRING
+        soe_flag: STRING
+        soe_source: STRING
+        controlador_tipo: STRING
+        freeze_status_hint: STRING
+        notes: STRING
+        source_doc: STRING
+        cnpj_source: STRING
+        retrieved_at: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
