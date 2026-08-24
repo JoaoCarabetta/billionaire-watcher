@@ -1,0 +1,6 @@
+ano,cpf_candidato,cpf_cnpj_doador,nome_doador,valor_receita,tipo_receita,fonte_receita,numero_recibo_eleitoral,cpf_doador_masked
+2026,***234***,***456***,Ana Maria Silva,50000.00,Doação,Pessoa física,2026001,***456***
+2026,***234***,***789***,Carlos Eduardo Santos,75000.00,Doação,Pessoa física,2026002,***789***
+2026,***567***,***456***,Ana Maria Silva,100000.00,Doação,Pessoa física,2026003,***456***
+2026,***567***,***123***,Pedro Henrique Costa,25000.00,Doação,Pessoa física,2026004,***123***
+2026,***890***,***789***,Carlos Eduardo Santos,30000.00,Doação,Pessoa física,2026005,***789***
