@@ -170,66 +170,50 @@ unit_tests:
   - name: test_freeze_listed_empty_61_is_hole
     description: |
       SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
-      results in hole, not a CEO fill-in or offshore invention.
-    model: int_freeze_listed_controllers
+      results in a visible hole row, not an absent row or CEO fill-in.
+      Every listed non-SOE group must appear in freeze_persons.
+    model: freeze_persons
     given:
-      - input: ref('stg_group_flags')
+      - input: ref('int_freeze_listed_controllers')
         rows:
-          - rank_2024: 3
-            empresa: 'No Controller Inc'
-            razao_social: 'No Controller S.A.'
+          # Listed group with empty FRE 6.1
+          - group_rank: 3
+            group_name: 'No Controller Inc'
             cnpj_basico: '11111111'
-            cnpj_full: '11111111000100'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
             listed_flag: true
-            listed_source: 'CVM'
             soe_flag: false
-            soe_source: null
             controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          # Only acionista_relevante, no controller
-          - CNPJ_Companhia: '11111111000100'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'No Controller S.A.'
-            ID_Acionista: 300
-            Acionista: 'BlackRock'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '99999999000199'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 120
-            Percentual_Acao_Ordinaria_Circulacao: 6.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 120
-            Percentual_Total_Acoes_Circulacao: 6.0
-            Nacionalidade: 'Estrangeira'
-            Sigla_UF: null
-            Residente_Exterior: 'S'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'N'
-            Participante_Acordo_Acionistas: 'N'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'CVM FRE 2026 item 6.1 CNPJ 11111111: empty'
+            fre_item: '6.1'
+            hole: true
+            cpf_masked: null
+            freeze_status: 'hole'
+            notes: 'FRE 6.1 empty: no Acionista_Controlador=S found'
+      - input: ref('int_freeze_soe')
+        rows: []
+      - input: ref('int_freeze_unlisted_rf')
+        rows: []
+      - input: ref('int_freeze_foreign_hq')
+        rows: []
     expect:
-      rows: [] # Empty result because no Acionista_Controlador=S found
+      rows:
+        - group_rank: 3
+          group_name: 'No Controller Inc'
+          person_name: null
+          freeze_status: 'hole'
+          hole: true
 
-  # SEAM 5: QSA-only edge is socio, never acionista_controlador
-  - name: test_freeze_unlisted_qsa_edge_is_socio
+  # SEAM 5: QSA-only names stay OFF the freeze
+  - name: test_freeze_unlisted_qsa_names_off_sa
     description: |
-      SEAM TEST: RF QSA edges must be labeled 'socio' or 'administrador',
-      never 'acionista_controlador'. QSA is not the shareholder book.
+      SEAM TEST: QSA-only names stay OFF the freeze until public act names Art. 116.
+      S.A. QSA is officers, not shareholders. Emit hole row, person_name null.
     model: int_freeze_unlisted_rf
     given:
       - input: ref('stg_group_flags')
@@ -279,9 +263,49 @@ unit_tests:
             ente_federativo: null
     expect:
       rows:
-        # For S.A. (natureza 2054), QSA is officers, so we have a hole
-        # Edge label should never be acionista_controlador
         - group_rank: 18
+          person_name: null
+          role: null
+          edge_label: null
+          freeze_status: 'hole'
+
+  # SEAM 5b: QSA-only names stay OFF for Ltda too
+  - name: test_freeze_unlisted_qsa_names_off_ltda
+    description: |
+      SEAM TEST: QSA-only names stay OFF the freeze for Ltda (natureza 2062) too.
+      Emit hole row, person_name null, until public act names Art. 116 controller.
+    model: freeze_persons
+    given:
+      - input: ref('int_freeze_listed_controllers')
+        rows: []
+      - input: ref('int_freeze_soe')
+        rows: []
+      - input: ref('int_freeze_unlisted_rf')
+        rows:
+          - group_rank: 10
+            group_name: 'Cargill'
+            cnpj_basico: '01961898'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: false
+            soe_flag: false
+            controlador_tipo: 'foreign'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'RF QSA 01961898 data 2026-01-11'
+            fre_item: null
+            hole: true
+            cpf_masked: null
+            freeze_status: 'hole'
+            notes: 'Ltda QSA lists partners. No public act names Art. 116 controller.'
+      - input: ref('int_freeze_foreign_hq')
+        rows: []
+    expect:
+      rows:
+        - group_rank: 10
+          group_name: 'Cargill'
           person_name: null
           role: null
           edge_label: null

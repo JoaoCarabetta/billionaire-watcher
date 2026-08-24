@@ -1,6 +1,8 @@
 -- int_freeze_listed_controllers.sql
 -- Walk FRE 6.1 Acionista_Controlador=S to natural persons
 -- Source: stg_cvm_fre_posicao_acionaria_2026 + stg_group_flags
+-- IMPORTANT: Every listed non-SOE group must emit at least one row.
+-- Missing controller = visible HOLE, not absent row.
 
 with group_flags as (
     select * from {{ ref('stg_group_flags') }}
@@ -35,14 +37,15 @@ controlling_shareholders as (
         fre.CNPJ_Companhia,
         fre.Data_Referencia
     from group_flags gf
-    inner join fre_positions fre
+    left join fre_positions fre
         on gf.cnpj_full = fre.CNPJ_Companhia
-    where fre.Acionista_Controlador = 'S'
+        and fre.Acionista_Controlador = 'S'
 ),
 
 -- Walk Acionista_Relacionado to find natural persons
 -- If Tipo_Pessoa_Acionista_Relacionado = 'PF', we have the natural person
 -- Otherwise this is a PJ in the chain (would need recursive walk, marked as hole for now)
+-- If no FRE row at all (ID_Acionista is null), mark as hole
 natural_person_controllers as (
     select
         group_rank,
@@ -54,6 +57,8 @@ natural_person_controllers as (
         soe_flag,
         controlador_tipo,
         case
+            -- No FRE controlling shareholder found at all
+            when ID_Acionista is null then null
             -- If the relacionado is a natural person, use it
             when Tipo_Pessoa_Acionista_Relacionado = 'PF' then Acionista_Relacionado
             -- If the direct acionista is a natural person (no relacionado), use it
@@ -61,17 +66,31 @@ natural_person_controllers as (
             -- Otherwise we have a PJ without a named PF, mark as hole
             else null
         end as person_name,
-        'controlador' as role,
-        'acionista_controlador' as edge_label,
+        case
+            when ID_Acionista is null then null
+            when Tipo_Pessoa_Acionista_Relacionado = 'PF' then 'controlador'
+            when Tipo_Pessoa_Acionista = 'PF' and Acionista_Relacionado is null then 'controlador'
+            else null
+        end as role,
+        case
+            when ID_Acionista is null then null
+            when Tipo_Pessoa_Acionista_Relacionado = 'PF' then 'acionista_controlador'
+            when Tipo_Pessoa_Acionista = 'PF' and Acionista_Relacionado is null then 'acionista_controlador'
+            else null
+        end as edge_label,
         Participante_Acordo_Acionistas as acordo_acionistas,
-        concat(
-            'CVM FRE 2026 item 6.1 CNPJ ',
-            CNPJ_Companhia,
-            ' ref ',
-            cast(Data_Referencia as string)
-        ) as source_doc,
+        case
+            when ID_Acionista is null then concat('CVM FRE 2026 item 6.1 CNPJ ', cnpj_basico, ': empty')
+            else concat(
+                'CVM FRE 2026 item 6.1 CNPJ ',
+                CNPJ_Companhia,
+                ' ref ',
+                cast(Data_Referencia as string)
+            )
+        end as source_doc,
         '6.1' as fre_item,
         case
+            when ID_Acionista is null then true
             when Tipo_Pessoa_Acionista_Relacionado = 'PF' then false
             when Tipo_Pessoa_Acionista = 'PF' and Acionista_Relacionado is null then false
             else true
@@ -82,11 +101,13 @@ natural_person_controllers as (
             else null
         end as cpf_masked,
         case
+            when ID_Acionista is null then 'hole'
             when Tipo_Pessoa_Acionista_Relacionado = 'PF' then 'in'
             when Tipo_Pessoa_Acionista = 'PF' and Acionista_Relacionado is null then 'in'
             else 'hole'
         end as freeze_status,
         case
+            when ID_Acionista is null then 'FRE 6.1 empty: no Acionista_Controlador=S found'
             when Tipo_Pessoa_Acionista_Relacionado = 'PF' then 'FRE 6.1 walk to PF'
             when Tipo_Pessoa_Acionista = 'PF' and Acionista_Relacionado is null then 'FRE 6.1 direct PF'
             else 'FRE 6.1 chain ends at PJ without named PF controller'
