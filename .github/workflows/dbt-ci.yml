@@ -29,10 +29,9 @@ jobs:
         run: pip install dbt-bigquery==1.8.2
 
       - name: Create CI profiles.yml
-        working-directory: transform
         run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
+          mkdir -p $HOME/.dbt
+          cat > $HOME/.dbt/profiles.yml << 'EOF'
           billionaire_watcher:
             target: ci
             outputs:
@@ -45,13 +44,6 @@ jobs:
                 threads: 1
           EOF
 
-      - name: Create auth bypass for unit tests
-        run: |
-          # Set environment variables to bypass BigQuery authentication
-          echo "GOOGLE_APPLICATION_CREDENTIALS=/dev/null" >> $GITHUB_ENV
-          echo "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE=/dev/null" >> $GITHUB_ENV
-          echo "GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS=true" >> $GITHUB_ENV
-
       - name: Install dbt packages
         working-directory: transform
         run: dbt deps
@@ -60,18 +52,10 @@ jobs:
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-        run: |
-          echo "Running dbt parse..."
-          dbt parse || (echo "dbt parse failed with exit code $?" && exit 1)
+        run: dbt parse
 
       - name: Run dbt unit tests
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-          DBT_PROFILES_DIR: ~/.dbt
-        run: |
-          echo "Running dbt unit tests..."
-          echo "Profile directory: $DBT_PROFILES_DIR"
-          cat ~/.dbt/profiles.yml
-          dbt debug --config-dir || true
-          dbt test --select test_type:unit 2>&1 | tee /tmp/dbt_test_output.log || (echo "dbt test failed, output:" && cat /tmp/dbt_test_output.log && exit 1)
+        run: dbt test --select test_type:unit
