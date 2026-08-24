@@ -125,7 +125,7 @@ unit_tests:
           value: controlador
         - person_name: João Silva
           fact_kind: identity
-          value: 'Controla JBS'
+          value: JBS
 
   # TDD Seam 4: review/hole/skip_soe/candidato_forbes produce zero published facts
   - name: test_published_facts_excludes_non_in_status
@@ -159,32 +159,24 @@ unit_tests:
       Fixture validates allowed edge labels only.
     model: control_edge_facts
     given:
-      - input: ref('int_match_freeze_to_control_edges')
+      - input: ref('freeze_persons_with_forbes')
         rows:
           - person_name: João Silva
+            freeze_status: in
             cnpj_basico: '02916265'
             group_name: JBS
             role: controlador
-            freeze_edge_label: acionista_controlador
-            freeze_source_doc: CVM FRE 2026
+            edge_label: acionista_controlador
+            source_doc: CVM FRE 2026
             cpf_masked: null
-            rf_nome: João Silva
-            qualificacao: '10'
-            data_entrada_sociedade: null
-            razao_social: JBS S.A.
-            control_edge_id: rf_control_02916265_João Silva
           - person_name: Maria Santos
+            freeze_status: in
             cnpj_basico: '33000167'
             group_name: Petrobras
             role: socio_chave
-            freeze_edge_label: socio
-            freeze_source_doc: RF QSA
+            edge_label: socio
+            source_doc: RF QSA
             cpf_masked: null
-            rf_nome: Maria Santos
-            qualificacao: '49'
-            data_entrada_sociedade: null
-            razao_social: Petrobras S.A.
-            control_edge_id: rf_control_33000167_Maria Santos
     expect:
       rows:
         - person_name: João Silva
@@ -257,3 +249,97 @@ unit_tests:
           value: João Silva
         - fact_id: fact_control_clean
           value: João Silva é sócio de JBS
+
+  # PM Review 1: Identity facts must be raw fields only (no "Controla {group}")
+  - name: test_identity_facts_no_controla_sentence
+    description: |
+      PM Review: Identity facts must output raw fields only.
+      No sentence "Controla {group}". value is person_name, role, or group_name as stored.
+    model: identity_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          field: name
+          value: João Silva
+        - person_name: João Silva
+          field: role
+          value: controlador
+        - person_name: João Silva
+          field: group_name
+          value: JBS
+
+  # PM Review 2: Control facts must follow freeze edge_label (acionista_controlador NOT "é sócio de")
+  - name: test_control_edge_facts_follow_freeze_edge_label
+    description: |
+      PM Review: Control facts must follow freeze edge_label.
+      If edge_label is acionista_controlador, do NOT write "é sócio de".
+      Use freeze source_doc, not invented RF URL.
+    model: control_edge_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            edge_label: acionista_controlador
+            source_doc: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
+            cpf_masked: null
+          - person_name: Maria Santos
+            freeze_status: in
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: socio_chave
+            edge_label: socio
+            source_doc: RF QSA CNPJ 33000167
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          edge_label: acionista_controlador
+          value: João Silva é acionista controlador de JBS (CNPJ 02916265)
+          source_locator: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
+        - person_name: Maria Santos
+          edge_label: socio
+          value: Maria Santos é sócio de Petrobras (CNPJ 33000167)
+          source_locator: RF QSA CNPJ 33000167
+
+  # PM Review 3: No fake locator, drop facts with null source_doc
+  - name: test_facts_drop_null_source_doc
+    description: |
+      PM Review: No fake locator ("Freeze source document").
+      Drop the fact if source_doc is null. No current_timestamp() as retrieved_at.
+    model: identity_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+          - person_name: Pedro Costa
+            freeze_status: in
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: controlador
+            source_doc: null
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          source_locator: CVM FRE 2026
+          source_retrieved_at: null

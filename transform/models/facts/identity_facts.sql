@@ -2,11 +2,13 @@
 -- Identity facts for freeze persons (name, role, group affiliation)
 -- One fact per identity field per person
 -- Published facts ONLY for freeze_status=in
+-- PM: Raw fields only. No sentence "Controla {group}". value is person_name, role, or group_name as stored.
 
 with freeze_persons as (
     select * from {{ ref('freeze_persons_with_forbes') }}
     where freeze_status = 'in' -- Published facts only
       and person_name is not null
+      and source_doc is not null -- Drop facts with null source_doc
 ),
 
 identity_facts_base as (
@@ -22,8 +24,8 @@ identity_facts_base as (
             when source_doc like 'Forbes%' then 'Forbes'
             else 'Receita Federal do Brasil'
         end as source_publisher,
-        coalesce(source_doc, 'Freeze source document') as source_locator,
-        current_timestamp() as source_retrieved_at,
+        source_doc as source_locator,
+        null as source_retrieved_at, -- No fake timestamp; use date from freeze/source if available
         cpf_masked,
         cnpj_basico,
         group_name
@@ -43,8 +45,8 @@ identity_facts_base as (
             when source_doc like 'Forbes%' then 'Forbes'
             else 'Receita Federal do Brasil'
         end as source_publisher,
-        coalesce(source_doc, 'Freeze source document') as source_locator,
-        current_timestamp() as source_retrieved_at,
+        source_doc as source_locator,
+        null as source_retrieved_at,
         cpf_masked,
         cnpj_basico,
         group_name
@@ -52,20 +54,20 @@ identity_facts_base as (
 
     union all
 
-    -- Fact: group affiliation
+    -- Fact: group affiliation (raw group_name, no sentence)
     select
         concat('identity_', cnpj_basico, '_', person_name, '_group') as fact_id,
         person_name,
         'identity' as fact_kind,
-        'group_affiliation' as field,
-        concat('Controla ', group_name) as value,
+        'group_name' as field,
+        group_name as value, -- Raw group_name, no "Controla" prefix
         case
             when source_doc like 'CVM FRE%' then 'CVM - Comissão de Valores Mobiliários'
             when source_doc like 'Forbes%' then 'Forbes'
             else 'Receita Federal do Brasil'
         end as source_publisher,
-        coalesce(source_doc, 'Freeze source document') as source_locator,
-        current_timestamp() as source_retrieved_at,
+        source_doc as source_locator,
+        null as source_retrieved_at,
         cpf_masked,
         cnpj_basico,
         group_name
