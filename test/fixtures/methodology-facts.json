@@ -46,7 +46,7 @@
   },
   {
     "id": "metod-qsa-socio-label",
-    "value": "A aresta da Receita Federal (fonte br_me_cnpj.socios) é rotulada como sócio, nunca como dono.",
+    "value": "A aresta da Receita Federal é rotulada como sócio, nunca como dono (fonte Receita Federal / Base dos Dados).",
     "source": {
       "publisher": "Receita Federal do Brasil",
       "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
@@ -109,7 +109,7 @@
   },
   {
     "id": "metod-forbes-safety-net",
-    "value": "A lista Forbes de bilionários serve como rede de segurança para revisão manual de candidatos não capturados pelo método posicional, não como fonte primária de controle.",
+    "value": "A lista Forbes serve como rede de segurança para revisão manual de candidatos não capturados pelo método posicional, não como fonte primária de controle.",
     "source": {
       "publisher": "Billionaire Watcher",
       "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",

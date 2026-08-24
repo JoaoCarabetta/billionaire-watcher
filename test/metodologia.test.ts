@@ -168,19 +168,23 @@ describe('Metodologia Page', () => {
       expect(builtHtml).not.toMatch(/foi realizado|freeze foi/i);
     });
 
-    it('should state aresta da Receita é sócio, nunca dono', () => {
-      expect(builtHtml).toMatch(/aresta.*Receita|sócio/i);
-      expect(builtHtml).toMatch(/br_me_cnpj\.socios/i);
+    it('should state aresta da Receita é sócio, nunca dono (no table id)', () => {
+      expect(builtHtml).toMatch(/aresta.*Receita/i);
+      expect(builtHtml).toMatch(/sócio.*nunca.*dono/i);
+      expect(builtHtml).toMatch(/Receita Federal|Base dos Dados/i);
+      // br_me_cnpj.socios is pipeline jargon - must be ABSENT
+      expect(builtHtml).not.toMatch(/br_me_cnpj\.socios/i);
     });
   });
 
   describe('Test 4: Voice guidelines - forbidden patterns', () => {
-    it('should NOT have forbidden tokens (freeze, candidato_forbes, UBO)', () => {
+    it('should NOT have forbidden tokens (freeze, candidato_forbes, UBO, br_me_cnpj)', () => {
       // English "freeze" is forbidden
       expect(builtHtml).not.toMatch(/\bfreeze\b/i);
       // CSV jargon
       expect(builtHtml).not.toMatch(/candidato_forbes/i);
       expect(builtHtml).not.toMatch(/skip_soe/i);
+      expect(builtHtml).not.toMatch(/br_me_cnpj\.socios/i);
       // UBO is NEVER list token - even in rejection sentences
       expect(builtHtml).not.toMatch(/\bUBO\b/);
     });
@@ -198,8 +202,9 @@ describe('Metodologia Page', () => {
       expect(builtHtml).not.toMatch(/é um.*empresário.*fundador/i);
     });
 
-    it('should NOT use "o bilionário"', () => {
+    it('should NOT use "o bilionário" or identity labels', () => {
       expect(builtHtml).not.toMatch(/o bilionário/i);
+      expect(builtHtml).not.toMatch(/de bilionários/i);
     });
 
     it('should NOT have full CPF in the page', () => {
