@@ -14,7 +14,7 @@ The project follows a three-layer architecture as defined in [ADR-0003](../docs/
 2. **Match** (future) - Entity resolution and person-to-CNPJ matching
 3. **Facts** (future) - One row per fact with sources and citations
 
-**This PR implements the staging layer only.** Match and Facts layers are out of scope (see issue #25).
+The project implements staging (issue #10) and freeze walk (issue #25) layers. Match and Facts layers are future work.
 
 ### Data Sources
 
@@ -36,6 +36,53 @@ The project follows a three-layer architecture as defined in [ADR-0003](../docs/
 | `stg_group_flags` | Top-50 group flags from Valor | cnpj_basico |
 | `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE 6.1 shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
 | `stg_cvm_cad_cia_aberta` | CVM listed company registry | CNPJ_CIA |
+
+### Freeze Models (Issue #25)
+
+Freeze walk models implementing grupo × pessoa natural × papel per issue #22 spec:
+
+| Model | Description | Grain |
+|-------|-------------|-------|
+| `int_freeze_listed_controllers` | Listed controllers from FRE 6.1 walk | (cnpj_basico, person_name) |
+| `int_freeze_soe` | SOE groups with skip_soe status | cnpj_basico |
+| `int_freeze_unlisted_rf` | Unlisted controllers from RF QSA | (cnpj_basico, person_name) |
+| `int_freeze_foreign_hq` | Foreign HQ groups (hole unless publicly named) | cnpj_basico |
+| `freeze_persons` | Final freeze table (positional freeze) | (group_rank, person_name, role) |
+| `int_forbes_candidates` | Forbes safety-net candidates | person_name |
+| `freeze_persons_with_forbes` | Final freeze + Forbes safety-net | (group_rank, person_name, role) |
+
+### Forbes Safety-Net (Issue #26)
+
+Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_status=review` AFTER the positional freeze. Forbes rows are ADDITIVE on top of `freeze_persons`.
+
+**Input Source:** The `forbes_billionaires_brazil_nexus` seed is **FIXTURE DATA ONLY** for testing Forbes safety-net logic. It does NOT contain real Forbes billionaires, actual USD wealth estimates, or live Forbes data. Do NOT use this seed as a live Forbes extract.
+
+**Add ONLY if ALL of:**
+- On Forbes World's Billionaires (seed/fixture, not live scrape)
+- Brazil-operations nexus = true
+- cnpj_basico is NOT NULL (identified Brazil-operating group; group MAY be outside top-50)
+- NOT already in positional freeze
+- Documentable control of Brazil-operating group
+
+**Do NOT add:**
+- Celebrities/athletes without group control
+- Dispersed family fortunes
+- Monarchs/office-tied wealth
+- Wikipedia names without control documentation
+- Brazil-nexus without identified cnpj_basico (Saverin-style: nexus but no documentable group control)
+
+**No auto-promotion:** Models do NOT auto-promote to `freeze_status=in` even when control_doc is available. Humans promote after review.
+
+**GAP-FORBES-BR-URL:** No separate Forbes Brazil methodology URL exists. The global Forbes World's Billionaires list is used with a Brazil-nexus filter applied in the fixture/seed.
+
+**Key Constraints:**
+- LISTED: Walk FRE 6.1 Acionista_Controlador=S to natural persons
+- SOE: freeze_status=skip_soe, no PF controller (União is not a person)
+- UNLISTED: RF QSA edges labeled 'socio', never 'acionista_controlador' (QSA is not shareholder book)
+- FOREIGN HQ: Hole unless FRE 6.1.h / 20-F / 13D publicly names PF
+- No edge_label 'dono' or 'UBO' (RF does not compute beneficial ownership)
+- Missing controller = hole (not CEO fill-in or offshore invention)
+- cpf_masked only (no full CPF on page-bound fields)
 
 ### CNPJ Normalization
 
@@ -172,14 +219,15 @@ dbt run --vars '{"rf_partition_date": "2026-02-15"}'
 
 ## Out of Scope
 
-This PR implements **staging models only** (issue #10). Out of scope:
+Out of scope for current implementation:
 
 - Match models (entity resolution)
 - Facts models (structured JSONL with citations)
 - TSE donations (deferred)
 - HTML generation (Astro, separate concern)
 - R2 export (dbt v1 does not touch R2)
-- Issue #25 (freeze walk)
+- Forbes safety-net (issue #26)
+- Recursion before 4 Oct (per spec #22)
 
 ## Development
 

@@ -68,3 +68,30 @@ sources:
             encoding: ISO-8859-1
             field_delimiter: ";"
             skip_leading_rows: 1
+
+  - name: br_tse_eleicoes
+    description: Base dos Dados - TSE election data (closed cycles)
+    database: basedosdados
+    schema: br_tse_eleicoes
+    tables:
+      - name: receitas_candidato
+        description: TSE candidate receipts (donations), partitioned by ano
+        columns:
+          - name: ano
+            description: Election year
+          - name: cpf_candidato
+            description: Candidate CPF (masked in BD, full in live TSE - NOT FOR PUBLIC FACTS)
+          - name: nome_candidato
+            description: Candidate name (public field)
+          - name: cpf_cnpj_doador
+            description: Donor CPF or CNPJ (masked)
+          - name: nome_doador
+            description: Donor name
+          - name: valor_receita
+            description: Receipt amount
+          - name: tipo_receita
+            description: Receipt type
+          - name: fonte_receita
+            description: Receipt source
+          - name: numero_recibo_eleitoral
+            description: Electoral receipt number (unique identifier)

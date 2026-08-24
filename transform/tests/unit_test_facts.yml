@@ -1,0 +1,834 @@
+version: 2
+
+unit_tests:
+  # TDD Seam 1: fact_id unique
+  - name: test_published_facts_fact_id_unique
+    description: |
+      Seam 1: fact_id must be unique in published_facts.
+      Fixture includes duplicate fact_ids to ensure test catches violations.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: fact_001
+            person_name: João Silva
+            fact_kind: identity
+            value: João Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+          - fact_id: fact_002
+            person_name: Maria Santos
+            fact_kind: identity
+            value: Maria Santos
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+      - input: ref('control_edge_facts')
+        rows:
+          - fact_id: fact_003
+            person_name: João Silva
+            fact_kind: control_edge
+            value: João Silva é sócio de JBS
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+    expect:
+      rows:
+        - fact_id: fact_001
+          person_id: João Silva
+        - fact_id: fact_002
+          person_id: Maria Santos
+        - fact_id: fact_003
+          person_id: João Silva
+
+  # TDD Seam 2: source_locator not_null
+  - name: test_published_facts_source_not_null
+    description: |
+      Seam 2: source_locator must never be null.
+      Fixture includes null source to ensure test catches violations.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: fact_valid
+            person_name: João Silva
+            fact_kind: identity
+            value: João Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+      - input: ref('control_edge_facts')
+        rows: []
+    expect:
+      rows:
+        - fact_id: fact_valid
+          person_id: João Silva
+          source_locator: CVM FRE 2026
+
+  # TDD Seam 3: relationship to freeze_status=in
+  - name: test_identity_facts_only_freeze_status_in
+    description: |
+      Seam 3: Every published fact's person must be in freeze with freeze_status=in.
+      Fixture includes review/hole/skip_soe to ensure they produce zero facts.
+    model: identity_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+          - person_name: Pedro Costa
+            freeze_status: review
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: candidato_forbes
+            source_doc: Forbes 2026
+            cpf_masked: null
+          - person_name: null
+            freeze_status: hole
+            cnpj_basico: '01832635'
+            group_name: Vale
+            role: null
+            source_doc: CVM FRE 2026 empty
+            cpf_masked: null
+          - person_name: null
+            freeze_status: skip_soe
+            cnpj_basico: '33592510'
+            group_name: Banco do Brasil
+            role: null
+            source_doc: null
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          fact_kind: identity
+          value: João Silva
+        - person_name: João Silva
+          fact_kind: identity
+          value: controlador
+        - person_name: João Silva
+          fact_kind: identity
+          value: JBS
+
+  # TDD Seam 4: review/hole/skip_soe/candidato_forbes produce zero published facts
+  - name: test_published_facts_excludes_non_in_status
+    description: |
+      Seam 4: review / hole / skip_soe / candidato_forbes produce zero published facts.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: fact_in_status
+            person_name: João Silva
+            fact_kind: identity
+            value: João Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+      - input: ref('control_edge_facts')
+        rows: []
+    expect:
+      rows:
+        - fact_id: fact_in_status
+          person_id: João Silva
+
+  # TDD Seam 5: no edge_label dono or UBO
+  - name: test_control_edge_facts_no_dono_or_ubo
+    description: |
+      Seam 5: No edge_label dono or UBO in control edge facts.
+      Fixture validates allowed edge labels only.
+    model: control_edge_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            edge_label: acionista_controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+          - person_name: Maria Santos
+            freeze_status: in
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: socio_chave
+            edge_label: socio
+            source_doc: RF QSA
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          fact_kind: control_edge
+          edge_label: acionista_controlador
+        - person_name: Maria Santos
+          fact_kind: control_edge
+          edge_label: socio
+
+  # TDD Seam 6: no full CPF in fact columns/values
+  - name: test_published_facts_no_full_cpf
+    description: |
+      Seam 6: No full CPF (11 digits) in fact columns or values.
+      Fixture validates cpf_masked only.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: fact_masked_cpf
+            person_name: João Silva
+            fact_kind: identity
+            value: João Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: 2026-08-24
+            cpf_masked: '***456***'
+            cnpj_basico: '02916265'
+            group_name: JBS
+      - input: ref('control_edge_facts')
+        rows: []
+    expect:
+      rows:
+        - fact_id: fact_masked_cpf
+          person_id: João Silva
+          cpf_masked: '***456***'
+
+  # TDD Seam 7: no "o bilionário" / "o bilionário X" in fact values
+  - name: test_published_facts_no_bilionario_phrase
+    description: |
+      Seam 7: No "o bilionário" or "o bilionário X" in fact values.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: fact_clean_value
+            person_name: João Silva
+            fact_kind: identity
+            value: João Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+      - input: ref('control_edge_facts')
+        rows:
+          - fact_id: fact_control_clean
+            person_name: João Silva
+            fact_kind: control_edge
+            value: João Silva é sócio de JBS
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: 2026-08-24
+            cpf_masked: null
+            cnpj_basico: '02916265'
+            group_name: JBS
+    expect:
+      rows:
+        - fact_id: fact_clean_value
+          value: João Silva
+        - fact_id: fact_control_clean
+          value: João Silva é sócio de JBS
+
+  # PM Review 1: Identity facts must be raw fields only (no "Controla {group}")
+  - name: test_identity_facts_no_controla_sentence
+    description: |
+      PM Review: Identity facts must output raw fields only.
+      No sentence "Controla {group}". value is person_name, role, or group_name as stored.
+    model: identity_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          field: name
+          value: João Silva
+        - person_name: João Silva
+          field: role
+          value: controlador
+        - person_name: João Silva
+          field: group_name
+          value: JBS
+
+  # PM Review 2: Control facts must follow freeze edge_label (acionista_controlador NOT "é sócio de")
+  - name: test_control_edge_facts_follow_freeze_edge_label
+    description: |
+      PM Review: Control facts must follow freeze edge_label.
+      If edge_label is acionista_controlador, do NOT write "é sócio de".
+      Use freeze source_doc, not invented RF URL.
+    model: control_edge_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            edge_label: acionista_controlador
+            source_doc: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
+            cpf_masked: null
+          - person_name: Maria Santos
+            freeze_status: in
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: socio_chave
+            edge_label: socio
+            source_doc: RF QSA CNPJ 33000167
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          edge_label: acionista_controlador
+          value: João Silva é acionista controlador de JBS (CNPJ 02916265)
+          source_locator: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
+        - person_name: Maria Santos
+          edge_label: socio
+          value: Maria Santos é sócio de Petrobras (CNPJ 33000167)
+          source_locator: RF QSA CNPJ 33000167
+
+  # PM Review 3: No fake locator, drop facts with null source_doc
+  - name: test_facts_drop_null_source_doc
+    description: |
+      PM Review: No fake locator ("Freeze source document").
+      Drop the fact if source_doc is null. No current_timestamp() as retrieved_at.
+    model: identity_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '02916265'
+            group_name: JBS
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: null
+          - person_name: Pedro Costa
+            freeze_status: in
+            cnpj_basico: '33000167'
+            group_name: Petrobras
+            role: controlador
+            source_doc: null
+            cpf_masked: null
+    expect:
+      rows:
+        - person_name: João Silva
+          source_locator: CVM FRE 2026
+          source_retrieved_at: null
+
+  # Donation TDD Seam 1: unique fact_id
+  - name: test_donation_facts_fact_id_unique
+    description: |
+      Donation Seam 1: fact_id must be unique in donation_facts.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Carlos Eduardo Santos
+            freeze_status: in
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***789***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Ana Maria Silva
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026001'
+            cpf_doador_masked: '***456***'
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***789***'
+            nome_doador: Carlos Eduardo Santos
+            valor_receita: 75000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026002'
+            cpf_doador_masked: '***789***'
+    expect:
+      rows:
+        - fact_id: donation_2026001_Ana Maria Silva
+          person_name: Ana Maria Silva
+          fact_kind: donation
+        - fact_id: donation_2026002_Carlos Eduardo Santos
+          person_name: Carlos Eduardo Santos
+          fact_kind: donation
+
+  # Donation TDD Seam 2: source_locator not_null
+  - name: test_donation_facts_source_not_null
+    description: |
+      Donation Seam 2: source_locator must never be null.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Ana Maria Silva
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026001'
+            cpf_doador_masked: '***456***'
+    expect:
+      rows:
+        - fact_id: donation_2026001_Ana Maria Silva
+          source_locator: TSE Receitas Candidato 2026 recibo 2026001
+
+  # Donation TDD Seam 3: only freeze_status=in publishes donations
+  - name: test_donation_facts_only_freeze_status_in
+    description: |
+      Donation Seam 3: Only freeze_status=in persons publish donation facts.
+      review/hole/skip_soe/candidato_forbes do NOT publish.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Pedro Costa
+            freeze_status: review
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: candidato_forbes
+            source_doc: Forbes 2026
+            cpf_masked: '***123***'
+          - person_name: Maria Santos
+            freeze_status: hole
+            cnpj_basico: '33333333'
+            group_name: Test Group C
+            role: null
+            source_doc: CVM FRE 2026
+            cpf_masked: '***999***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Ana Maria Silva
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026001'
+            cpf_doador_masked: '***456***'
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***123***'
+            nome_doador: Pedro Costa
+            valor_receita: 25000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026002'
+            cpf_doador_masked: '***123***'
+    expect:
+      rows:
+        - person_name: Ana Maria Silva
+          fact_kind: donation
+
+  # Donation TDD Seam 4: no full CPF
+  - name: test_donation_facts_no_full_cpf
+    description: |
+      Donation Seam 4: No full CPF (11 digits) in donation facts.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Ana Maria Silva
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026001'
+            cpf_doador_masked: '***456***'
+    expect:
+      rows:
+        - person_name: Ana Maria Silva
+          cpf_masked: '***456***'
+
+  # Association TDD Seam 1: association without supporting fact_ids does NOT emit
+  - name: test_association_facts_no_emit_without_supporting_facts
+    description: |
+      Association Seam 1: Association without supporting fact_ids does NOT emit.
+    model: association_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Carlos Eduardo Santos
+            freeze_status: in
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***789***'
+      - input: ref('control_edge_facts')
+        rows: []
+      - input: ref('donation_facts')
+        rows: []
+      - input: ref('tse_donations_2026')
+        rows: []
+    expect:
+      rows: []
+
+  # Association TDD Seam 2: shared control creates association with supporting fact_ids
+  - name: test_association_facts_shared_control
+    description: |
+      Association Seam 2: Shared control creates association with supporting fact_ids.
+    model: association_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Carlos Eduardo Santos
+            freeze_status: in
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***789***'
+      - input: ref('control_edge_facts')
+        rows:
+          - fact_id: control_edge_11111111_Ana Maria Silva_socio
+            person_name: Ana Maria Silva
+            fact_kind: control_edge
+            value: Ana Maria Silva é sócio de Test Group Shared
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '99999999'
+            group_name: Test Group Shared
+          - fact_id: control_edge_99999999_Carlos Eduardo Santos_socio
+            person_name: Carlos Eduardo Santos
+            fact_kind: control_edge
+            value: Carlos Eduardo Santos é sócio de Test Group Shared
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: null
+            cpf_masked: '***789***'
+            cnpj_basico: '99999999'
+            group_name: Test Group Shared
+      - input: ref('donation_facts')
+        rows: []
+      - input: ref('tse_donations_2026')
+        rows: []
+    expect:
+      rows:
+        - person_name: Ana Maria Silva
+          fact_kind: association
+          value: Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999
+
+  # Association TDD Seam 3: co-donation creates association with supporting fact_ids
+  - name: test_association_facts_co_donation
+    description: |
+      Association Seam 3: Co-donation creates association with supporting fact_ids.
+    model: association_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Carlos Eduardo Santos
+            freeze_status: in
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***789***'
+      - input: ref('control_edge_facts')
+        rows: []
+      - input: ref('donation_facts')
+        rows:
+          - fact_id: donation_2026001_Ana Maria Silva
+            person_name: Ana Maria Silva
+            fact_kind: donation
+            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
+            source_publisher: Tribunal Superior Eleitoral
+            source_locator: TSE Receitas Candidato 2026 recibo 2026001
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+          - fact_id: donation_2026002_Carlos Eduardo Santos
+            person_name: Carlos Eduardo Santos
+            fact_kind: donation
+            value: Carlos Eduardo Santos doou R$ 75000.0 para Deputado Federal Candidato A em 2026 (recibo 2026002)
+            source_publisher: Tribunal Superior Eleitoral
+            source_locator: TSE Receitas Candidato 2026 recibo 2026002
+            source_retrieved_at: null
+            cpf_masked: '***789***'
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***456***'
+            nome_doador: Ana Maria Silva
+            valor_receita: 50000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026001'
+            cpf_doador_masked: '***456***'
+          - ano: 2026
+            cpf_candidato: '***234***'
+            nome_candidato: Deputado Federal Candidato A
+            cpf_cnpj_doador: '***789***'
+            nome_doador: Carlos Eduardo Santos
+            valor_receita: 75000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026002'
+            cpf_doador_masked: '***789***'
+    expect:
+      rows:
+        - person_name: Ana Maria Silva
+          fact_kind: association
+          value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
+
+  # PM Review 1: No candidate CPF in value or fact_id
+  - name: test_no_candidate_cpf_in_value_or_fact_id
+    description: |
+      PM Review: No candidate CPF in value or fact_id.
+      Live TSE has full CPF. Public fields use candidate name only.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows: []
+      - input: ref('control_edge_facts')
+        rows: []
+      - input: ref('donation_facts')
+        rows:
+          - fact_id: donation_2026001_Ana Maria Silva
+            person_name: Ana Maria Silva
+            fact_kind: donation
+            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
+            source_publisher: Tribunal Superior Eleitoral
+            source_locator: TSE Receitas Candidato 2026 recibo 2026001
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+      - input: ref('association_facts')
+        rows:
+          - fact_id: association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva
+            person_name: Ana Maria Silva
+            fact_kind: association
+            value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
+            source_publisher: Billionaire Watcher (derived)
+            source_locator: Derived from donation facts
+            source_retrieved_at: null
+            cpf_masked: null
+            cnpj_basico: null
+            group_name: null
+            supporting_fact_ids: ['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos']
+    expect:
+      rows:
+        - fact_id: donation_2026001_Ana Maria Silva
+          value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
+        - fact_id: association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva
+          value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
+
+  # PM Review 2: Published association rows have supporting_fact_ids
+  - name: test_published_association_has_supporting_fact_ids
+    description: |
+      PM Review: supporting_fact_ids must be a column on published_facts.
+      Null on identity/control/donation. Populated on associations.
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows:
+          - fact_id: identity_001
+            person_name: Ana Maria Silva
+            fact_kind: identity
+            value: Ana Maria Silva
+            source_publisher: CVM
+            source_locator: CVM FRE 2026
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+      - input: ref('control_edge_facts')
+        rows: []
+      - input: ref('donation_facts')
+        rows:
+          - fact_id: donation_2026001_Ana Maria Silva
+            person_name: Ana Maria Silva
+            fact_kind: donation
+            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026
+            source_publisher: TSE
+            source_locator: TSE Receitas Candidato 2026 recibo 2026001
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+      - input: ref('association_facts')
+        rows:
+          - fact_id: association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva
+            person_name: Ana Maria Silva
+            fact_kind: association
+            value: Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999
+            source_publisher: Billionaire Watcher (derived)
+            source_locator: Derived from control facts
+            source_retrieved_at: null
+            cpf_masked: null
+            cnpj_basico: null
+            group_name: null
+            supporting_fact_ids: ['control_edge_001', 'control_edge_002']
+    expect:
+      rows:
+        - fact_id: identity_001
+          supporting_fact_ids: null
+        - fact_id: donation_2026001_Ana Maria Silva
+          supporting_fact_ids: null
+        - fact_id: association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva
+          supporting_fact_ids: ['control_edge_001', 'control_edge_002']
+
+  # PM Review 3: Association publishes on both freeze persons
+  - name: test_association_publishes_on_both_persons
+    description: |
+      PM Review: Association publishes on both freeze persons.
+      Two rows per association (one for each person_name), same supporting_fact_ids.
+    model: association_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Ana Maria Silva
+            freeze_status: in
+            cnpj_basico: '11111111'
+            group_name: Test Group A
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***456***'
+          - person_name: Carlos Eduardo Santos
+            freeze_status: in
+            cnpj_basico: '22222222'
+            group_name: Test Group B
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '***789***'
+      - input: ref('control_edge_facts')
+        rows:
+          - fact_id: control_edge_11111111_Ana Maria Silva_socio
+            person_name: Ana Maria Silva
+            fact_kind: control_edge
+            value: Ana Maria Silva é sócio de Test Group Shared
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: null
+            cpf_masked: '***456***'
+            cnpj_basico: '99999999'
+            group_name: Test Group Shared
+          - fact_id: control_edge_99999999_Carlos Eduardo Santos_socio
+            person_name: Carlos Eduardo Santos
+            fact_kind: control_edge
+            value: Carlos Eduardo Santos é sócio de Test Group Shared
+            source_publisher: RF
+            source_locator: RF QSA
+            source_retrieved_at: null
+            cpf_masked: '***789***'
+            cnpj_basico: '99999999'
+            group_name: Test Group Shared
+      - input: ref('donation_facts')
+        rows: []
+      - input: ref('tse_donations_2026')
+        rows: []
+    expect:
+      rows:
+        - person_name: Ana Maria Silva
+          fact_kind: association
+          supporting_fact_ids: ['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']
+        - person_name: Carlos Eduardo Santos
+          fact_kind: association
+          supporting_fact_ids: ['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']

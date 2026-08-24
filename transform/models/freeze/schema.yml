@@ -1,0 +1,285 @@
+version: 2
+
+models:
+  - name: int_freeze_listed_controllers
+    description: |
+      Listed company controllers walked from FRE 6.1 to natural persons.
+      Source: CVM FRE item 6.1, Acionista_Controlador=S, walk Acionista_Relacionado.
+      
+      Empty 6.1 = no controller-freeze (hole, not CEO fill-in).
+      Item 6.2 ≥5% without a control shareholders' agreement = acionista_relevante, OUT.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: person_name
+        description: Natural person name (null if hole)
+      - name: role
+        description: Role (controlador | herdeiro | socio_chave)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['controlador', 'herdeiro', 'socio_chave']
+      - name: edge_label
+        description: Edge type (acionista_controlador | socio | administrador) - NEVER dono/UBO
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['acionista_controlador', 'socio', 'administrador']
+      - name: freeze_status
+        description: Freeze status (in | skip_soe | hole)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['in', 'skip_soe', 'hole', 'review']
+
+  - name: int_freeze_soe
+    description: |
+      SOE groups with skip_soe status and no PF controller.
+      União is not a person; do not freeze CEO/minister/CA chair.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: freeze_status
+        description: Must be skip_soe for SOE groups
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['skip_soe']
+    tests:
+      - dbt_utils.expression_is_true:
+          name: soe_has_no_pf_controlador
+          config:
+            severity: error
+          arguments:
+            expression: "person_name is null and role is null"
+
+  - name: int_freeze_unlisted_rf
+    description: |
+      Unlisted controllers from RF QSA.
+      CRITICAL: RF QSA is sócios e administradores, NOT shareholder book.
+      S.A. QSA is officers, not shareholders.
+      Only use if a public act NAMES a PF as Art. 116 controller.
+      Otherwise: visible HOLE.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position
+        tests:
+          - not_null
+      - name: edge_label
+        description: QSA edges are socio, never acionista_controlador
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['socio', 'administrador', null]
+
+  - name: int_freeze_foreign_hq
+    description: |
+      Foreign HQ groups: freeze parent PF only if publicly named.
+      Brazilian CEO is not default controller.
+      Otherwise: HOLE.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position
+        tests:
+          - not_null
+      - name: freeze_status
+        description: Hole unless FRE 6.1.h or equivalent available
+        tests:
+          - not_null
+
+  - name: freeze_persons
+    description: |
+      Final freeze table: grupo × pessoa natural × papel.
+      One row per group × natural person × role using positional control (Lei 6.404/1976 Art. 116).
+      Freeze people at the end of the chain, not the PJ holding.
+      
+      SEAM TESTS (must fail if violated):
+      1. No edge_label dono or UBO
+      2. SOE with freeze_status=in and a PF controlador fails
+      3. FRE 6.2 institution without control acordo must not be role=controlador
+      4. Missing controller is hole, not CEO or offshore invention
+      5. QSA-only edge is socio, never acionista_controlador
+      6. No full CPF on page-bound fields (cpf_masked only)
+      7. cnpj_basico is 8-char STRING (leading zeros)
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position
+        tests:
+          - not_null
+      - name: group_name
+        description: Company brand name (Valor)
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: ranking_source
+        description: Source of ranking (Valor 1000 FY2024)
+      - name: receita_fy2024_brl
+        description: Revenue FY2024 in BRL (future enhancement)
+      - name: listed_flag
+        description: Listed company flag
+        tests:
+          - not_null
+      - name: soe_flag
+        description: State-owned enterprise flag
+        tests:
+          - not_null
+      - name: controlador_tipo
+        description: Controller type (listed | unlisted | foreign | soe)
+      - name: person_name
+        description: Natural person name (null for SOE or hole)
+      - name: role
+        description: Role (controlador | herdeiro | socio_chave)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['controlador', 'herdeiro', 'socio_chave', null]
+      - name: edge_label
+        description: Edge type (acionista_controlador | socio | administrador) - NEVER dono/UBO
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['acionista_controlador', 'socio', 'administrador', null]
+      - name: acordo_acionistas
+        description: Participante_Acordo_Acionistas flag from FRE
+      - name: source_doc
+        description: Source document citation
+      - name: fre_item
+        description: FRE item reference (6.1, 6.2, etc.)
+      - name: hole
+        description: True if controller not identified
+        tests:
+          - not_null
+      - name: cpf_masked
+        description: Masked CPF (DO NOT expand for HTML)
+      - name: freeze_status
+        description: Freeze status (in | skip_soe | hole | review)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['in', 'skip_soe', 'hole', 'review']
+      - name: notes
+        description: Additional notes about the freeze row
+    tests:
+      - dbt_utils.expression_is_true:
+          name: no_edge_label_dono_or_ubo
+          config:
+            severity: error
+          arguments:
+            expression: "edge_label not in ('dono', 'UBO', 'ubo', 'Dono')"
+      - dbt_utils.expression_is_true:
+          name: soe_cannot_have_pf_controlador_with_in_status
+          config:
+            severity: error
+          arguments:
+            expression: "not (soe_flag = true and freeze_status = 'in' and person_name is not null)"
+      - dbt_utils.expression_is_true:
+          name: cnpj_basico_is_8_chars
+          config:
+            severity: error
+          arguments:
+            expression: "length(cnpj_basico) = 8"
+            
+  - name: int_forbes_candidates
+    description: |
+      Forbes safety-net candidates for role=candidato_forbes, freeze_status=review.
+      Added AFTER positional freeze. Additive only.
+      Add ONLY if ALL of:
+      - On Forbes World's Billionaires
+      - Brazil-operations nexus = true
+      - cnpj_basico is NOT NULL (identified Brazil-operating group; may be outside top-50)
+      - NOT already in positional freeze
+      - Documentable control of Brazil-operating group
+      Do NOT auto-promote to freeze_status=in even if control_doc_available=true.
+    columns:
+      - name: person_name
+        description: Natural person name from Forbes
+        tests:
+          - not_null
+      - name: role
+        description: Must be candidato_forbes for Forbes safety-net
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['candidato_forbes']
+      - name: freeze_status
+        description: Must be review for Forbes candidates
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['review']
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros; REQUIRED for Forbes rows)
+        tests:
+          - not_null
+      - name: notes
+        description: Must use Forbes formula, not "o bilionário X"
+    tests:
+      - dbt_utils.expression_is_true:
+          name: forbes_notes_no_bilionario_phrase
+          config:
+            severity: error
+          arguments:
+            expression: "notes not like '%o bilionário%' and notes not like '%O bilionário%'"
+      - dbt_utils.expression_is_true:
+          name: forbes_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+            
+  - name: freeze_persons_with_forbes
+    description: |
+      Final freeze table with Forbes safety-net: positional freeze UNION Forbes candidates.
+      Issue #26: Forbes rows are ADDITIVE on top of freeze_persons (issue #25).
+      Same schema as freeze_persons.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position (null for Forbes candidates outside top-50)
+      - name: person_name
+        description: Natural person name (null for SOE or hole)
+      - name: role
+        description: Role (controlador | herdeiro | socio_chave | candidato_forbes)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['controlador', 'herdeiro', 'socio_chave', 'candidato_forbes', null]
+      - name: freeze_status
+        description: Freeze status (in | skip_soe | hole | review)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['in', 'skip_soe', 'hole', 'review']
+      - name: notes
+        description: Additional notes (must not contain "o bilionário X")
+    tests:
+      - dbt_utils.expression_is_true:
+          name: no_bilionario_phrase_in_notes
+          config:
+            severity: error
+          arguments:
+            expression: "notes not like '%o bilionário%' and notes not like '%O bilionário%'"
+      - dbt_utils.expression_is_true:
+          name: cnpj_basico_is_8_chars_when_not_null
+          config:
+            severity: error
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
