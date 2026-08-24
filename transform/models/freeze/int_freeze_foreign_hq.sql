@@ -1,5 +1,6 @@
 -- int_freeze_foreign_hq.sql
--- Foreign HQ groups: freeze parent PF only if publicly named
+-- Foreign HQ groups (unlisted only): freeze parent PF only if publicly named
+-- Listed foreign-controlled → int_freeze_listed_controllers (e.g. Ambev)
 -- Brazilian CEO is not default controller
 -- Otherwise: HOLE
 
@@ -7,6 +8,7 @@ with group_flags as (
     select * from {{ ref('stg_group_flags') }}
     where controlador_tipo = 'foreign'
       and soe_flag = false
+      and listed_flag = false -- Foreign unlisted only; listed foreign → int_freeze_listed_controllers
 )
 
 select

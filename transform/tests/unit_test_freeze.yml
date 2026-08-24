@@ -166,7 +166,71 @@ unit_tests:
           role: 'controlador'
           edge_label: 'acionista_controlador'
 
-  # SEAM 4: Missing controller is hole, not CEO or offshore invention
+  # SEAM 4a: Missing controller is hole at int_freeze_listed_controllers
+  - name: test_freeze_listed_empty_61_is_hole_int
+    description: |
+      SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
+      produces hole row in int_freeze_listed_controllers itself.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 3
+            empresa: 'No Controller Inc'
+            razao_social: 'No Controller S.A.'
+            cnpj_basico: '11111111'
+            cnpj_full: '11111111000100'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          # Only acionista_relevante, no controller
+          - CNPJ_Companhia: '11111111000100'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'No Controller S.A.'
+            ID_Acionista: 300
+            Acionista: 'BlackRock'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '99999999000199'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 120
+            Percentual_Acao_Ordinaria_Circulacao: 6.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 120
+            Percentual_Total_Acoes_Circulacao: 6.0
+            Nacionalidade: 'Estrangeira'
+            Sigla_UF: null
+            Residente_Exterior: 'S'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'N'
+            Participante_Acordo_Acionistas: 'N'
+    expect:
+      rows:
+        - group_rank: 3
+          group_name: 'No Controller Inc'
+          person_name: null
+          freeze_status: 'hole'
+          hole: true
+
+  # SEAM 4b: Missing controller is hole, not CEO or offshore invention
   - name: test_freeze_listed_empty_61_is_hole
     description: |
       SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
@@ -309,6 +373,47 @@ unit_tests:
           person_name: null
           role: null
           edge_label: null
+          freeze_status: 'hole'
+
+  # Partition test: foreign unlisted appears exactly once
+  - name: test_freeze_foreign_unlisted_no_duplicate
+    description: |
+      PARTITION TEST: Foreign unlisted group (Cargill-style: listed_flag=false,
+      controlador_tipo=foreign) appears exactly once in freeze_persons.
+      Locked partition: unlisted+foreign → int_freeze_foreign_hq only.
+    model: freeze_persons
+    given:
+      - input: ref('int_freeze_listed_controllers')
+        rows: []
+      - input: ref('int_freeze_soe')
+        rows: []
+      - input: ref('int_freeze_unlisted_rf')
+        rows: []
+      - input: ref('int_freeze_foreign_hq')
+        rows:
+          - group_rank: 10
+            group_name: 'Cargill'
+            cnpj_basico: '01961898'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: false
+            soe_flag: false
+            controlador_tipo: 'foreign'
+            person_name: null
+            role: null
+            edge_label: null
+            acordo_acionistas: null
+            source_doc: 'Valor capital_origem=US'
+            fre_item: null
+            hole: true
+            cpf_masked: null
+            freeze_status: 'hole'
+            notes: 'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.'
+    expect:
+      rows:
+        - group_rank: 10
+          group_name: 'Cargill'
+          person_name: null
           freeze_status: 'hole'
 
   # SEAM 6: No full CPF on page-bound fields (cpf_masked only)

@@ -9,6 +9,7 @@ with group_flags as (
     select * from {{ ref('stg_group_flags') }}
     where listed_flag = false
       and soe_flag = false
+      and controlador_tipo != 'foreign' -- Foreign unlisted → int_freeze_foreign_hq
 ),
 
 rf_empresas as (
