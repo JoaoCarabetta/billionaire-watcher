@@ -1,24 +1,15 @@
 [
   {
-    "id": "metod-1",
-    "value": "O arquivo identifica poder econômico no Brasil a partir de grupos empresariais ranqueados pela receita líquida do exercício fiscal de 2024.",
+    "id": "metod-ranking-source",
+    "value": "A porta de entrada para grupos é o ranking Valor 1000 2025, que ordena empresas por receita líquida consolidada do exercício fiscal de 2024.",
     "source": {
       "publisher": "Valor Econômico",
-      "locator": "https://valor.globo.com/empresas/valor1000/",
+      "locator": "https://infograficos.valor.globo.com/valor1000/2025",
       "retrieved_at": "2026-10-04"
     }
   },
   {
-    "id": "metod-2",
-    "value": "O ranking Valor 1000 2025 organiza as maiores empresas por receita líquida consolidada do ano fiscal 2024.",
-    "source": {
-      "publisher": "Valor Econômico",
-      "locator": "https://valor.globo.com/empresas/valor1000/",
-      "retrieved_at": "2026-10-04"
-    }
-  },
-  {
-    "id": "metod-3",
+    "id": "metod-positional-door",
     "value": "A porta de entrada para pessoas físicas usa o conceito de acionista controlador conforme Lei 6.404/1976 Art. 116.",
     "source": {
       "publisher": "Presidência da República",
@@ -27,8 +18,17 @@
     }
   },
   {
-    "id": "metod-4",
-    "value": "Para empresas de capital aberto, o arquivo consulta os Formulários de Referência (FRE) seção 6.1 onde consta a identificação do acionista controlador.",
+    "id": "metod-positional-method",
+    "value": "O método posicional identifica elites por posições em organizações estratégicas (Hoffmann-Lange 2007, pp. 910–914).",
+    "source": {
+      "publisher": "Hoffmann-Lange, U. (2007). Methods of Elite Identification",
+      "locator": "https://doi.org/10.1002/9780470996645.ch41",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-fre-listed",
+    "value": "Para empresas de capital aberto, consultar o Formulário de Referência (FRE) seção 6.1, que identifica o acionista controlador.",
     "source": {
       "publisher": "CVM - Comissão de Valores Mobiliários",
       "locator": "https://www.gov.br/cvm/pt-br/assuntos/regulados/companhias/informacoes-periodicas-e-eventuais/formulario-de-referencia",
@@ -36,8 +36,8 @@
     }
   },
   {
-    "id": "metod-5",
-    "value": "Para empresas de capital fechado, o arquivo consulta o Quadro de Sócios e Administradores (QSA) da Receita Federal.",
+    "id": "metod-qsa-unlisted",
+    "value": "Para empresas de capital fechado, consultar o Quadro de Sócios e Administradores (QSA) da Receita Federal.",
     "source": {
       "publisher": "Receita Federal do Brasil",
       "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
@@ -45,8 +45,8 @@
     }
   },
   {
-    "id": "metod-6",
-    "value": "O QSA registra vínculos societários conforme Instrução Normativa RFB 2.119/2022, mas não identifica beneficiário final (UBO) porque o e-BEF não é público.",
+    "id": "metod-qsa-socio-label",
+    "value": "As arestas de vínculo societário da Receita Federal são rotuladas como sócio, não como beneficiário final (UBO).",
     "source": {
       "publisher": "Receita Federal do Brasil",
       "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
@@ -54,7 +54,16 @@
     }
   },
   {
-    "id": "metod-7",
+    "id": "metod-qsa-no-ubo",
+    "value": "O QSA registra vínculos societários conforme Instrução Normativa RFB 2.119/2022, mas não identifica beneficiário final porque o e-BEF não é público.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-visible-hole",
     "value": "Quando o controlador não é identificado nas fontes públicas, o dossiê apresenta lacuna visível em vez de inferência.",
     "source": {
       "publisher": "Billionaire Watcher",
@@ -63,17 +72,35 @@
     }
   },
   {
-    "id": "metod-8",
-    "value": "O método posicional segue Hoffmann-Lange (1980) que identifica elites por posições em organizações estratégicas.",
+    "id": "metod-soe-not-person",
+    "value": "Quando a União, Estado ou Município consta como acionista controlador, a empresa é identificada como estatal e não gera dossiê de pessoa física porque ente federativo não é pessoa natural.",
     "source": {
-      "publisher": "Hoffmann-Lange, U.",
-      "locator": "https://doi.org/10.1007/978-1-349-05539-6_6",
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
       "retrieved_at": "2026-10-04"
     }
   },
   {
-    "id": "metod-9",
-    "value": "A lista Forbes serve como rede de segurança (candidato_forbes) para revisão manual, não como fonte primária.",
+    "id": "metod-foreign-ceo-not-controller",
+    "value": "O CEO brasileiro de subsidiária não é tratado como controlador padrão quando a sede de controle está no exterior.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-foreign-included",
+    "value": "Empresas estrangeiras ranqueadas no Valor 1000 são incluídas quando identificado controlador pessoa física.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-forbes-safety-net",
+    "value": "A lista Forbes serve como rede de segurança para revisão manual de candidatos não capturados pelo método posicional, não como fonte primária de controle.",
     "source": {
       "publisher": "Forbes Brasil",
       "locator": "https://www.forbes.com.br/listas/",
@@ -81,8 +108,8 @@
     }
   },
   {
-    "id": "metod-10",
-    "value": "O freeze foi realizado em 4 de outubro de 2026.",
+    "id": "metod-freeze-date",
+    "value": "O protocolo estabelece 4 de outubro de 2026 como data de referência do freeze.",
     "source": {
       "publisher": "Billionaire Watcher",
       "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
@@ -90,8 +117,8 @@
     }
   },
   {
-    "id": "metod-11",
-    "value": "O método rejeita interlocks de conselho como proxy de propriedade (Useem 1979 identifica conexões, não controle).",
+    "id": "metod-reject-interlocks",
+    "value": "O método rejeita interlocks de conselho como proxy de propriedade porque identificam conexões entre elites, não controle acionário (Useem 1979, p. 555).",
     "source": {
       "publisher": "Useem, M. (1979). The Social Organization of the American Business Elite",
       "locator": "https://doi.org/10.2307/2094593",
@@ -99,8 +126,8 @@
     }
   },
   {
-    "id": "metod-12",
-    "value": "O método rejeita Wikipedia e Forbes como fontes primárias porque não documentam cadeia de controle.",
+    "id": "metod-reject-wikipedia-forbes",
+    "value": "O método rejeita Wikipedia e Forbes como fontes primárias porque não documentam cadeia de controle acionário.",
     "source": {
       "publisher": "Billionaire Watcher",
       "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
@@ -108,26 +135,8 @@
     }
   },
   {
-    "id": "metod-13",
+    "id": "metod-reject-tse-volume",
     "value": "O método rejeita volume de doações TSE como critério de elite porque doação política não determina propriedade empresarial.",
-    "source": {
-      "publisher": "Billionaire Watcher",
-      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
-      "retrieved_at": "2026-10-04"
-    }
-  },
-  {
-    "id": "metod-14",
-    "value": "Empresas estatais federais, estaduais e municipais são identificadas quando a União, Estado ou Município consta como acionista controlador.",
-    "source": {
-      "publisher": "CVM - Comissão de Valores Mobiliários",
-      "locator": "https://www.gov.br/cvm/pt-br/assuntos/regulados/companhias/informacoes-periodicas-e-eventuais/formulario-de-referencia",
-      "retrieved_at": "2026-10-04"
-    }
-  },
-  {
-    "id": "metod-15",
-    "value": "Empresas estrangeiras ranqueadas no Valor 1000 são incluídas quando identificado controlador pessoa física.",
     "source": {
       "publisher": "Billionaire Watcher",
       "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",

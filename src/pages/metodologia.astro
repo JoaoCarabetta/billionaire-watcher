@@ -2,15 +2,15 @@
 import FactWithCitation from '../components/FactWithCitation.astro';
 import Citations from '../components/Citations.astro';
 import { getMethodologyFacts } from '../utils/fixtures';
-import type { Source } from '../types';
+import type { Source, Fact } from '../types';
 
-const facts = getMethodologyFacts();
+const allFacts = getMethodologyFacts();
 
 // Build citation map: unique sources by first appearance
 const citationMap = new Map<string, number>();
 let nextCitationNumber = 1;
 
-const allSources = facts.filter(f => f.source).map(f => f.source!);
+const allSources = allFacts.filter(f => f.source).map(f => f.source!);
 
 for (const source of allSources) {
   if (!citationMap.has(source.locator)) {
@@ -19,6 +19,44 @@ for (const source of allSources) {
 }
 
 const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
+
+// Helper to get fact by id
+const getFactById = (id: string): Fact | undefined => allFacts.find(f => f.id === id);
+
+// Organize facts by section using ids
+const rankingFacts = [
+  getFactById('metod-ranking-source')
+].filter(Boolean) as Fact[];
+
+const positionalDoorFacts = [
+  getFactById('metod-positional-door'),
+  getFactById('metod-positional-method'),
+  getFactById('metod-fre-listed'),
+  getFactById('metod-qsa-unlisted'),
+  getFactById('metod-qsa-socio-label'),
+  getFactById('metod-qsa-no-ubo'),
+  getFactById('metod-visible-hole')
+].filter(Boolean) as Fact[];
+
+const scopeFacts = [
+  getFactById('metod-soe-not-person'),
+  getFactById('metod-foreign-ceo-not-controller'),
+  getFactById('metod-foreign-included')
+].filter(Boolean) as Fact[];
+
+const forbesFacts = [
+  getFactById('metod-forbes-safety-net')
+].filter(Boolean) as Fact[];
+
+const freezeDateFacts = [
+  getFactById('metod-freeze-date')
+].filter(Boolean) as Fact[];
+
+const rejectedMethodsFacts = [
+  getFactById('metod-reject-interlocks'),
+  getFactById('metod-reject-wikipedia-forbes'),
+  getFactById('metod-reject-tse-volume')
+].filter(Boolean) as Fact[];
 ---
 
 <!DOCTYPE html>
@@ -92,42 +130,42 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
     <main>
       <section class="methodology-content">
         <h2>Critério de Inclusão</h2>
-        {facts.slice(0, 2).map((fact) => (
+        {rankingFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
 
       <section class="methodology-content">
         <h2>Porta de Entrada para Pessoas Físicas</h2>
-        {facts.slice(2, 7).map((fact) => (
+        {positionalDoorFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
 
       <section class="methodology-content">
-        <h2>Método Posicional</h2>
-        {facts.slice(7, 10).map((fact) => (
+        <h2>Escopo: Empresas Estatais e Estrangeiras</h2>
+        {scopeFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
 
       <section class="methodology-content">
-        <h2>Data do Freeze</h2>
-        {facts.slice(10, 11).map((fact) => (
+        <h2>Rede de Segurança</h2>
+        {forbesFacts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Data de Referência</h2>
+        {freezeDateFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
 
       <section class="methodology-content">
         <h2>Métodos Rejeitados</h2>
-        {facts.slice(11, 14).map((fact) => (
-          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
-        ))}
-      </section>
-
-      <section class="methodology-content">
-        <h2>Empresas Estatais e Estrangeiras</h2>
-        {facts.slice(14, 16).map((fact) => (
+        {rejectedMethodsFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>

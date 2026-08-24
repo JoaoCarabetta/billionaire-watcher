@@ -8,10 +8,12 @@ describe('Metodologia Page', () => {
   let buildFailed: boolean = false;
   let buildError: string = '';
   let homeHtml: string = '';
+  let dossierHtml: string = '';
 
   beforeAll(() => {
     const metodologiaPath = path.join(__dirname, '..', 'dist', 'metodologia', 'index.html');
     const homePath = path.join(__dirname, '..', 'dist', 'index.html');
+    const dossierPath = path.join(__dirname, '..', 'dist', 'pessoa', 'p1', 'index.html');
     
     // Always rebuild to ensure fresh state
     try {
@@ -35,6 +37,10 @@ describe('Metodologia Page', () => {
     
     if (fs.existsSync(homePath)) {
       homeHtml = fs.readFileSync(homePath, 'utf-8');
+    }
+    
+    if (fs.existsSync(dossierPath)) {
+      dossierHtml = fs.readFileSync(dossierPath, 'utf-8');
     }
   });
 
@@ -86,9 +92,12 @@ describe('Metodologia Page', () => {
       expect(builtHtml).toMatch(/6\.404|Art\. 116|artigo 116/i);
     });
 
-    it('should clarify sócio (not UBO) and mention QSA/IN RFB', () => {
-      expect(builtHtml).toMatch(/sócio/i);
+    it('should clarify RF edges are labeled sócio (not dono/UBO)', () => {
+      // Must explicitly state that RF partner edges are labeled "sócio"
+      // Not just pass because "Quadro de Sócios" contains the substring
+      expect(builtHtml).toMatch(/rotulad[ao]s?\s+como\s+sócio/i);
       expect(builtHtml).toMatch(/QSA|Quadro de Sócios/i);
+      expect(builtHtml).toMatch(/IN.*RFB.*2\.119|Instrução Normativa.*2\.119/i);
       // The methodology can mention UBO to clarify what we DON'T use
       // but should not use "dono" as a label
       const mentionsDono = /\bdono\b/i.test(builtHtml);
@@ -118,14 +127,26 @@ describe('Metodologia Page', () => {
     it('should mention rejected methods: TSE volume as elite membership', () => {
       expect(builtHtml).toMatch(/TSE|doações|volume/i);
     });
+
+    it('should mention SOE (União/Estado/Município not person)', () => {
+      expect(builtHtml).toMatch(/União|Estado|Município/i);
+      expect(builtHtml).toMatch(/estatal/i);
+    });
+
+    it('should mention foreign companies and CEO not default controller', () => {
+      expect(builtHtml).toMatch(/estrangeira/i);
+      expect(builtHtml).toMatch(/CEO|subsidiária/i);
+    });
   });
 
   describe('Test 4: Voice guidelines - forbidden patterns', () => {
-    it('should NOT have pipeline jargon (RSS, LLM, UniqueEvent, etc.)', () => {
+    it('should NOT have pipeline jargon (RSS, LLM, UniqueEvent, candidato_forbes, etc.)', () => {
       expect(builtHtml).not.toMatch(/\bRSS\b/);
       expect(builtHtml).not.toMatch(/\bLLM\b/);
       expect(builtHtml).not.toMatch(/UniqueEvent/i);
       expect(builtHtml).not.toMatch(/extrai campos com IA/i);
+      expect(builtHtml).not.toMatch(/candidato_forbes/i);
+      expect(builtHtml).not.toMatch(/skip_soe/i);
     });
 
     it('should NOT have Wikipedia identity lead', () => {
@@ -166,9 +187,13 @@ describe('Metodologia Page', () => {
     });
   });
 
-  describe('Test 5: Home links to metodologia', () => {
+  describe('Test 5: Home and dossier link to metodologia', () => {
     it('should have a link from home page to /metodologia', () => {
       expect(homeHtml).toMatch(/href=["']\/metodologia["']/i);
+    });
+
+    it('should have a link from dossier footer to /metodologia', () => {
+      expect(dossierHtml).toMatch(/href=["']\/metodologia["']/i);
     });
   });
 
