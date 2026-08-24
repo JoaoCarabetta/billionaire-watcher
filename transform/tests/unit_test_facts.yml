@@ -946,3 +946,103 @@ unit_tests:
         - person_name: Test Person
           fact_kind: donation
       format: dict
+
+  # Issue #57: CPF format mismatch fix - punctuated CPF joins 11-digit
+  - name: test_donation_facts_punctuated_cpf_joins_11_digits
+    description: |
+      Issue #57: Punctuated freeze CPF (123.456.789-01) joins TSE 11-digit CPF (12345678901).
+      Both sides normalize to 11 digits via regexp_replace + lpad.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: João Silva
+            freeze_status: in
+            cnpj_basico: '12345678'
+            group_name: Test Company
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '123.456.789-01'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***999***'
+            nome_candidato: Test Candidate
+            cpf_cnpj_doador: '12345678901'
+            nome_doador: JOAO SILVA
+            valor_receita: 1000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026TEST001'
+            cpf_doador_masked: '12345678901'
+    expect:
+      rows:
+        - person_name: João Silva
+          fact_kind: donation
+          cpf_masked: '123.456.789-01'
+      format: dict
+
+  # Issue #57: Last-5-only overlap must NOT match
+  - name: test_donation_facts_last_5_only_must_not_match
+    description: |
+      Issue #57: Last-5-only overlap must NOT match.
+      Freeze CPF 999.888.777-01 vs TSE CPF 12345677701 must not join.
+      Only full 11-digit match is valid.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Maria Santos
+            freeze_status: in
+            cnpj_basico: '87654321'
+            group_name: Another Company
+            role: controlador
+            source_doc: CVM FRE 2026
+            cpf_masked: '999.888.777-01'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***999***'
+            nome_candidato: Test Candidate
+            cpf_cnpj_doador: '12345677701'
+            nome_doador: OUTRA PESSOA
+            valor_receita: 2000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026TEST002'
+            cpf_doador_masked: '12345677701'
+    expect:
+      rows: []
+
+  # Issue #57: Published CPF never contains 11 consecutive digits
+  - name: test_published_facts_cpf_masked_no_11_consecutive_digits
+    description: |
+      Issue #57: Published_facts row never contains 11 consecutive digits in cpf_masked.
+      CPF is masked as ***NNN*** (stars + last-3 + stars).
+    model: published_facts
+    given:
+      - input: ref('identity_facts')
+        rows: []
+      - input: ref('control_edge_facts')
+        rows: []
+      - input: ref('donation_facts')
+        rows:
+          - fact_id: donation_TEST_João Silva
+            person_name: João Silva
+            fact_kind: donation
+            value: João Silva doou R$ 1000.0 para Test Candidate em 2026 (recibo TEST)
+            source_publisher: Tribunal Superior Eleitoral
+            source_locator: TSE Receitas Candidato 2026 recibo TEST
+            source_retrieved_at: null
+            cpf_masked: '123.456.789-01'
+            cnpj_basico: '12345678'
+            group_name: Test Company
+      - input: ref('association_facts')
+        rows: []
+    expect:
+      rows:
+        - fact_id: donation_TEST_João Silva
+          person_id: João Silva
+          cpf_masked: '***001***'
+          fact_kind: donation
+      format: dict
