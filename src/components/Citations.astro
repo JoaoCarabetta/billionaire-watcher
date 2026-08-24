@@ -1,28 +1,30 @@
 ---
-import type { Fact } from '../types';
+import type { Source } from '../types';
 
 interface Props {
-  facts: Fact[];
+  sources: Source[];
 }
 
-const { facts } = Astro.props;
+const { sources } = Astro.props;
 
-const factsWithSources = facts.filter(f => f.source);
+const uniqueSources = sources.filter((source, index, self) =>
+  index === self.findIndex((s) => s.locator === source.locator)
+);
 ---
 
-{factsWithSources.length > 0 && (
+{uniqueSources.length > 0 && (
   <section class="citations">
     <h2>Referências</h2>
     <ol>
-      {factsWithSources.map((fact, index) => (
+      {uniqueSources.map((source, index) => (
         <li id={`citation-${index + 1}`}>
-          <strong>{fact.source!.publisher}</strong>
+          <strong>{source.publisher}</strong>
           {' — '}
-          <a href={fact.source!.locator} target="_blank" rel="noopener noreferrer">
-            {fact.source!.locator}
+          <a href={source.locator} target="_blank" rel="noopener noreferrer">
+            {source.locator}
           </a>
           {' '}
-          <span class="retrieved">(recuperado em {fact.source!.retrieved_at})</span>
+          <span class="retrieved">(recuperado em {source.retrieved_at})</span>
         </li>
       ))}
     </ol>

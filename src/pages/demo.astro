@@ -6,6 +6,7 @@ import { getFacts, getDerivedAssociations } from '../utils/fixtures';
 
 const facts = getFacts();
 const associations = getDerivedAssociations();
+const sources = facts.filter(f => f.source).map(f => f.source!);
 ---
 
 <!DOCTYPE html>
@@ -78,7 +79,7 @@ const associations = getDerivedAssociations();
         </section>
       )}
 
-      <Citations facts={facts} />
+      <Citations sources={sources} />
     </main>
   </body>
 </html>

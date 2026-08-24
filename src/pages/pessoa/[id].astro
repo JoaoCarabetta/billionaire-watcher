@@ -1,8 +1,15 @@
 ---
 import FactWithCitation from '../../components/FactWithCitation.astro';
+import RFPartnerEdge from '../../components/RFPartnerEdge.astro';
+import CVMFREControl from '../../components/CVMFREControl.astro';
 import Citations from '../../components/Citations.astro';
-import { getFreeze, getIdentityFactsByPersonId } from '../../utils/fixtures';
-import type { Person } from '../../types';
+import { 
+  getFreeze, 
+  getIdentityFactsByPersonId,
+  getRFPartnerEdgesByPersonId,
+  getCVMFREControlsByPersonId
+} from '../../utils/fixtures';
+import type { Person, Source } from '../../types';
 
 export async function getStaticPaths() {
   const freezePersons = getFreeze();
@@ -19,10 +26,23 @@ interface Props {
 
 const { person } = Astro.props;
 const identityFacts = getIdentityFactsByPersonId(person.person_id);
+const rfPartnerEdges = getRFPartnerEdgesByPersonId(person.person_id);
+const cvmFreControls = getCVMFREControlsByPersonId(person.person_id);
 
 // Find name fact for title, or fallback to freeze CSV name as index chrome
 const nameFact = identityFacts.find(f => f.field === 'nome');
 const pageTitle = nameFact ? nameFact.value : person.person_name;
+
+// Collect all sources for citations
+const allSources: Source[] = [
+  ...identityFacts.filter(f => f.source).map(f => f.source!),
+  ...rfPartnerEdges.filter(e => e.source).map(e => e.source),
+  ...cvmFreControls.filter(c => c.source).map(c => c.source)
+];
+
+// Create citation number mapping
+let citationCounter = 0;
+const getCitationNumber = () => ++citationCounter;
 ---
 
 <!DOCTYPE html>
@@ -77,6 +97,28 @@ const pageTitle = nameFact ? nameFact.value : person.person_name;
         margin-bottom: 1rem;
         font-size: 0.9rem;
       }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.5rem;
+      }
+      
+      th {
+        text-align: left;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #ddd;
+      }
+      
+      .missing-control {
+        padding: 1rem;
+        background: #fff3cd;
+        border-left: 3px solid #ffc107;
+        color: #856404;
+        margin-top: 0.5rem;
+      }
     </style>
   </head>
   <body>
@@ -90,13 +132,50 @@ const pageTitle = nameFact ? nameFact.value : person.person_name;
       {identityFacts.length > 0 && (
         <section>
           <h2>Dados de Identidade</h2>
-          {identityFacts.map((fact, index) => (
-            <FactWithCitation fact={fact} citationNumber={index + 1} />
+          {identityFacts.map((fact) => (
+            <FactWithCitation fact={fact} citationNumber={getCitationNumber()} />
           ))}
         </section>
       )}
 
-      <Citations facts={identityFacts} />
+      {rfPartnerEdges.length > 0 && (
+        <section>
+          <h2>Empresas e Sócios</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Relação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rfPartnerEdges.map((edge) => (
+                <RFPartnerEdge edge={edge} citationNumber={getCitationNumber()} />
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {cvmFreControls.length > 0 && (
+        <section>
+          <h2>Controle Acionário (CVM)</h2>
+          {cvmFreControls.map((control) => (
+            <CVMFREControl control={control} citationNumber={getCitationNumber()} />
+          ))}
+        </section>
+      )}
+
+      {rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
+        <section>
+          <h2>Controle Acionário</h2>
+          <div class="missing-control">
+            Informações sobre controle acionário não identificadas nos registros públicos da CVM (Formulário de Referência).
+          </div>
+        </section>
+      )}
+
+      <Citations sources={allSources} />
     </main>
   </body>
 </html>

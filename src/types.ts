@@ -29,3 +29,21 @@ export interface IdentityFact extends Fact {
   person_id: string;
   field: string;
 }
+
+export interface RFPartnerEdge {
+  id: string;
+  person_id: string;
+  company_cnpj: string;
+  company_name: string;
+  relationship: string;
+  source: Source;
+}
+
+export interface CVMFREControl {
+  id: string;
+  person_id: string;
+  company_name: string;
+  control_type: string;
+  control_description: string;
+  source: Source;
+}
