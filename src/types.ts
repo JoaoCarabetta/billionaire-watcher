@@ -47,3 +47,28 @@ export interface CVMFREControl {
   control_description: string;
   source: Source;
 }
+
+export interface Donation {
+  id: string;
+  donor_type: 'person' | 'cnpj';
+  donor_cpf?: string;
+  donor_cnpj?: string;
+  donor_name: string;
+  candidate_cpf: string;
+  candidate_name: string;
+  candidate_numero: string;
+  amount: number;
+  year: number;
+  cycle: string;
+  source: Source;
+}
+
+export interface Candidate {
+  cpf: string;
+  name: string;
+  numero: string | null;
+  in_freeze: boolean;
+  person_id?: string;
+  wikipedia_url?: string;
+  tse_url?: string;
+}
