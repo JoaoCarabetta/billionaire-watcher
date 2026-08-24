@@ -58,4 +58,9 @@ jobs:
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-        run: dbt test --select test_type:unit
+        run: |
+          echo "=== Running dbt unit tests ==="
+          dbt test --select test_type:unit || {
+            echo "=== Unit tests failed, checking logs ==="
+            exit 1
+          }
