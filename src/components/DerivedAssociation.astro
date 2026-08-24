@@ -1,32 +1,80 @@
 ---
-import type { DerivedAssociation, Fact } from '../types';
-import { getFactById } from '../utils/fixtures';
+import type { DerivedAssociation, Source, Candidate } from '../types';
+import { getDonations, getCandidateByCpf, getFreeze, redactCPF } from '../utils/fixtures';
 
 interface Props {
   association: DerivedAssociation;
-  factsStartIndex: number;
+  citationMap: Map<string, number>;
 }
 
-const { association, factsStartIndex } = Astro.props;
+const { association, citationMap } = Astro.props;
 
-const parentFacts = association.parent_facts
-  .map(id => getFactById(id))
-  .filter((f): f is Fact => f !== undefined);
+// Get parent donations
+const allDonations = getDonations();
+const parentDonations = association.parent_donation_ids
+  .map(id => allDonations.find(d => d.id === id))
+  .filter(d => d !== undefined);
 
-if (parentFacts.length === 0) {
-  throw new Error(`Derived association ${association.id} has no valid parent facts`);
+if (parentDonations.length === 0) {
+  throw new Error(`Derived association ${association.id} has no valid parent donations`);
 }
 
-const citationNumbers = association.parent_facts.map((factId, idx) => {
-  const allFacts = parentFacts;
-  const factIndex = allFacts.findIndex(f => f.id === factId);
-  return factIndex !== -1 ? factsStartIndex + factIndex + 1 : null;
-}).filter((n): n is number => n !== null);
+// Get unique citation numbers from parent donation sources
+const uniqueSources = new Map<string, Source>();
+for (const donation of parentDonations) {
+  if (!uniqueSources.has(donation.source.locator)) {
+    uniqueSources.set(donation.source.locator, donation.source);
+  }
+}
+
+const citationNumbers = Array.from(uniqueSources.values())
+  .map(source => citationMap.get(source.locator))
+  .filter((n): n is number => n !== undefined);
+
+if (citationNumbers.length === 0) {
+  throw new Error(`Derived association ${association.id} has no citation numbers`);
+}
+
+// Get candidate or freeze person for link
+let linkUrl = '';
+let linkText = '';
+
+if (association.association_type === 'politician' && association.associated_candidate_cpf) {
+  const candidate = getCandidateByCpf(association.associated_candidate_cpf);
+  if (candidate) {
+    linkText = redactCPF(candidate.name);
+    if (candidate.in_freeze && candidate.person_id) {
+      linkUrl = `/pessoa/${candidate.person_id}`;
+    } else if (candidate.wikipedia_url) {
+      linkUrl = candidate.wikipedia_url;
+    } else if (candidate.tse_url) {
+      linkUrl = candidate.tse_url;
+    }
+  }
+} else if (association.association_type === 'freeze_person' && association.associated_person_id) {
+  const freeze = getFreeze();
+  const otherPerson = freeze.find(p => p.person_id === association.associated_person_id);
+  if (otherPerson) {
+    linkText = otherPerson.person_name;
+    linkUrl = `/pessoa/${otherPerson.person_id}`;
+  }
+}
 ---
 
 <div class="derived-association" data-association-id={association.id}>
   <p class="association-description">
-    {association.description}
+    {association.description.split(linkText).map((part, idx, arr) => (
+      <>
+        {part}
+        {idx < arr.length - 1 && linkUrl && (
+          association.association_type === 'politician' && !linkUrl.startsWith('/pessoa') ? (
+            <a href={linkUrl} target="_blank" rel="noopener noreferrer">{linkText}</a>
+          ) : (
+            <a href={linkUrl}>{linkText}</a>
+          )
+        )}
+      </>
+    ))}
     {citationNumbers.map((num, idx) => (
       <sup class="citation-marker">
         [{num}]{idx < citationNumbers.length - 1 ? ',' : ''}

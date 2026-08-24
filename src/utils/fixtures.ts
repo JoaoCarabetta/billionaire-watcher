@@ -19,9 +19,111 @@ export function getFactById(id: string): Fact | undefined {
 
 export function getDerivedAssociations(): DerivedAssociation[] {
   return associationsData.filter(assoc => 
-    assoc.parent_facts.length > 0 &&
-    assoc.parent_facts.every(factId => getFactById(factId) !== undefined)
+    assoc.parent_donation_ids.length > 0 &&
+    assoc.parent_donation_ids.every(donationId => {
+      const donation = getDonations().find(d => d.id === donationId);
+      return donation !== undefined;
+    })
   );
+}
+
+export function getDerivedAssociationsByPersonId(personId: string): DerivedAssociation[] {
+  const freeze = getFreeze();
+  const person = freeze.find(p => p.person_id === personId);
+  if (!person) return [];
+  
+  const donations = getDonationsByPersonId(personId);
+  const candidates = getCandidates();
+  const associations: DerivedAssociation[] = [];
+  
+  // Group donations by candidate
+  const donationsByCandidate = new Map<string, Donation[]>();
+  for (const donation of donations) {
+    const candidateCpf = donation.candidate_cpf.replace(/\D/g, '');
+    if (!donationsByCandidate.has(candidateCpf)) {
+      donationsByCandidate.set(candidateCpf, []);
+    }
+    donationsByCandidate.get(candidateCpf)!.push(donation);
+  }
+  
+  // Create politician associations (one per candidate donated to)
+  for (const [candidateCpf, candidateDonations] of donationsByCandidate.entries()) {
+    const candidate = candidates.find(c => c.cpf.replace(/\D/g, '') === candidateCpf);
+    if (!candidate) continue;
+    
+    // Skip if candidate is in freeze (they should be in freeze-to-freeze associations instead)
+    if (candidate.in_freeze) continue;
+    
+    const totalAmount = candidateDonations.reduce((sum, d) => sum + d.amount, 0);
+    const years = [...new Set(candidateDonations.map(d => d.year))].sort();
+    const yearText = years.length === 1 ? years[0].toString() : `${years[0]}-${years[years.length - 1]}`;
+    
+    associations.push({
+      id: `assoc-politician-${personId}-${candidateCpf}`,
+      person_id: personId,
+      associated_candidate_cpf: candidate.cpf,
+      association_type: 'politician',
+      description: `Doou ${formatCurrency(totalAmount)} para ${candidate.name} (${yearText})`,
+      parent_donation_ids: candidateDonations.map(d => d.id)
+    });
+  }
+  
+  // Create freeze-to-freeze associations (co-donors)
+  const allDonations = getDonations();
+  const allFreeze = freeze.filter(p => p.person_id !== personId);
+  
+  for (const otherPerson of allFreeze) {
+    const otherDonations = getDonationsByPersonId(otherPerson.person_id);
+    
+    // Find candidates both donated to
+    const sharedCandidates = new Map<string, { myDonations: Donation[], theirDonations: Donation[] }>();
+    
+    for (const myDonation of donations) {
+      const candidateCpf = myDonation.candidate_cpf.replace(/\D/g, '');
+      const theirDonationsToSame = otherDonations.filter(d => 
+        d.candidate_cpf.replace(/\D/g, '') === candidateCpf
+      );
+      
+      if (theirDonationsToSame.length > 0) {
+        if (!sharedCandidates.has(candidateCpf)) {
+          sharedCandidates.set(candidateCpf, { myDonations: [], theirDonations: [] });
+        }
+        sharedCandidates.get(candidateCpf)!.myDonations.push(myDonation);
+        sharedCandidates.get(candidateCpf)!.theirDonations.push(...theirDonationsToSame);
+      }
+    }
+    
+    if (sharedCandidates.size > 0) {
+      // Get unique parent donation IDs (both my donations and their donations)
+      const allParentDonationIds = new Set<string>();
+      for (const { myDonations, theirDonations } of sharedCandidates.values()) {
+        myDonations.forEach(d => allParentDonationIds.add(d.id));
+        theirDonations.forEach(d => allParentDonationIds.add(d.id));
+      }
+      
+      const candidateNames = Array.from(sharedCandidates.keys())
+        .map(cpf => {
+          const candidate = candidates.find(c => c.cpf.replace(/\D/g, '') === cpf);
+          return candidate ? redactCPF(candidate.name) : 'candidato';
+        })
+        .slice(0, 2);
+      
+      const candidateText = candidateNames.length === 1 
+        ? candidateNames[0]
+        : `${candidateNames[0]} e outros`;
+      
+      associations.push({
+        id: `assoc-freeze-${personId}-${otherPerson.person_id}`,
+        person_id: personId,
+        associated_person_id: otherPerson.person_id,
+        association_type: 'freeze_person',
+        description: `Co-doador com ${otherPerson.person_name} para ${candidateText}`,
+        parent_donation_ids: Array.from(allParentDonationIds)
+      });
+    }
+  }
+  
+  return associations;
 }
 
 export function redactCPF(text: string): string {

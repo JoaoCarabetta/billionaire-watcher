@@ -13,8 +13,12 @@ export interface Fact {
 
 export interface DerivedAssociation {
   id: string;
+  person_id: string;
+  associated_person_id?: string;
+  associated_candidate_cpf?: string;
+  association_type: 'politician' | 'freeze_person';
   description: string;
-  parent_facts: string[];
+  parent_donation_ids: string[];
 }
 
 export interface Person {
