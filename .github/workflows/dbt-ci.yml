@@ -37,7 +37,7 @@ jobs:
             outputs:
               ci:
                 type: bigquery
-                method: oauth
+                method: anonymous
                 project: dummy-project
                 dataset: dummy_dataset
                 location: US
