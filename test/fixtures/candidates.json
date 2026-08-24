@@ -20,5 +20,12 @@
     "numero": null,
     "in_freeze": true,
     "person_id": "p1"
+  },
+  {
+    "cpf": "888.999.000-11",
+    "name": "Marina Costa",
+    "numero": "9876",
+    "in_freeze": false,
+    "tse_url": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2026/2/BR/888999000-11"
   }
 ]

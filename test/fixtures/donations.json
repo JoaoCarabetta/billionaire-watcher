@@ -66,5 +66,39 @@
       "locator": "https://basedosdados.org/queries/tse-receitas-2018",
       "retrieved_at": "2026-08-24"
     }
+  },
+  {
+    "id": "donation-5-2026",
+    "donor_type": "person",
+    "donor_cpf": "123.456.789-00",
+    "donor_name": "João Silva",
+    "candidate_cpf": "888.999.000-11",
+    "candidate_name": "Marina Costa",
+    "candidate_numero": "9876",
+    "amount": 75000.00,
+    "year": 2026,
+    "cycle": "Eleições Municipais 2026",
+    "source": {
+      "publisher": "TSE - Dados Abertos Eleitorais",
+      "locator": "https://dadosabertos.tse.jus.br/dataset/prestacao-de-contas-eleitorais-2026",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "donation-6-2026-cnpj",
+    "donor_type": "cnpj",
+    "donor_cnpj": "12.345.678/0001-99",
+    "donor_name": "Empresa XYZ Ltda.",
+    "candidate_cpf": "888.999.000-11",
+    "candidate_name": "Marina Costa",
+    "candidate_numero": "9876",
+    "amount": 150000.00,
+    "year": 2026,
+    "cycle": "Eleições Municipais 2026",
+    "source": {
+      "publisher": "TSE - Dados Abertos Eleitorais",
+      "locator": "https://dadosabertos.tse.jus.br/dataset/prestacao-de-contas-eleitorais-2026",
+      "retrieved_at": "2026-10-04"
+    }
   }
 ]
