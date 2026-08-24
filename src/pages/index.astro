@@ -68,11 +68,6 @@ const freezePersons = getFreeze();
         font-weight: 600;
         font-size: 1.1rem;
       }
-      
-      .person-meta {
-        color: #666;
-        font-size: 0.9rem;
-      }
     </style>
   </head>
   <body>
@@ -92,9 +87,6 @@ const freezePersons = getFreeze();
                 <a href={`/pessoa/${person.person_id}`}>
                   {person.person_name}
                 </a>
-                <span class="person-meta">
-                  {' — '}{person.role} na {person.group_name}
-                </span>
               </li>
             ))}
           </ul>

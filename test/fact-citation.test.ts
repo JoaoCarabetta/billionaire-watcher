@@ -11,18 +11,16 @@ describe('Fact + Citation Seam', () => {
   beforeAll(() => {
     const distPath = path.join(__dirname, '..', 'dist', 'demo', 'index.html');
     
-    // Check if build already exists
-    if (!fs.existsSync(distPath)) {
-      try {
-        execSync('npm run build', { 
-          cwd: path.join(__dirname, '..'),
-          stdio: 'pipe',
-          encoding: 'utf-8'
-        });
-      } catch (error: any) {
-        buildFailed = true;
-        buildError = error.message || String(error);
-      }
+    // Always rebuild to ensure fresh state
+    try {
+      execSync('npm run build', { 
+        cwd: path.join(__dirname, '..'),
+        stdio: 'pipe',
+        encoding: 'utf-8'
+      });
+    } catch (error: any) {
+      buildFailed = true;
+      buildError = error.message || String(error);
     }
     
     // Read the built HTML

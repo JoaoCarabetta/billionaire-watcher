@@ -19,6 +19,10 @@ interface Props {
 
 const { person } = Astro.props;
 const identityFacts = getIdentityFactsByPersonId(person.person_id);
+
+// Find name fact for title, or fallback to freeze CSV name as index chrome
+const nameFact = identityFacts.find(f => f.field === 'nome');
+const pageTitle = nameFact ? nameFact.value : person.person_name;
 ---
 
 <!DOCTYPE html>
@@ -26,7 +30,7 @@ const identityFacts = getIdentityFactsByPersonId(person.person_id);
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{person.person_name} - Billionaire Watcher</title>
+    <title>{pageTitle} - Billionaire Watcher</title>
     <style>
       * {
         margin: 0;
@@ -73,32 +77,16 @@ const identityFacts = getIdentityFactsByPersonId(person.person_id);
         margin-bottom: 1rem;
         font-size: 0.9rem;
       }
-      
-      .person-info {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 4px;
-        margin-bottom: 2rem;
-      }
-      
-      .person-info p {
-        margin: 0.5rem 0;
-      }
     </style>
   </head>
   <body>
     <a href="/" class="back-link">← Voltar para o índice</a>
     
     <header>
-      <h1>{person.person_name}</h1>
+      <h1>{pageTitle}</h1>
     </header>
 
     <main>
-      <div class="person-info">
-        <p><strong>Grupo:</strong> {person.group_name}</p>
-        <p><strong>Papel:</strong> {person.role}</p>
-      </div>
-
       {identityFacts.length > 0 && (
         <section>
           <h2>Dados de Identidade</h2>

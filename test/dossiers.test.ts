@@ -11,18 +11,16 @@ describe('Tracer: Freeze CSV + Identity Dossiers', () => {
   beforeAll(() => {
     const distIndexPath = path.join(__dirname, '..', 'dist', 'index.html');
     
-    // Check if build already exists
-    if (!fs.existsSync(distIndexPath)) {
-      try {
-        execSync('npm run build', { 
-          cwd: path.join(__dirname, '..'),
-          stdio: 'pipe',
-          encoding: 'utf-8'
-        });
-      } catch (error: any) {
-        buildFailed = true;
-        buildError = error.message || String(error);
-      }
+    // Always rebuild to ensure fresh state
+    try {
+      execSync('npm run build', { 
+        cwd: path.join(__dirname, '..'),
+        stdio: 'pipe',
+        encoding: 'utf-8'
+      });
+    } catch (error: any) {
+      buildFailed = true;
+      buildError = error.message || String(error);
     }
     
     distPath = path.join(__dirname, '..', 'dist');
@@ -115,10 +113,33 @@ describe('Tracer: Freeze CSV + Identity Dossiers', () => {
       const factDivMatches = html.match(/<div class="fact"[^>]*data-fact-id="[^"]*"[^>]*>/g);
       const citationInFactMatches = html.match(/<sup class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
       
-      if (factDivMatches && citationInFactMatches) {
-        expect(factDivMatches.length).toBeGreaterThan(0);
-        expect(citationInFactMatches.length).toBeGreaterThan(0);
-        expect(factDivMatches.length).toBe(citationInFactMatches.length);
+      // Must have facts and citations - no guard, fail if missing
+      expect(factDivMatches).toBeTruthy();
+      expect(citationInFactMatches).toBeTruthy();
+      expect(factDivMatches!.length).toBeGreaterThan(0);
+      expect(citationInFactMatches!.length).toBeGreaterThan(0);
+      expect(factDivMatches!.length).toBe(citationInFactMatches!.length);
+    });
+
+    it('should not render unsourced freeze CSV cells (group, role) unless they exist as cited Facts', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // These are freeze CSV cells for p1: group="Empresa XYZ Ltda.", role="controlador"
+      // They should NOT appear on the page unless they exist as cited identity Facts
+      
+      // Check if these strings appear outside of cited Facts
+      // If they appear, they must be within a fact-value span with a citation
+      const empresaXYZMatches = html.match(/Empresa XYZ Ltda\./g) || [];
+      const controladorMatches = html.match(/controlador/gi) || [];
+      
+      // For each occurrence, verify it's part of a cited fact
+      for (const match of empresaXYZMatches) {
+        const matchIndex = html.indexOf(match);
+        const surroundingContext = html.slice(Math.max(0, matchIndex - 200), matchIndex + 200);
+        
+        // Must be part of a fact with citation, not raw text
+        expect(surroundingContext).toMatch(/<span class="fact-value"[^>]*>.*Empresa XYZ Ltda\..*<\/span>\s*<sup class="citation-marker"/);
       }
     });
   });
@@ -136,6 +157,18 @@ describe('Tracer: Freeze CSV + Identity Dossiers', () => {
       const html = fs.readFileSync(homePath, 'utf-8');
       
       expect(html).toContain('/pessoa/p1');
+    });
+
+    it('should not attach unsourced role/group claims to home links', () => {
+      const homePath = path.join(distPath, 'index.html');
+      const html = fs.readFileSync(homePath, 'utf-8');
+      
+      // The freeze CSV has role="controlador" and group="Empresa XYZ Ltda." for p1
+      // These should NOT appear on the home page as unsourced claims
+      expect(html).not.toMatch(/controlador\s+na\s+Empresa XYZ/i);
+      expect(html).not.toMatch(/sócia\s+na\s+ABC Participações/i);
+      
+      // If role/group appear, they must be in cited Facts, not raw CSV text
     });
 
     it('should list person p2 on home page', () => {
