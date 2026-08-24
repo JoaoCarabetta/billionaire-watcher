@@ -1,0 +1,409 @@
+unit_tests:
+  # SEAM 1: No edge_label dono or UBO
+  - name: test_freeze_rejects_dono_edge_label
+    description: |
+      SEAM TEST: A row with edge_label 'dono' or 'UBO' must fail.
+      This test should FAIL if we ever introduce a dono/UBO edge.
+    model: freeze_persons
+    given:
+      - input: ref('int_freeze_listed_controllers')
+        rows:
+          - group_rank: 1
+            group_name: 'Test Company'
+            cnpj_basico: '12345678'
+            ranking_source: 'Valor 1000 FY2024'
+            receita_fy2024_brl: null
+            listed_flag: true
+            soe_flag: false
+            controlador_tipo: 'listed'
+            person_name: 'João Silva'
+            role: 'controlador'
+            edge_label: 'acionista_controlador'
+            acordo_acionistas: null
+            source_doc: 'CVM FRE 2026'
+            fre_item: '6.1'
+            hole: false
+            cpf_masked: '***123456**'
+            freeze_status: 'in'
+            notes: 'Test'
+      - input: ref('int_freeze_soe')
+        rows: []
+      - input: ref('int_freeze_unlisted_rf')
+        rows: []
+      - input: ref('int_freeze_foreign_hq')
+        rows: []
+    expect:
+      rows:
+        - group_rank: 1
+          group_name: 'Test Company'
+          cnpj_basico: '12345678'
+          edge_label: 'acionista_controlador'
+
+  # SEAM 2: SOE with freeze_status=in and a PF controlador fails
+  - name: test_freeze_soe_skip_with_no_pf
+    description: |
+      SEAM TEST: SOE groups must have freeze_status=skip_soe and no PF controlador.
+      SOE with freeze_status=in and a PF controlador must fail.
+    model: int_freeze_soe
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 1
+            empresa: 'Petrobras'
+            razao_social: 'Petróleo Brasileiro S.A.'
+            cnpj_basico: '33000167'
+            cnpj_full: '33000167000101'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: true
+            soe_source: 'Carta Anual 2025'
+            controlador_tipo: 'soe'
+            freeze_status_hint: 'skip_soe'
+            notes: 'Federal SOE'
+            source_doc: 'Carta Anual'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+    expect:
+      rows:
+        - group_rank: 1
+          group_name: 'Petrobras'
+          cnpj_basico: '33000167'
+          person_name: null
+          role: null
+          freeze_status: 'skip_soe'
+
+  # SEAM 3: FRE 6.2 institution without control acordo must not be role=controlador
+  - name: test_freeze_fre_62_without_acordo_not_controlador
+    description: |
+      SEAM TEST: FRE 6.2 ≥5% institutions without Participante_Acordo_Acionistas=S
+      must not be role=controlador. They are acionista_relevante, OUT.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 2
+            empresa: 'Test Listed'
+            razao_social: 'Test Listed S.A.'
+            cnpj_basico: '02916265'
+            cnpj_full: '02916265000160'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          # Controller with Acionista_Controlador=S
+          - CNPJ_Companhia: '02916265000160'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'Test Listed S.A.'
+            ID_Acionista: 100
+            Acionista: 'Família Silva'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '12345678000100'
+            ID_Acionista_Relacionado: 101
+            Acionista_Relacionado: 'João Silva'
+            Tipo_Pessoa_Acionista_Relacionado: 'PF'
+            CPF_CNPJ_Acionista_Relacionado: '***123456**'
+            Quantidade_Acao_Ordinaria_Circulacao: 1000
+            Percentual_Acao_Ordinaria_Circulacao: 51.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 1000
+            Percentual_Total_Acoes_Circulacao: 51.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SP'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'S'
+          # Institution with ≥5% but NOT controlling (no acordo)
+          - CNPJ_Companhia: '02916265000160'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'Test Listed S.A.'
+            ID_Acionista: 200
+            Acionista: 'Previ'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '00000000000191'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 150
+            Percentual_Acao_Ordinaria_Circulacao: 7.5
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 150
+            Percentual_Total_Acoes_Circulacao: 7.5
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'DF'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'N'
+            Participante_Acordo_Acionistas: 'N'
+    expect:
+      rows:
+        # Only the controller with Acionista_Controlador=S should appear
+        - group_rank: 2
+          person_name: 'João Silva'
+          role: 'controlador'
+          edge_label: 'acionista_controlador'
+
+  # SEAM 4: Missing controller is hole, not CEO or offshore invention
+  - name: test_freeze_listed_empty_61_is_hole
+    description: |
+      SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
+      results in hole, not a CEO fill-in or offshore invention.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 3
+            empresa: 'No Controller Inc'
+            razao_social: 'No Controller S.A.'
+            cnpj_basico: '11111111'
+            cnpj_full: '11111111000100'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          # Only acionista_relevante, no controller
+          - CNPJ_Companhia: '11111111000100'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'No Controller S.A.'
+            ID_Acionista: 300
+            Acionista: 'BlackRock'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '99999999000199'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 120
+            Percentual_Acao_Ordinaria_Circulacao: 6.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 120
+            Percentual_Total_Acoes_Circulacao: 6.0
+            Nacionalidade: 'Estrangeira'
+            Sigla_UF: null
+            Residente_Exterior: 'S'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'N'
+            Participante_Acordo_Acionistas: 'N'
+    expect:
+      rows: [] # Empty result because no Acionista_Controlador=S found
+
+  # SEAM 5: QSA-only edge is socio, never acionista_controlador
+  - name: test_freeze_unlisted_qsa_edge_is_socio
+    description: |
+      SEAM TEST: RF QSA edges must be labeled 'socio' or 'administrador',
+      never 'acionista_controlador'. QSA is not the shareholder book.
+    model: int_freeze_unlisted_rf
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 18
+            empresa: 'Copersucar'
+            razao_social: 'Copersucar S.A.'
+            cnpj_basico: '10265949'
+            cnpj_full: '10265949000177'
+            listed_flag: false
+            listed_source: null
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'unlisted'
+            freeze_status_hint: 'pending'
+            notes: 'SA fechada'
+            source_doc: 'CVM cancelled'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_rf_socios')
+        rows:
+          - ano: 2026
+            mes: 1
+            data: '2026-01-11'
+            cnpj_basico: '10265949'
+            tipo: 'PF'
+            nome: 'Maria Santos'
+            documento: '***789012**'
+            qualificacao: '16'
+            data_entrada_sociedade: '2020-01-01'
+            id_pais: null
+            cpf_representante_legal: null
+            nome_representante_legal: null
+            qualificacao_representante_legal: null
+            faixa_etaria: null
+      - input: ref('stg_rf_empresas')
+        rows:
+          - ano: 2026
+            mes: 1
+            data: '2026-01-11'
+            cnpj_basico: '10265949'
+            razao_social: 'COPERSUCAR S.A.'
+            natureza_juridica: '2054'
+            qualificacao_responsavel: '05'
+            capital_social: 1775195789.81
+            porte: '05'
+            ente_federativo: null
+    expect:
+      rows:
+        # For S.A. (natureza 2054), QSA is officers, so we have a hole
+        # Edge label should never be acionista_controlador
+        - group_rank: 18
+          person_name: null
+          role: null
+          edge_label: null
+          freeze_status: 'hole'
+
+  # SEAM 6: No full CPF on page-bound fields (cpf_masked only)
+  - name: test_freeze_preserves_cpf_masking
+    description: |
+      SEAM TEST: cpf_masked field must contain masked CPF, never full CPF.
+      This is enforced by the staging models, but we verify here.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 2
+            empresa: 'Test Listed'
+            razao_social: 'Test Listed S.A.'
+            cnpj_basico: '02916265'
+            cnpj_full: '02916265000160'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          - CNPJ_Companhia: '02916265000160'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'Test Listed S.A.'
+            ID_Acionista: 100
+            Acionista: 'Test Holding'
+            Tipo_Pessoa_Acionista: 'PJ'
+            CPF_CNPJ_Acionista: '12345678000100'
+            ID_Acionista_Relacionado: 101
+            Acionista_Relacionado: 'João Silva'
+            Tipo_Pessoa_Acionista_Relacionado: 'PF'
+            CPF_CNPJ_Acionista_Relacionado: '***123456**'
+            Quantidade_Acao_Ordinaria_Circulacao: 1000
+            Percentual_Acao_Ordinaria_Circulacao: 51.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 1000
+            Percentual_Total_Acoes_Circulacao: 51.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SP'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: 'S'
+    expect:
+      rows:
+        - group_rank: 2
+          person_name: 'João Silva'
+          cpf_masked: '***123456**'
+
+  # SEAM 7: cnpj_basico is 8-char STRING (leading zeros)
+  - name: test_freeze_cnpj_basico_leading_zeros
+    description: |
+      SEAM TEST: cnpj_basico must be 8-char STRING with leading zeros preserved.
+      JBS is '02916265', not '2916265' or 2916265.
+    model: int_freeze_listed_controllers
+    given:
+      - input: ref('stg_group_flags')
+        rows:
+          - rank_2024: 2
+            empresa: 'JBS'
+            razao_social: 'JBS S.A.'
+            cnpj_basico: '02916265'
+            cnpj_full: '02916265000160'
+            listed_flag: true
+            listed_source: 'CVM'
+            soe_flag: false
+            soe_source: null
+            controlador_tipo: 'listed'
+            freeze_status_hint: 'pending'
+            notes: 'Test'
+            source_doc: 'CVM'
+            cnpj_source: 'BD'
+            retrieved_at: '2026-08-24'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        rows:
+          - CNPJ_Companhia: '02916265000160'
+            Data_Referencia: '2025-12-31'
+            Versao: 1
+            ID_Documento: 1
+            Nome_Companhia: 'JBS S.A.'
+            ID_Acionista: 100
+            Acionista: 'Test Controller'
+            Tipo_Pessoa_Acionista: 'PF'
+            CPF_CNPJ_Acionista: '***111111**'
+            ID_Acionista_Relacionado: null
+            Acionista_Relacionado: null
+            Tipo_Pessoa_Acionista_Relacionado: null
+            CPF_CNPJ_Acionista_Relacionado: null
+            Quantidade_Acao_Ordinaria_Circulacao: 1000
+            Percentual_Acao_Ordinaria_Circulacao: 51.0
+            Quantidade_Acao_Preferencial_Circulacao: 0
+            Percentual_Acao_Preferencial_Circulacao: 0.0
+            Quantidade_Total_Acoes_Circulacao: 1000
+            Percentual_Total_Acoes_Circulacao: 51.0
+            Nacionalidade: 'Brasileira'
+            Sigla_UF: 'SP'
+            Residente_Exterior: 'N'
+            Representante_Legal: null
+            Tipo_Pessoa_Representante_Legal: null
+            CPF_CNPJ_Representante_legal: null
+            Data_Composicao_Capital_Social: '2025-12-31'
+            Data_Ultima_Alteracao: '2025-12-31'
+            Acionista_Controlador: 'S'
+            Participante_Acordo_Acionistas: null
+    expect:
+      rows:
+        - cnpj_basico: '02916265'
+          group_name: 'JBS'

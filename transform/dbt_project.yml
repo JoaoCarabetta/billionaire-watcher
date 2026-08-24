@@ -22,6 +22,11 @@ models:
       +materialized: table
       +meta:
         location: US
+    freeze:
+      +schema: billionaire_watcher
+      +materialized: table
+      +meta:
+        location: US
 
 seeds:
   billionaire_watcher:
