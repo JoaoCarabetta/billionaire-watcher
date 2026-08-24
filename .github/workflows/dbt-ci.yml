@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'transform/**'
+      - '.github/workflows/dbt-ci.yml'
   push:
     branches:
       - main
     paths:
       - 'transform/**'
+      - '.github/workflows/dbt-ci.yml'
 
 jobs:
   dbt-parse-and-test:

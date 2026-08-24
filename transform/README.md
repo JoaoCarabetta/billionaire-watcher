@@ -145,6 +145,10 @@ Unit tests verify:
 - CNPJ punctuation stripping (e.g., `02.916.265/0001-60` → `02916265000160`)
 - RF partner edges are sócio, never dono/UBO
 
+### Continuous Integration
+
+GitHub Actions runs `dbt parse` and `dbt test --select test_type:unit` on every PR and push that touches `transform/` or the workflow itself. No GCP credentials required — unit tests use fixtures only.
+
 ### Variables
 
 The project defines variables in `dbt_project.yml`:

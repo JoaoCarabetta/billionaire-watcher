@@ -40,7 +40,7 @@ describe('dbt CI Workflow (issue #43)', () => {
     expect(on.push, 'Should trigger on push').toBeDefined();
   });
 
-  it('should filter paths to include transform/**', () => {
+  it('should filter paths to include transform/** and workflow file', () => {
     expect(workflowContent).not.toBeNull();
     
     const on = workflowContent.on || workflowContent['on'] || workflowContent.true;
@@ -49,11 +49,13 @@ describe('dbt CI Workflow (issue #43)', () => {
     const prPaths = on.pull_request?.paths || on['pull_request']?.paths;
     expect(prPaths, 'pull_request should have paths filter').toBeDefined();
     expect(prPaths, 'pull_request paths should include transform/**').toContain('transform/**');
+    expect(prPaths, 'pull_request paths should include workflow file').toContain('.github/workflows/dbt-ci.yml');
     
     // Check push paths
     const pushPaths = on.push?.paths;
     expect(pushPaths, 'push should have paths filter').toBeDefined();
     expect(pushPaths, 'push paths should include transform/**').toContain('transform/**');
+    expect(pushPaths, 'push paths should include workflow file').toContain('.github/workflows/dbt-ci.yml');
   });
 
   it('should trigger on main branch', () => {
