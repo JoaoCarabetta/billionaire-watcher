@@ -47,42 +47,10 @@ jobs:
 
       - name: Create auth bypass for unit tests
         run: |
-          mkdir -p /tmp/dbt_ci
-          cat > /tmp/dbt_ci/sitecustomize.py << 'EOF'
-          # Bypass BigQuery authentication for dbt unit tests
-          import sys
-          
-          def patch_google_auth():
-              try:
-                  from unittest.mock import MagicMock, patch
-                  import google.auth
-                  import google.auth.credentials
-                  
-                  class MockCredentials:
-                      def __init__(self):
-                          self.token = "mock-token"
-                          self.valid = True
-                          self.expired = False
-                          self._project_id = "dummy-project"
-                      
-                      def refresh(self, request):
-                          pass
-                      
-                      def before_request(self, request, method, url, headers):
-                          headers['authorization'] = 'Bearer mock-token'
-                  
-                  def mock_default(scopes=None, request=None, quota_project_id=None):
-                      return MockCredentials(), "dummy-project"
-                  
-                  google.auth.default = mock_default
-                  
-              except Exception as e:
-                  print(f"Warning: Could not patch google.auth: {e}", file=sys.stderr)
-          
-          patch_google_auth()
-          EOF
-          
-          echo "PYTHONPATH=/tmp/dbt_ci:$PYTHONPATH" >> $GITHUB_ENV
+          # Set environment variables to bypass BigQuery authentication
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/dev/null" >> $GITHUB_ENV
+          echo "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE=/dev/null" >> $GITHUB_ENV
+          echo "GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS=true" >> $GITHUB_ENV
 
       - name: Install dbt packages
         working-directory: transform
@@ -90,8 +58,20 @@ jobs:
 
       - name: Run dbt parse
         working-directory: transform
-        run: dbt parse
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /dev/null
+        run: |
+          echo "Running dbt parse..."
+          dbt parse || (echo "dbt parse failed with exit code $?" && exit 1)
 
       - name: Run dbt unit tests
         working-directory: transform
-        run: dbt test --select test_type:unit
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /dev/null
+          DBT_PROFILES_DIR: ~/.dbt
+        run: |
+          echo "Running dbt unit tests..."
+          echo "Profile directory: $DBT_PROFILES_DIR"
+          cat ~/.dbt/profiles.yml
+          dbt debug --config-dir || true
+          dbt test --select test_type:unit 2>&1 | tee /tmp/dbt_test_output.log || (echo "dbt test failed, output:" && cat /tmp/dbt_test_output.log && exit 1)
