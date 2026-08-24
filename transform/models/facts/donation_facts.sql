@@ -32,7 +32,7 @@ tse_2026 as (
 -- Closed cycles from BD br_tse_eleicoes (2014, 2018, 2022)
 -- NOTE: In unit tests, use seed/fixture only. No live BD call.
 tse_closed_cycles as (
-    {% if target.name == 'test' %}
+    {% if target.name in ('test', 'ci') %}
     -- Unit tests: empty CTE (no live BD calls in tests)
     select
         cast(null as int64) as ano,
