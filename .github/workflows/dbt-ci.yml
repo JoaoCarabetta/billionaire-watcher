@@ -1,0 +1,56 @@
+name: dbt CI
+
+on:
+  pull_request:
+    paths:
+      - 'transform/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'transform/**'
+
+jobs:
+  dbt-parse-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-bigquery
+        run: pip install dbt-bigquery==1.8.2
+
+      - name: Create CI profiles.yml
+        working-directory: transform
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          billionaire_watcher:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: oauth
+                project: dummy-project
+                dataset: dummy_dataset
+                location: US
+                threads: 1
+          EOF
+
+      - name: Install dbt packages
+        working-directory: transform
+        run: dbt deps
+
+      - name: Run dbt parse
+        working-directory: transform
+        run: dbt parse
+
+      - name: Run dbt unit tests
+        working-directory: transform
+        run: dbt test --select test_type:unit
