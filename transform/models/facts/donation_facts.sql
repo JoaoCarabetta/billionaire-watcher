@@ -39,7 +39,7 @@ tse_closed_cycles as (
         cast(null as string) as nome_candidato,
         cast(null as string) as nome_doador,
         cast(null as string) as cpf_doador_masked,
-        cast(null as float64) as valor_receita,
+        cast(null as double) as valor_receita,
         cast(null as string) as tipo_receita,
         cast(null as string) as fonte_receita,
         cast(null as string) as numero_recibo_eleitoral
