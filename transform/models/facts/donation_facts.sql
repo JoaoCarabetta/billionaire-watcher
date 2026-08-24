@@ -85,7 +85,33 @@ all_tse_donations as (
     select * from tse_closed_cycles
 ),
 
--- Match freeze persons to TSE donations on cpf_masked
+-- FIX #57: Normalize CPF to 11 digits on both sides for matching
+-- freeze.cpf_masked is full CPF in format NNN.NNN.NNN-NN (misnamed, not masked)
+-- TSE cpf_doador_masked is 11 digits (may have punctuation in 2026 seed)
+freeze_normalized as (
+    select
+        person_name,
+        cpf_masked,
+        cnpj_basico,
+        group_name,
+        lpad(regexp_replace(cpf_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+    from freeze_persons
+),
+
+tse_normalized as (
+    select
+        ano,
+        nome_candidato,
+        nome_doador,
+        cpf_doador_masked,
+        valor_receita,
+        tipo_receita,
+        numero_recibo_eleitoral,
+        lpad(regexp_replace(cpf_doador_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+    from all_tse_donations
+),
+
+-- Match freeze persons to TSE donations on normalized 11-digit CPF
 matched_donations as (
     select
         f.person_name,
@@ -98,9 +124,9 @@ matched_donations as (
         d.valor_receita,
         d.tipo_receita,
         d.numero_recibo_eleitoral
-    from freeze_persons f
-    inner join all_tse_donations d
-        on f.cpf_masked = d.cpf_doador_masked
+    from freeze_normalized f
+    inner join tse_normalized d
+        on f.cpf_digits = d.cpf_digits
 ),
 
 donation_facts_base as (
