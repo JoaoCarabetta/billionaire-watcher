@@ -61,4 +61,12 @@ jobs:
 
       - name: Run dbt unit tests
         working-directory: transform
-        run: dbt test --select test_type:unit --target ci --log-level info
+        run: |
+          dbt test --select test_type:unit --target ci --log-level info 2>&1 | tee /tmp/test_output.txt
+          exit_code=${PIPESTATUS[0]}
+          if [ $exit_code -ne 0 ]; then
+            echo "=== Unit tests failed with exit code $exit_code ==="
+            echo "=== Last 100 lines of output ==="
+            tail -n 100 /tmp/test_output.txt
+            exit $exit_code
+          fi
