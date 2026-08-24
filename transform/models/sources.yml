@@ -79,6 +79,9 @@ sources:
           TSE candidate receipts (donations), partitioned by ano.
           FIX #51: nome_candidato and tipo_receita do NOT exist on this table.
           Join to candidatos for candidate names.
+          Verified 2026-08-24: origem_receita (not fonte_receita) for PF filter.
+          Receipt ID varies by year: numero_recibo_eleitoral (2014), numero_recibo_doacao (2018),
+          numero_documento_doacao (2022), sequencial_receita (fallback).
         columns:
           - name: ano
             description: Election year
@@ -90,10 +93,16 @@ sources:
             description: Donor name
           - name: valor_receita
             description: Receipt amount
-          - name: fonte_receita
-            description: Receipt source (e.g., "Pessoa física")
+          - name: origem_receita
+            description: Receipt origin (e.g., "recursos de pessoas fisicas" for PF donations)
           - name: numero_recibo_eleitoral
-            description: Electoral receipt number (unique identifier)
+            description: Electoral receipt number (2014 coverage, may be null in other years)
+          - name: numero_recibo_doacao
+            description: Donation receipt number (2018 coverage, may be null in other years)
+          - name: numero_documento_doacao
+            description: Donation document number (2022 coverage, may be null in other years)
+          - name: sequencial_receita
+            description: Receipt sequential ID (available all years, fallback identifier)
             
       - name: candidatos
         description: |

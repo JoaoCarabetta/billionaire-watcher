@@ -904,3 +904,45 @@ unit_tests:
           value: Test Donor doou R$ 75000.0 para Candidate Public Name em 2026 (recibo 2026888)
           fact_kind: donation
       format: dict
+      
+  # Issue #51: Verify closed-cycle SQL uses correct live BD filters
+  # NOTE: This test uses tse_2026 seed path (target.name='test' returns empty tse_closed_cycles)
+  # Production closed-cycle SQL MUST:
+  # 1. Filter origem_receita = 'recursos de pessoas fisicas' (NOT fonte_receita = 'Pessoa física')
+  # 2. NOT filter numero_recibo_eleitoral is not null (would drop 2018/2022)
+  # 3. Use coalesce(numero_recibo_eleitoral, numero_recibo_doacao, numero_documento_doacao, sequencial_receita)
+  # 4. LEFT JOIN candidatos (emit named hole if nome missing, not silent drop)
+  - name: test_donation_facts_closed_cycle_filters_documented
+    description: |
+      Issue #51: Document that closed-cycle SQL does NOT filter:
+      - fonte_receita = 'Pessoa física' (wrong column, use origem_receita)
+      - numero_recibo_eleitoral is not null (would drop 2018/2022)
+      This test uses fixture path only. Verify production SQL manually against BD.
+    model: donation_facts
+    given:
+      - input: ref('freeze_persons_with_forbes')
+        rows:
+          - person_name: Test Person
+            freeze_status: in
+            cnpj_basico: '99999999'
+            group_name: Test Group
+            role: controlador
+            source_doc: Test Doc
+            cpf_masked: '***111***'
+      - input: ref('tse_donations_2026')
+        rows:
+          - ano: 2026
+            cpf_candidato: '***222***'
+            nome_candidato: Test Candidate
+            cpf_cnpj_doador: '***111***'
+            nome_doador: Test Person
+            valor_receita: 10000.00
+            tipo_receita: Doação
+            fonte_receita: Pessoa física
+            numero_recibo_eleitoral: '2026TEST'
+            cpf_doador_masked: '***111***'
+    expect:
+      rows:
+        - person_name: Test Person
+          fact_kind: donation
+      format: dict
