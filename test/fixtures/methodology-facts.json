@@ -1,0 +1,137 @@
+[
+  {
+    "id": "metod-1",
+    "value": "O arquivo identifica poder econômico no Brasil a partir de grupos empresariais ranqueados pela receita líquida do exercício fiscal de 2024.",
+    "source": {
+      "publisher": "Valor Econômico",
+      "locator": "https://valor.globo.com/empresas/valor1000/",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-2",
+    "value": "O ranking Valor 1000 2025 organiza as maiores empresas por receita líquida consolidada do ano fiscal 2024.",
+    "source": {
+      "publisher": "Valor Econômico",
+      "locator": "https://valor.globo.com/empresas/valor1000/",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-3",
+    "value": "A porta de entrada para pessoas físicas usa o conceito de acionista controlador conforme Lei 6.404/1976 Art. 116.",
+    "source": {
+      "publisher": "Presidência da República",
+      "locator": "https://www.planalto.gov.br/ccivil_03/leis/l6404consol.htm",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-4",
+    "value": "Para empresas de capital aberto, o arquivo consulta os Formulários de Referência (FRE) seção 6.1 onde consta a identificação do acionista controlador.",
+    "source": {
+      "publisher": "CVM - Comissão de Valores Mobiliários",
+      "locator": "https://www.gov.br/cvm/pt-br/assuntos/regulados/companhias/informacoes-periodicas-e-eventuais/formulario-de-referencia",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-5",
+    "value": "Para empresas de capital fechado, o arquivo consulta o Quadro de Sócios e Administradores (QSA) da Receita Federal.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-6",
+    "value": "O QSA registra vínculos societários conforme Instrução Normativa RFB 2.119/2022, mas não identifica beneficiário final (UBO) porque o e-BEF não é público.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.in.gov.br/en/web/dou/-/instrucao-normativa-rfb-n-2.119-de-20-de-dezembro-de-2022-453565948",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-7",
+    "value": "Quando o controlador não é identificado nas fontes públicas, o dossiê apresenta lacuna visível em vez de inferência.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-8",
+    "value": "O método posicional segue Hoffmann-Lange (1980) que identifica elites por posições em organizações estratégicas.",
+    "source": {
+      "publisher": "Hoffmann-Lange, U.",
+      "locator": "https://doi.org/10.1007/978-1-349-05539-6_6",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-9",
+    "value": "A lista Forbes serve como rede de segurança (candidato_forbes) para revisão manual, não como fonte primária.",
+    "source": {
+      "publisher": "Forbes Brasil",
+      "locator": "https://www.forbes.com.br/listas/",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-10",
+    "value": "O freeze foi realizado em 4 de outubro de 2026.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-11",
+    "value": "O método rejeita interlocks de conselho como proxy de propriedade (Useem 1979 identifica conexões, não controle).",
+    "source": {
+      "publisher": "Useem, M. (1979). The Social Organization of the American Business Elite",
+      "locator": "https://doi.org/10.2307/2094593",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-12",
+    "value": "O método rejeita Wikipedia e Forbes como fontes primárias porque não documentam cadeia de controle.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-13",
+    "value": "O método rejeita volume de doações TSE como critério de elite porque doação política não determina propriedade empresarial.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-14",
+    "value": "Empresas estatais federais, estaduais e municipais são identificadas quando a União, Estado ou Município consta como acionista controlador.",
+    "source": {
+      "publisher": "CVM - Comissão de Valores Mobiliários",
+      "locator": "https://www.gov.br/cvm/pt-br/assuntos/regulados/companhias/informacoes-periodicas-e-eventuais/formulario-de-referencia",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-15",
+    "value": "Empresas estrangeiras ranqueadas no Valor 1000 são incluídas quando identificado controlador pessoa física.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  }
+]

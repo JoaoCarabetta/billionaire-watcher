@@ -1,0 +1,138 @@
+---
+import FactWithCitation from '../components/FactWithCitation.astro';
+import Citations from '../components/Citations.astro';
+import { getMethodologyFacts } from '../utils/fixtures';
+import type { Source } from '../types';
+
+const facts = getMethodologyFacts();
+
+// Build citation map: unique sources by first appearance
+const citationMap = new Map<string, number>();
+let nextCitationNumber = 1;
+
+const allSources = facts.filter(f => f.source).map(f => f.source!);
+
+for (const source of allSources) {
+  if (!citationMap.has(source.locator)) {
+    citationMap.set(source.locator, nextCitationNumber++);
+  }
+}
+
+const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodologia - Billionaire Watcher</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        color: #1a1a1a;
+      }
+      
+      section {
+        margin: 2rem 0;
+      }
+      
+      section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #1a1a1a;
+      }
+      
+      a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+      
+      .back-link {
+        margin-bottom: 2rem;
+        display: block;
+      }
+      
+      .methodology-content {
+        margin: 2rem 0;
+      }
+      
+      .fact {
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/" class="back-link">← Voltar</a>
+    
+    <header>
+      <h1>Metodologia</h1>
+    </header>
+
+    <main>
+      <section class="methodology-content">
+        <h2>Critério de Inclusão</h2>
+        {facts.slice(0, 2).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Porta de Entrada para Pessoas Físicas</h2>
+        {facts.slice(2, 7).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Método Posicional</h2>
+        {facts.slice(7, 10).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Data do Freeze</h2>
+        {facts.slice(10, 11).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Métodos Rejeitados</h2>
+        {facts.slice(11, 14).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Empresas Estatais e Estrangeiras</h2>
+        {facts.slice(14, 16).map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <Citations citationMap={citationMap} allSources={allSources} />
+    </main>
+  </body>
+</html>
