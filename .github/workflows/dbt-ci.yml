@@ -60,18 +60,10 @@ jobs:
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-        run: |
-          echo "Running dbt parse..."
-          dbt parse || (echo "dbt parse failed with exit code $?" && exit 1)
+        run: dbt parse
 
       - name: Run dbt unit tests
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-          DBT_PROFILES_DIR: ~/.dbt
-        run: |
-          echo "Running dbt unit tests..."
-          echo "Profile directory: $DBT_PROFILES_DIR"
-          cat ~/.dbt/profiles.yml
-          dbt debug --config-dir || true
-          dbt test --select test_type:unit 2>&1 | tee /tmp/dbt_test_output.log || (echo "dbt test failed, output:" && cat /tmp/dbt_test_output.log && exit 1)
+        run: dbt test --select test_type:unit
