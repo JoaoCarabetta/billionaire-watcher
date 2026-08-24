@@ -8,7 +8,7 @@ with source as (
 ),
 
 freeze_cnpjs as (
-    select cnpj_basico from {{ ref('nonexistent_model_that_does_not_exist') }}
+    select cnpj_basico from {{ ref('freeze_cnpj_basicos') }}
 ),
 
 filtered as (
