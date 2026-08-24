@@ -1,0 +1,34 @@
+[
+  {
+    "id": "fact-1",
+    "value": "João Silva é controlador da Empresa XYZ Ltda.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
+      "retrieved_at": "2026-08-24"
+    }
+  },
+  {
+    "id": "fact-2",
+    "value": "Maria Santos é sócia da ABC Participações S.A.",
+    "source": {
+      "publisher": "CVM - Comissão de Valores Mobiliários",
+      "locator": "https://www.gov.br/cvm/pt-br/assuntos/consultas-publicas/formulario-de-referencia-2025",
+      "retrieved_at": "2026-08-20"
+    }
+  },
+  {
+    "id": "fact-3-no-source",
+    "value": "Pedro Costa é um bilionário famoso."
+  },
+  {
+    "id": "fact-4-with-cpf",
+    "value": "Ana Lima é controladora da DEF Holdings",
+    "cpf": "123.456.789-00",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/consulta-qsa",
+      "retrieved_at": "2026-08-24"
+    }
+  }
+]
