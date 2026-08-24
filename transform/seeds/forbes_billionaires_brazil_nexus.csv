@@ -1,6 +1,7 @@
 person_name,forbes_year,estimated_wealth_usd_billions,brazil_operations_nexus,control_doc_available,cnpj_basico,notes,source_doc
-Jorge Paulo Lemann,2026,15.2,true,true,02916265,Consta da lista Forbes 2026 com patrimônio estimado de US$ 15.2 bilhões. Control of JBS S.A. documented in FRE 6.1.,Forbes World's Billionaires 2026; CVM FRE 6.1
-Eduardo Saverin,2026,8.5,true,false,,Consta da lista Forbes 2026 com patrimônio estimado de US$ 8.5 bilhões. Brazil-nexus via tech investments but no documentable control of top-50 Brazil-operating group.,Forbes World's Billionaires 2026
-Neymar Jr.,2026,1.2,false,false,,Celebrity athlete. No documentable control of Brazil-operating group. Should not be added.,Forbes World's Billionaires 2026
-Marcel Herrmann Telles,2026,10.1,true,false,02916265,Consta da lista Forbes 2026 com patrimônio estimado de US$ 10.1 bilhões. Brazil-nexus via JBS but awaiting control documentation.,Forbes World's Billionaires 2026
-Carlos Alberto Sicupira,2026,7.8,true,false,02916265,Consta da lista Forbes 2026 com patrimônio estimado de US$ 7.8 bilhões. Brazil-nexus via JBS but awaiting control documentation.,Forbes World's Billionaires 2026
+Test Forbes Person,2026,5.0,true,false,11111111,Consta da lista Forbes 2026 (fixture for testing).,Forbes 2026 fixture
+Forbes With Control Doc,2026,10.0,true,true,22222222,Consta da lista Forbes 2026 com controle documentado (fixture).,Forbes 2026 fixture; FRE 6.1 fixture
+Celebrity Athlete,2026,1.0,false,false,,Celebrity athlete. No documentable control. (fixture for exclusion test),Forbes 2026 fixture
+Already In Freeze,2026,8.0,true,true,33333333,Consta da lista Forbes 2026 (fixture for duplicate test).,Forbes 2026 fixture
+Forbes Person Clean,2026,6.0,true,false,44444444,Consta da lista Forbes 2026 com patrimônio estimado (fixture).,Forbes 2026 fixture
+Forbes Nexus No CNPJ,2026,8.5,true,false,,Consta da lista Forbes 2026. Brazil-nexus via investments but no documentable control of identified Brazil-operating group (fixture for Saverin-style exclusion test).,Forbes 2026 fixture

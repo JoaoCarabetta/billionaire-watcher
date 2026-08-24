@@ -5,8 +5,9 @@
 -- Add ONLY if ALL of:
 -- 1. On Forbes World's Billionaires (seed/fixture)
 -- 2. Brazil-operations nexus = true
--- 3. NOT already in positional freeze (not in freeze_persons with freeze_status in ('in', 'skip_soe'))
--- 4. Documentable control of Brazil-operating group (group MAY be outside top-50)
+-- 3. cnpj_basico is NOT NULL (identified Brazil-operating group; may be outside top-50)
+-- 4. NOT already in positional freeze (not in freeze_persons with freeze_status in ('in', 'skip_soe'))
+-- 5. Documentable control of Brazil-operating group
 --
 -- Do NOT auto-promote to freeze_status=in even if control_doc_available=true.
 -- Humans promote. Models stay review.
@@ -24,7 +25,7 @@ positional_freeze as (
     where freeze_status in ('in', 'skip_soe')
 ),
 
-forbes_with_nexus as (
+forbes_with_nexus_and_cnpj as (
     select
         f.person_name,
         f.forbes_year,
@@ -35,6 +36,7 @@ forbes_with_nexus as (
         f.control_doc_available
     from forbes_seed f
     where f.brazil_operations_nexus = true
+        and f.cnpj_basico is not null
 ),
 
 -- Filter out persons already in positional freeze
@@ -48,7 +50,7 @@ forbes_not_in_freeze as (
         f.notes,
         f.source_doc,
         f.control_doc_available
-    from forbes_with_nexus f
+    from forbes_with_nexus_and_cnpj f
     left join positional_freeze pf
         on f.person_name = pf.person_name
         and (

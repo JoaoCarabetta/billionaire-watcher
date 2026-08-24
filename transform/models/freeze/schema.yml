@@ -203,7 +203,8 @@ models:
       Added AFTER positional freeze. Additive only.
       Add ONLY if ALL of:
       - On Forbes World's Billionaires
-      - Brazil-operations nexus
+      - Brazil-operations nexus = true
+      - cnpj_basico is NOT NULL (identified Brazil-operating group; may be outside top-50)
       - NOT already in positional freeze
       - Documentable control of Brazil-operating group
       Do NOT auto-promote to freeze_status=in even if control_doc_available=true.
@@ -224,6 +225,10 @@ models:
           - accepted_values:
               arguments:
                 values: ['review']
+      - name: cnpj_basico
+        description: 8-digit CNPJ base (STRING with leading zeros; REQUIRED for Forbes rows)
+        tests:
+          - not_null
       - name: notes
         description: Must use Forbes formula, not "o bilionário X"
     tests:

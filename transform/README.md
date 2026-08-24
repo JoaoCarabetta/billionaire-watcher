@@ -55,17 +55,21 @@ Freeze walk models implementing grupo × pessoa natural × papel per issue #22 s
 
 Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_status=review` AFTER the positional freeze. Forbes rows are ADDITIVE on top of `freeze_persons`.
 
+**Input Source:** The `forbes_billionaires_brazil_nexus` seed is **FIXTURE DATA ONLY** for testing Forbes safety-net logic. It does NOT contain real Forbes billionaires, actual USD wealth estimates, or live Forbes data. Do NOT use this seed as a live Forbes extract.
+
 **Add ONLY if ALL of:**
 - On Forbes World's Billionaires (seed/fixture, not live scrape)
-- Brazil-operations nexus
+- Brazil-operations nexus = true
+- cnpj_basico is NOT NULL (identified Brazil-operating group; group MAY be outside top-50)
 - NOT already in positional freeze
-- Documentable control of Brazil-operating group (group MAY be outside top-50)
+- Documentable control of Brazil-operating group
 
 **Do NOT add:**
 - Celebrities/athletes without group control
 - Dispersed family fortunes
 - Monarchs/office-tied wealth
 - Wikipedia names without control documentation
+- Brazil-nexus without identified cnpj_basico (Saverin-style: nexus but no documentable group control)
 
 **No auto-promotion:** Models do NOT auto-promote to `freeze_status=in` even when control_doc is available. Humans promote after review.
 
