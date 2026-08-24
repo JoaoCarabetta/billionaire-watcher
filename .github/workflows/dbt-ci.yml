@@ -61,4 +61,4 @@ jobs:
 
       - name: Run dbt unit tests
         working-directory: transform
-        run: dbt test --select test_type:unit --target ci
+        run: dbt test --select test_type:unit --target ci --log-level info
