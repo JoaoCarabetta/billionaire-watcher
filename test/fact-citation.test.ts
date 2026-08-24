@@ -9,20 +9,26 @@ describe('Fact + Citation Seam', () => {
   let buildError: string = '';
 
   beforeAll(() => {
+    const distPath = path.join(__dirname, '..', 'dist', 'demo', 'index.html');
+    
+    // Always rebuild to ensure fresh state
     try {
       execSync('npm run build', { 
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe',
         encoding: 'utf-8'
       });
-      
-      const distPath = path.join(__dirname, '..', 'dist', 'index.html');
-      if (fs.existsSync(distPath)) {
-        builtHtml = fs.readFileSync(distPath, 'utf-8');
-      }
     } catch (error: any) {
       buildFailed = true;
       buildError = error.message || String(error);
+    }
+    
+    // Read the built HTML
+    if (fs.existsSync(distPath)) {
+      builtHtml = fs.readFileSync(distPath, 'utf-8');
+    } else {
+      buildFailed = true;
+      buildError = 'Demo page not found after build';
     }
   });
 

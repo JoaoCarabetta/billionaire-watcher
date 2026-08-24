@@ -1,7 +1,11 @@
 ---
-import { getFreeze } from '../utils/fixtures';
+import FactWithCitation from '../components/FactWithCitation.astro';
+import DerivedAssociation from '../components/DerivedAssociation.astro';
+import Citations from '../components/Citations.astro';
+import { getFacts, getDerivedAssociations } from '../utils/fixtures';
 
-const freezePersons = getFreeze();
+const facts = getFacts();
+const associations = getDerivedAssociations();
 ---
 
 <!DOCTYPE html>
@@ -9,7 +13,7 @@ const freezePersons = getFreeze();
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billionaire Watcher - Arquivo Cívico de Poder Econômico</title>
+    <title>Demo - Citation Seam</title>
     <style>
       * {
         margin: 0;
@@ -50,48 +54,31 @@ const freezePersons = getFreeze();
       a:hover {
         text-decoration: underline;
       }
-      
-      .person-list {
-        list-style: none;
-        padding: 0;
-      }
-      
-      .person-list li {
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-        background-color: #f8f9fa;
-        border-left: 3px solid #0066cc;
-        border-radius: 2px;
-      }
-      
-      .person-list a {
-        font-weight: 600;
-        font-size: 1.1rem;
-      }
     </style>
   </head>
   <body>
     <header>
-      <h1>Billionaire Watcher</h1>
+      <h1>Citation Seam Demo</h1>
     </header>
 
     <main>
       <section>
-        <h2>Pessoas no Índice Congelado</h2>
-        {freezePersons.length === 0 ? (
-          <p>Nenhuma pessoa no índice.</p>
-        ) : (
-          <ul class="person-list">
-            {freezePersons.map(person => (
-              <li>
-                <a href={`/pessoa/${person.person_id}`}>
-                  {person.person_name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
+        <h2>Fatos Verificados</h2>
+        {facts.map((fact, index) => (
+          <FactWithCitation fact={fact} citationNumber={index + 1} />
+        ))}
       </section>
+
+      {associations.length > 0 && (
+        <section>
+          <h2>Associações Derivadas</h2>
+          {associations.map((association) => (
+            <DerivedAssociation association={association} factsStartIndex={0} />
+          ))}
+        </section>
+      )}
+
+      <Citations facts={facts} />
     </main>
   </body>
 </html>
