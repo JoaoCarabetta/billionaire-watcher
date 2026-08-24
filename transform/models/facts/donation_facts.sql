@@ -31,6 +31,10 @@ tse_2026 as (
 
 -- Closed cycles from BD br_tse_eleicoes (2014, 2018, 2022)
 -- NOTE: In unit tests, use seed/fixture only. No live BD call.
+-- FIX #51: Join receitas_candidato → candidatos for nome_candidato (doesn't exist on receitas)
+-- VERIFIED 2026-08-24: origem_receita = 'recursos de pessoas fisicas' (NOT fonte_receita)
+-- Receipt coverage: 2014 numero_recibo_eleitoral / 2018 numero_recibo_doacao / 2022 numero_documento_doacao
+-- LEFT JOIN to emit named hole when candidatos.nome missing (not silent drop)
 tse_closed_cycles as (
     {% if target.name == 'test' %}
     -- Unit tests: empty CTE (no live BD calls in tests)
@@ -45,21 +49,33 @@ tse_closed_cycles as (
         cast(null as string) as numero_recibo_eleitoral
     where false
     {% else %}
-    -- Production: query BD for closed cycles
+    -- Production: query BD for closed cycles with candidatos LEFT JOIN
     select
-        ano,
-        nome_candidato,
-        nome_doador,
-        cpf_cnpj_doador as cpf_doador_masked,
-        valor_receita,
-        tipo_receita,
-        fonte_receita,
-        numero_recibo_eleitoral
-    from {{ source('br_tse_eleicoes', 'receitas_candidato') }}
-    where ano in (2014, 2018, 2022)
-      and fonte_receita = 'Pessoa física' -- PF only
-      and numero_recibo_eleitoral is not null
-      and nome_candidato is not null -- Must have candidate name for public facts
+        r.ano,
+        coalesce(
+            c.nome,
+            c.nome_urna,
+            concat('[candidate name unavailable: ano=', cast(r.ano as string), ' seq=', cast(r.sequencial_candidato as string), ']')
+        ) as nome_candidato,
+        r.nome_doador,
+        r.cpf_cnpj_doador as cpf_doador_masked,
+        r.valor_receita,
+        cast(null as string) as tipo_receita, -- Not available on receitas_candidato
+        r.origem_receita as fonte_receita, -- Map origem_receita to fixture's fonte_receita column
+        coalesce(
+            r.numero_recibo_eleitoral,
+            r.numero_recibo_doacao,
+            r.numero_documento_doacao,
+            cast(r.sequencial_receita as string)
+        ) as numero_recibo_eleitoral
+    from {{ source('br_tse_eleicoes', 'receitas_candidato') }} r
+    left join {{ source('br_tse_eleicoes', 'candidatos') }} c
+        on r.ano = c.ano
+        and r.sequencial_candidato = c.sequencial
+    where r.ano in (2014, 2018, 2022)
+      and r.origem_receita = 'recursos de pessoas fisicas' -- PF only (NOT fonte_receita)
+      -- Do NOT filter numero_recibo_eleitoral is not null (would drop 2018/2022)
+      -- Do NOT filter candidate name is not null (emit named hole instead)
     {% endif %}
 ),
 
