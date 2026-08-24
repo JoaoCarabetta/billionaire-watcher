@@ -113,6 +113,65 @@ natural_person_controllers as (
             else 'FRE 6.1 chain ends at PJ without named PF controller'
         end as notes
     from controlling_shareholders
+),
+
+-- Keep all rows with named PF (freeze_status='in')
+named_pf_rows as (
+    select * from natural_person_controllers
+    where person_name is not null
+),
+
+-- For groups with zero named PF, emit exactly one hole row
+groups_with_named_pf as (
+    select distinct cnpj_basico
+    from named_pf_rows
+),
+
+hole_rows as (
+    select
+        npc.group_rank,
+        npc.group_name,
+        npc.cnpj_basico,
+        npc.ranking_source,
+        npc.receita_fy2024_brl,
+        npc.listed_flag,
+        npc.soe_flag,
+        npc.controlador_tipo,
+        cast(null as string) as person_name,
+        cast(null as string) as role,
+        cast(null as string) as edge_label,
+        cast(null as string) as acordo_acionistas,
+        npc.source_doc,
+        npc.fre_item,
+        true as hole,
+        cast(null as string) as cpf_masked,
+        'hole' as freeze_status,
+        npc.notes
+    from (
+        select
+            group_rank,
+            group_name,
+            cnpj_basico,
+            ranking_source,
+            receita_fy2024_brl,
+            listed_flag,
+            soe_flag,
+            controlador_tipo,
+            min(source_doc) as source_doc,
+            min(fre_item) as fre_item,
+            min(notes) as notes
+        from natural_person_controllers
+        group by 1, 2, 3, 4, 5, 6, 7, 8
+    ) npc
+    left join groups_with_named_pf gwpf
+        on npc.cnpj_basico = gwpf.cnpj_basico
+    where gwpf.cnpj_basico is null
+),
+
+final_rows as (
+    select * from named_pf_rows
+    union all
+    select * from hole_rows
 )
 
-select * from natural_person_controllers
+select * from final_rows

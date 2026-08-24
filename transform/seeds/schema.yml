@@ -50,7 +50,11 @@ seeds:
       - Documentable control of Brazil-operating group (group MAY be outside top-50)
       Do NOT add celebrities/athletes unless they control a Brazil-operating group.
       GAP-FORBES-BR-URL: no separate Forbes Brazil methodology URL; global list + Brazil-nexus filter.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
     config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
       column_types:
         person_name: STRING
         forbes_year: INT64
@@ -94,7 +98,11 @@ seeds:
       Test data for donation facts. Fake CPFs (masked), not João Silva page people.
       One row per donor×candidate×cycle receipt (match HTML fixture table grain).
       PJ donations banned since 2016; 2026 donations are PF only.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
     config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
       column_types:
         ano: INT64
         cpf_candidato: STRING

@@ -51,11 +51,47 @@ Freeze walk models implementing grupo × pessoa natural × papel per issue #22 s
 | `int_forbes_candidates` | Forbes safety-net candidates | person_name |
 | `freeze_persons_with_forbes` | Final freeze + Forbes safety-net | (group_rank, person_name, role) |
 
+#### Freeze Count Audit (2026-08-24 warehouse run)
+
+Real `dbt run` in `billionairewatcher.billionaire_watcher` on 2026-08-24:
+
+**Before walk bug fix (issue #50):**
+
+| controlador_tipo | freeze_status | row_count | group_count | notes |
+|-----------------|---------------|-----------|-------------|-------|
+| listed | in | 95 | 9 | Marfrig, Rede D'Or, Suzano, Simpar, RD Saúde, Magalu, WEG, Energisa, Mateus |
+| listed | hole | 491 | 27 | **BUG**: One hole per PJ controller line, even when group has PF 'in' rows |
+| foreign | hole | 49 | 19 | One hole per foreign group (correct) |
+| unlisted | hole | 3 | 3 | One hole per unlisted group (correct) |
+| soe | skip_soe | 1 | 1 | Petrobras (correct) |
+| **TOTAL** | | **639** | **50** | |
+
+**After walk bug fix (issue #50):**
+
+| controlador_tipo | freeze_status | row_count | group_count | notes |
+|-----------------|---------------|-----------|-------------|-------|
+| listed | in | 95 | 9 | Same 9 groups with named PF controllers |
+| listed | hole | 18 | 18 | **FIXED**: 27 listed groups − 9 with named PF = 18 hole-only groups |
+| foreign | hole | 19 | 19 | One hole per foreign group (no change) |
+| unlisted | hole | 3 | 3 | One hole per unlisted group (no change) |
+| soe | skip_soe | 1 | 1 | Petrobras (no change) |
+| **TOTAL** | | **136** | **50** | |
+
+**Locked grain per group:**
+- One path per top-50 group (50 total)
+- `in`: one row per named PF controller (multiple PFs OK)
+- `hole`: at most ONE row per group, and ONLY if that group has zero named PF
+- `skip_soe`: one row (Petrobras)
+
+Groups with both 'in' and 'hole' rows (like WEG with 133 hole + 44 in) was the bug. After fix: the 9 groups with named PF emit ONLY 'in' rows (XOR); the remaining 18 listed groups emit one 'hole' row each.
+
 ### Forbes Safety-Net (Issue #26)
 
 Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_status=review` AFTER the positional freeze. Forbes rows are ADDITIVE on top of `freeze_persons`.
 
 **Input Source:** The `forbes_billionaires_brazil_nexus` seed is **FIXTURE DATA ONLY** for testing Forbes safety-net logic. It does NOT contain real Forbes billionaires, actual USD wealth estimates, or live Forbes data. Do NOT use this seed as a live Forbes extract.
+
+**CRITICAL - Production Exclusion:** The `forbes_billionaires_brazil_nexus` and `tse_donations_2026` seeds are **DISABLED on the warehouse target** (dev) and prod via `enabled: "{{ target.name in ['test', 'ci'] }}"` in `seeds/schema.yml`. The warehouse profile uses target name `dev` (see `profiles.yml.example`), which is excluded. Only test/ci targets may seed these fixtures. These seeds must NEVER be loaded into the `billionairewatcher` warehouse. Unit tests use the CSVs as fixtures without loading them to BigQuery.
 
 **Add ONLY if ALL of:**
 - On Forbes World's Billionaires (seed/fixture, not live scrape)
@@ -94,6 +130,14 @@ Forbes safety-net adds natural persons as `role=candidato_forbes` and `freeze_st
   - Example: JBS is `'02916265000160'` (from `02.916.265/0001-60`)
 
 Unit tests verify leading-zero preservation for both formats.
+
+### Schema Name Override
+
+The project uses a custom `generate_schema_name` macro (`macros/generate_schema_name.sql`) to land all models and seeds directly in the `billionaire_watcher` dataset, not `billionaire_watcher_billionaire_watcher`.
+
+**Warehouse location:** `billionairewatcher.billionaire_watcher` (project: `billionairewatcher`, dataset: `billionaire_watcher`, region: `US`)
+
+This macro strips the redundant project-name prefix that dbt-bigquery would otherwise append.
 
 ### RF Partner Edges: sócio, never dono/UBO
 
