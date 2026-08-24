@@ -9,13 +9,19 @@ describe('Tracer: Historical TSE Donations', () => {
   let buildError: string = '';
 
   beforeAll(() => {
-    distPath = path.join(__dirname, '..', 'dist');
-    
-    // Check if dist exists, if not, build is required
-    if (!fs.existsSync(distPath)) {
+    // Always rebuild to ensure fresh state
+    try {
+      execSync('npm run build', { 
+        cwd: path.join(__dirname, '..'),
+        stdio: 'pipe',
+        encoding: 'utf-8'
+      });
+    } catch (error: any) {
       buildFailed = true;
-      buildError = 'dist/ folder not found. Run `npm run build` first.';
+      buildError = error.message || String(error);
     }
+    
+    distPath = path.join(__dirname, '..', 'dist');
   });
 
   describe('Test 1: Historical donations for freeze person appear on dossier with citations', () => {
@@ -171,14 +177,13 @@ describe('Tracer: Historical TSE Donations', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // Any donation text should be accompanied by a citation
-      const donationMatches = html.match(/doou|doação|contribuiu/gi) || [];
+      // Must have donations section with citations
+      expect(html).toContain('Doações Políticas');
       
-      if (donationMatches.length > 0) {
-        // Check that there are corresponding citations
-        const citationMatches = html.match(/<sup[^>]*class="citation-marker"[^>]*>\[\d+\]<\/sup>/g) || [];
-        expect(citationMatches.length).toBeGreaterThan(0);
-      }
+      // Check that there are citation markers in donations section
+      const citationMatches = html.match(/<sup[^>]*class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
+      expect(citationMatches).toBeTruthy();
+      expect(citationMatches!.length).toBeGreaterThan(0);
     });
   });
 
@@ -209,16 +214,17 @@ describe('Tracer: Historical TSE Donations', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // When showing CNPJ donation attribution, RF relation should be sócio
-      if (html.includes('Empresa XYZ')) {
-        const xyzSection = html.match(/Empresa XYZ[\s\S]{0,500}/);
-        if (xyzSection && xyzSection[0].match(/sócio|controlador|dono|UBO/i)) {
-          expect(xyzSection[0]).toContain('sócio');
-          expect(xyzSection[0]).not.toMatch(/\bcontrolador\b/i);
-          expect(xyzSection[0]).not.toMatch(/\bUBO\b/i);
-          expect(xyzSection[0]).not.toMatch(/\bdono\b/i);
-        }
-      }
+      // Must have RF sócios section
+      expect(html).toContain('Empresas e Sócios');
+      expect(html).toContain('Empresa XYZ');
+      
+      // RF relation must be sócio, not controlador/UBO/dono
+      const xyzSection = html.match(/Empresa XYZ[\s\S]{0,500}/);
+      expect(xyzSection).toBeTruthy();
+      expect(xyzSection![0]).toContain('sócio');
+      expect(xyzSection![0]).not.toMatch(/\bcontrolador\b/i);
+      expect(xyzSection![0]).not.toMatch(/\bUBO\b/i);
+      expect(xyzSection![0]).not.toMatch(/\bdono\b/i);
     });
   });
 
@@ -227,44 +233,60 @@ describe('Tracer: Historical TSE Donations', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
+      // Must have Referências section
+      expect(html).toContain('Referências');
+      
       // Extract all citation markers
       const markerMatches = html.match(/\[(\d+)\]/g);
-      if (markerMatches) {
-        const markerNumbers = markerMatches.map(m => parseInt(m.match(/\d+/)![0]));
-        
-        // Extract all citation list items
-        const citationMatches = html.match(/<li id="citation-(\d+)">/g);
-        if (citationMatches) {
-          const citationNumbers = citationMatches.map(m => parseInt(m.match(/\d+/)![0]));
-          
-          // Every marker should have a corresponding citation
-          markerNumbers.forEach(num => {
-            expect(citationNumbers).toContain(num);
-          });
-        }
-      }
+      expect(markerMatches).toBeTruthy();
+      expect(markerMatches!.length).toBeGreaterThan(0);
+      
+      const markerNumbers = markerMatches!.map(m => parseInt(m.match(/\d+/)![0]));
+      
+      // Extract all citation list items (may include data-astro-cid attributes)
+      const citationMatches = html.match(/<li id="citation-(\d+)"[^>]*>/g);
+      expect(citationMatches).toBeTruthy();
+      expect(citationMatches!.length).toBeGreaterThan(0);
+      
+      const citationNumbers = citationMatches!.map(m => {
+        const match = m.match(/citation-(\d+)/);
+        return parseInt(match![1]);
+      });
+      
+      // Every marker must have a corresponding citation
+      markerNumbers.forEach(num => {
+        expect(citationNumbers).toContain(num);
+      });
     });
 
     it('should have matching citation markers and reference list in donations table', () => {
       const tablePath = path.join(distPath, 'doacoes', 'index.html');
       const html = fs.readFileSync(tablePath, 'utf-8');
       
+      // Must have Referências section
+      expect(html).toContain('Referências');
+      
       // Extract all citation markers
       const markerMatches = html.match(/\[(\d+)\]/g);
-      if (markerMatches) {
-        const markerNumbers = markerMatches.map(m => parseInt(m.match(/\d+/)![0]));
-        
-        // Extract all citation list items
-        const citationMatches = html.match(/<li id="citation-(\d+)">/g);
-        if (citationMatches) {
-          const citationNumbers = citationMatches.map(m => parseInt(m.match(/\d+/)![0]));
-          
-          // Every marker should have a corresponding citation
-          markerNumbers.forEach(num => {
-            expect(citationNumbers).toContain(num);
-          });
-        }
-      }
+      expect(markerMatches).toBeTruthy();
+      expect(markerMatches!.length).toBeGreaterThan(0);
+      
+      const markerNumbers = markerMatches!.map(m => parseInt(m.match(/\d+/)![0]));
+      
+      // Extract all citation list items (may include data-astro-cid attributes)
+      const citationMatches = html.match(/<li id="citation-(\d+)"[^>]*>/g);
+      expect(citationMatches).toBeTruthy();
+      expect(citationMatches!.length).toBeGreaterThan(0);
+      
+      const citationNumbers = citationMatches!.map(m => {
+        const match = m.match(/citation-(\d+)/);
+        return parseInt(match![1]);
+      });
+      
+      // Every marker must have a corresponding citation
+      markerNumbers.forEach(num => {
+        expect(citationNumbers).toContain(num);
+      });
     });
   });
 });
