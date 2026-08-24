@@ -1,26 +1,6 @@
 version: 2
 
 models:
-  - name: int_match_freeze_to_control_edges
-    description: |
-      Match freeze persons to control-chain CNPJs from RF socios.
-      Maps freeze_persons_with_forbes → RF edges.
-      DO NOT name-only add people. DO NOT scan full Brazil RF.
-      Only matches persons already in freeze with cnpj_basico.
-    columns:
-      - name: person_name
-        description: Natural person name from freeze
-        tests:
-          - not_null
-      - name: cnpj_basico
-        description: 8-digit CNPJ base (STRING with leading zeros)
-        tests:
-          - not_null
-      - name: control_edge_id
-        description: Unique identifier for control edge
-        tests:
-          - not_null
-
   - name: identity_facts
     description: |
       Identity facts for freeze persons (name, role, group affiliation).
@@ -113,9 +93,89 @@ models:
           arguments:
             expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
 
+  - name: donation_facts
+    description: |
+      TSE campaign donation facts for freeze persons.
+      One fact per receipt (person×candidate×cycle receipt grain).
+      Published facts ONLY for freeze_status=in.
+      PJ donations banned since 2016; 2026 is PF only.
+    columns:
+      - name: fact_id
+        description: Unique identifier for the fact
+        tests:
+          - not_null
+          - unique
+      - name: person_name
+        description: Natural person name
+        tests:
+          - not_null
+      - name: fact_kind
+        description: Must be 'donation' for donation facts
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['donation']
+      - name: source_locator
+        description: Source document locator (never null)
+        tests:
+          - not_null
+      - name: cpf_masked
+        description: Masked CPF only (no full CPF)
+    tests:
+      - dbt_utils.expression_is_true:
+          name: donation_facts_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+      - dbt_utils.expression_is_true:
+          name: donation_facts_no_bilionario_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
+
+  - name: association_facts
+    description: |
+      Association facts derived from shared control or co-donation.
+      Each association lists the fact_ids that support it.
+      Association without supporting fact_ids does NOT emit.
+      Ordinary candidates stay rows, not dossier persons.
+    columns:
+      - name: fact_id
+        description: Unique identifier for the fact
+        tests:
+          - not_null
+          - unique
+      - name: person_name
+        description: Natural person name (one person in the association)
+        tests:
+          - not_null
+      - name: fact_kind
+        description: Must be 'association' for association facts
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['association']
+      - name: source_locator
+        description: Source document locator (derived from supporting facts)
+        tests:
+          - not_null
+      - name: supporting_fact_ids
+        description: Array of fact_ids that support this association
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.expression_is_true:
+          name: association_facts_no_bilionario_in_value
+          config:
+            severity: error
+          arguments:
+            expression: "value not like '%o bilionário%' and value not like '%O bilionário%'"
+
   - name: published_facts
     description: |
-      Union of all published facts (identity + control edges).
+      Union of all published facts (identity + control edges + donations + associations).
       ONLY freeze_status=in persons. review/hole/skip_soe/candidato_forbes do NOT publish.
       
       TDD SEAMS (must fail if violated):
@@ -126,6 +186,9 @@ models:
       5. no edge_label/value dono or UBO
       6. no full CPF in fact columns/values
       7. no "o bilionário" / "o bilionário X" in fact values
+      8. no candidate CPF in value or fact_id
+      9. association without supporting fact_ids does NOT emit
+      10. association publishes on both freeze persons (two rows per association)
     columns:
       - name: fact_id
         description: Unique identifier for the fact
@@ -137,14 +200,14 @@ models:
         tests:
           - not_null
       - name: fact_kind
-        description: Fact type (identity | control_edge)
+        description: Fact type (identity | control_edge | donation | association)
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['identity', 'control_edge']
+                values: ['identity', 'control_edge', 'donation', 'association']
       - name: value
-        description: Fact value/claim (no "o bilionário X")
+        description: Fact value/claim (no "o bilionário X", no candidate CPF)
         tests:
           - not_null
       - name: source_publisher
@@ -161,6 +224,8 @@ models:
           - not_null
       - name: cpf_masked
         description: Masked CPF only (no full CPF)
+      - name: supporting_fact_ids
+        description: Array of fact_ids that support this association (null for identity/control/donation)
     tests:
       - dbt_utils.expression_is_true:
           name: published_facts_no_full_cpf

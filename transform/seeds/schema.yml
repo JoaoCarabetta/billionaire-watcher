@@ -87,3 +87,52 @@ seeds:
           - not_null
       - name: source_doc
         description: Source document citation
+
+  - name: tse_donations_2026
+    description: |
+      TSE 2026 campaign donations (FIXTURE/SEED ONLY, NOT LIVE TSE DATA).
+      Test data for donation facts. Fake CPFs (masked), not João Silva page people.
+      One row per donor×candidate×cycle receipt (match HTML fixture table grain).
+      PJ donations banned since 2016; 2026 donations are PF only.
+    config:
+      column_types:
+        ano: INT64
+        cpf_candidato: STRING
+        nome_candidato: STRING
+        cpf_cnpj_doador: STRING
+        nome_doador: STRING
+        valor_receita: FLOAT64
+        tipo_receita: STRING
+        fonte_receita: STRING
+        numero_recibo_eleitoral: STRING
+        cpf_doador_masked: STRING
+    columns:
+      - name: ano
+        description: Election year (2026)
+        tests:
+          - not_null
+      - name: cpf_candidato
+        description: Candidate CPF (masked, NOT FOR PUBLIC FACTS - use nome_candidato)
+        tests:
+          - not_null
+      - name: nome_candidato
+        description: Candidate name (public field for facts)
+        tests:
+          - not_null
+      - name: cpf_cnpj_doador
+        description: Donor CPF or CNPJ (masked)
+      - name: nome_doador
+        description: Donor name
+        tests:
+          - not_null
+      - name: valor_receita
+        description: Receipt amount
+        tests:
+          - not_null
+      - name: numero_recibo_eleitoral
+        description: Electoral receipt number (unique identifier per receipt)
+        tests:
+          - not_null
+          - unique
+      - name: cpf_doador_masked
+        description: Donor masked CPF (no full CPF)
