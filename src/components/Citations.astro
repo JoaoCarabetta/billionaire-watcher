@@ -2,31 +2,43 @@
 import type { Source } from '../types';
 
 interface Props {
-  sources: Source[];
+  citationMap: Map<string, number>;
+  allSources: Source[];
 }
 
-const { sources } = Astro.props;
+const { citationMap, allSources } = Astro.props;
 
-const uniqueSources = sources.filter((source, index, self) =>
-  index === self.findIndex((s) => s.locator === source.locator)
-);
+// Build a map of locator -> source for quick lookup
+const sourceByLocator = new Map<string, Source>();
+for (const source of allSources) {
+  if (!sourceByLocator.has(source.locator)) {
+    sourceByLocator.set(source.locator, source);
+  }
+}
+
+// Sort entries by citation number
+const sortedCitations = Array.from(citationMap.entries())
+  .sort((a, b) => a[1] - b[1]);
 ---
 
-{uniqueSources.length > 0 && (
+{citationMap.size > 0 && (
   <section class="citations">
     <h2>Referências</h2>
     <ol>
-      {uniqueSources.map((source, index) => (
-        <li id={`citation-${index + 1}`}>
-          <strong>{source.publisher}</strong>
-          {' — '}
-          <a href={source.locator} target="_blank" rel="noopener noreferrer">
-            {source.locator}
-          </a>
-          {' '}
-          <span class="retrieved">(recuperado em {source.retrieved_at})</span>
-        </li>
-      ))}
+      {sortedCitations.map(([locator, number]) => {
+        const source = sourceByLocator.get(locator)!;
+        return (
+          <li id={`citation-${number}`}>
+            <strong>{source.publisher}</strong>
+            {' — '}
+            <a href={source.locator} target="_blank" rel="noopener noreferrer">
+              {source.locator}
+            </a>
+            {' '}
+            <span class="retrieved">(recuperado em {source.retrieved_at})</span>
+          </li>
+        );
+      })}
     </ol>
   </section>
 )}

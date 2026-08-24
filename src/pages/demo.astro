@@ -3,10 +3,24 @@ import FactWithCitation from '../components/FactWithCitation.astro';
 import DerivedAssociation from '../components/DerivedAssociation.astro';
 import Citations from '../components/Citations.astro';
 import { getFacts, getDerivedAssociations } from '../utils/fixtures';
+import type { Source } from '../types';
 
 const facts = getFacts();
 const associations = getDerivedAssociations();
-const sources = facts.filter(f => f.source).map(f => f.source!);
+
+// Build citation map: unique sources by first appearance
+const citationMap = new Map<string, number>();
+let nextCitationNumber = 1;
+
+const allSources = facts.filter(f => f.source).map(f => f.source!);
+
+for (const source of allSources) {
+  if (!citationMap.has(source.locator)) {
+    citationMap.set(source.locator, nextCitationNumber++);
+  }
+}
+
+const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
 ---
 
 <!DOCTYPE html>
@@ -65,8 +79,8 @@ const sources = facts.filter(f => f.source).map(f => f.source!);
     <main>
       <section>
         <h2>Fatos Verificados</h2>
-        {facts.map((fact, index) => (
-          <FactWithCitation fact={fact} citationNumber={index + 1} />
+        {facts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
       </section>
 
@@ -79,7 +93,7 @@ const sources = facts.filter(f => f.source).map(f => f.source!);
         </section>
       )}
 
-      <Citations sources={sources} />
+      <Citations citationMap={citationMap} allSources={allSources} />
     </main>
   </body>
 </html>
