@@ -6,126 +6,141 @@ unit_tests:
     model: stg_rf_socios
     given:
       - input: source('br_me_cnpj', 'socios')
-        rows:
-          - ano: 2026
-            mes: 1
-            data: '2026-01-11'
-            cnpj_basico: '02916265'
-            tipo: 'PJ'
-            nome: 'TEST PARTNER LTDA'
-            documento: '12345678901234'
-            qualificacao: '49'
-            data_entrada_sociedade: '2020-01-01'
-            id_pais: null
-            cpf_representante_legal: null
-            nome_representante_legal: null
-            qualificacao_representante_legal: null
-            faixa_etaria: null
+        format: sql
+        rows: |
+          select
+            2026 as ano,
+            1 as mes,
+            cast('2026-01-11' as date) as data,
+            '02916265' as cnpj_basico,
+            'PJ' as tipo,
+            'TEST PARTNER LTDA' as nome,
+            '12345678901234' as documento,
+            '49' as qualificacao,
+            cast('2020-01-01' as date) as data_entrada_sociedade,
+            cast(null as varchar) as id_pais,
+            cast(null as varchar) as cpf_representante_legal,
+            cast(null as varchar) as nome_representante_legal,
+            cast(null as varchar) as qualificacao_representante_legal,
+            cast(null as varchar) as faixa_etaria
       - input: ref('freeze_cnpj_basicos')
-        rows:
-          - cnpj_basico: '02916265'
+        format: sql
+        rows: |
+          select '02916265' as cnpj_basico
     expect:
-      rows:
-        - ano: 2026
-          mes: 1
-          data: '2026-01-11'
-          cnpj_basico: '02916265'
-          tipo: 'PJ'
-          nome: 'TEST PARTNER LTDA'
-          documento: '12345678901234'
-          qualificacao: '49'
-          data_entrada_sociedade: '2020-01-01'
-          id_pais: null
-          cpf_representante_legal: null
-          nome_representante_legal: null
-          qualificacao_representante_legal: null
-          faixa_etaria: null
+      format: sql
+      rows: |
+        select
+          2026 as ano,
+          1 as mes,
+          cast('2026-01-11' as date) as data,
+          '02916265' as cnpj_basico,
+          'PJ' as tipo,
+          'TEST PARTNER LTDA' as nome,
+          '12345678901234' as documento,
+          '49' as qualificacao,
+          cast('2020-01-01' as date) as data_entrada_sociedade,
+          cast(null as varchar) as id_pais,
+          cast(null as varchar) as cpf_representante_legal,
+          cast(null as varchar) as nome_representante_legal,
+          cast(null as varchar) as qualificacao_representante_legal,
+          cast(null as varchar) as faixa_etaria
 
   - name: test_stg_rf_empresas_preserves_leading_zeros
     description: Verify that cnpj_basico preserves leading zeros (JBS 02916265)
     model: stg_rf_empresas
     given:
       - input: source('br_me_cnpj', 'empresas')
-        rows:
-          - ano: 2026
-            mes: 1
-            data: '2026-01-11'
-            cnpj_basico: '02916265'
-            razao_social: 'JBS S.A.'
-            natureza_juridica: '2046'
-            qualificacao_responsavel: '05'
-            capital_social: 23631071304.24
-            porte: '05'
-            ente_federativo: null
+        format: sql
+        rows: |
+          select
+            2026 as ano,
+            1 as mes,
+            cast('2026-01-11' as date) as data,
+            '02916265' as cnpj_basico,
+            'JBS S.A.' as razao_social,
+            '2046' as natureza_juridica,
+            '05' as qualificacao_responsavel,
+            23631071304.24 as capital_social,
+            '05' as porte,
+            cast(null as varchar) as ente_federativo
       - input: ref('freeze_cnpj_basicos')
-        rows:
-          - cnpj_basico: '02916265'
+        format: sql
+        rows: |
+          select '02916265' as cnpj_basico
     expect:
-      rows:
-        - ano: 2026
-          mes: 1
-          data: '2026-01-11'
-          cnpj_basico: '02916265'
-          razao_social: 'JBS S.A.'
-          natureza_juridica: '2046'
-          qualificacao_responsavel: '05'
-          capital_social: 23631071304.24
-          porte: '05'
-          ente_federativo: null
+      format: sql
+      rows: |
+        select
+          2026 as ano,
+          1 as mes,
+          cast('2026-01-11' as date) as data,
+          '02916265' as cnpj_basico,
+          'JBS S.A.' as razao_social,
+          '2046' as natureza_juridica,
+          '05' as qualificacao_responsavel,
+          23631071304.24 as capital_social,
+          '05' as porte,
+          cast(null as varchar) as ente_federativo
 
   - name: test_stg_rf_estabelecimentos_preserves_leading_zeros
     description: Verify that cnpj_basico (8) and cnpj (14) preserve leading zeros
     model: stg_rf_estabelecimentos
     given:
       - input: source('br_me_cnpj', 'estabelecimentos')
-        rows:
-          - ano: 2026
-            mes: 1
-            data: '2026-01-11'
-            cnpj: '02916265000160'
-            cnpj_basico: '02916265'
-            cnpj_ordem: '0001'
-            cnpj_dv: '60'
-            identificador_matriz_filial: '1'
-            nome_fantasia: 'JBS'
-            situacao_cadastral: '02'
-            data_situacao_cadastral: '2007-03-29'
-            motivo_situacao_cadastral: null
-            nome_cidade_exterior: null
-            id_pais: null
-            data_inicio_atividade: '2007-03-29'
-            cnae_fiscal_principal: '1011201'
-            cnae_fiscal_secundaria: null
-            sigla_uf: 'SP'
-            id_municipio: '6291'
-            id_municipio_rf: '6291'
-            tipo_logradouro: 'AVENIDA'
-            logradouro: 'MARGINAL DIREITA TIETE'
-            numero: '500'
-            complemento: null
-            bairro: 'VILA JAGUARA'
-            cep: '05118100'
-            ddd_1: '11'
-            telefone_1: '21844000'
-            ddd_2: null
-            telefone_2: null
-            ddd_fax: null
-            fax: null
-            email: null
-            situacao_especial: null
-            data_situacao_especial: null
+        format: sql
+        rows: |
+          select
+            2026 as ano,
+            1 as mes,
+            cast('2026-01-11' as date) as data,
+            '02916265000160' as cnpj,
+            '02916265' as cnpj_basico,
+            '0001' as cnpj_ordem,
+            '60' as cnpj_dv,
+            '1' as identificador_matriz_filial,
+            'JBS' as nome_fantasia,
+            '02' as situacao_cadastral,
+            cast('2007-03-29' as date) as data_situacao_cadastral,
+            cast(null as varchar) as motivo_situacao_cadastral,
+            cast(null as varchar) as nome_cidade_exterior,
+            cast(null as varchar) as id_pais,
+            cast('2007-03-29' as date) as data_inicio_atividade,
+            '1011201' as cnae_fiscal_principal,
+            cast(null as varchar) as cnae_fiscal_secundaria,
+            'SP' as sigla_uf,
+            '6291' as id_municipio,
+            '6291' as id_municipio_rf,
+            'AVENIDA' as tipo_logradouro,
+            'MARGINAL DIREITA TIETE' as logradouro,
+            '500' as numero,
+            cast(null as varchar) as complemento,
+            'VILA JAGUARA' as bairro,
+            '05118100' as cep,
+            '11' as ddd_1,
+            '21844000' as telefone_1,
+            cast(null as varchar) as ddd_2,
+            cast(null as varchar) as telefone_2,
+            cast(null as varchar) as ddd_fax,
+            cast(null as varchar) as fax,
+            cast(null as varchar) as email,
+            cast(null as varchar) as situacao_especial,
+            cast(null as date) as data_situacao_especial
       - input: ref('freeze_cnpj_basicos')
-        rows:
-          - cnpj_basico: '02916265'
+        format: sql
+        rows: |
+          select '02916265' as cnpj_basico
     expect:
-      rows:
-        - ano: 2026
-          mes: 1
-          data: '2026-01-11'
-          cnpj: '02916265000160'
-          cnpj_basico: '02916265'
-          cnpj_ordem: '0001'
-          cnpj_dv: '60'
+      format: sql
+      rows: |
+        select
+          2026 as ano,
+          1 as mes,
+          cast('2026-01-11' as date) as data,
+          '02916265000160' as cnpj,
+          '02916265' as cnpj_basico,
+          '0001' as cnpj_ordem,
+          '60' as cnpj_dv
 
   - name: test_stg_group_flags_preserves_leading_zeros
     description: |
@@ -134,39 +149,43 @@ unit_tests:
     model: stg_group_flags
     given:
       - input: ref('top50_flags_seed')
-        rows:
-          - rank_2024: 2
-            empresa: 'JBS'
-            razao_social: 'JBS S.A.'
-            cnpj_basico: '02916265'
-            cnpj_full: '02916265000160'
-            listed_flag: 'true'
-            listed_source: 'CVM cad_cia_aberta'
-            soe_flag: 'false'
-            soe_source: 'Not a federal SOE'
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Brazilian listed issuer'
-            source_doc: 'CVM cad_cia_aberta CD_CVM=20575'
-            cnpj_source: 'basedosdados.br_me_cnpj'
-            retrieved_at: '2026-08-24'
+        format: sql
+        rows: |
+          select
+            2 as rank_2024,
+            'JBS' as empresa,
+            'JBS S.A.' as razao_social,
+            '02916265' as cnpj_basico,
+            '02916265000160' as cnpj_full,
+            'true' as listed_flag,
+            'CVM cad_cia_aberta' as listed_source,
+            'false' as soe_flag,
+            'Not a federal SOE' as soe_source,
+            'listed' as controlador_tipo,
+            'pending' as freeze_status_hint,
+            'Brazilian listed issuer' as notes,
+            'CVM cad_cia_aberta CD_CVM=20575' as source_doc,
+            'basedosdados.br_me_cnpj' as cnpj_source,
+            '2026-08-24' as retrieved_at
     expect:
-      rows:
-        - rank_2024: 2
-          empresa: 'JBS'
-          razao_social: 'JBS S.A.'
-          cnpj_basico: '02916265'
-          cnpj_full: '02916265000160'
-          listed_flag: true
-          listed_source: 'CVM cad_cia_aberta'
-          soe_flag: false
-          soe_source: 'Not a federal SOE'
-          controlador_tipo: 'listed'
-          freeze_status_hint: 'pending'
-          notes: 'Brazilian listed issuer'
-          source_doc: 'CVM cad_cia_aberta CD_CVM=20575'
-          cnpj_source: 'basedosdados.br_me_cnpj'
-          retrieved_at: '2026-08-24'
+      format: sql
+      rows: |
+        select
+          2 as rank_2024,
+          'JBS' as empresa,
+          'JBS S.A.' as razao_social,
+          '02916265' as cnpj_basico,
+          '02916265000160' as cnpj_full,
+          true as listed_flag,
+          'CVM cad_cia_aberta' as listed_source,
+          false as soe_flag,
+          'Not a federal SOE' as soe_source,
+          'listed' as controlador_tipo,
+          'pending' as freeze_status_hint,
+          'Brazilian listed issuer' as notes,
+          'CVM cad_cia_aberta CD_CVM=20575' as source_doc,
+          'basedosdados.br_me_cnpj' as cnpj_source,
+          '2026-08-24' as retrieved_at
 
   - name: test_stg_cvm_fre_cnpj_14_digit_string
     description: |
@@ -175,45 +194,49 @@ unit_tests:
     model: stg_cvm_fre_posicao_acionaria_2026
     given:
       - input: source('gcs_cvm', 'fre_posicao_acionaria_2026')
-        rows:
-          - CNPJ_Companhia: '02.916.265/0001-60'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 123456
-            Nome_Companhia: 'JBS S.A.'
-            ID_Acionista: 1
-            Acionista: 'TEST SHAREHOLDER'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '12.345.678/0001-90'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 1000000
-            Percentual_Acao_Ordinaria_Circulacao: 25.5
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 1000000
-            Percentual_Total_Acoes_Circulacao: 25.5
-            Nacionalidade: 'BRASILEIRA'
-            Sigla_UF: 'SP'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '31/12/2025'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'N'
-            Participante_Acordo_Acionistas: 'N'
+        format: sql
+        rows: |
+          select
+            '02.916.265/0001-60' as CNPJ_Companhia,
+            '2025-12-31' as Data_Referencia,
+            1 as Versao,
+            123456 as ID_Documento,
+            'JBS S.A.' as Nome_Companhia,
+            1 as ID_Acionista,
+            'TEST SHAREHOLDER' as Acionista,
+            'PJ' as Tipo_Pessoa_Acionista,
+            '12.345.678/0001-90' as CPF_CNPJ_Acionista,
+            cast(null as integer) as ID_Acionista_Relacionado,
+            cast(null as varchar) as Acionista_Relacionado,
+            cast(null as varchar) as Tipo_Pessoa_Acionista_Relacionado,
+            cast(null as varchar) as CPF_CNPJ_Acionista_Relacionado,
+            1000000 as Quantidade_Acao_Ordinaria_Circulacao,
+            25.5 as Percentual_Acao_Ordinaria_Circulacao,
+            0 as Quantidade_Acao_Preferencial_Circulacao,
+            0.0 as Percentual_Acao_Preferencial_Circulacao,
+            1000000 as Quantidade_Total_Acoes_Circulacao,
+            25.5 as Percentual_Total_Acoes_Circulacao,
+            'BRASILEIRA' as Nacionalidade,
+            'SP' as Sigla_UF,
+            'N' as Residente_Exterior,
+            cast(null as varchar) as Representante_Legal,
+            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,
+            cast(null as varchar) as CPF_CNPJ_Representante_legal,
+            '31/12/2025' as Data_Composicao_Capital_Social,
+            '2025-12-31' as Data_Ultima_Alteracao,
+            'N' as Acionista_Controlador,
+            'N' as Participante_Acordo_Acionistas
     expect:
-      rows:
-        - CNPJ_Companhia: '02916265000160'
-          Data_Referencia: '2025-12-31'
-          Versao: 1
-          ID_Documento: 123456
-          Nome_Companhia: 'JBS S.A.'
-          ID_Acionista: 1
-          Acionista: 'TEST SHAREHOLDER'
+      format: sql
+      rows: |
+        select
+          '02916265000160' as CNPJ_Companhia,
+          '2025-12-31' as Data_Referencia,
+          1 as Versao,
+          123456 as ID_Documento,
+          'JBS S.A.' as Nome_Companhia,
+          1 as ID_Acionista,
+          'TEST SHAREHOLDER' as Acionista
 
   - name: test_stg_cvm_cad_cnpj_14_digit_string
     description: |
@@ -222,57 +245,61 @@ unit_tests:
     model: stg_cvm_cad_cia_aberta
     given:
       - input: source('gcs_cvm', 'cad_cia_aberta')
-        rows:
-          - CNPJ_CIA: '02.916.265/0001-60'
-            DENOM_SOCIAL: 'JBS SA'
-            DENOM_COMERC: 'JBS'
-            DT_REG: '2007-04-02'
-            DT_CONST: '1953-09-04'
-            DT_CANCEL: null
-            MOTIVO_CANCEL: null
-            SIT: 'ATIVO'
-            DT_INI_SIT: '2007-04-02'
-            CD_CVM: 20575
-            SETOR_ATIV: 'ALIMENTOS'
-            TP_MERC: 'BOLSA'
-            CATEG_REG: 'Categoria A'
-            DT_INI_CATEG: '2007-04-02'
-            SIT_EMISSOR: 'ATIVO'
-            DT_INI_SIT_EMISSOR: '2007-04-02'
-            CONTROLE_ACIONARIO: 'PRIVADO'
-            TP_ENDER: 'COMERCIAL'
-            LOGRADOURO: 'AVENIDA MARGINAL DIREITA TIETE'
-            COMPL: null
-            BAIRRO: 'VILA JAGUARA'
-            MUN: 'SAO PAULO'
-            UF: 'SP'
-            PAIS: 'BRASIL'
-            CEP: 5118100
-            DDD_TEL: 11
-            TEL: 21844000
-            DDD_FAX: null
-            FAX: null
-            EMAIL: 'ri@jbs.com.br'
-            TP_RESP: 'DIR'
-            RESP: 'GUILHERME PERBOYRE CAVALCANTI'
-            DT_INI_RESP: '2020-05-14'
-            LOGRADOURO_RESP: null
-            COMPL_RESP: null
-            BAIRRO_RESP: null
-            MUN_RESP: null
-            UF_RESP: null
-            PAIS_RESP: null
-            CEP_RESP: null
-            DDD_TEL_RESP: null
-            TEL_RESP: null
-            DDD_FAX_RESP: null
-            FAX_RESP: null
-            EMAIL_RESP: null
-            CNPJ_AUDITOR: '02449992000125'
-            AUDITOR: 'PWC'
+        format: sql
+        rows: |
+          select
+            '02.916.265/0001-60' as CNPJ_CIA,
+            'JBS SA' as DENOM_SOCIAL,
+            'JBS' as DENOM_COMERC,
+            '2007-04-02' as DT_REG,
+            '1953-09-04' as DT_CONST,
+            cast(null as varchar) as DT_CANCEL,
+            cast(null as varchar) as MOTIVO_CANCEL,
+            'ATIVO' as SIT,
+            '2007-04-02' as DT_INI_SIT,
+            20575 as CD_CVM,
+            'ALIMENTOS' as SETOR_ATIV,
+            'BOLSA' as TP_MERC,
+            'Categoria A' as CATEG_REG,
+            '2007-04-02' as DT_INI_CATEG,
+            'ATIVO' as SIT_EMISSOR,
+            '2007-04-02' as DT_INI_SIT_EMISSOR,
+            'PRIVADO' as CONTROLE_ACIONARIO,
+            'COMERCIAL' as TP_ENDER,
+            'AVENIDA MARGINAL DIREITA TIETE' as LOGRADOURO,
+            cast(null as varchar) as COMPL,
+            'VILA JAGUARA' as BAIRRO,
+            'SAO PAULO' as MUN,
+            'SP' as UF,
+            'BRASIL' as PAIS,
+            5118100 as CEP,
+            11 as DDD_TEL,
+            21844000 as TEL,
+            cast(null as integer) as DDD_FAX,
+            cast(null as integer) as FAX,
+            'ri@jbs.com.br' as EMAIL,
+            'DIR' as TP_RESP,
+            'GUILHERME PERBOYRE CAVALCANTI' as RESP,
+            '2020-05-14' as DT_INI_RESP,
+            cast(null as varchar) as LOGRADOURO_RESP,
+            cast(null as varchar) as COMPL_RESP,
+            cast(null as varchar) as BAIRRO_RESP,
+            cast(null as varchar) as MUN_RESP,
+            cast(null as varchar) as UF_RESP,
+            cast(null as varchar) as PAIS_RESP,
+            cast(null as integer) as CEP_RESP,
+            cast(null as integer) as DDD_TEL_RESP,
+            cast(null as integer) as TEL_RESP,
+            cast(null as integer) as DDD_FAX_RESP,
+            cast(null as integer) as FAX_RESP,
+            cast(null as varchar) as EMAIL_RESP,
+            '02449992000125' as CNPJ_AUDITOR,
+            'PWC' as AUDITOR
     expect:
-      rows:
-        - CNPJ_CIA: '02916265000160'
-          DENOM_SOCIAL: 'JBS SA'
-          SIT: 'ATIVO'
-          CD_CVM: 20575
+      format: sql
+      rows: |
+        select
+          '02916265000160' as CNPJ_CIA,
+          'JBS SA' as DENOM_SOCIAL,
+          'ATIVO' as SIT,
+          20575 as CD_CVM
