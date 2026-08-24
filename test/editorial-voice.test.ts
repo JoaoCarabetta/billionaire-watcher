@@ -17,6 +17,8 @@ import path from 'path';
  * - "dono" / "UBO" on RF edges (must be "sócio")
  * - Nariz-de-cera ("No cenário atual...")
  * - LLM calques (delve, intricate, "é fundamental ressaltar", "mergulha no", "tecido", "papel crucial")
+ * - "Não X, mas Y" rhetorical pattern
+ * - Value adjectives (poderoso, polêmico, gigante, tragédia)
  * 
  * DO NOT touch /metodologia (not in scope for this issue).
  */
@@ -25,6 +27,15 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
   let distPath: string;
   let buildFailed: boolean = false;
   let buildError: string = '';
+
+  // In-scope pages for issue #39
+  const IN_SCOPE_PAGES = {
+    home: 'index.html',
+    p1Dossier: 'pessoa/p1/index.html',
+    donations: 'doacoes/index.html',
+    notFound: '404.html',
+    llmsTxt: 'llms.txt'
+  };
 
   beforeAll(() => {
     try {
@@ -41,51 +52,29 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
     distPath = path.join(__dirname, '..', 'dist');
   });
 
+  // Helper to get all in-scope HTML pages (excluding llms.txt)
+  const getInScopeHtmlPages = () => [
+    path.join(distPath, IN_SCOPE_PAGES.home),
+    path.join(distPath, IN_SCOPE_PAGES.p1Dossier),
+    path.join(distPath, IN_SCOPE_PAGES.donations),
+    path.join(distPath, IN_SCOPE_PAGES.notFound)
+  ];
+
   describe('Test: No Wikipedia identity lead', () => {
-    it('should not contain "é um empresário" in p1 dossier', () => {
+    it('should not contain "é um empresário" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
-      const html = fs.readFileSync(dossierPath, 'utf-8');
-      
-      expect(html).not.toMatch(/é um empresário/i);
-      expect(html).not.toMatch(/é uma empresária/i);
-    });
-
-    it('should not contain "é um empresário" in home page', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const homePath = path.join(distPath, 'index.html');
-      const html = fs.readFileSync(homePath, 'utf-8');
-      
-      expect(html).not.toMatch(/é um empresário/i);
-      expect(html).not.toMatch(/é uma empresária/i);
-    });
-
-    it('should not contain "é um empresário" in donations page', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const donationsPath = path.join(distPath, 'doacoes', 'index.html');
-      const html = fs.readFileSync(donationsPath, 'utf-8');
-      
-      expect(html).not.toMatch(/é um empresário/i);
-      expect(html).not.toMatch(/é uma empresária/i);
-    });
-
-    it('should not contain "é um empresário" in 404 page', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const notFoundPath = path.join(distPath, '404.html');
-      const html = fs.readFileSync(notFoundPath, 'utf-8');
-      
-      expect(html).not.toMatch(/é um empresário/i);
-      expect(html).not.toMatch(/é uma empresária/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain Wikipedia identity lead`).not.toMatch(/é um empresário/i);
+        expect(html, `${pagePath} should not contain Wikipedia identity lead`).not.toMatch(/é uma empresária/i);
+      }
     });
 
     it('should not contain "é um empresário" in llms.txt', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const llmsPath = path.join(distPath, 'llms.txt');
+      const llmsPath = path.join(distPath, IN_SCOPE_PAGES.llmsTxt);
       const text = fs.readFileSync(llmsPath, 'utf-8');
       
       expect(text).not.toMatch(/é um empresário/i);
@@ -94,50 +83,24 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
   });
 
   describe('Test: No "bilionário" as identity label', () => {
-    it('should not contain "o bilionário" in p1 dossier', () => {
+    it('should not contain "o bilionário" or "bilionário [Name]" pattern in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
-      const html = fs.readFileSync(dossierPath, 'utf-8');
-      
-      expect(html).not.toMatch(/o bilionário/i);
-      expect(html).not.toMatch(/a bilionária/i);
-    });
-
-    it('should not contain "bilionário [Name]" pattern in p1 dossier', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
-      const html = fs.readFileSync(dossierPath, 'utf-8');
-      
-      // Pattern: "bilionário" followed by a name (João, Maria, etc.)
-      expect(html).not.toMatch(/bilionári[oa]\s+[A-Z][a-záàâãéêíóôõúüç]+/);
-    });
-
-    it('should not contain "o bilionário" in home page', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const homePath = path.join(distPath, 'index.html');
-      const html = fs.readFileSync(homePath, 'utf-8');
-      
-      expect(html).not.toMatch(/o bilionário/i);
-      expect(html).not.toMatch(/a bilionária/i);
-    });
-
-    it('should not contain "o bilionário" in donations page', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const donationsPath = path.join(distPath, 'doacoes', 'index.html');
-      const html = fs.readFileSync(donationsPath, 'utf-8');
-      
-      expect(html).not.toMatch(/o bilionário/i);
-      expect(html).not.toMatch(/a bilionária/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        
+        expect(html, `${pagePath} should not contain "o bilionário"`).not.toMatch(/o bilionário/i);
+        expect(html, `${pagePath} should not contain "a bilionária"`).not.toMatch(/a bilionária/i);
+        
+        // Pattern: "bilionário" followed by a name (João, Maria, etc.)
+        expect(html, `${pagePath} should not use bilionário as identity label`).not.toMatch(/bilionári[oa]\s+[A-Z][a-záàâãéêíóôõúüç]+/);
+      }
     });
 
     it('should not contain "o bilionário" in llms.txt', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const llmsPath = path.join(distPath, 'llms.txt');
+      const llmsPath = path.join(distPath, IN_SCOPE_PAGES.llmsTxt);
       const text = fs.readFileSync(llmsPath, 'utf-8');
       
       expect(text).not.toMatch(/o bilionário/i);
@@ -146,173 +109,131 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
   });
 
   describe('Test: RF edges use "sócio", never "dono" or "UBO"', () => {
-    it('should not contain "dono" as relationship in p1 dossier', () => {
+    it('should have Empresas e Sócios section in p1 dossier', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // "dono" should not appear in the RF edges context
-      // Allow "controlador" in company names but not as relationship
+      // Assert the section exists
       const rfSectionMatch = html.match(/<h2[^>]*>Empresas e Sócios<\/h2>([\s\S]*?)<\/section>/i);
-      if (rfSectionMatch) {
-        const rfSection = rfSectionMatch[1];
-        expect(rfSection).not.toMatch(/\bdono\b/i);
-      }
+      expect(rfSectionMatch, 'p1 dossier must have Empresas e Sócios section').toBeTruthy();
     });
 
-    it('should not contain "UBO" as relationship in p1 dossier', () => {
+    it('should not contain "dono" in Empresas e Sócios section', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // "UBO" should not appear in the RF edges section
       const rfSectionMatch = html.match(/<h2[^>]*>Empresas e Sócios<\/h2>([\s\S]*?)<\/section>/i);
-      if (rfSectionMatch) {
-        const rfSection = rfSectionMatch[1];
-        expect(rfSection).not.toMatch(/\bUBO\b/);
-      }
+      expect(rfSectionMatch, 'p1 dossier must have Empresas e Sócios section').toBeTruthy();
+      
+      const rfSection = rfSectionMatch![1];
+      // \bdono\b but not "doador"
+      expect(rfSection, 'RF edges must not use "dono"').not.toMatch(/\bdono\b/i);
     });
 
-    it('should use "sócio" for all RF edges in p1 dossier', () => {
+    it('should not contain "UBO" in Empresas e Sócios section', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // All RF edges should show "sócio"
       const rfSectionMatch = html.match(/<h2[^>]*>Empresas e Sócios<\/h2>([\s\S]*?)<\/section>/i);
-      if (rfSectionMatch) {
-        const rfSection = rfSectionMatch[1];
-        // Check that "sócio" appears (at least once)
-        expect(rfSection).toMatch(/sócio/i);
-      }
+      expect(rfSectionMatch, 'p1 dossier must have Empresas e Sócios section').toBeTruthy();
+      
+      const rfSection = rfSectionMatch![1];
+      expect(rfSection, 'RF edges must not use "UBO"').not.toMatch(/\bUBO\b/);
+    });
+
+    it('should use "sócio" for all RF edges', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+      
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      const rfSectionMatch = html.match(/<h2[^>]*>Empresas e Sócios<\/h2>([\s\S]*?)<\/section>/i);
+      expect(rfSectionMatch, 'p1 dossier must have Empresas e Sócios section').toBeTruthy();
+      
+      const rfSection = rfSectionMatch![1];
+      expect(rfSection, 'RF edges must use "sócio"').toMatch(/sócio/i);
     });
   });
 
   describe('Test: No nariz-de-cera phrases', () => {
-    it('should not contain "No cenário atual" in any page', () => {
+    it('should not contain "No cenário atual" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/no cenário atual/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain nariz-de-cera`).not.toMatch(/no cenário atual/i);
       }
     });
 
-    it('should not contain "No contexto de" in any page', () => {
+    it('should not contain "No contexto de" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/no contexto de/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain nariz-de-cera`).not.toMatch(/no contexto de/i);
       }
     });
   });
 
   describe('Test: No LLM calques', () => {
-    it('should not contain "é fundamental ressaltar" in any page', () => {
+    it('should not contain "é fundamental ressaltar" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/é fundamental ressaltar/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain LLM calque`).not.toMatch(/é fundamental ressaltar/i);
       }
     });
 
-    it('should not contain "mergulha no" in any page', () => {
+    it('should not contain "mergulha no" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/mergulha no/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain LLM calque`).not.toMatch(/mergulha no/i);
       }
     });
 
-    it('should not contain "papel crucial" in any page', () => {
+    it('should not contain "papel crucial" in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/papel crucial/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain LLM calque`).not.toMatch(/papel crucial/i);
       }
     });
 
-    it('should not contain "tecido" as metaphor in any page', () => {
+    it('should not contain "tecido" as metaphor in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
         // "tecido" as in "tecido empresarial" or "tecido social" (LLM calque)
-        expect(html).not.toMatch(/tecido (empresarial|social|econômico)/i);
+        expect(html, `${pagePath} should not contain LLM calque`).not.toMatch(/tecido (empresarial|social|econômico)/i);
       }
     });
 
-    it('should not contain English LLM words (delve, intricate, showcase) in any page', () => {
+    it('should not contain English LLM words (delve, intricate, showcase) in any HTML page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const pages = [
-        path.join(distPath, 'index.html'),
-        path.join(distPath, 'pessoa', 'p1', 'index.html'),
-        path.join(distPath, 'doacoes', 'index.html'),
-        path.join(distPath, '404.html')
-      ];
-      
-      for (const page of pages) {
-        const html = fs.readFileSync(page, 'utf-8');
-        expect(html).not.toMatch(/\bdelve\b/i);
-        expect(html).not.toMatch(/\bintricate\b/i);
-        expect(html).not.toMatch(/\bshowcas(e|ing)\b/i);
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        expect(html, `${pagePath} should not contain English LLM words`).not.toMatch(/\bdelve\b/i);
+        expect(html, `${pagePath} should not contain English LLM words`).not.toMatch(/\bintricate\b/i);
+        expect(html, `${pagePath} should not contain English LLM words`).not.toMatch(/\bshowcas(e|ing)\b/i);
       }
     });
 
-    it('should not contain llms.txt with LLM calques', () => {
+    it('should not contain LLM calques in llms.txt', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const llmsPath = path.join(distPath, 'llms.txt');
+      const llmsPath = path.join(distPath, IN_SCOPE_PAGES.llmsTxt);
       const text = fs.readFileSync(llmsPath, 'utf-8');
       
       expect(text).not.toMatch(/é fundamental ressaltar/i);
@@ -321,11 +242,60 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
     });
   });
 
+  describe('Test: No "Não X, mas Y" rhetorical pattern', () => {
+    it('should not contain "Não X, mas Y" pattern in any HTML page', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+      
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        // Match "Não [up to 60 chars], mas " pattern (REDACAO NEVER #3)
+        expect(html, `${pagePath} should not contain "Não X, mas Y" rhetorical pattern`).not.toMatch(/Não [^.]{0,60}, mas /i);
+      }
+    });
+
+    it('should not contain "Não X, mas Y" pattern in llms.txt', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+      
+      const llmsPath = path.join(distPath, IN_SCOPE_PAGES.llmsTxt);
+      const text = fs.readFileSync(llmsPath, 'utf-8');
+      
+      expect(text).not.toMatch(/Não [^.]{0,60}, mas /i);
+    });
+  });
+
+  describe('Test: No value adjectives without cifra', () => {
+    it('should not contain value adjectives (poderoso, polêmico, gigante, tragédia) in any HTML page', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+      
+      for (const pagePath of getInScopeHtmlPages()) {
+        const html = fs.readFileSync(pagePath, 'utf-8');
+        
+        // REDACAO NEVER #6: poderoso, polêmico, gigante, tragédia
+        expect(html, `${pagePath} should not contain "poderoso"`).not.toMatch(/\bpoderos[oa]s?\b/i);
+        expect(html, `${pagePath} should not contain "polêmico"`).not.toMatch(/\bpolêmic[oa]s?\b/i);
+        expect(html, `${pagePath} should not contain "gigante"`).not.toMatch(/\bgigantes?\b/i);
+        expect(html, `${pagePath} should not contain "tragédia"`).not.toMatch(/\btragédias?\b/i);
+      }
+    });
+
+    it('should not contain value adjectives in llms.txt', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+      
+      const llmsPath = path.join(distPath, IN_SCOPE_PAGES.llmsTxt);
+      const text = fs.readFileSync(llmsPath, 'utf-8');
+      
+      expect(text).not.toMatch(/\bpoderos[oa]s?\b/i);
+      expect(text).not.toMatch(/\bpolêmic[oa]s?\b/i);
+      expect(text).not.toMatch(/\bgigantes?\b/i);
+      expect(text).not.toMatch(/\btragédias?\b/i);
+    });
+  });
+
   describe('Test: Citations remain visible in dossiers', () => {
     it('should have visible citation markers in p1 dossier', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       // Check for citation markers (sup with brackets or just brackets)
@@ -336,7 +306,7 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
     it('should have References section in p1 dossier', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       expect(html).toMatch(/Referências/i);
@@ -345,28 +315,12 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
     it('should have visible sources in p1 dossier references', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, IN_SCOPE_PAGES.p1Dossier);
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       // Check that references contain publisher names and URLs
       expect(html).toMatch(/Receita Federal do Brasil/);
       expect(html).toMatch(/https:\/\//);
-    });
-  });
-
-  describe('Test: /metodologia is not modified (out of scope)', () => {
-    it('should not have metodologia page in dist (not created yet)', () => {
-      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-      
-      const metodologiaPath = path.join(distPath, 'metodologia', 'index.html');
-      // This page doesn't exist yet, so we just verify it's not there
-      // If it exists in the future, DO NOT modify it per issue #39
-      
-      if (fs.existsSync(metodologiaPath)) {
-        // If it exists, we should NOT have touched it
-        // This test would need to compare against the original
-        console.log('Note: /metodologia exists but is out of scope for issue #39');
-      }
     });
   });
 });
