@@ -1,219 +1,122 @@
 unit_tests:
-  # FORBES SEAM 1: Positional freeze rows still present; Forbes is additive
-  - name: test_forbes_positional_freeze_preserved
-    description: |
-      FORBES SEAM TEST 1: Positional freeze rows must still be present.
-      Forbes candidates are ADDITIVE, not replacement.
-    model: freeze_persons_with_forbes
-    given:
-      - input: ref('freeze_persons')
-        rows:
-          - group_rank: 1
-            group_name: 'Test Company'
-            cnpj_basico: '12345678'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: false
-            controlador_tipo: 'listed'
-            person_name: 'João Silva'
-            role: 'controlador'
-            edge_label: 'acionista_controlador'
-            acordo_acionistas: null
-            source_doc: 'CVM FRE 2026'
-            fre_item: '6.1'
-            hole: false
-            cpf_masked: '***123456**'
-            freeze_status: 'in'
-            notes: 'Test positional'
-      - input: ref('int_forbes_candidates')
-        rows:
-          - group_rank: null
-            group_name: null
-            cnpj_basico: '87654321'
-            ranking_source: 'Forbes World''s Billionaires 2026'
-            receita_fy2024_brl: null
-            listed_flag: false
-            soe_flag: false
-            controlador_tipo: null
-            person_name: 'Maria Forbes'
-            role: 'candidato_forbes'
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'Forbes 2026'
-            fre_item: null
-            hole: false
-            cpf_masked: null
-            freeze_status: 'review'
-            notes: 'Consta da lista Forbes 2026'
-    expect:
-      rows:
-        - person_name: 'João Silva'
-          role: 'controlador'
-          freeze_status: 'in'
-        - person_name: 'Maria Forbes'
-          role: 'candidato_forbes'
-          freeze_status: 'review'
+- name: test_forbes_positional_freeze_preserved
+  description: 'FORBES SEAM TEST 1: Positional freeze rows must still be present.
 
-  # FORBES SEAM 2: New rows are candidato_forbes + freeze_status=review
-  - name: test_forbes_candidates_are_review
-    description: |
-      FORBES SEAM TEST 2: New Forbes rows must be role=candidato_forbes and freeze_status=review.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Test Forbes Person'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 5.0
-            brazil_operations_nexus: true
-            control_doc_available: false
-            cnpj_basico: '11111111'
-            notes: 'Consta da lista Forbes 2026'
-            source_doc: 'Forbes 2026'
-      - input: ref('freeze_persons')
-        rows: []
-    expect:
-      rows:
-        - person_name: 'Test Forbes Person'
-          role: 'candidato_forbes'
-          freeze_status: 'review'
+    Forbes candidates are ADDITIVE, not replacement.
 
-  # FORBES SEAM 3: candidato_forbes cannot be freeze_status=in without source_doc
-  # AND even with source_doc, do not auto-promote to in
-  - name: test_forbes_no_auto_promote_to_in
-    description: |
-      FORBES SEAM TEST 3: candidato_forbes must stay freeze_status=review
-      even when control_doc_available=true. No auto-promotion to 'in'.
-      Humans promote, models do not.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Forbes With Control Doc'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 10.0
-            brazil_operations_nexus: true
-            control_doc_available: true
-            cnpj_basico: '22222222'
-            notes: 'Consta da lista Forbes 2026 com controle documentado'
-            source_doc: 'Forbes 2026; FRE 6.1'
-      - input: ref('freeze_persons')
-        rows: []
-    expect:
-      rows:
-        - person_name: 'Forbes With Control Doc'
-          role: 'candidato_forbes'
-          freeze_status: 'review'
+    '
+  model: freeze_persons_with_forbes
+  given:
+  - input: ref('freeze_persons')
+    rows: "select\n            1 as group_rank,\n            'Test Company' as group_name,\n            '12345678' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            'Test positional' as notes"
+    format: sql
+  - input: ref('int_forbes_candidates')
+    rows: "select\n            cast(null as varchar) as group_rank,\n            cast(null as varchar) as group_name,\n            '87654321' as cnpj_basico,\n            'Forbes World''s Billionaires 2026' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Maria Forbes' as person_name,\n            'candidato_forbes' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Forbes 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            false as hole,\n            cast(null as varchar) as cpf_masked,\n            'review' as freeze_status,\n            'Consta da lista Forbes 2026' as notes"
+    format: sql
+  expect:
+    rows: "select\n            'João Silva' as person_name,\n            'controlador' as role,\n            'in' as freeze_status\n          union all\n          select\n            'Maria Forbes' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status"
+    format: sql
+- name: test_forbes_candidates_are_review
+  description: 'FORBES SEAM TEST 2: New Forbes rows must be role=candidato_forbes and freeze_status=review.
 
-  # FORBES SEAM 4: Celebrity/athlete without group control is not added
-  - name: test_forbes_celebrity_without_control_excluded
-    description: |
-      FORBES SEAM TEST 4: Celebrity/athlete without documentable control
-      of a Brazil-operating group must NOT be added as candidato_forbes.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Celebrity Athlete'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 1.0
-            brazil_operations_nexus: false
-            control_doc_available: false
-            cnpj_basico: null
-            notes: 'Celebrity athlete. No documentable control.'
-            source_doc: 'Forbes 2026'
-      - input: ref('freeze_persons')
-        rows: []
-    expect:
-      rows: []
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Test Forbes Person' as person_name,\n            2026 as forbes_year,\n            5.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            '11111111' as cnpj_basico,\n            'Consta da lista Forbes 2026' as notes,\n            'Forbes 2026' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: select null as dummy_col where false
+    format: sql
+  expect:
+    rows: "select\n            'Test Forbes Person' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status"
+    format: sql
+- name: test_forbes_no_auto_promote_to_in
+  description: 'FORBES SEAM TEST 3: candidato_forbes must stay freeze_status=review
 
-  # FORBES SEAM 5: Person already in positional freeze is not duplicated
-  - name: test_forbes_no_duplicate_if_in_positional_freeze
-    description: |
-      FORBES SEAM TEST 5: A person already in positional freeze
-      (freeze_status in 'in', 'skip_soe') must NOT be duplicated as candidato_forbes.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Already In Freeze'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 8.0
-            brazil_operations_nexus: true
-            control_doc_available: true
-            cnpj_basico: '33333333'
-            notes: 'Consta da lista Forbes 2026'
-            source_doc: 'Forbes 2026'
-      - input: ref('freeze_persons')
-        rows:
-          - group_rank: 5
-            group_name: 'Existing Company'
-            cnpj_basico: '33333333'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: false
-            controlador_tipo: 'listed'
-            person_name: 'Already In Freeze'
-            role: 'controlador'
-            edge_label: 'acionista_controlador'
-            acordo_acionistas: null
-            source_doc: 'CVM FRE 2026'
-            fre_item: '6.1'
-            hole: false
-            cpf_masked: '***999999**'
-            freeze_status: 'in'
-            notes: 'Positional controller'
-    expect:
-      rows: []
+    even when control_doc_available=true. No auto-promotion to ''in''.
 
-  # FORBES SEAM 6: No full CPF; no "o bilionário" string in output fields
-  - name: test_forbes_no_full_cpf_no_bilionario_phrase
-    description: |
-      FORBES SEAM TEST 6: Output must not contain full CPF (only cpf_masked).
-      Output must not contain "o bilionário X" phrase in any field.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Forbes Person Clean'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 6.0
-            brazil_operations_nexus: true
-            control_doc_available: false
-            cnpj_basico: '44444444'
-            notes: 'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões'
-            source_doc: 'Forbes 2026'
-      - input: ref('freeze_persons')
-        rows: []
-    expect:
-      rows:
-        - person_name: 'Forbes Person Clean'
-          role: 'candidato_forbes'
-          freeze_status: 'review'
-          cpf_masked: null
-          notes: 'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões'
+    Humans promote, models do not.
 
-  # FORBES SEAM 7: Brazil-nexus true but null cnpj_basico excluded (Saverin-style)
-  - name: test_forbes_nexus_true_null_cnpj_excluded
-    description: |
-      FORBES SEAM TEST 7: Brazil-nexus=true but cnpj_basico=null must be excluded.
-      Only add Forbes rows with BOTH brazil_operations_nexus=true AND cnpj_basico present.
-      Saverin-style (nexus but no identified Brazil-operating group) stays out.
-    model: int_forbes_candidates
-    given:
-      - input: ref('forbes_billionaires_brazil_nexus')
-        rows:
-          - person_name: 'Forbes Nexus No CNPJ'
-            forbes_year: 2026
-            estimated_wealth_usd_billions: 8.5
-            brazil_operations_nexus: true
-            control_doc_available: false
-            cnpj_basico: null
-            notes: 'Consta da lista Forbes 2026. Brazil-nexus via investments but no documentable control of identified Brazil-operating group.'
-            source_doc: 'Forbes 2026'
-      - input: ref('freeze_persons')
-        rows: []
-    expect:
-      rows: []
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Forbes With Control Doc' as person_name,\n            2026 as forbes_year,\n            10.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            true as control_doc_available,\n            '22222222' as cnpj_basico,\n            'Consta da lista Forbes 2026 com controle documentado' as notes,\n            'Forbes 2026; FRE 6.1' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: select null as dummy_col where false
+    format: sql
+  expect:
+    rows: "select\n            'Forbes With Control Doc' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status"
+    format: sql
+- name: test_forbes_celebrity_without_control_excluded
+  description: 'FORBES SEAM TEST 4: Celebrity/athlete without documentable control
+
+    of a Brazil-operating group must NOT be added as candidato_forbes.
+
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Celebrity Athlete' as person_name,\n            2026 as forbes_year,\n            1.0 as estimated_wealth_usd_billions,\n            false as brazil_operations_nexus,\n            false as control_doc_available,\n            cast(null as varchar) as cnpj_basico,\n            'Celebrity athlete. No documentable control.' as notes,\n            'Forbes 2026' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: select null as dummy_col where false
+    format: sql
+  expect:
+    rows: select null as dummy_col where false
+    format: sql
+- name: test_forbes_no_duplicate_if_in_positional_freeze
+  description: 'FORBES SEAM TEST 5: A person already in positional freeze
+
+    (freeze_status in ''in'', ''skip_soe'') must NOT be duplicated as candidato_forbes.
+
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Already In Freeze' as person_name,\n            2026 as forbes_year,\n            8.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            true as control_doc_available,\n            '33333333' as cnpj_basico,\n            'Consta da lista Forbes 2026' as notes,\n            'Forbes 2026' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: "select\n            5 as group_rank,\n            'Existing Company' as group_name,\n            '33333333' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'Already In Freeze' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***999999**' as cpf_masked,\n            'in' as freeze_status,\n            'Positional controller' as notes"
+    format: sql
+  expect:
+    rows: select null as dummy_col where false
+    format: sql
+- name: test_forbes_no_full_cpf_no_bilionario_phrase
+  description: 'FORBES SEAM TEST 6: Output must not contain full CPF (only cpf_masked).
+
+    Output must not contain "o bilionário X" phrase in any field.
+
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Forbes Person Clean' as person_name,\n            2026 as forbes_year,\n            6.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            '44444444' as cnpj_basico,\n            'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões' as notes,\n            'Forbes 2026' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: select null as dummy_col where false
+    format: sql
+  expect:
+    rows: "select\n            'Forbes Person Clean' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status,\n            cast(null as varchar) as cpf_masked,\n            'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões' as notes"
+    format: sql
+- name: test_forbes_nexus_true_null_cnpj_excluded
+  description: 'FORBES SEAM TEST 7: Brazil-nexus=true but cnpj_basico=null must be excluded.
+
+    Only add Forbes rows with BOTH brazil_operations_nexus=true AND cnpj_basico present.
+
+    Saverin-style (nexus but no identified Brazil-operating group) stays out.
+
+    '
+  model: int_forbes_candidates
+  given:
+  - input: ref('forbes_billionaires_brazil_nexus')
+    rows: "select\n            'Forbes Nexus No CNPJ' as person_name,\n            2026 as forbes_year,\n            8.5 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            cast(null as varchar) as cnpj_basico,\n            'Consta da lista Forbes 2026. Brazil-nexus via investments but no documentable control of identified Brazil-operating group.' as notes,\n            'Forbes 2026' as source_doc"
+    format: sql
+  - input: ref('freeze_persons')
+    rows: select null as dummy_col where false
+    format: sql
+  expect:
+    rows: select null as dummy_col where false
+    format: sql

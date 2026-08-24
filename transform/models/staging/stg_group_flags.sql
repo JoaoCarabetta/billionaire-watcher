@@ -8,7 +8,7 @@ with source as (
         empresa,
         razao_social,
         lpad(cast(cnpj_basico as string), 8, '0') as cnpj_basico,
-        lpad(regexp_replace(cast(cnpj_full as string), r'[^\d]', ''), 14, '0') as cnpj_full,
+        lpad(regexp_replace(cast(cnpj_full as string), '[^0-9]', ''), 14, '0') as cnpj_full,
         cast(listed_flag as bool) as listed_flag,
         listed_source,
         cast(soe_flag as bool) as soe_flag,
