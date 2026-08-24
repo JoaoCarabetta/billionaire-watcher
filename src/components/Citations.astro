@@ -1,30 +1,44 @@
 ---
-import type { Fact } from '../types';
+import type { Source } from '../types';
 
 interface Props {
-  facts: Fact[];
+  citationMap: Map<string, number>;
+  allSources: Source[];
 }
 
-const { facts } = Astro.props;
+const { citationMap, allSources } = Astro.props;
 
-const factsWithSources = facts.filter(f => f.source);
+// Build a map of locator -> source for quick lookup
+const sourceByLocator = new Map<string, Source>();
+for (const source of allSources) {
+  if (!sourceByLocator.has(source.locator)) {
+    sourceByLocator.set(source.locator, source);
+  }
+}
+
+// Sort entries by citation number
+const sortedCitations = Array.from(citationMap.entries())
+  .sort((a, b) => a[1] - b[1]);
 ---
 
-{factsWithSources.length > 0 && (
+{citationMap.size > 0 && (
   <section class="citations">
     <h2>Referências</h2>
     <ol>
-      {factsWithSources.map((fact, index) => (
-        <li id={`citation-${index + 1}`}>
-          <strong>{fact.source!.publisher}</strong>
-          {' — '}
-          <a href={fact.source!.locator} target="_blank" rel="noopener noreferrer">
-            {fact.source!.locator}
-          </a>
-          {' '}
-          <span class="retrieved">(recuperado em {fact.source!.retrieved_at})</span>
-        </li>
-      ))}
+      {sortedCitations.map(([locator, number]) => {
+        const source = sourceByLocator.get(locator)!;
+        return (
+          <li id={`citation-${number}`}>
+            <strong>{source.publisher}</strong>
+            {' — '}
+            <a href={source.locator} target="_blank" rel="noopener noreferrer">
+              {source.locator}
+            </a>
+            {' '}
+            <span class="retrieved">(recuperado em {source.retrieved_at})</span>
+          </li>
+        );
+      })}
     </ol>
   </section>
 )}

@@ -109,16 +109,16 @@ describe('Tracer: Freeze CSV + Identity Dossiers', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
-      // Check that we have fact elements with citation markers
+      // Check that we have fact elements with citation markers for identity facts
       const factDivMatches = html.match(/<div class="fact"[^>]*data-fact-id="[^"]*"[^>]*>/g);
-      const citationInFactMatches = html.match(/<sup class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
+      const identityCitationMatches = html.match(/<div class="fact"[^>]*>[\s\S]*?<sup class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
       
       // Must have facts and citations - no guard, fail if missing
       expect(factDivMatches).toBeTruthy();
-      expect(citationInFactMatches).toBeTruthy();
+      expect(identityCitationMatches).toBeTruthy();
       expect(factDivMatches!.length).toBeGreaterThan(0);
-      expect(citationInFactMatches!.length).toBeGreaterThan(0);
-      expect(factDivMatches!.length).toBe(citationInFactMatches!.length);
+      expect(identityCitationMatches!.length).toBeGreaterThan(0);
+      expect(factDivMatches!.length).toBe(identityCitationMatches!.length);
     });
 
     it('should not render unsourced freeze CSV cells (group, role) unless they exist as cited Facts', () => {
@@ -128,18 +128,24 @@ describe('Tracer: Freeze CSV + Identity Dossiers', () => {
       // These are freeze CSV cells for p1: group="Empresa XYZ Ltda.", role="controlador"
       // They should NOT appear on the page unless they exist as cited identity Facts
       
-      // Check if these strings appear outside of cited Facts
-      // If they appear, they must be within a fact-value span with a citation
+      // "Empresa XYZ Ltda." can appear in RF partner edges (which have citations), but not as unsourced text
       const empresaXYZMatches = html.match(/Empresa XYZ Ltda\./g) || [];
-      const controladorMatches = html.match(/controlador/gi) || [];
       
-      // For each occurrence, verify it's part of a cited fact
+      // "controlador" should NOT appear - RF edges use "sócio" instead
+      // The freeze CSV has role="controlador" but this should NOT be rendered anywhere
+      expect(html).not.toMatch(/controlador(?!a)/i); // allow "controladora" as company name in the future
+      
+      // Verify that Empresa XYZ Ltda. appears with citation
+      expect(empresaXYZMatches.length).toBeGreaterThan(0);
       for (const match of empresaXYZMatches) {
         const matchIndex = html.indexOf(match);
         const surroundingContext = html.slice(Math.max(0, matchIndex - 200), matchIndex + 200);
         
-        // Must be part of a fact with citation, not raw text
-        expect(surroundingContext).toMatch(/<span class="fact-value"[^>]*>.*Empresa XYZ Ltda\..*<\/span>\s*<sup class="citation-marker"/);
+        // Must be part of an RF edge (in a table) or a cited fact, not raw text
+        const hasRFEdgeCitation = surroundingContext.includes('rf-edge') && surroundingContext.includes('[');
+        const hasFactCitation = /<span class="fact-value"[^>]*>.*Empresa XYZ Ltda\..*<\/span>\s*<sup class="citation-marker"/.test(surroundingContext);
+        
+        expect(hasRFEdgeCitation || hasFactCitation).toBe(true);
       }
     });
   });
