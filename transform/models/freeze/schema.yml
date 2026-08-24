@@ -196,3 +196,85 @@ models:
             severity: error
           arguments:
             expression: "length(cnpj_basico) = 8"
+            
+  - name: int_forbes_candidates
+    description: |
+      Forbes safety-net candidates for role=candidato_forbes, freeze_status=review.
+      Added AFTER positional freeze. Additive only.
+      Add ONLY if ALL of:
+      - On Forbes World's Billionaires
+      - Brazil-operations nexus
+      - NOT already in positional freeze
+      - Documentable control of Brazil-operating group
+      Do NOT auto-promote to freeze_status=in even if control_doc_available=true.
+    columns:
+      - name: person_name
+        description: Natural person name from Forbes
+        tests:
+          - not_null
+      - name: role
+        description: Must be candidato_forbes for Forbes safety-net
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['candidato_forbes']
+      - name: freeze_status
+        description: Must be review for Forbes candidates
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['review']
+      - name: notes
+        description: Must use Forbes formula, not "o bilionário X"
+    tests:
+      - dbt_utils.expression_is_true:
+          name: forbes_notes_no_bilionario_phrase
+          config:
+            severity: error
+          arguments:
+            expression: "notes not like '%o bilionário%' and notes not like '%O bilionário%'"
+      - dbt_utils.expression_is_true:
+          name: forbes_no_full_cpf
+          config:
+            severity: error
+          arguments:
+            expression: "cpf_masked is null or cpf_masked not regexp_contains(r'^\\d{11}$')"
+            
+  - name: freeze_persons_with_forbes
+    description: |
+      Final freeze table with Forbes safety-net: positional freeze UNION Forbes candidates.
+      Issue #26: Forbes rows are ADDITIVE on top of freeze_persons (issue #25).
+      Same schema as freeze_persons.
+    columns:
+      - name: group_rank
+        description: Valor 1000 ranking position (null for Forbes candidates outside top-50)
+      - name: person_name
+        description: Natural person name (null for SOE or hole)
+      - name: role
+        description: Role (controlador | herdeiro | socio_chave | candidato_forbes)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['controlador', 'herdeiro', 'socio_chave', 'candidato_forbes', null]
+      - name: freeze_status
+        description: Freeze status (in | skip_soe | hole | review)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['in', 'skip_soe', 'hole', 'review']
+      - name: notes
+        description: Additional notes (must not contain "o bilionário X")
+    tests:
+      - dbt_utils.expression_is_true:
+          name: no_bilionario_phrase_in_notes
+          config:
+            severity: error
+          arguments:
+            expression: "notes not like '%o bilionário%' and notes not like '%O bilionário%'"
+      - dbt_utils.expression_is_true:
+          name: cnpj_basico_is_8_chars_when_not_null
+          config:
+            severity: error
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
