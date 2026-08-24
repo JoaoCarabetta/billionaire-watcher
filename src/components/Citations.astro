@@ -1,0 +1,57 @@
+---
+import type { Fact } from '../types';
+
+interface Props {
+  facts: Fact[];
+}
+
+const { facts } = Astro.props;
+
+const factsWithSources = facts.filter(f => f.source);
+---
+
+{factsWithSources.length > 0 && (
+  <section class="citations">
+    <h2>Referências</h2>
+    <ol>
+      {factsWithSources.map((fact, index) => (
+        <li id={`citation-${index + 1}`}>
+          <strong>{fact.source!.publisher}</strong>
+          {' — '}
+          <a href={fact.source!.locator} target="_blank" rel="noopener noreferrer">
+            {fact.source!.locator}
+          </a>
+          {' '}
+          <span class="retrieved">(recuperado em {fact.source!.retrieved_at})</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+<style>
+  .citations {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #ddd;
+  }
+  
+  .citations h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .citations ol {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  
+  .citations li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .retrieved {
+    color: #666;
+    font-size: 0.85em;
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import type { Fact } from '../types';
+import { redactCPF } from '../utils/fixtures';
+
+interface Props {
+  fact: Fact;
+  citationNumber: number;
+}
+
+const { fact, citationNumber } = Astro.props;
+
+if (!fact.source) {
+  throw new Error(`Fact ${fact.id} is missing a source and cannot be rendered`);
+}
+
+const cleanValue = redactCPF(fact.value);
+---
+
+<div class="fact" data-fact-id={fact.id}>
+  <span class="fact-value">{cleanValue}</span>
+  <sup class="citation-marker">[{citationNumber}]</sup>
+</div>
+
+<style>
+  .fact {
+    margin: 0.5rem 0;
+  }
+  
+  .citation-marker {
+    color: #0066cc;
+    font-weight: bold;
+    margin-left: 0.1em;
+  }
+</style>
