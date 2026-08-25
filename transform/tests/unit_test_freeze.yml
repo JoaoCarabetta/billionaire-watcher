@@ -91,7 +91,7 @@ unit_tests:
     rows: "select\n            1 as rank_2024,\n            'Petrobras' as empresa,\n            'Petróleo Brasileiro S.A.' as razao_social,\n            '33000167' as cnpj_basico,\n            '33000167000101' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            true as soe_flag,\n            'Carta Anual 2025' as soe_source,\n            'soe' as controlador_tipo,\n            'skip_soe' as freeze_status_hint,\n            'Federal SOE' as notes,\n            'Carta Anual' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
     format: sql
   expect:
-    rows: "select\n            1 as group_rank,\n            'Petrobras' as group_name,\n            '33000167' as cnpj_basico,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            'skip_soe' as freeze_status"
+    rows: "select\n            1 as group_rank,\n            'Petrobras' as group_name,\n            '33000167' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            true as soe_flag,\n            'soe' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Carta Anual' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'skip_soe' as freeze_status,\n            'Federal SOE' as notes"
     format: sql
 - name: test_freeze_fre_62_without_acordo_not_controlador
   description: 'SEAM TEST: FRE 6.2 ≥5% institutions without Participante_Acordo_Acionistas=S
@@ -111,7 +111,7 @@ unit_tests:
       \            'N' as Acionista_Controlador,\n            'N' as Participante_Acordo_Acionistas"
     format: sql
   expect:
-    rows: "select\n            2 as group_rank,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label"
+    rows: "select\n            2 as group_rank,\n            'Test Listed' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            'S' as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
     format: sql
 - name: test_freeze_listed_empty_61_is_hole_int
   description: 'SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
@@ -129,7 +129,7 @@ unit_tests:
       \            'Estrangeira' as Nacionalidade,\n            cast(null as varchar) as Sigla_UF,\n            'S' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'N' as Acionista_Controlador,\n            'N' as Participante_Acordo_Acionistas"
     format: sql
   expect:
-    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            cast(null as varchar) as person_name,\n            'hole' as freeze_status,\n            true as hole"
+    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            '11111111' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 11111111000100: empty' as source_doc,\n            '6.1' as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'FRE 6.1 empty: no Acionista_Controlador=S found' as notes"
     format: sql
 - name: test_freeze_listed_empty_61_is_hole
   description: 'SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
@@ -211,7 +211,7 @@ unit_tests:
           where false"
     format: sql
   expect:
-    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            cast(null as varchar) as person_name,\n            'hole' as freeze_status,\n            true as hole"
+    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            '11111111' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 11111111: empty' as source_doc,\n            '6.1' as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'FRE 6.1 empty: no Acionista_Controlador=S found' as notes"
     format: sql
 - name: test_freeze_unlisted_qsa_names_off_sa
   description: 'SEAM TEST: QSA-only names stay OFF the freeze until public act names Art. 116.
@@ -231,7 +231,7 @@ unit_tests:
     rows: "select\n            2026 as ano,\n            1 as mes,\n            cast('2026-01-11' as date) as data,\n            '10265949' as cnpj_basico,\n            'COPERSUCAR S.A.' as razao_social,\n            '2054' as natureza_juridica,\n            '05' as qualificacao_responsavel,\n            1775195789.81 as capital_social,\n            '05' as porte,\n            cast(null as varchar) as ente_federativo"
     format: sql
   expect:
-    rows: "select\n            18 as group_rank,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            'hole' as freeze_status"
+    rows: "select\n            18 as group_rank,\n            'Copersucar' as group_name,\n            '10265949' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'unlisted' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'RF QSA 10265949 data 2026-01-11' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'S.A. QSA lists officers. No public act names Art. 116 controller.' as notes"
     format: sql
 - name: test_freeze_unlisted_qsa_names_off_ltda
   description: 'SEAM TEST: QSA-only names stay OFF the freeze for Ltda (natureza 2062) too.
@@ -311,7 +311,7 @@ unit_tests:
           where false"
     format: sql
   expect:
-    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            'hole' as freeze_status"
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'RF QSA 01961898 data 2026-01-11' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Ltda QSA lists partners. No public act names Art. 116 controller.' as notes"
     format: sql
 - name: test_freeze_foreign_unlisted_no_duplicate
   description: 'PARTITION TEST: Foreign unlisted group (Cargill-style: listed_flag=false,
@@ -393,7 +393,7 @@ unit_tests:
     rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Valor capital_origem=US' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.' as notes"
     format: sql
   expect:
-    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            cast(null as varchar) as person_name,\n            'hole' as freeze_status"
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Valor capital_origem=US' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.' as notes"
     format: sql
 - name: test_freeze_preserves_cpf_masking
   description: 'SEAM TEST: cpf_masked field must contain masked CPF, never full CPF.
@@ -411,7 +411,7 @@ unit_tests:
       \ Nacionalidade,\n            'SP' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'S' as Acionista_Controlador,\n            'S' as Participante_Acordo_Acionistas"
     format: sql
   expect:
-    rows: "select\n            2 as group_rank,\n            'João Silva' as person_name,\n            '***123456**' as cpf_masked"
+    rows: "select\n            2 as group_rank,\n            'Test Listed' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            'S' as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
     format: sql
 - name: test_freeze_cnpj_basico_leading_zeros
   description: 'SEAM TEST: cnpj_basico must be 8-char STRING with leading zeros preserved.
@@ -429,5 +429,5 @@ unit_tests:
       \            'Brasileira' as Nacionalidade,\n            'SP' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'S' as Acionista_Controlador,\n            cast(null as varchar) as Participante_Acordo_Acionistas"
     format: sql
   expect:
-    rows: "select\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    rows: "select\n            2 as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'Test Controller' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***111111**' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
     format: sql
