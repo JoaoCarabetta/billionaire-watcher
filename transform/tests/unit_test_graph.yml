@@ -204,11 +204,17 @@ unit_tests:
             cast(null as string) as edge_role,
             27.74 as pct_capital,
             62.45 as pct_votos,
-            cast(null as integer) as qty_ordinarias,
-            cast(null as integer) as qty_preferenciais,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '02260956' as node_id, 'company' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
     expect:
       format: sql
       rows: |
@@ -219,8 +225,8 @@ unit_tests:
           cast(null as string) as edge_role,
           27.74 as pct_capital,
           62.45 as pct_votos,
-          cast(null as integer) as qty_ordinarias,
-          cast(null as integer) as qty_preferenciais,
+          609526325 as qty_ordinarias,
+          89144004 as qty_preferenciais,
           'Energisa IR 14 Aug 2026' as source_doc,
           'table 6.1' as source_locator,
           cast('2026-08-14' as date) as source_retrieved_at
@@ -247,6 +253,12 @@ unit_tests:
             'Minoritário hop without percent' as source_doc,
             'fixture' as source_locator,
             '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select 'Diana Oliveira Teste_1' as node_id, 'person' as node_kind
+          union all
+          select '44556677' as node_id, 'company' as node_kind
     expect:
       format: sql
       rows: |
@@ -364,6 +376,14 @@ unit_tests:
             'Fund administrador' as source_doc,
             'fixture' as source_locator,
             '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '22334455' as node_id, 'company' as node_kind
+          union all
+          select '33445566' as node_id, 'company' as node_kind
+          union all
+          select '12345678' as node_id, 'fund' as node_kind
     expect:
       format: sql
       rows: |
@@ -532,6 +552,12 @@ unit_tests:
             'Float/outros acionistas' as source_doc,
             'fixture' as source_locator,
             '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '00000001' as node_id, 'outros' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
     expect:
       format: sql
       rows: |
@@ -594,3 +620,254 @@ unit_tests:
           35.0 as pct_economica_pessoa,
           35.0 as pct_votos_pessoa,
           2 as path_length
+
+  - name: test_graph_edges_listed_hop_with_share_quantities
+    description: |
+      Verify Gipar→Energisa listed hop has both percents AND both share quantities (issue #63).
+      Published IR table 14 Aug 2026: 62.45% voting, 27.74% total capital,
+      609,526,325 ordinárias, 89,144,004 preferenciais.
+      Exactly one control edge from Gipar to Energisa with all four values.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '02260956' as node_id, 'company' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '02260956' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          27.74 as pct_capital,
+          62.45 as pct_votos,
+          609526325 as qty_ordinarias,
+          89144004 as qty_preferenciais,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_edges_fre_ir_wins_over_qsa_for_listed_control
+    description: |
+      Verify CVM FRE/IR statement of control wins over QSA for who controls a listed company (issue #63).
+      Given both Gipar→Energisa (IR table 6.1) and person→Energisa (QSA), only emit Gipar→Energisa.
+      QSA person→listed direct edge is filtered out when FRE/IR control exists.
+      Family names in 6.1 are NOT each sole controlador of Energisa.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            'Carlos Botelho QSA_1' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            100.0 as pct_capital,
+            100.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Receita Federal QSA Energisa' as source_doc,
+            'QSA conflicting' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '02260956' as node_id, 'company' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
+          union all
+          select 'Carlos Botelho QSA_1' as node_id, 'person' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '02260956' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          27.74 as pct_capital,
+          62.45 as pct_votos,
+          609526325 as qty_ordinarias,
+          89144004 as qty_preferenciais,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_nodes_named_minorities_squadra_opportunity_bndespar_are_companies
+    description: |
+      Verify named minorities (Squadra-shaped, Opportunity-shaped, BNDESPAR-shaped)
+      are company nodes, not person nodes (issue #63).
+      All three minority shareholders are node_kind=company.
+    model: graph_nodes
+    given:
+      - input: ref('energisa_companies_fixture')
+        format: sql
+        rows: |
+          select
+            '55443322' as cnpj_basico,
+            'company' as node_kind,
+            'Minoritário Squadra DTVM S.A.' as name
+          union all
+          select
+            '66554433' as cnpj_basico,
+            'company' as node_kind,
+            'Minoritário Opportunity Equity S.A.' as name
+          union all
+          select
+            '77665544' as cnpj_basico,
+            'company' as node_kind,
+            'BNDESPAR Participações S.A.' as name
+      - input: ref('energisa_persons_fixture')
+        format: sql
+        rows: |
+          select
+            'Diana Oliveira Teste_1' as node_id,
+            'person' as node_kind,
+            'Diana Oliveira Teste' as name,
+            cast(null as string) as cpf,
+            'Diana Oliveira Teste_1' as provisional_name_key
+    expect:
+      format: sql
+      rows: |
+        select
+          '55443322' as node_id,
+          'company' as node_kind,
+          'Minoritário Squadra DTVM S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '55443322' as cnpj_basico
+        union all
+        select
+          '66554433' as node_id,
+          'company' as node_kind,
+          'Minoritário Opportunity Equity S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '66554433' as cnpj_basico
+        union all
+        select
+          '77665544' as node_id,
+          'company' as node_kind,
+          'BNDESPAR Participações S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '77665544' as cnpj_basico
+        union all
+        select
+          'Diana Oliveira Teste_1' as node_id,
+          'person' as node_kind,
+          'Diana Oliveira Teste' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          'Diana Oliveira Teste_1' as provisional_name_key,
+          cast(null as string) as cnpj_basico
+
+  - name: test_graph_edges_family_names_not_sole_controllers
+    description: |
+      Verify family names in FRE 6.1 list are NOT each sole controlador of Energisa (issue #63).
+      No direct person → Energisa edges in the fixture (only Gipar → Energisa).
+      Family members connect through the holding chain (person → holdings → Gipar → Energisa).
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            '12345678901' as from_id,
+            '55667788' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            70.0 as pct_capital,
+            70.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Itacatu control' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '02260956' as node_id, 'company' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
+          union all
+          select '12345678901' as node_id, 'person' as node_kind
+          union all
+          select '55667788' as node_id, 'company' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '02260956' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          27.74 as pct_capital,
+          62.45 as pct_votos,
+          609526325 as qty_ordinarias,
+          89144004 as qty_preferenciais,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '12345678901' as from_id,
+          '55667788' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          70.0 as pct_capital,
+          70.0 as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Itacatu control' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
