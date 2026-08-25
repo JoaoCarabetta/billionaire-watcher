@@ -62,6 +62,7 @@ two_hop_holdings as (
     inner join nodes n_person on e1.from_id = n_person.node_id
     inner join nodes n_company on e2.to_id = n_company.node_id
     where n_person.node_kind = 'person'
+      and e2.to_id != e1.from_id
 ),
 
 -- Three-hop paths (person → company1 → company2 → company3)
@@ -93,6 +94,7 @@ three_hop_holdings as (
     inner join nodes n_person on e1.from_id = n_person.node_id
     inner join nodes n_company on e3.to_id = n_company.node_id
     where n_person.node_kind = 'person'
+      and e3.to_id not in (e1.from_id, e1.to_id, e2.to_id)
 ),
 
 -- Four-hop paths (person → company1 → company2 → company3 → company4)
@@ -127,6 +129,7 @@ four_hop_holdings as (
     inner join nodes n_person on e1.from_id = n_person.node_id
     inner join nodes n_company on e4.to_id = n_company.node_id
     where n_person.node_kind = 'person'
+      and e4.to_id not in (e1.from_id, e1.to_id, e2.to_id, e3.to_id)
 ),
 
 -- Five-hop paths (person → c1 → c2 → c3 → c4 → c5)
@@ -164,6 +167,7 @@ five_hop_holdings as (
     inner join nodes n_person on e1.from_id = n_person.node_id
     inner join nodes n_company on e5.to_id = n_company.node_id
     where n_person.node_kind = 'person'
+      and e5.to_id not in (e1.from_id, e1.to_id, e2.to_id, e3.to_id, e4.to_id)
 ),
 
 all_holdings as (

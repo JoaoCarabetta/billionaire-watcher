@@ -547,3 +547,50 @@ unit_tests:
           'Float/outros acionistas' as source_doc,
           'fixture' as source_locator,
           cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_person_holdings_stops_at_cycle
+    description: |
+      Verify walk stops when returning to a node already on the path.
+      Ana (12345678901) → Itacatu (70%) plus ring Itacatu ↔ Nova Gipar.
+      Expect 1-hop Ana → Itacatu and 2-hop Ana → Nova Gipar.
+      Do NOT expect 3-hop back to Itacatu (walk stops at cycle).
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select '12345678901' as from_id, '55667788' as to_id, 70.0 as pct_capital, 70.0 as pct_votos
+          union all
+          select '55667788' as from_id, '11223344' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+          union all
+          select '11223344' as from_id, '55667788' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
+          union all
+          select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '11223344' as node_id, 'company' as node_kind, 'Nova Gipar Holding S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '55667788' as company_node_id,
+          'Itacatu Participações S.A.' as company_name,
+          70.0 as pct_economica_pessoa,
+          70.0 as pct_votos_pessoa,
+          1 as path_length
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '11223344' as company_node_id,
+          'Nova Gipar Holding S.A.' as company_name,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
+          2 as path_length
