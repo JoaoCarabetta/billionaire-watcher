@@ -58,6 +58,10 @@ const rejectedMethodsFacts = [
   getFactById('metod-reject-wikipedia-forbes'),
   getFactById('metod-reject-tse-volume')
 ].filter(Boolean) as Fact[];
+
+const dataAccessFacts = [
+  getFactById('metod-published-facts-index')
+].filter(Boolean) as Fact[];
 ---
 
 <!DOCTYPE html>
@@ -169,6 +173,16 @@ const rejectedMethodsFacts = [
         {rejectedMethodsFacts.map((fact) => (
           <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
         ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Acesso aos Dados</h2>
+        {dataAccessFacts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+        <p style="margin-top: 1rem; color: #666;">
+          Arquivos por pessoa: <code>/api/facts/latest/{'{'}slug{'}'}.json</code> e <code>/api/facts/latest/{'{'}slug{'}'}.jsonl</code>
+        </p>
       </section>
 
       <Citations citationMap={citationMap} allSources={allSources} />

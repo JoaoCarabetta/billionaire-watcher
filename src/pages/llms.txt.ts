@@ -27,6 +27,15 @@ Voz: notícia de arquivo cívico, não biografia.
 ${freezePersons.slice(0, 3).map(p => `/pessoa/${p.person_id}/`).join('\n')}
 
 Dados estruturados: cada dossiê contém seções (Identidade, Empresas, Controle, Doações) com citações numeradas.
+
+## Fatos Publicados
+
+Índice de fatos estruturados:
+https://billionaire-watcher.pages.dev/api/facts/latest/index.json
+
+Arquivos por pessoa:
+https://billionaire-watcher.pages.dev/api/facts/latest/{slug}.json
+https://billionaire-watcher.pages.dev/api/facts/latest/{slug}.jsonl
 `;
 
   return new Response(text, {

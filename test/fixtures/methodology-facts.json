@@ -151,5 +151,14 @@
       "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
       "retrieved_at": "2026-10-04"
     }
+  },
+  {
+    "id": "metod-published-facts-index",
+    "value": "Fatos estruturados publicados estão disponíveis em formato JSON no índice público, contendo fatos de identidade, controle societário, doações políticas e associações derivadas.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://billionaire-watcher.pages.dev/api/facts/latest/index.json",
+      "retrieved_at": "2026-08-25"
+    }
   }
 ]
