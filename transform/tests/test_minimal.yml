@@ -3,44 +3,8 @@ unit_tests:
     model: stg_rf_estabelecimentos  
     given:
       - input: source('br_me_cnpj', 'estabelecimentos')
-        format: sql  
-        rows: |
-          select
-            2026 as ano,
-            1 as mes,
-            cast('2026-01-11' as date) as data,
-            '02916265000160' as cnpj,
-            '02916265' as cnpj_basico,
-            '0001' as cnpj_ordem,
-            '60' as cnpj_dv,
-            '1' as identificador_matriz_filial,
-            'JBS' as nome_fantasia,
-            '02' as situacao_cadastral,
-            cast('2007-03-29' as date) as data_situacao_cadastral,
-            cast(null as varchar) as motivo_situacao_cadastral,
-            cast(null as varchar) as nome_cidade_exterior,
-            cast(null as varchar) as id_pais,
-            cast('2007-03-29' as date) as data_inicio_atividade,
-            '1011201' as cnae_fiscal_principal,
-            cast(null as varchar) as cnae_fiscal_secundaria,
-            'SP' as sigla_uf,
-            '6291' as id_municipio,
-            '6291' as id_municipio_rf,
-            'AVENIDA' as tipo_logradouro,
-            'MARGINAL DIREITA TIETE' as logradouro,
-            '500' as numero,
-            cast(null as varchar) as complemento,
-            'VILA JAGUARA' as bairro,
-            '05118100' as cep,
-            '11' as ddd_1,
-            '21844000' as telefone_1,
-            cast(null as varchar) as ddd_2,
-            cast(null as varchar) as telefone_2,
-            cast(null as varchar) as ddd_fax,
-            cast(null as varchar) as fax,
-            cast(null as varchar) as email,
-            cast(null as varchar) as situacao_especial,
-            cast(null as date) as data_situacao_especial
+        format: sql
+        fixture: stg_rf_estabelecimentos_given
       - input: ref('freeze_cnpj_basicos')
         format: sql
         rows: |
@@ -55,4 +19,32 @@ unit_tests:
           '02916265000160' as cnpj,
           '02916265' as cnpj_basico,
           '0001' as cnpj_ordem,
-          '60' as cnpj_dv
+          '60' as cnpj_dv,
+          '1' as identificador_matriz_filial,
+          'JBS' as nome_fantasia,
+          '02' as situacao_cadastral,
+          cast('2007-03-29' as date) as data_situacao_cadastral,
+          cast(null as varchar) as motivo_situacao_cadastral,
+          cast(null as varchar) as nome_cidade_exterior,
+          cast(null as varchar) as id_pais,
+          cast('2007-03-29' as date) as data_inicio_atividade,
+          '1011201' as cnae_fiscal_principal,
+          cast(null as varchar) as cnae_fiscal_secundaria,
+          'SP' as sigla_uf,
+          '6291' as id_municipio,
+          '6291' as id_municipio_rf,
+          'AVENIDA' as tipo_logradouro,
+          'MARGINAL DIREITA TIETE' as logradouro,
+          '500' as numero,
+          cast(null as varchar) as complemento,
+          'VILA JAGUARA' as bairro,
+          '05118100' as cep,
+          '11' as ddd_1,
+          '21844000' as telefone_1,
+          cast(null as varchar) as ddd_2,
+          cast(null as varchar) as telefone_2,
+          cast(null as varchar) as ddd_fax,
+          cast(null as varchar) as fax,
+          cast(null as varchar) as email,
+          cast(null as varchar) as situacao_especial,
+          cast(null as date) as data_situacao_especial
