@@ -417,7 +417,7 @@ unit_tests:
     description: |
       Verify derived person fields only on complete paths.
       Ana (12345678901) → Itacatu (70%) → Nova Gipar (50%) → Gipar (100%) → Energisa (27.74% capital, 62.45% votes).
-      Model returns all paths; this test checks all 4 hops.
+      Model aggregates by person × company; each company has exactly one path.
     model: graph_person_holdings
     given:
       - input: ref('graph_edges')
@@ -453,7 +453,9 @@ unit_tests:
           'Itacatu Participações S.A.' as company_name,
           70.0 as pct_economica_pessoa,
           70.0 as pct_votos_pessoa,
-          1 as path_length
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
         union all
         select
           '12345678901' as person_node_id,
@@ -463,7 +465,9 @@ unit_tests:
           'Nova Gipar Holding S.A.' as company_name,
           35.0 as pct_economica_pessoa,
           35.0 as pct_votos_pessoa,
-          2 as path_length
+          2 as min_path_length,
+          2 as max_path_length,
+          1 as path_count
         union all
         select
           '12345678901' as person_node_id,
@@ -473,7 +477,9 @@ unit_tests:
           'Gipar S.A.' as company_name,
           35.0 as pct_economica_pessoa,
           35.0 as pct_votos_pessoa,
-          3 as path_length
+          3 as min_path_length,
+          3 as max_path_length,
+          1 as path_count
         union all
         select
           '12345678901' as person_node_id,
@@ -483,14 +489,16 @@ unit_tests:
           'Energisa S.A.' as company_name,
           9.709 as pct_economica_pessoa,
           21.8575 as pct_votos_pessoa,
-          4 as path_length
+          4 as min_path_length,
+          4 as max_path_length,
+          1 as path_count
 
   - name: test_graph_person_holdings_incomplete_path_null
     description: |
       Verify incomplete path (hop without percent) produces null person percents.
       Diana → Minoritário Alpha (no percent) → Energisa (5% capital, 3.2% votes).
       Product should be null because first hop has null percents.
-      Model returns both the 1-hop (to Alpha) and 2-hop (to Energisa) paths.
+      Model aggregates by person × company; both paths are incomplete so result is null.
     model: graph_person_holdings
     given:
       - input: ref('graph_edges')
@@ -518,7 +526,9 @@ unit_tests:
           'Minoritário Alpha S.A.' as company_name,
           cast(null as double) as pct_economica_pessoa,
           cast(null as double) as pct_votos_pessoa,
-          1 as path_length
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
         union all
         select
           'Diana Oliveira Teste_1' as person_node_id,
@@ -528,7 +538,9 @@ unit_tests:
           'Energisa S.A.' as company_name,
           cast(null as double) as pct_economica_pessoa,
           cast(null as double) as pct_votos_pessoa,
-          2 as path_length
+          2 as min_path_length,
+          2 as max_path_length,
+          1 as path_count
 
   - name: test_graph_edges_float_stop_no_children
     description: |
@@ -609,7 +621,9 @@ unit_tests:
           'Itacatu Participações S.A.' as company_name,
           70.0 as pct_economica_pessoa,
           70.0 as pct_votos_pessoa,
-          1 as path_length
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
         union all
         select
           '12345678901' as person_node_id,
@@ -619,7 +633,9 @@ unit_tests:
           'Nova Gipar Holding S.A.' as company_name,
           35.0 as pct_economica_pessoa,
           35.0 as pct_votos_pessoa,
-          2 as path_length
+          2 as min_path_length,
+          2 as max_path_length,
+          1 as path_count
 
   - name: test_graph_edges_listed_hop_with_share_quantities
     description: |
@@ -1127,7 +1143,9 @@ unit_tests:
           'Minoritário Alpha S.A.' as company_name,
           cast(null as double) as pct_economica_pessoa,
           cast(null as double) as pct_votos_pessoa,
-          1 as path_length
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
         union all
         select
           'Diana Oliveira Teste_1' as person_node_id,
@@ -1137,4 +1155,315 @@ unit_tests:
           'Energisa S.A.' as company_name,
           cast(null as double) as pct_economica_pessoa,
           cast(null as double) as pct_votos_pessoa,
-          2 as path_length
+          2 as min_path_length,
+          2 as max_path_length,
+          1 as path_count
+
+  - name: test_graph_person_holdings_sum_disjoint_complete_paths
+    description: |
+      Verify disjoint complete paths to same company are summed (issue #65).
+      Ana has two paths to Energisa:
+        Path 1: Ana (40%) → Itacatu (50%) → Energisa = 20% economic, 20% voting
+        Path 2: Ana (30%) → Nova Gipar (60%) → Energisa = 18% economic, 18% voting
+      Result should sum: 38% economic, 38% voting, path_count=2, min=2, max=2.
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select '12345678901' as from_id, '55667788' as to_id, 40.0 as pct_capital, 40.0 as pct_votos
+          union all
+          select '55667788' as from_id, '00864214' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+          union all
+          select '12345678901' as from_id, '11223344' as to_id, 30.0 as pct_capital, 30.0 as pct_votos
+          union all
+          select '11223344' as from_id, '00864214' as to_id, 60.0 as pct_capital, 60.0 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
+          union all
+          select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '11223344' as node_id, 'company' as node_kind, 'Nova Gipar Holding S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '00864214' as node_id, 'company' as node_kind, 'Energisa S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '55667788' as company_node_id,
+          'Itacatu Participações S.A.' as company_name,
+          40.0 as pct_economica_pessoa,
+          40.0 as pct_votos_pessoa,
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '11223344' as company_node_id,
+          'Nova Gipar Holding S.A.' as company_name,
+          30.0 as pct_economica_pessoa,
+          30.0 as pct_votos_pessoa,
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '00864214' as company_node_id,
+          'Energisa S.A.' as company_name,
+          38.0 as pct_economica_pessoa,
+          38.0 as pct_votos_pessoa,
+          2 as min_path_length,
+          2 as max_path_length,
+          2 as path_count
+
+  - name: test_graph_person_holdings_sum_one_complete_one_incomplete
+    description: |
+      Verify sum includes only complete paths when mixed with incomplete (issue #65).
+      Ana has two paths to Energisa:
+        Path 1: Ana (40%) → Itacatu (50%) → Energisa = 20% economic, 20% voting (complete)
+        Path 2: Ana (null) → Nova Gipar (60%) → Energisa = null (incomplete)
+      Result should be 20% (sum of complete paths only), path_count=2.
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select '12345678901' as from_id, '55667788' as to_id, 40.0 as pct_capital, 40.0 as pct_votos
+          union all
+          select '55667788' as from_id, '00864214' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+          union all
+          select '12345678901' as from_id, '11223344' as to_id, cast(null as double) as pct_capital, cast(null as double) as pct_votos
+          union all
+          select '11223344' as from_id, '00864214' as to_id, 60.0 as pct_capital, 60.0 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
+          union all
+          select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '11223344' as node_id, 'company' as node_kind, 'Nova Gipar Holding S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '00864214' as node_id, 'company' as node_kind, 'Energisa S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '55667788' as company_node_id,
+          'Itacatu Participações S.A.' as company_name,
+          40.0 as pct_economica_pessoa,
+          40.0 as pct_votos_pessoa,
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '11223344' as company_node_id,
+          'Nova Gipar Holding S.A.' as company_name,
+          cast(null as double) as pct_economica_pessoa,
+          cast(null as double) as pct_votos_pessoa,
+          1 as min_path_length,
+          1 as max_path_length,
+          1 as path_count
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '00864214' as company_node_id,
+          'Energisa S.A.' as company_name,
+          20.0 as pct_economica_pessoa,
+          20.0 as pct_votos_pessoa,
+          2 as min_path_length,
+          2 as max_path_length,
+          2 as path_count
+
+  - name: test_graph_edges_fund_with_controlling_cotista_source
+    description: |
+      Verify fund with controlling cotista (has public act source) records cotista edge (issue #65).
+      Fund 12345678 has gestora (22334455), administrador (33445566), and controlling cotista
+      (Carlos Teste with CPF) documented in a public act (CVM document).
+      All three edges present with appropriate edge_role.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '22334455' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'gestora' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'CVM Fund gestora' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            '33445566' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'administrador' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'CVM Fund administrador' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            '11122233344' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'cotista' as edge_role,
+            60.0 as pct_capital,
+            60.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'CVM Public Act Fund Controlling Cotista Carlos Teste' as source_doc,
+            'CVM 358/2002 art 12' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '22334455' as node_id, 'company' as node_kind
+          union all
+          select '33445566' as node_id, 'company' as node_kind
+          union all
+          select '12345678' as node_id, 'fund' as node_kind
+          union all
+          select '11122233344' as node_id, 'person' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '22334455' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'gestora' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'CVM Fund gestora' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '33445566' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'administrador' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'CVM Fund administrador' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '11122233344' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'cotista' as edge_role,
+          60.0 as pct_capital,
+          60.0 as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'CVM Public Act Fund Controlling Cotista Carlos Teste' as source_doc,
+          'CVM 358/2002 art 12' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_edges_fund_without_cotista_zero_invented
+    description: |
+      Verify fund without controlling cotista in fixture has zero invented cotistas (issue #65).
+      Fund 12345678 has only gestora (22334455) and administrador (33445566).
+      No cotista edges (zero rows with edge_role='cotista').
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '22334455' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'gestora' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Fund gestora' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            '33445566' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'administrador' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Fund administrador' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '22334455' as node_id, 'company' as node_kind
+          union all
+          select '33445566' as node_id, 'company' as node_kind
+          union all
+          select '12345678' as node_id, 'fund' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '22334455' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'gestora' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Fund gestora' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '33445566' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'administrador' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Fund administrador' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
