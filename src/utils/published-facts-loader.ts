@@ -34,21 +34,38 @@ export function loadPublishedFacts(): PublishedFact[] {
   }
 
   const publishedFactsDir = process.env.PUBLISHED_FACTS_DIR;
+  const usePublishedFacts = process.env.USE_PUBLISHED_FACTS;
   
   let facts: PublishedFact[];
   
-  if (publishedFactsDir && fs.existsSync(publishedFactsDir)) {
-    // Load from production directory
-    facts = loadFromDirectory(publishedFactsDir);
-  } else {
-    // Fallback to git fixture
+  if (publishedFactsDir) {
+    // Load from production directory or test directory
+    if (!fs.existsSync(publishedFactsDir)) {
+      throw new Error(`PUBLISHED_FACTS_DIR is set but directory does not exist: ${publishedFactsDir}`);
+    }
+    
+    // Check if it's pointing to a directory with published-facts.json
+    const fixtureFile = path.join(publishedFactsDir, 'published-facts.json');
+    if (fs.existsSync(fixtureFile)) {
+      const fixtureData = fs.readFileSync(fixtureFile, 'utf-8');
+      facts = JSON.parse(fixtureData);
+    } else {
+      facts = loadFromDirectory(publishedFactsDir);
+    }
+  } else if (usePublishedFacts) {
+    // Test mode: use git fixture
     const fixturePath = path.join(process.cwd(), 'test', 'fixtures', 'published-facts.json');
     const fixtureData = fs.readFileSync(fixturePath, 'utf-8');
     facts = JSON.parse(fixtureData);
+  } else {
+    // Fallback to empty (old fixtures will be used instead)
+    cachedFacts = [];
+    return cachedFacts;
   }
   
   // Filter to only facts with source_locator
   cachedFacts = facts.filter(fact => fact.source_locator);
+  
   return cachedFacts;
 }
 

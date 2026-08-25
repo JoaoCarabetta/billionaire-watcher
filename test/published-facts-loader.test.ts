@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { 
   loadPublishedFacts,
   getPublishedFactsByPersonId,
@@ -6,6 +6,19 @@ import {
 } from '../src/utils/published-facts-loader';
 
 describe('Published Facts Loader', () => {
+  let originalEnv: NodeJS.ProcessEnv;
+  
+  beforeAll(() => {
+    // Save original env
+    originalEnv = { ...process.env };
+    // Set USE_PUBLISHED_FACTS for these tests
+    process.env.USE_PUBLISHED_FACTS = 'true';
+  });
+  
+  afterAll(() => {
+    // Restore original env
+    process.env = originalEnv;
+  });
   describe('loadPublishedFacts()', () => {
     it('should load published facts from fixture', () => {
       const facts = loadPublishedFacts();

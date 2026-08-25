@@ -42,7 +42,11 @@ describe('Tracer: Editorial Voice (REDACAO.md)', () => {
       execSync('npm run build', { 
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe',
-        encoding: 'utf-8'
+        encoding: 'utf-8',
+        env: {
+          ...process.env,
+          ALLOW_OLD_FIXTURES: 'true'
+        }
       });
     } catch (error: any) {
       buildFailed = true;

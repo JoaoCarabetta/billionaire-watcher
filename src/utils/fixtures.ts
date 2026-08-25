@@ -191,6 +191,15 @@ export function getFreeze(): Person[] {
     return getPublishedFactsFreeze();
   }
   
+  // Production builds must not use old fixtures
+  if (!process.env.ALLOW_OLD_FIXTURES && !process.env.NODE_ENV?.includes('test')) {
+    throw new Error(
+      'Production build requires published facts. ' +
+      'Set PUBLISHED_FACTS_DIR or USE_PUBLISHED_FACTS environment variable. ' +
+      'Old fixture builds (test/fixtures/freeze.csv) are disabled in production.'
+    );
+  }
+  
   try {
     const freezePath = path.join(process.cwd(), 'test', 'fixtures', 'freeze.csv');
     const freezeContent = fs.readFileSync(freezePath, 'utf-8');

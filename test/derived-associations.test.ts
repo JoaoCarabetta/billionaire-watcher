@@ -14,7 +14,11 @@ describe('Tracer: Derived associations (cited, freeze-only)', () => {
       execSync('npm run build', { 
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe',
-        encoding: 'utf-8'
+        encoding: 'utf-8',
+        env: {
+          ...process.env,
+          ALLOW_OLD_FIXTURES: 'true'
+        }
       });
     } catch (error: any) {
       buildFailed = true;

@@ -18,7 +18,11 @@ describe('Tracer: TSE 2026 Donations with Refresh', () => {
       execSync('npm run build', { 
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe',
-        encoding: 'utf-8'
+        encoding: 'utf-8',
+        env: {
+          ...process.env,
+          ALLOW_OLD_FIXTURES: 'true'
+        }
       });
     } catch (error: any) {
       buildFailed = true;

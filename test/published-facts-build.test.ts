@@ -230,6 +230,14 @@ describe('Published Facts Build Integration', () => {
       // Must contain person names (real content)
       expect(textContent).toContain('João Silva');
       
+      // Must have at least one citation marker (Wikipedia-style [n])
+      expect(html).toMatch(/\[\d+\]/);
+      
+      // Must NOT contain unsourced methodology prose (specific phrases from the old paragraph)
+      expect(textContent).not.toContain('Congelamento editorial');
+      expect(textContent).not.toContain('Sem narrativa especulativa');
+      expect(textContent).not.toContain('Metodologia documentada');
+      
       // Must not contain 11-digit CPF
       expect(textContent).not.toMatch(/\d{11}/);
     });
