@@ -13,7 +13,8 @@ import {
   getDerivedAssociationsByPersonId,
   getCandidateByCpf,
   formatCurrency,
-  redactCPF
+  redactCPF,
+  shouldUsePublishedFacts
 } from '../../utils/fixtures';
 import type { Person, Source } from '../../types';
 
@@ -41,6 +42,11 @@ const associations = getDerivedAssociationsByPersonId(person.person_id);
 const nameFact = identityFacts.find(f => f.field === 'nome');
 const pageTitle = nameFact ? nameFact.value : person.person_name;
 
+// Get CPF for JSON-LD (masked format)
+// Both identity facts and freeze CSV cpf need redaction for old fixtures
+const cpfFromFacts = identityFacts.find(f => f.cpf)?.cpf;
+const cpfForJsonLd = cpfFromFacts ? redactCPF(cpfFromFacts) : (person.cpf ? redactCPF(person.cpf) : null);
+
 // Build citation map: unique sources by first appearance, numbered sequentially
 const citationMap = new Map<string, number>();
 let nextCitationNumber = 1;
@@ -50,7 +56,8 @@ const allSources: Source[] = [
   ...identityFacts.filter(f => f.source).map(f => f.source!),
   ...rfPartnerEdges.filter(e => e.source).map(e => e.source),
   ...cvmFreControls.filter(c => c.source).map(c => c.source),
-  ...donations.map(d => d.source)
+  ...donations.map(d => d.source),
+  ...associations.filter(a => a.source).map(a => a.source!)
 ];
 
 // Assign numbers to unique sources by first appearance
@@ -70,6 +77,13 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{pageTitle} - Billionaire Watcher</title>
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": pageTitle,
+      "url": `https://billionaire-watcher.pages.dev/pessoa/${person.person_id}/`,
+      ...(cpfForJsonLd ? { "taxID": cpfForJsonLd } : {})
+    })} />
     <style>
       * {
         margin: 0;
@@ -193,6 +207,12 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
           {identityFacts.map((fact) => (
             <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
           ))}
+          {/* Show CPF if any identity fact has it OR if person has cpf from freeze.csv */}
+          {(identityFacts.some(f => f.cpf) || person.cpf) && (
+            <div class="fact cpf-fact">
+              <span class="fact-value">CPF: {redactCPF(identityFacts.find(f => f.cpf)?.cpf || person.cpf || '')}</span>
+            </div>
+          )}
         </section>
       )}
 
@@ -224,6 +244,7 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
         </section>
       )}
 
+      {/* Show CVM hole only when RF edges exist but no CVM controls */}
       {rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
         <section>
           <h2>Controle Acionário</h2>

@@ -1,7 +1,82 @@
 ---
-import { getFreeze } from '../utils/fixtures';
+import { getFreeze, getIdentityFactsByPersonId, getRFPartnerEdgesByPersonId } from '../utils/fixtures';
+import type { Source } from '../types';
 
 const freezePersons = getFreeze();
+
+// Build citation map for facts shown on home
+const citationMap = new Map<string, number>();
+let nextCitationNumber = 1;
+
+// Collect sample facts from each person (for 500+ char requirement)
+interface PersonFact {
+  personId: string;
+  personName: string;
+  facts: Array<{ value: string; source: Source }>;
+}
+
+const personFacts: PersonFact[] = [];
+
+for (const person of freezePersons) {
+  const identityFacts = getIdentityFactsByPersonId(person.person_id);
+  const rfEdges = getRFPartnerEdgesByPersonId(person.person_id);
+  
+  const facts: Array<{ value: string; source: Source }> = [];
+  
+  // Add role fact
+  const roleFact = identityFacts.find(f => f.field === 'role');
+  if (roleFact && roleFact.source) {
+    facts.push({ value: roleFact.value, source: roleFact.source });
+    if (!citationMap.has(roleFact.source.locator)) {
+      citationMap.set(roleFact.source.locator, nextCitationNumber++);
+    }
+  }
+  
+  // Add company fact
+  const companyFact = identityFacts.find(f => f.field === 'group_name');
+  if (companyFact && companyFact.source) {
+    facts.push({ value: companyFact.value, source: companyFact.source });
+    if (!citationMap.has(companyFact.source.locator)) {
+      citationMap.set(companyFact.source.locator, nextCitationNumber++);
+    }
+  }
+  
+  // Add RF edges
+  for (const rfEdge of rfEdges) {
+    if (rfEdge.source) {
+      facts.push({ 
+        value: `${rfEdge.relationship} de ${rfEdge.company_name}`, 
+        source: rfEdge.source 
+      });
+      if (!citationMap.has(rfEdge.source.locator)) {
+        citationMap.set(rfEdge.source.locator, nextCitationNumber++);
+      }
+    }
+  }
+  
+  if (facts.length > 0) {
+    personFacts.push({
+      personId: person.person_id,
+      personName: person.person_name,
+      facts
+    });
+  }
+}
+
+// Build unique sources list
+const allSources = personFacts.flatMap(pf => pf.facts.map(f => f.source));
+const uniqueSources = Array.from(citationMap.entries())
+  .map(([locator, num]) => {
+    const source = allSources.find(s => s && s.locator === locator);
+    return { num, source };
+  })
+  .filter(entry => entry.source)
+  .sort((a, b) => a.num - b.num);
+
+const getCitationNumber = (source: Source | undefined) => {
+  if (!source || !source.locator) return 0;
+  return citationMap.get(source.locator) || 0;
+};
 ---
 
 <!DOCTYPE html>
@@ -68,6 +143,12 @@ const freezePersons = getFreeze();
         font-weight: 600;
         font-size: 1.1rem;
       }
+      
+      .citation-marker {
+        color: #0066cc;
+        font-weight: bold;
+        margin-left: 0.1em;
+      }
     </style>
   </head>
   <body>
@@ -77,12 +158,33 @@ const freezePersons = getFreeze();
 
     <main>
       <section>
-        <h2>Pessoas no Índice Congelado</h2>
+        <p>Arquivo cívico. Fatos citados de fontes públicas.</p>
+      </section>
+      
+      <section>
+        <h2>Pessoas</h2>
         {freezePersons.length === 0 ? (
           <p>Nenhuma pessoa no índice.</p>
         ) : (
           <ul class="person-list">
-            {freezePersons.map(person => (
+            {personFacts.map(pf => (
+              <li>
+                <strong>
+                  <a href={`/pessoa/${pf.personId}`}>
+                    {pf.personName}
+                  </a>
+                </strong>
+                {' — '}
+                {pf.facts.map((fact, idx) => (
+                  <span>
+                    {idx > 0 && '; '}
+                    {fact.value}
+                    <sup class="citation-marker">[{getCitationNumber(fact.source)}]</sup>
+                  </span>
+                ))}
+              </li>
+            ))}
+            {freezePersons.filter(p => !personFacts.find(pf => pf.personId === p.person_id)).map(person => (
               <li>
                 <a href={`/pessoa/${person.person_id}`}>
                   {person.person_name}
@@ -92,6 +194,26 @@ const freezePersons = getFreeze();
           </ul>
         )}
       </section>
+
+      {uniqueSources.length > 0 && (
+        <section>
+          <h2>Referências</h2>
+          <ol style="font-size: 0.9rem; line-height: 1.6;">
+            {uniqueSources.map(({ num, source }) => (
+              <li id={`citation-${num}`}>
+                <strong>{source!.publisher}</strong>
+                {' — '}
+                {source!.locator}
+                {source!.retrieved_at && (
+                  <span style="color: #666; font-size: 0.85em;">
+                    {' '}(recuperado em {source!.retrieved_at})
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <section>
         <h2>Doações Políticas</h2>

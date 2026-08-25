@@ -19,6 +19,7 @@ export interface DerivedAssociation {
   association_type: 'politician' | 'freeze_person';
   description: string;
   parent_donation_ids: string[];
+  source?: Source;
 }
 
 export interface Person {
