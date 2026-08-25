@@ -1,867 +1,433 @@
 unit_tests:
-  # SEAM 1: No edge_label dono or UBO
-  - name: test_freeze_rejects_dono_edge_label
-    description: |
-      SEAM TEST: A row with edge_label 'dono' or 'UBO' must fail.
-      This test should FAIL if we ever introduce a dono/UBO edge.
-    model: freeze_persons
-    given:
-      - input: ref('int_freeze_listed_controllers')
-        rows:
-          - group_rank: 1
-            group_name: 'Test Company'
-            cnpj_basico: '12345678'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: false
-            controlador_tipo: 'listed'
-            person_name: 'João Silva'
-            role: 'controlador'
-            edge_label: 'acionista_controlador'
-            acordo_acionistas: null
-            source_doc: 'CVM FRE 2026'
-            fre_item: '6.1'
-            hole: false
-            cpf_masked: '***123456**'
-            freeze_status: 'in'
-            notes: 'Test'
-      - input: ref('int_freeze_soe')
-        rows: []
-      - input: ref('int_freeze_unlisted_rf')
-        rows: []
-      - input: ref('int_freeze_foreign_hq')
-        rows: []
-    expect:
-      rows:
-        - group_rank: 1
-          group_name: 'Test Company'
-          cnpj_basico: '12345678'
-          edge_label: 'acionista_controlador'
+- name: test_freeze_rejects_dono_edge_label
+  description: 'SEAM TEST: A row with edge_label ''dono'' or ''UBO'' must fail.
 
-  # SEAM 2: SOE with freeze_status=in and a PF controlador fails
-  - name: test_freeze_soe_skip_with_no_pf
-    description: |
-      SEAM TEST: SOE groups must have freeze_status=skip_soe and no PF controlador.
-      SOE with freeze_status=in and a PF controlador must fail.
-    model: int_freeze_soe
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 1
-            empresa: 'Petrobras'
-            razao_social: 'Petróleo Brasileiro S.A.'
-            cnpj_basico: '33000167'
-            cnpj_full: '33000167000101'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: true
-            soe_source: 'Carta Anual 2025'
-            controlador_tipo: 'soe'
-            freeze_status_hint: 'skip_soe'
-            notes: 'Federal SOE'
-            source_doc: 'Carta Anual'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-    expect:
-      rows:
-        - group_rank: 1
-          group_name: 'Petrobras'
-          cnpj_basico: '33000167'
-          person_name: null
-          role: null
-          freeze_status: 'skip_soe'
+    This test should FAIL if we ever introduce a dono/UBO edge.
 
-  # SEAM 3: FRE 6.2 institution without control acordo must not be role=controlador
-  - name: test_freeze_fre_62_without_acordo_not_controlador
-    description: |
-      SEAM TEST: FRE 6.2 ≥5% institutions without Participante_Acordo_Acionistas=S
-      must not be role=controlador. They are acionista_relevante, OUT.
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 2
-            empresa: 'Test Listed'
-            razao_social: 'Test Listed S.A.'
-            cnpj_basico: '02916265'
-            cnpj_full: '02916265000160'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          # Controller with Acionista_Controlador=S
-          - CNPJ_Companhia: '02916265000160'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'Test Listed S.A.'
-            ID_Acionista: 100
-            Acionista: 'Família Silva'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '12345678000100'
-            ID_Acionista_Relacionado: 101
-            Acionista_Relacionado: 'João Silva'
-            Tipo_Pessoa_Acionista_Relacionado: 'PF'
-            CPF_CNPJ_Acionista_Relacionado: '***123456**'
-            Quantidade_Acao_Ordinaria_Circulacao: 1000
-            Percentual_Acao_Ordinaria_Circulacao: 51.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 1000
-            Percentual_Total_Acoes_Circulacao: 51.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SP'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'S'
-          # Institution with ≥5% but NOT controlling (no acordo)
-          - CNPJ_Companhia: '02916265000160'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'Test Listed S.A.'
-            ID_Acionista: 200
-            Acionista: 'Previ'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '00000000000191'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 150
-            Percentual_Acao_Ordinaria_Circulacao: 7.5
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 150
-            Percentual_Total_Acoes_Circulacao: 7.5
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'DF'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'N'
-            Participante_Acordo_Acionistas: 'N'
-    expect:
-      rows:
-        # Only the controller with Acionista_Controlador=S should appear
-        - group_rank: 2
-          person_name: 'João Silva'
-          role: 'controlador'
-          edge_label: 'acionista_controlador'
+    '
+  model: freeze_persons
+  given:
+  - input: ref('int_freeze_listed_controllers')
+    rows: "select\n            1 as group_rank,\n            'Test Company' as group_name,\n            '12345678' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            'Test' as notes"
+    format: sql
+  - input: ref('int_freeze_soe')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_unlisted_rf')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_foreign_hq')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  expect:
+    rows: "select\n            1 as group_rank,\n            'Test Company' as group_name,\n            '12345678' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            'Test' as notes"
+    format: sql
+- name: test_freeze_soe_skip_with_no_pf
+  description: 'SEAM TEST: SOE groups must have freeze_status=skip_soe and no PF controlador.
 
-  # SEAM 4a: Missing controller is hole at int_freeze_listed_controllers
-  - name: test_freeze_listed_empty_61_is_hole_int
-    description: |
-      SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
-      produces hole row in int_freeze_listed_controllers itself.
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 3
-            empresa: 'No Controller Inc'
-            razao_social: 'No Controller S.A.'
-            cnpj_basico: '11111111'
-            cnpj_full: '11111111000100'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          # Only acionista_relevante, no controller
-          - CNPJ_Companhia: '11111111000100'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'No Controller S.A.'
-            ID_Acionista: 300
-            Acionista: 'BlackRock'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '99999999000199'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 120
-            Percentual_Acao_Ordinaria_Circulacao: 6.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 120
-            Percentual_Total_Acoes_Circulacao: 6.0
-            Nacionalidade: 'Estrangeira'
-            Sigla_UF: null
-            Residente_Exterior: 'S'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'N'
-            Participante_Acordo_Acionistas: 'N'
-    expect:
-      rows:
-        - group_rank: 3
-          group_name: 'No Controller Inc'
-          person_name: null
-          freeze_status: 'hole'
-          hole: true
+    SOE with freeze_status=in and a PF controlador must fail.
 
-  # SEAM 4b: Missing controller is hole, not CEO or offshore invention
-  - name: test_freeze_listed_empty_61_is_hole
-    description: |
-      SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
-      results in a visible hole row, not an absent row or CEO fill-in.
-      Every listed non-SOE group must appear in freeze_persons.
-    model: freeze_persons
-    given:
-      - input: ref('int_freeze_listed_controllers')
-        rows:
-          # Listed group with empty FRE 6.1
-          - group_rank: 3
-            group_name: 'No Controller Inc'
-            cnpj_basico: '11111111'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: false
-            controlador_tipo: 'listed'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'CVM FRE 2026 item 6.1 CNPJ 11111111: empty'
-            fre_item: '6.1'
-            hole: true
-            cpf_masked: null
-            freeze_status: 'hole'
-            notes: 'FRE 6.1 empty: no Acionista_Controlador=S found'
-      - input: ref('int_freeze_soe')
-        rows: []
-      - input: ref('int_freeze_unlisted_rf')
-        rows: []
-      - input: ref('int_freeze_foreign_hq')
-        rows: []
-    expect:
-      rows:
-        - group_rank: 3
-          group_name: 'No Controller Inc'
-          person_name: null
-          freeze_status: 'hole'
-          hole: true
+    '
+  model: int_freeze_soe
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            1 as rank_2024,\n            'Petrobras' as empresa,\n            'Petróleo Brasileiro S.A.' as razao_social,\n            '33000167' as cnpj_basico,\n            '33000167000101' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            true as soe_flag,\n            'Carta Anual 2025' as soe_source,\n            'soe' as controlador_tipo,\n            'skip_soe' as freeze_status_hint,\n            'Federal SOE' as notes,\n            'Carta Anual' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  expect:
+    rows: "select\n            1 as group_rank,\n            'Petrobras' as group_name,\n            '33000167' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            true as soe_flag,\n            'soe' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Carta Anual 2025' as source_doc,\n            cast(null as varchar) as fre_item,\n            false as hole,\n            cast(null as varchar) as cpf_masked,\n            'skip_soe' as freeze_status,\n            'Federal SOE: União is Art. 116 controller, not a natural person' as notes"
+    format: sql
+- name: test_freeze_fre_62_without_acordo_not_controlador
+  description: 'SEAM TEST: FRE 6.2 ≥5% institutions without Participante_Acordo_Acionistas=S
 
-  # SEAM 5: QSA-only names stay OFF the freeze
-  - name: test_freeze_unlisted_qsa_names_off_sa
-    description: |
-      SEAM TEST: QSA-only names stay OFF the freeze until public act names Art. 116.
-      S.A. QSA is officers, not shareholders. Emit hole row, person_name null.
-    model: int_freeze_unlisted_rf
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 18
-            empresa: 'Copersucar'
-            razao_social: 'Copersucar S.A.'
-            cnpj_basico: '10265949'
-            cnpj_full: '10265949000177'
-            listed_flag: false
-            listed_source: null
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'unlisted'
-            freeze_status_hint: 'pending'
-            notes: 'SA fechada'
-            source_doc: 'CVM cancelled'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_rf_socios')
-        rows:
-          - ano: 2026
-            mes: 1
-            data: '2026-01-11'
-            cnpj_basico: '10265949'
-            tipo: 'PF'
-            nome: 'Maria Santos'
-            documento: '***789012**'
-            qualificacao: '16'
-            data_entrada_sociedade: '2020-01-01'
-            id_pais: null
-            cpf_representante_legal: null
-            nome_representante_legal: null
-            qualificacao_representante_legal: null
-            faixa_etaria: null
-      - input: ref('stg_rf_empresas')
-        rows:
-          - ano: 2026
-            mes: 1
-            data: '2026-01-11'
-            cnpj_basico: '10265949'
-            razao_social: 'COPERSUCAR S.A.'
-            natureza_juridica: '2054'
-            qualificacao_responsavel: '05'
-            capital_social: 1775195789.81
-            porte: '05'
-            ente_federativo: null
-    expect:
-      rows:
-        - group_rank: 18
-          person_name: null
-          role: null
-          edge_label: null
-          freeze_status: 'hole'
+    must not be role=controlador. They are acionista_relevante, OUT.
 
-  # SEAM 5b: QSA-only names stay OFF for Ltda too
-  - name: test_freeze_unlisted_qsa_names_off_ltda
-    description: |
-      SEAM TEST: QSA-only names stay OFF the freeze for Ltda (natureza 2062) too.
-      Emit hole row, person_name null, until public act names Art. 116 controller.
-    model: freeze_persons
-    given:
-      - input: ref('int_freeze_listed_controllers')
-        rows: []
-      - input: ref('int_freeze_soe')
-        rows: []
-      - input: ref('int_freeze_unlisted_rf')
-        rows:
-          - group_rank: 10
-            group_name: 'Cargill'
-            cnpj_basico: '01961898'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: false
-            soe_flag: false
-            controlador_tipo: 'foreign'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'RF QSA 01961898 data 2026-01-11'
-            fre_item: null
-            hole: true
-            cpf_masked: null
-            freeze_status: 'hole'
-            notes: 'Ltda QSA lists partners. No public act names Art. 116 controller.'
-      - input: ref('int_freeze_foreign_hq')
-        rows: []
-    expect:
-      rows:
-        - group_rank: 10
-          group_name: 'Cargill'
-          person_name: null
-          role: null
-          edge_label: null
-          freeze_status: 'hole'
+    '
+  model: int_freeze_listed_controllers
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            2 as rank_2024,\n            'Test Listed' as empresa,\n            'Test Listed S.A.' as razao_social,\n            '02916265' as cnpj_basico,\n            '02916265000160' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            false as soe_flag,\n            cast(null as varchar) as soe_source,\n            'listed' as controlador_tipo,\n            'pending' as freeze_status_hint,\n            'Test' as notes,\n            'CVM' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+    rows: "select\n            '02916265000160' as CNPJ_Companhia,\n            cast('2025-12-31' as date) as Data_Referencia,\n            1 as Versao,\n            1 as ID_Documento,\n            'Test Listed S.A.' as Nome_Companhia,\n            100 as ID_Acionista,\n            'Família Silva' as Acionista,\n            'PJ' as Tipo_Pessoa_Acionista,\n            '12345678000100' as CPF_CNPJ_Acionista,\n            101 as ID_Acionista_Relacionado,\n            'João Silva' as Acionista_Relacionado,\n            'PF' as Tipo_Pessoa_Acionista_Relacionado,\n            '***123456**' as CPF_CNPJ_Acionista_Relacionado,\n            1000 as Quantidade_Acao_Ordinaria_Circulacao,\n            51.0 as Percentual_Acao_Ordinaria_Circulacao,\n            0 as Quantidade_Acao_Preferencial_Circulacao,\n            0.0 as Percentual_Acao_Preferencial_Circulacao,\n            1000 as Quantidade_Total_Acoes_Circulacao,\n            51.0 as Percentual_Total_Acoes_Circulacao,\n            'Brasileira'\
+      \ as Nacionalidade,\n            'SP' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'S' as Acionista_Controlador,\n            'S' as Participante_Acordo_Acionistas\n          union all\n          select\n            '02916265000160' as CNPJ_Companhia,\n            cast('2025-12-31' as date) as Data_Referencia,\n            1 as Versao,\n            1 as ID_Documento,\n            'Test Listed S.A.' as Nome_Companhia,\n            200 as ID_Acionista,\n            'Previ' as Acionista,\n            'PJ' as Tipo_Pessoa_Acionista,\n            '00000000000191' as CPF_CNPJ_Acionista,\n            cast(null as varchar) as ID_Acionista_Relacionado,\n\
+      \            cast(null as varchar) as Acionista_Relacionado,\n            cast(null as varchar) as Tipo_Pessoa_Acionista_Relacionado,\n            cast(null as varchar) as CPF_CNPJ_Acionista_Relacionado,\n            150 as Quantidade_Acao_Ordinaria_Circulacao,\n            7.5 as Percentual_Acao_Ordinaria_Circulacao,\n            0 as Quantidade_Acao_Preferencial_Circulacao,\n            0.0 as Percentual_Acao_Preferencial_Circulacao,\n            150 as Quantidade_Total_Acoes_Circulacao,\n            7.5 as Percentual_Total_Acoes_Circulacao,\n            'Brasileira' as Nacionalidade,\n            'DF' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n\
+      \            'N' as Acionista_Controlador,\n            'N' as Participante_Acordo_Acionistas"
+    format: sql
+  expect:
+    rows: "select\n            2 as group_rank,\n            'Test Listed' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            'S' as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            'FRE 6.1 walk to PF' as notes"
+    format: sql
+- name: test_freeze_listed_empty_61_is_hole_int
+  description: 'SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
 
-  # Partition test: foreign unlisted appears exactly once
-  - name: test_freeze_foreign_unlisted_no_duplicate
-    description: |
-      PARTITION TEST: Foreign unlisted group (Cargill-style: listed_flag=false,
-      controlador_tipo=foreign) appears exactly once in freeze_persons.
-      Locked partition: unlisted+foreign → int_freeze_foreign_hq only.
-    model: freeze_persons
-    given:
-      - input: ref('int_freeze_listed_controllers')
-        rows: []
-      - input: ref('int_freeze_soe')
-        rows: []
-      - input: ref('int_freeze_unlisted_rf')
-        rows: []
-      - input: ref('int_freeze_foreign_hq')
-        rows:
-          - group_rank: 10
-            group_name: 'Cargill'
-            cnpj_basico: '01961898'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: false
-            soe_flag: false
-            controlador_tipo: 'foreign'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'Valor capital_origem=US'
-            fre_item: null
-            hole: true
-            cpf_masked: null
-            freeze_status: 'hole'
-            notes: 'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.'
-    expect:
-      rows:
-        - group_rank: 10
-          group_name: 'Cargill'
-          person_name: null
-          freeze_status: 'hole'
+    produces hole row in int_freeze_listed_controllers itself.
 
-  # SEAM 6: No full CPF on page-bound fields (cpf_masked only)
-  - name: test_freeze_preserves_cpf_masking
-    description: |
-      SEAM TEST: cpf_masked field must contain masked CPF, never full CPF.
-      This is enforced by the staging models, but we verify here.
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 2
-            empresa: 'Test Listed'
-            razao_social: 'Test Listed S.A.'
-            cnpj_basico: '02916265'
-            cnpj_full: '02916265000160'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          - CNPJ_Companhia: '02916265000160'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'Test Listed S.A.'
-            ID_Acionista: 100
-            Acionista: 'Test Holding'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '12345678000100'
-            ID_Acionista_Relacionado: 101
-            Acionista_Relacionado: 'João Silva'
-            Tipo_Pessoa_Acionista_Relacionado: 'PF'
-            CPF_CNPJ_Acionista_Relacionado: '***123456**'
-            Quantidade_Acao_Ordinaria_Circulacao: 1000
-            Percentual_Acao_Ordinaria_Circulacao: 51.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 1000
-            Percentual_Total_Acoes_Circulacao: 51.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SP'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'S'
-    expect:
-      rows:
-        - group_rank: 2
-          person_name: 'João Silva'
-          cpf_masked: '***123456**'
+    '
+  model: int_freeze_listed_controllers
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            3 as rank_2024,\n            'No Controller Inc' as empresa,\n            'No Controller S.A.' as razao_social,\n            '11111111' as cnpj_basico,\n            '11111111000100' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            false as soe_flag,\n            cast(null as varchar) as soe_source,\n            'listed' as controlador_tipo,\n            'pending' as freeze_status_hint,\n            'Test' as notes,\n            'CVM' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+    rows: "select\n            '11111111000100' as CNPJ_Companhia,\n            cast('2025-12-31' as date) as Data_Referencia,\n            1 as Versao,\n            1 as ID_Documento,\n            'No Controller S.A.' as Nome_Companhia,\n            300 as ID_Acionista,\n            'BlackRock' as Acionista,\n            'PJ' as Tipo_Pessoa_Acionista,\n            '99999999000199' as CPF_CNPJ_Acionista,\n            cast(null as varchar) as ID_Acionista_Relacionado,\n            cast(null as varchar) as Acionista_Relacionado,\n            cast(null as varchar) as Tipo_Pessoa_Acionista_Relacionado,\n            cast(null as varchar) as CPF_CNPJ_Acionista_Relacionado,\n            120 as Quantidade_Acao_Ordinaria_Circulacao,\n            6.0 as Percentual_Acao_Ordinaria_Circulacao,\n            0 as Quantidade_Acao_Preferencial_Circulacao,\n            0.0 as Percentual_Acao_Preferencial_Circulacao,\n            120 as Quantidade_Total_Acoes_Circulacao,\n            6.0 as Percentual_Total_Acoes_Circulacao,\n\
+      \            'Estrangeira' as Nacionalidade,\n            cast(null as varchar) as Sigla_UF,\n            'S' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'N' as Acionista_Controlador,\n            'N' as Participante_Acordo_Acionistas"
+    format: sql
+  expect:
+    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            '11111111' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 11111111: empty' as source_doc,\n            '6.1' as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'FRE 6.1 empty: no Acionista_Controlador=S found' as notes"
+    format: sql
+- name: test_freeze_listed_empty_61_is_hole
+  description: 'SEAM TEST: Listed company with empty FRE 6.1 (no Acionista_Controlador=S)
 
-  # WALK BUG FIX: Listed group with PF controllers must not emit holes
-  - name: test_freeze_listed_no_hole_when_pf_exists
-    description: |
-      WALK BUG FIX: A listed group that has PF controllers (freeze_status=in)
-      must NOT also emit hole rows. Each group emits either:
-      - One or more 'in' rows (one per named PF), OR
-      - Exactly one 'hole' row (if zero named PF).
-      A group with 44 'in' rows must not also have 133 'hole' rows (WEG counterexample).
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 41
-            empresa: 'WEG'
-            razao_social: 'WEG S.A.'
-            cnpj_basico: '84429695'
-            cnpj_full: '84429695000111'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          # Named PF controller 1
-          - CNPJ_Companhia: '84429695000111'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'WEG S.A.'
-            ID_Acionista: 100
-            Acionista: 'Controller PF 1'
-            Tipo_Pessoa_Acionista: 'PF'
-            CPF_CNPJ_Acionista: '***111111**'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 500
-            Percentual_Acao_Ordinaria_Circulacao: 25.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 500
-            Percentual_Total_Acoes_Circulacao: 25.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SC'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'S'
-          # Named PF controller 2
-          - CNPJ_Companhia: '84429695000111'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'WEG S.A.'
-            ID_Acionista: 101
-            Acionista: 'Controller PF 2'
-            Tipo_Pessoa_Acionista: 'PF'
-            CPF_CNPJ_Acionista: '***222222**'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 500
-            Percentual_Acao_Ordinaria_Circulacao: 25.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 500
-            Percentual_Total_Acoes_Circulacao: 25.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SC'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'S'
-          # PJ controller without named PF (would be a hole in old logic)
-          - CNPJ_Companhia: '84429695000111'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'WEG S.A.'
-            ID_Acionista: 200
-            Acionista: 'Controller PJ'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '12345678000100'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 200
-            Percentual_Acao_Ordinaria_Circulacao: 10.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 200
-            Percentual_Total_Acoes_Circulacao: 10.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SC'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'N'
-    expect:
-      rows:
-        # Should emit exactly 2 'in' rows (the named PFs)
-        - group_rank: 41
-          person_name: 'Controller PF 1'
-          freeze_status: 'in'
-          hole: false
-        - group_rank: 41
-          person_name: 'Controller PF 2'
-          freeze_status: 'in'
-          hole: false
-        # Should NOT emit any hole rows because this group has named PFs
+    results in a visible hole row, not an absent row or CEO fill-in.
 
-  # WALK BUG FIX: Listed group with zero PF emits exactly one hole
-  - name: test_freeze_listed_one_hole_when_zero_pf
-    description: |
-      WALK BUG FIX: A listed group with zero named PF controllers
-      emits exactly ONE hole row, even if FRE has multiple PJ controller lines.
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 29
-            empresa: 'Equatorial'
-            razao_social: 'Equatorial S.A.'
-            cnpj_basico: '03220438'
-            cnpj_full: '03220438000173'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          # Multiple PJ controllers without named PF
-          - CNPJ_Companhia: '03220438000173'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'Equatorial S.A.'
-            ID_Acionista: 300
-            Acionista: 'PJ Controller 1'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '11111111000100'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 300
-            Percentual_Acao_Ordinaria_Circulacao: 30.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 300
-            Percentual_Total_Acoes_Circulacao: 30.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'MA'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'N'
-          - CNPJ_Companhia: '03220438000173'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'Equatorial S.A.'
-            ID_Acionista: 301
-            Acionista: 'PJ Controller 2'
-            Tipo_Pessoa_Acionista: 'PJ'
-            CPF_CNPJ_Acionista: '22222222000100'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 200
-            Percentual_Acao_Ordinaria_Circulacao: 20.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 200
-            Percentual_Total_Acoes_Circulacao: 20.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'MA'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: 'N'
-    expect:
-      rows:
-        # Should emit exactly ONE hole row, not two
-        - group_rank: 29
-          person_name: null
-          freeze_status: 'hole'
-          hole: true
+    Every listed non-SOE group must appear in freeze_persons.
 
-  # UNION ALL typing fix: freeze_persons compiles with typed NULLs
-  - name: test_freeze_persons_union_all_typed_nulls
-    description: |
-      UNION ALL TYPING FIX: freeze_persons UNION ALL must compile without BigQuery.
-      All NULL columns must be explicitly typed to avoid untyped NULL errors.
-      Test that all four arms (listed, soe, unlisted, foreign) union correctly.
-    model: freeze_persons
-    given:
-      - input: ref('int_freeze_listed_controllers')
-        rows:
-          - group_rank: 1
-            group_name: 'Listed Test'
-            cnpj_basico: '11111111'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: false
-            controlador_tipo: 'listed'
-            person_name: 'Person A'
-            role: 'controlador'
-            edge_label: 'acionista_controlador'
-            acordo_acionistas: null
-            source_doc: 'CVM FRE 2026'
-            fre_item: '6.1'
-            hole: false
-            cpf_masked: '***111111**'
-            freeze_status: 'in'
-            notes: 'Listed test'
-      - input: ref('int_freeze_soe')
-        rows:
-          - group_rank: 2
-            group_name: 'SOE Test'
-            cnpj_basico: '22222222'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: true
-            soe_flag: true
-            controlador_tipo: 'soe'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'Carta Anual'
-            fre_item: null
-            hole: false
-            cpf_masked: null
-            freeze_status: 'skip_soe'
-            notes: 'Federal SOE'
-      - input: ref('int_freeze_unlisted_rf')
-        rows:
-          - group_rank: 3
-            group_name: 'Unlisted Test'
-            cnpj_basico: '33333333'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: false
-            soe_flag: false
-            controlador_tipo: 'unlisted'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'RF QSA'
-            fre_item: null
-            hole: true
-            cpf_masked: null
-            freeze_status: 'hole'
-            notes: 'Unlisted hole'
-      - input: ref('int_freeze_foreign_hq')
-        rows:
-          - group_rank: 4
-            group_name: 'Foreign Test'
-            cnpj_basico: '44444444'
-            ranking_source: 'Valor 1000 FY2024'
-            receita_fy2024_brl: null
-            listed_flag: false
-            soe_flag: false
-            controlador_tipo: 'foreign'
-            person_name: null
-            role: null
-            edge_label: null
-            acordo_acionistas: null
-            source_doc: 'Valor'
-            fre_item: null
-            hole: true
-            cpf_masked: null
-            freeze_status: 'hole'
-            notes: 'Foreign HQ'
-    expect:
-      rows:
-        - group_rank: 1
-          person_name: 'Person A'
-          freeze_status: 'in'
-        - group_rank: 2
-          person_name: null
-          freeze_status: 'skip_soe'
-        - group_rank: 3
-          person_name: null
-          freeze_status: 'hole'
-        - group_rank: 4
-          person_name: null
-          freeze_status: 'hole'
+    '
+  model: freeze_persons
+  given:
+  - input: ref('int_freeze_listed_controllers')
+    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            '11111111' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 11111111: empty' as source_doc,\n            '6.1' as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'FRE 6.1 empty: no Acionista_Controlador=S found' as notes"
+    format: sql
+  - input: ref('int_freeze_soe')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_unlisted_rf')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_foreign_hq')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  expect:
+    rows: "select\n            3 as group_rank,\n            'No Controller Inc' as group_name,\n            '11111111' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 11111111: empty' as source_doc,\n            '6.1' as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'FRE 6.1 empty: no Acionista_Controlador=S found' as notes"
+    format: sql
+- name: test_freeze_unlisted_qsa_names_off_sa
+  description: 'SEAM TEST: QSA-only names stay OFF the freeze until public act names Art. 116.
 
+    S.A. QSA is officers, not shareholders. Emit hole row, person_name null.
 
-  # SEAM 7: cnpj_basico is 8-char STRING (leading zeros)
-  - name: test_freeze_cnpj_basico_leading_zeros
-    description: |
-      SEAM TEST: cnpj_basico must be 8-char STRING with leading zeros preserved.
-      JBS is '02916265', not '2916265' or 2916265.
-    model: int_freeze_listed_controllers
-    given:
-      - input: ref('stg_group_flags')
-        rows:
-          - rank_2024: 2
-            empresa: 'JBS'
-            razao_social: 'JBS S.A.'
-            cnpj_basico: '02916265'
-            cnpj_full: '02916265000160'
-            listed_flag: true
-            listed_source: 'CVM'
-            soe_flag: false
-            soe_source: null
-            controlador_tipo: 'listed'
-            freeze_status_hint: 'pending'
-            notes: 'Test'
-            source_doc: 'CVM'
-            cnpj_source: 'BD'
-            retrieved_at: '2026-08-24'
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        rows:
-          - CNPJ_Companhia: '02916265000160'
-            Data_Referencia: '2025-12-31'
-            Versao: 1
-            ID_Documento: 1
-            Nome_Companhia: 'JBS S.A.'
-            ID_Acionista: 100
-            Acionista: 'Test Controller'
-            Tipo_Pessoa_Acionista: 'PF'
-            CPF_CNPJ_Acionista: '***111111**'
-            ID_Acionista_Relacionado: null
-            Acionista_Relacionado: null
-            Tipo_Pessoa_Acionista_Relacionado: null
-            CPF_CNPJ_Acionista_Relacionado: null
-            Quantidade_Acao_Ordinaria_Circulacao: 1000
-            Percentual_Acao_Ordinaria_Circulacao: 51.0
-            Quantidade_Acao_Preferencial_Circulacao: 0
-            Percentual_Acao_Preferencial_Circulacao: 0.0
-            Quantidade_Total_Acoes_Circulacao: 1000
-            Percentual_Total_Acoes_Circulacao: 51.0
-            Nacionalidade: 'Brasileira'
-            Sigla_UF: 'SP'
-            Residente_Exterior: 'N'
-            Representante_Legal: null
-            Tipo_Pessoa_Representante_Legal: null
-            CPF_CNPJ_Representante_legal: null
-            Data_Composicao_Capital_Social: '2025-12-31'
-            Data_Ultima_Alteracao: '2025-12-31'
-            Acionista_Controlador: 'S'
-            Participante_Acordo_Acionistas: null
-    expect:
-      rows:
-        - cnpj_basico: '02916265'
-          group_name: 'JBS'
+    '
+  model: int_freeze_unlisted_rf
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            18 as rank_2024,\n            'Copersucar' as empresa,\n            'Copersucar S.A.' as razao_social,\n            '10265949' as cnpj_basico,\n            '10265949000177' as cnpj_full,\n            false as listed_flag,\n            cast(null as varchar) as listed_source,\n            false as soe_flag,\n            cast(null as varchar) as soe_source,\n            'unlisted' as controlador_tipo,\n            'pending' as freeze_status_hint,\n            'SA fechada' as notes,\n            'CVM cancelled' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  - input: ref('stg_rf_socios')
+    rows: "select\n            2026 as ano,\n            1 as mes,\n            cast('2026-01-11' as date) as data,\n            '10265949' as cnpj_basico,\n            'PF' as tipo,\n            'Maria Santos' as nome,\n            '***789012**' as documento,\n            '16' as qualificacao,\n            cast('2020-01-01' as date) as data_entrada_sociedade,\n            cast(null as varchar) as id_pais,\n            cast(null as varchar) as cpf_representante_legal,\n            cast(null as varchar) as nome_representante_legal,\n            cast(null as varchar) as qualificacao_representante_legal,\n            cast(null as varchar) as faixa_etaria"
+    format: sql
+  - input: ref('stg_rf_empresas')
+    rows: "select\n            2026 as ano,\n            1 as mes,\n            cast('2026-01-11' as date) as data,\n            '10265949' as cnpj_basico,\n            'COPERSUCAR S.A.' as razao_social,\n            '2054' as natureza_juridica,\n            '05' as qualificacao_responsavel,\n            1775195789.81 as capital_social,\n            '05' as porte,\n            cast(null as varchar) as ente_federativo"
+    format: sql
+  expect:
+    rows: "select\n            18 as group_rank,\n            'Copersucar' as group_name,\n            '10265949' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'unlisted' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'RF QSA 10265949 data 2026-01-11' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'S.A. QSA lists officers, not shareholders. No public act names Art. 116 controller.' as notes"
+    format: sql
+- name: test_freeze_unlisted_qsa_names_off_ltda
+  description: 'SEAM TEST: QSA-only names stay OFF the freeze for Ltda (natureza 2062) too.
+
+    Emit hole row, person_name null, until public act names Art. 116 controller.
+
+    '
+  model: freeze_persons
+  given:
+  - input: ref('int_freeze_listed_controllers')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_soe')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_unlisted_rf')
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'RF QSA 01961898 data 2026-01-11' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Ltda QSA lists partners. No public act names Art. 116 controller.' as notes"
+    format: sql
+  - input: ref('int_freeze_foreign_hq')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  expect:
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'RF QSA 01961898 data 2026-01-11' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Ltda QSA lists partners. No public act names Art. 116 controller.' as notes"
+    format: sql
+- name: test_freeze_foreign_unlisted_no_duplicate
+  description: 'PARTITION TEST: Foreign unlisted group (Cargill-style: listed_flag=false,
+
+    controlador_tipo=foreign) appears exactly once in freeze_persons.
+
+    Locked partition: unlisted+foreign → int_freeze_foreign_hq only.
+
+    '
+  model: freeze_persons
+  given:
+  - input: ref('int_freeze_listed_controllers')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_soe')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_unlisted_rf')
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
+    format: sql
+  - input: ref('int_freeze_foreign_hq')
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Valor capital_origem=US' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.' as notes"
+    format: sql
+  expect:
+    rows: "select\n            10 as group_rank,\n            'Cargill' as group_name,\n            '01961898' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            false as listed_flag,\n            false as soe_flag,\n            'foreign' as controlador_tipo,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'Valor capital_origem=US' as source_doc,\n            cast(null as varchar) as fre_item,\n            true as hole,\n            cast(null as varchar) as cpf_masked,\n            'hole' as freeze_status,\n            'Foreign HQ: parent PF only if publicly named (FRE 6.1.h / 20-F / 13D). Brazilian CEO is not default controller.' as notes"
+    format: sql
+- name: test_freeze_preserves_cpf_masking
+  description: 'SEAM TEST: cpf_masked field must contain masked CPF, never full CPF.
+
+    This is enforced by the staging models, but we verify here.
+
+    '
+  model: int_freeze_listed_controllers
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            2 as rank_2024,\n            'Test Listed' as empresa,\n            'Test Listed S.A.' as razao_social,\n            '02916265' as cnpj_basico,\n            '02916265000160' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            false as soe_flag,\n            cast(null as varchar) as soe_source,\n            'listed' as controlador_tipo,\n            'pending' as freeze_status_hint,\n            'Test' as notes,\n            'CVM' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+    rows: "select\n            '02916265000160' as CNPJ_Companhia,\n            cast('2025-12-31' as date) as Data_Referencia,\n            1 as Versao,\n            1 as ID_Documento,\n            'Test Listed S.A.' as Nome_Companhia,\n            100 as ID_Acionista,\n            'Test Holding' as Acionista,\n            'PJ' as Tipo_Pessoa_Acionista,\n            '12345678000100' as CPF_CNPJ_Acionista,\n            101 as ID_Acionista_Relacionado,\n            'João Silva' as Acionista_Relacionado,\n            'PF' as Tipo_Pessoa_Acionista_Relacionado,\n            '***123456**' as CPF_CNPJ_Acionista_Relacionado,\n            1000 as Quantidade_Acao_Ordinaria_Circulacao,\n            51.0 as Percentual_Acao_Ordinaria_Circulacao,\n            0 as Quantidade_Acao_Preferencial_Circulacao,\n            0.0 as Percentual_Acao_Preferencial_Circulacao,\n            1000 as Quantidade_Total_Acoes_Circulacao,\n            51.0 as Percentual_Total_Acoes_Circulacao,\n            'Brasileira' as\
+      \ Nacionalidade,\n            'SP' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'S' as Acionista_Controlador,\n            'S' as Participante_Acordo_Acionistas"
+    format: sql
+  expect:
+    rows: "select\n            2 as group_rank,\n            'Test Listed' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            'S' as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***123456**' as cpf_masked,\n            'in' as freeze_status,\n            'FRE 6.1 walk to PF' as notes"
+    format: sql
+- name: test_freeze_cnpj_basico_leading_zeros
+  description: 'SEAM TEST: cnpj_basico must be 8-char STRING with leading zeros preserved.
+
+    JBS is ''02916265'', not ''2916265'' or 2916265.
+
+    '
+  model: int_freeze_listed_controllers
+  given:
+  - input: ref('stg_group_flags')
+    rows: "select\n            2 as rank_2024,\n            'JBS' as empresa,\n            'JBS S.A.' as razao_social,\n            '02916265' as cnpj_basico,\n            '02916265000160' as cnpj_full,\n            true as listed_flag,\n            'CVM' as listed_source,\n            false as soe_flag,\n            cast(null as varchar) as soe_source,\n            'listed' as controlador_tipo,\n            'pending' as freeze_status_hint,\n            'Test' as notes,\n            'CVM' as source_doc,\n            'BD' as cnpj_source,\n            cast('2026-08-24' as date) as retrieved_at"
+    format: sql
+  - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+    rows: "select\n            '02916265000160' as CNPJ_Companhia,\n            cast('2025-12-31' as date) as Data_Referencia,\n            1 as Versao,\n            1 as ID_Documento,\n            'JBS S.A.' as Nome_Companhia,\n            100 as ID_Acionista,\n            'Test Controller' as Acionista,\n            'PF' as Tipo_Pessoa_Acionista,\n            '***111111**' as CPF_CNPJ_Acionista,\n            cast(null as varchar) as ID_Acionista_Relacionado,\n            cast(null as varchar) as Acionista_Relacionado,\n            cast(null as varchar) as Tipo_Pessoa_Acionista_Relacionado,\n            cast(null as varchar) as CPF_CNPJ_Acionista_Relacionado,\n            1000 as Quantidade_Acao_Ordinaria_Circulacao,\n            51.0 as Percentual_Acao_Ordinaria_Circulacao,\n            0 as Quantidade_Acao_Preferencial_Circulacao,\n            0.0 as Percentual_Acao_Preferencial_Circulacao,\n            1000 as Quantidade_Total_Acoes_Circulacao,\n            51.0 as Percentual_Total_Acoes_Circulacao,\n\
+      \            'Brasileira' as Nacionalidade,\n            'SP' as Sigla_UF,\n            'N' as Residente_Exterior,\n            cast(null as varchar) as Representante_Legal,\n            cast(null as varchar) as Tipo_Pessoa_Representante_Legal,\n            cast(null as varchar) as CPF_CNPJ_Representante_legal,\n            cast('2025-12-31' as date) as Data_Composicao_Capital_Social,\n            cast('2025-12-31' as date) as Data_Ultima_Alteracao,\n            'S' as Acionista_Controlador,\n            cast(null as varchar) as Participante_Acordo_Acionistas"
+    format: sql
+  expect:
+    rows: "select\n            2 as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'Test Controller' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2025-12-31' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***111111**' as cpf_masked,\n            'in' as freeze_status,\n            'FRE 6.1 direct PF' as notes"
+    format: sql

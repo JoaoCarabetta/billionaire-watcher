@@ -1,1048 +1,505 @@
 version: 2
-
 unit_tests:
-  # TDD Seam 1: fact_id unique
-  - name: test_published_facts_fact_id_unique
-    description: |
-      Seam 1: fact_id must be unique in published_facts.
-      Fixture includes duplicate fact_ids to ensure test catches violations.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: fact_001
-            person_name: João Silva
-            fact_kind: identity
-            value: João Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-          - fact_id: fact_002
-            person_name: Maria Santos
-            fact_kind: identity
-            value: Maria Santos
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '33000167'
-            group_name: Petrobras
-      - input: ref('control_edge_facts')
-        rows:
-          - fact_id: fact_003
-            person_name: João Silva
-            fact_kind: control_edge
-            value: João Silva é sócio de JBS
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-    expect:
-      rows:
-        - fact_id: fact_001
-          person_id: João Silva
-        - fact_id: fact_002
-          person_id: Maria Santos
-        - fact_id: fact_003
-          person_id: João Silva
+- name: test_published_facts_fact_id_unique
+  description: 'Seam 1: fact_id must be unique in published_facts.
 
-  # TDD Seam 2: source_locator not_null
-  - name: test_published_facts_source_not_null
-    description: |
-      Seam 2: source_locator must never be null.
-      Fixture includes null source to ensure test catches violations.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: fact_valid
-            person_name: João Silva
-            fact_kind: identity
-            value: João Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-      - input: ref('control_edge_facts')
-        rows: []
-    expect:
-      rows:
-        - fact_id: fact_valid
-          person_id: João Silva
-          source_locator: CVM FRE 2026
+    Fixture includes duplicate fact_ids to ensure test catches violations.
 
-  # TDD Seam 3: relationship to freeze_status=in
-  - name: test_identity_facts_only_freeze_status_in
-    description: |
-      Seam 3: Every published fact's person must be in freeze with freeze_status=in.
-      Fixture includes review/hole/skip_soe to ensure they produce zero facts.
-    model: identity_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '02916265'
-            group_name: JBS
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: null
-          - person_name: Pedro Costa
-            freeze_status: review
-            cnpj_basico: '33000167'
-            group_name: Petrobras
-            role: candidato_forbes
-            source_doc: Forbes 2026
-            cpf_masked: null
-          - person_name: null
-            freeze_status: hole
-            cnpj_basico: '01832635'
-            group_name: Vale
-            role: null
-            source_doc: CVM FRE 2026 empty
-            cpf_masked: null
-          - person_name: null
-            freeze_status: skip_soe
-            cnpj_basico: '33592510'
-            group_name: Banco do Brasil
-            role: null
-            source_doc: null
-            cpf_masked: null
-    expect:
-      rows:
-        - person_name: João Silva
-          fact_kind: identity
-          value: João Silva
-        - person_name: João Silva
-          fact_kind: identity
-          value: controlador
-        - person_name: João Silva
-          fact_kind: identity
-          value: JBS
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'Maria Santos' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '33000167' as cnpj_basico,\n            'Petrobras' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            'fact_003' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'socio' as edge_label"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
+    format: sql
+  expect:
+    rows: "select\n            'fact_001' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_002' as fact_id,\n            'Maria Santos' as person_id,\n            'identity' as fact_kind,\n            'Maria Santos' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '33000167' as cnpj_basico,\n            'Petrobras' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_003' as fact_id,\n            'João Silva' as person_id,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
+    format: sql
+- name: test_published_facts_source_not_null
+  description: 'Seam 2: source_locator must never be null.
 
-  # TDD Seam 4: review/hole/skip_soe/candidato_forbes produce zero published facts
-  - name: test_published_facts_excludes_non_in_status
-    description: |
-      Seam 4: review / hole / skip_soe / candidato_forbes produce zero published facts.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: fact_in_status
-            person_name: João Silva
-            fact_kind: identity
-            value: João Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-      - input: ref('control_edge_facts')
-        rows: []
-    expect:
-      rows:
-        - fact_id: fact_in_status
-          person_id: João Silva
+    Fixture includes null source to ensure test catches violations.
 
-  # TDD Seam 5: no edge_label dono or UBO
-  - name: test_control_edge_facts_no_dono_or_ubo
-    description: |
-      Seam 5: No edge_label dono or UBO in control edge facts.
-      Fixture validates allowed edge labels only.
-    model: control_edge_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '02916265'
-            group_name: JBS
-            role: controlador
-            edge_label: acionista_controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: null
-          - person_name: Maria Santos
-            freeze_status: in
-            cnpj_basico: '33000167'
-            group_name: Petrobras
-            role: socio_chave
-            edge_label: socio
-            source_doc: RF QSA
-            cpf_masked: null
-    expect:
-      rows:
-        - person_name: João Silva
-          fact_kind: control_edge
-          edge_label: acionista_controlador
-        - person_name: Maria Santos
-          fact_kind: control_edge
-          edge_label: socio
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
+    format: sql
+  expect:
+    rows: "select\n            'fact_valid' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
+    format: sql
+- name: test_identity_facts_only_freeze_status_in
+  description: 'Seam 3: Every published fact''s person must be in freeze with freeze_status=in.
 
-  # TDD Seam 6: no full CPF in fact columns/values
-  - name: test_published_facts_no_full_cpf
-    description: |
-      Seam 6: No full CPF (11 digits) in fact columns or values.
-      Fixture validates cpf_masked only.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: fact_masked_cpf
-            person_name: João Silva
-            fact_kind: identity
-            value: João Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: 2026-08-24
-            cpf_masked: '***456***'
-            cnpj_basico: '02916265'
-            group_name: JBS
-      - input: ref('control_edge_facts')
-        rows: []
-    expect:
-      rows:
-        - fact_id: fact_masked_cpf
-          person_id: João Silva
-          cpf_masked: '***456***'
+    Fixture includes review/hole/skip_soe to ensure they produce zero facts.
 
-  # TDD Seam 7: no "o bilionário" / "o bilionário X" in fact values
-  - name: test_published_facts_no_bilionario_phrase
-    description: |
-      Seam 7: No "o bilionário" or "o bilionário X" in fact values.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: fact_clean_value
-            person_name: João Silva
-            fact_kind: identity
-            value: João Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-      - input: ref('control_edge_facts')
-        rows:
-          - fact_id: fact_control_clean
-            person_name: João Silva
-            fact_kind: control_edge
-            value: João Silva é sócio de JBS
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: 2026-08-24
-            cpf_masked: null
-            cnpj_basico: '02916265'
-            group_name: JBS
-    expect:
-      rows:
-        - fact_id: fact_clean_value
-          value: João Silva
-        - fact_id: fact_control_clean
-          value: João Silva é sócio de JBS
+    '
+  model: identity_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Petrobras', '33000167', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Pedro Costa', 'candidato_forbes', cast(null as varchar), cast(null as varchar), 'Forbes 2026', cast(null as varchar), cast(null as boolean), cast(null as varchar), 'review', cast(null as varchar)\n          union all\n          select\n            cast(null as integer), 'Vale', '01832635', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), 'CVM FRE 2026 empty', cast(null as varchar), cast(null as boolean), cast(null as varchar), 'hole', cast(null as varchar)\n          union all\n          select\n            cast(null as integer), 'Banco do Brasil', '33592510', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as varchar), 'skip_soe', cast(null as varchar)"
+    format: sql
+  expect:
+    rows: "select\n            'identity_02916265_João Silva_name' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM - Comissão de Valores Mobiliários' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'identity_02916265_João Silva_role', 'João Silva', 'identity', 'role', 'controlador', 'CVM - Comissão de Valores Mobiliários', 'CVM FRE 2026', cast(null as varchar), cast(null as varchar), '02916265', 'JBS'\n          union all\n          select\n            'identity_02916265_João Silva_group', 'João Silva', 'identity', 'group_name', 'JBS', 'CVM - Comissão de Valores Mobiliários', 'CVM FRE 2026', cast(null as varchar), cast(null as varchar), '02916265', 'JBS'"
+    format: sql
+- name: test_published_facts_excludes_non_in_status
+  description: 'Seam 4: review / hole / skip_soe / candidato_forbes produce zero published facts.
 
-  # PM Review 1: Identity facts must be raw fields only (no "Controla {group}")
-  - name: test_identity_facts_no_controla_sentence
-    description: |
-      PM Review: Identity facts must output raw fields only.
-      No sentence "Controla {group}". value is person_name, role, or group_name as stored.
-    model: identity_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '02916265'
-            group_name: JBS
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: null
-    expect:
-      rows:
-        - person_name: João Silva
-          field: name
-          value: João Silva
-        - person_name: João Silva
-          field: role
-          value: controlador
-        - person_name: João Silva
-          field: group_name
-          value: JBS
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
+    format: sql
+  expect:
+    rows: "select\n            'fact_in_status' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
+    format: sql
+- name: test_control_edge_facts_no_dono_or_ubo
+  description: 'Seam 5: No edge_label dono or UBO in control edge facts.
 
-  # PM Review 2: Control facts must follow freeze edge_label (acionista_controlador NOT "é sócio de")
-  - name: test_control_edge_facts_follow_freeze_edge_label
-    description: |
-      PM Review: Control facts must follow freeze edge_label.
-      If edge_label is acionista_controlador, do NOT write "é sócio de".
-      Use freeze source_doc, not invented RF URL.
-    model: control_edge_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '02916265'
-            group_name: JBS
-            role: controlador
-            edge_label: acionista_controlador
-            source_doc: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
-            cpf_masked: null
-          - person_name: Maria Santos
-            freeze_status: in
-            cnpj_basico: '33000167'
-            group_name: Petrobras
-            role: socio_chave
-            edge_label: socio
-            source_doc: RF QSA CNPJ 33000167
-            cpf_masked: null
-    expect:
-      rows:
-        - person_name: João Silva
-          edge_label: acionista_controlador
-          value: João Silva é acionista controlador de JBS (CNPJ 02916265)
-          source_locator: CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24
-        - person_name: Maria Santos
-          edge_label: socio
-          value: Maria Santos é sócio de Petrobras (CNPJ 33000167)
-          source_locator: RF QSA CNPJ 33000167
+    Fixture validates allowed edge labels only.
 
-  # PM Review 3: No fake locator, drop facts with null source_doc
-  - name: test_facts_drop_null_source_doc
-    description: |
-      PM Review: No fake locator ("Freeze source document").
-      Drop the fact if source_doc is null. No current_timestamp() as retrieved_at.
-    model: identity_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '02916265'
-            group_name: JBS
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: null
-          - person_name: Pedro Costa
-            freeze_status: in
-            cnpj_basico: '33000167'
-            group_name: Petrobras
-            role: controlador
-            source_doc: null
-            cpf_masked: null
-    expect:
-      rows:
-        - person_name: João Silva
-          source_locator: CVM FRE 2026
-          source_retrieved_at: null
+    '
+  model: control_edge_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Petrobras', '33000167', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Maria Santos', 'socio_chave', 'socio', cast(null as varchar), 'RF QSA', cast(null as varchar), cast(null as boolean), cast(null as varchar), 'in', cast(null as varchar)"
+    format: sql
+  expect:
+    rows: "select\n            'control_edge_02916265_João Silva_acionista_controlador' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é acionista controlador de JBS (CNPJ 02916265)' as value,\n            'CVM - Comissão de Valores Mobiliários' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'acionista_controlador' as edge_label\n          union all\n          select\n            'control_edge_33000167_Maria Santos_socio', 'Maria Santos', 'control_edge', 'Maria Santos é sócio de Petrobras (CNPJ 33000167)', 'Receita Federal do Brasil', 'RF QSA', cast(null as varchar), cast(null as varchar), '33000167', 'Petrobras', 'socio'"
+    format: sql
+- name: test_published_facts_no_full_cpf
+  description: 'Seam 6: No full CPF (11 digits) in fact columns or values.
 
-  # Donation TDD Seam 1: unique fact_id
-  - name: test_donation_facts_fact_id_unique
-    description: |
-      Donation Seam 1: fact_id must be unique in donation_facts.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Carlos Eduardo Santos
-            freeze_status: in
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***789***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Ana Maria Silva
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026001'
-            cpf_doador_masked: '***456***'
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***789***'
-            nome_doador: Carlos Eduardo Santos
-            valor_receita: 75000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026002'
-            cpf_doador_masked: '***789***'
-    expect:
-      rows:
-        - fact_id: donation_2026001_Ana Maria Silva
-          person_name: Ana Maria Silva
-          fact_kind: donation
-        - fact_id: donation_2026002_Carlos Eduardo Santos
-          person_name: Carlos Eduardo Santos
-          fact_kind: donation
+    Fixture validates cpf_masked only.
 
-  # Donation TDD Seam 2: source_locator not_null
-  - name: test_donation_facts_source_not_null
-    description: |
-      Donation Seam 2: source_locator must never be null.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Ana Maria Silva
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026001'
-            cpf_doador_masked: '***456***'
-    expect:
-      rows:
-        - fact_id: donation_2026001_Ana Maria Silva
-          source_locator: TSE Receitas Candidato 2026 recibo 2026001
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            cast(null as varchar) as edge_label\n          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name\n          where false"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            cast(null as varchar) as fact_id,\n            cast(null as varchar) as person_name,\n            cast(null as varchar) as fact_kind,\n            cast(null as varchar) as value,\n            cast(null as varchar) as source_publisher,\n            cast(null as varchar) as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          where false"
+    format: sql
+  expect:
+    rows: "select\n            'fact_masked_cpf' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
+    format: sql
+- name: test_published_facts_no_bilionario_phrase
+  description: 'Seam 7: No "o bilionário" or "o bilionário X" in fact values.
 
-  # Donation TDD Seam 3: only freeze_status=in publishes donations
-  - name: test_donation_facts_only_freeze_status_in
-    description: |
-      Donation Seam 3: Only freeze_status=in persons publish donation facts.
-      review/hole/skip_soe/candidato_forbes do NOT publish.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Pedro Costa
-            freeze_status: review
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: candidato_forbes
-            source_doc: Forbes 2026
-            cpf_masked: '***123***'
-          - person_name: Maria Santos
-            freeze_status: hole
-            cnpj_basico: '33333333'
-            group_name: Test Group C
-            role: null
-            source_doc: CVM FRE 2026
-            cpf_masked: '***999***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Ana Maria Silva
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026001'
-            cpf_doador_masked: '***456***'
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***123***'
-            nome_doador: Pedro Costa
-            valor_receita: 25000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026002'
-            cpf_doador_masked: '***123***'
-    expect:
-      rows:
-        - person_name: Ana Maria Silva
-          fact_kind: donation
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            'fact_control_clean' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'socio' as edge_label"
+    format: sql
+  - input: ref('donation_facts')
+    format: sql
+    fixture: empty_donation_facts
+  - input: ref('association_facts')
+    format: sql
+    fixture: empty_association_facts
+  expect:
+    rows: "select\n            'fact_clean_value' as fact_id,\n            'João Silva' as person_id,\n            'identity' as fact_kind,\n            'João Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'fact_control_clean' as fact_id,\n            'João Silva' as person_id,\n            'control_edge' as fact_kind,\n            'João Silva é sócio de JBS' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids"
+    format: sql
+- name: test_identity_facts_no_controla_sentence
+  description: 'PM Review: Identity facts must output raw fields only.
 
-  # Donation TDD Seam 4: no full CPF
-  - name: test_donation_facts_no_full_cpf
-    description: |
-      Donation Seam 4: No full CPF (11 digits) in donation facts.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Ana Maria Silva
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026001'
-            cpf_doador_masked: '***456***'
-    expect:
-      rows:
-        - person_name: Ana Maria Silva
-          cpf_masked: '***456***'
+    No sentence "Controla {group}". value is person_name, role, or group_name as stored.
 
-  # Association TDD Seam 1: association without supporting fact_ids does NOT emit
-  - name: test_association_facts_no_emit_without_supporting_facts
-    description: |
-      Association Seam 1: Association without supporting fact_ids does NOT emit.
-    model: association_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Carlos Eduardo Santos
-            freeze_status: in
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***789***'
-      - input: ref('control_edge_facts')
-        rows: []
-      - input: ref('donation_facts')
-        rows: []
-      - input: ref('tse_donations_2026')
-        rows: []
-    expect:
-      rows: []
+    '
+  model: identity_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
+    format: sql
+  expect:
+    rows: "select\n            'identity_02916265_João Silva_name' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM - Comissão de Valores Mobiliários' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'identity_02916265_João Silva_role', 'João Silva', 'identity', 'role', 'controlador', 'CVM - Comissão de Valores Mobiliários', 'CVM FRE 2026', cast(null as varchar), cast(null as varchar), '02916265', 'JBS'\n          union all\n          select\n            'identity_02916265_João Silva_group', 'João Silva', 'identity', 'group_name', 'JBS', 'CVM - Comissão de Valores Mobiliários', 'CVM FRE 2026', cast(null as varchar), cast(null as varchar), '02916265', 'JBS'"
+    format: sql
+- name: test_control_edge_facts_follow_freeze_edge_label
+  description: 'PM Review: Control facts must follow freeze edge_label.
 
-  # Association TDD Seam 2: shared control creates association with supporting fact_ids
-  - name: test_association_facts_shared_control
-    description: |
-      Association Seam 2: Shared control creates association with supporting fact_ids.
-    model: association_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Carlos Eduardo Santos
-            freeze_status: in
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***789***'
-      - input: ref('control_edge_facts')
-        rows:
-          - fact_id: control_edge_11111111_Ana Maria Silva_socio
-            person_name: Ana Maria Silva
-            fact_kind: control_edge
-            value: Ana Maria Silva é sócio de Test Group Shared
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '99999999'
-            group_name: Test Group Shared
-          - fact_id: control_edge_99999999_Carlos Eduardo Santos_socio
-            person_name: Carlos Eduardo Santos
-            fact_kind: control_edge
-            value: Carlos Eduardo Santos é sócio de Test Group Shared
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: null
-            cpf_masked: '***789***'
-            cnpj_basico: '99999999'
-            group_name: Test Group Shared
-      - input: ref('donation_facts')
-        rows: []
-      - input: ref('tse_donations_2026')
-        rows: []
-    expect:
-      rows:
-        - person_name: Ana Maria Silva
-          fact_kind: association
-          value: Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999
+    If edge_label is acionista_controlador, do NOT write "é sócio de".
 
-  # Association TDD Seam 3: co-donation creates association with supporting fact_ids
-  - name: test_association_facts_co_donation
-    description: |
-      Association Seam 3: Co-donation creates association with supporting fact_ids.
-    model: association_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Carlos Eduardo Santos
-            freeze_status: in
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***789***'
-      - input: ref('control_edge_facts')
-        rows: []
-      - input: ref('donation_facts')
-        rows:
-          - fact_id: donation_2026001_Ana Maria Silva
-            person_name: Ana Maria Silva
-            fact_kind: donation
-            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
-            source_publisher: Tribunal Superior Eleitoral
-            source_locator: TSE Receitas Candidato 2026 recibo 2026001
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-          - fact_id: donation_2026002_Carlos Eduardo Santos
-            person_name: Carlos Eduardo Santos
-            fact_kind: donation
-            value: Carlos Eduardo Santos doou R$ 75000.0 para Deputado Federal Candidato A em 2026 (recibo 2026002)
-            source_publisher: Tribunal Superior Eleitoral
-            source_locator: TSE Receitas Candidato 2026 recibo 2026002
-            source_retrieved_at: null
-            cpf_masked: '***789***'
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Ana Maria Silva
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026001'
-            cpf_doador_masked: '***456***'
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Deputado Federal Candidato A
-            cpf_cnpj_doador: '***789***'
-            nome_doador: Carlos Eduardo Santos
-            valor_receita: 75000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026002'
-            cpf_doador_masked: '***789***'
-    expect:
-      rows:
-        - person_name: Ana Maria Silva
-          fact_kind: association
-          value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
+    Use freeze source_doc, not invented RF URL.
 
-  # PM Review 1: No candidate CPF in value or fact_id
-  - name: test_no_candidate_cpf_in_value_or_fact_id
-    description: |
-      PM Review: No candidate CPF in value or fact_id.
-      Live TSE has full CPF. Public fields use candidate name only.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows: []
-      - input: ref('control_edge_facts')
-        rows: []
-      - input: ref('donation_facts')
-        rows:
-          - fact_id: donation_2026001_Ana Maria Silva
-            person_name: Ana Maria Silva
-            fact_kind: donation
-            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
-            source_publisher: Tribunal Superior Eleitoral
-            source_locator: TSE Receitas Candidato 2026 recibo 2026001
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-      - input: ref('association_facts')
-        rows:
-          - fact_id: association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva
-            person_name: Ana Maria Silva
-            fact_kind: association
-            value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
-            source_publisher: Billionaire Watcher (derived)
-            source_locator: Derived from donation facts
-            source_retrieved_at: null
-            cpf_masked: null
-            cnpj_basico: null
-            group_name: null
-            supporting_fact_ids: ['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos']
-    expect:
-      rows:
-        - fact_id: donation_2026001_Ana Maria Silva
-          value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)
-        - fact_id: association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva
-          value: Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026
+    '
+  model: control_edge_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Petrobras', '33000167', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Maria Santos', 'socio_chave', 'socio', cast(null as varchar), 'RF QSA CNPJ 33000167', cast(null as varchar), cast(null as boolean), cast(null as varchar), 'in', cast(null as varchar)"
+    format: sql
+  expect:
+    rows: "select\n            'control_edge_02916265_João Silva_acionista_controlador' as fact_id,\n            'João Silva' as person_name,\n            'control_edge' as fact_kind,\n            'João Silva é acionista controlador de JBS (CNPJ 02916265)' as value,\n            'CVM - Comissão de Valores Mobiliários' as source_publisher,\n            'CVM FRE 2026 item 6.1 CNPJ 02916265000160 ref 2026-08-24' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name,\n            'acionista_controlador' as edge_label\n          union all\n          select\n            'control_edge_33000167_Maria Santos_socio', 'Maria Santos', 'control_edge', 'Maria Santos é sócio de Petrobras (CNPJ 33000167)', 'Receita Federal do Brasil', 'RF QSA CNPJ 33000167', cast(null as varchar), cast(null as varchar), '33000167', 'Petrobras', 'socio'"
+    format: sql
+- name: test_facts_drop_null_source_doc
+  description: 'PM Review: No fake locator ("Freeze source document").
 
-  # PM Review 2: Published association rows have supporting_fact_ids
-  - name: test_published_association_has_supporting_fact_ids
-    description: |
-      PM Review: supporting_fact_ids must be a column on published_facts.
-      Null on identity/control/donation. Populated on associations.
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows:
-          - fact_id: identity_001
-            person_name: Ana Maria Silva
-            fact_kind: identity
-            value: Ana Maria Silva
-            source_publisher: CVM
-            source_locator: CVM FRE 2026
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-      - input: ref('control_edge_facts')
-        rows: []
-      - input: ref('donation_facts')
-        rows:
-          - fact_id: donation_2026001_Ana Maria Silva
-            person_name: Ana Maria Silva
-            fact_kind: donation
-            value: Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026
-            source_publisher: TSE
-            source_locator: TSE Receitas Candidato 2026 recibo 2026001
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-      - input: ref('association_facts')
-        rows:
-          - fact_id: association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva
-            person_name: Ana Maria Silva
-            fact_kind: association
-            value: Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999
-            source_publisher: Billionaire Watcher (derived)
-            source_locator: Derived from control facts
-            source_retrieved_at: null
-            cpf_masked: null
-            cnpj_basico: null
-            group_name: null
-            supporting_fact_ids: ['control_edge_001', 'control_edge_002']
-    expect:
-      rows:
-        - fact_id: identity_001
-          supporting_fact_ids: null
-        - fact_id: donation_2026001_Ana Maria Silva
-          supporting_fact_ids: null
-        - fact_id: association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva
-          supporting_fact_ids: ['control_edge_001', 'control_edge_002']
+    Drop the fact if source_doc is null. No current_timestamp() as retrieved_at.
 
-  # PM Review 3: Association publishes on both freeze persons
-  - name: test_association_publishes_on_both_persons
-    description: |
-      PM Review: Association publishes on both freeze persons.
-      Two rows per association (one for each person_name), same supporting_fact_ids.
-    model: association_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Ana Maria Silva
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group A
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***456***'
-          - person_name: Carlos Eduardo Santos
-            freeze_status: in
-            cnpj_basico: '22222222'
-            group_name: Test Group B
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '***789***'
-      - input: ref('control_edge_facts')
-        rows:
-          - fact_id: control_edge_11111111_Ana Maria Silva_socio
-            person_name: Ana Maria Silva
-            fact_kind: control_edge
-            value: Ana Maria Silva é sócio de Test Group Shared
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: null
-            cpf_masked: '***456***'
-            cnpj_basico: '99999999'
-            group_name: Test Group Shared
-          - fact_id: control_edge_99999999_Carlos Eduardo Santos_socio
-            person_name: Carlos Eduardo Santos
-            fact_kind: control_edge
-            value: Carlos Eduardo Santos é sócio de Test Group Shared
-            source_publisher: RF
-            source_locator: RF QSA
-            source_retrieved_at: null
-            cpf_masked: '***789***'
-            cnpj_basico: '99999999'
-            group_name: Test Group Shared
-      - input: ref('donation_facts')
-        rows: []
-      - input: ref('tse_donations_2026')
-        rows: []
-    expect:
-      rows:
-        - person_name: Ana Maria Silva
-          fact_kind: association
-          supporting_fact_ids: ['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']
-        - person_name: Carlos Eduardo Santos
-          fact_kind: association
-          supporting_fact_ids: ['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']
+    '
+  model: identity_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'JBS' as group_name,\n            '02916265' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'João Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            cast(null as varchar) as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Petrobras', '33000167', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Pedro Costa', 'controlador', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as varchar), 'in', cast(null as varchar)"
+    format: sql
+  expect:
+    rows: "select\n            'identity_02916265_João Silva_name' as fact_id,\n            'João Silva' as person_name,\n            'identity' as fact_kind,\n            'name' as field,\n            'João Silva' as value,\n            'CVM - Comissão de Valores Mobiliários' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            '02916265' as cnpj_basico,\n            'JBS' as group_name\n          union all\n          select\n            'identity_02916265_João Silva_role',\n            'João Silva',\n            'identity',\n            'role',\n            'controlador',\n            'CVM - Comissão de Valores Mobiliários',\n            'CVM FRE 2026',\n            cast(null as varchar),\n            cast(null as varchar),\n            '02916265',\n            'JBS'\n          union all\n          select\n            'identity_02916265_João Silva_group',\n            'João Silva',\n            'identity',\n            'group_name',\n            'JBS',\n            'CVM - Comissão de Valores Mobiliários',\n            'CVM FRE 2026',\n            cast(null as varchar),\n            cast(null as varchar),\n            '02916265',\n            'JBS'"
+    format: sql
+- name: test_donation_facts_fact_id_unique
+  description: 'Donation Seam 1: fact_id must be unique in donation_facts.
 
-  # Issue #51: Test that donation_facts joins to candidatos, not broken receitas columns
-  - name: test_donation_facts_joins_candidatos_for_name
-    description: |
-      Issue #51 Fix: donation_facts must join receitas_candidato → candidatos
-      for candidate names. nome_candidato and tipo_receita do NOT exist on
-      receitas_candidato. This test uses only the tse_2026 seed path (no BD call)
-      to verify the schema is correct for when BD is queried.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Test Person
-            freeze_status: in
-            cnpj_basico: '12345678'
-            group_name: Test Group
-            role: controlador
-            source_doc: Test Doc
-            cpf_masked: '***456***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***234***'
-            nome_candidato: Marina Costa
-            cpf_cnpj_doador: '***456***'
-            nome_doador: Test Person
-            valor_receita: 50000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026999'
-            cpf_doador_masked: '***456***'
-    expect:
-      rows:
-        - person_name: Test Person
-          fact_kind: donation
-          # value must contain candidate PUBLIC NAME from seed, never CPF
-      format: dict
-      
-  - name: test_donation_facts_value_has_candidate_name_not_cpf
-    description: |
-      Issue #51 Fix: Verify that donation fact value contains candidate
-      PUBLIC NAME (Marina Costa), never candidate CPF (***234***).
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Test Donor
-            freeze_status: in
-            cnpj_basico: '11111111'
-            group_name: Test Group
-            role: controlador
-            source_doc: Test Doc
-            cpf_masked: '***999***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***888***'
-            nome_candidato: Candidate Public Name
-            cpf_cnpj_doador: '***999***'
-            nome_doador: Test Donor
-            valor_receita: 75000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026888'
-            cpf_doador_masked: '***999***'
-    expect:
-      rows:
-        # Value must contain "Candidate Public Name", not "***888***"
-        - fact_id: donation_2026888_Test Donor
-          value: Test Donor doou R$ 75000.0 para Candidate Public Name em 2026 (recibo 2026888)
-          fact_kind: donation
-      format: dict
-      
-  # Issue #51: Verify closed-cycle SQL uses correct live BD filters
-  # NOTE: This test uses tse_2026 seed path (target.name='test' returns empty tse_closed_cycles)
-  # Production closed-cycle SQL MUST:
-  # 1. Filter origem_receita = 'recursos de pessoas fisicas' (NOT fonte_receita = 'Pessoa física')
-  # 2. NOT filter numero_recibo_eleitoral is not null (would drop 2018/2022)
-  # 3. Use coalesce(numero_recibo_eleitoral, numero_recibo_doacao, numero_documento_doacao, sequencial_receita)
-  # 4. LEFT JOIN candidatos (emit named hole if nome missing, not silent drop)
-  - name: test_donation_facts_closed_cycle_filters_documented
-    description: |
-      Issue #51: Document that closed-cycle SQL does NOT filter:
-      - fonte_receita = 'Pessoa física' (wrong column, use origem_receita)
-      - numero_recibo_eleitoral is not null (would drop 2018/2022)
-      This test uses fixture path only. Verify production SQL manually against BD.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Test Person
-            freeze_status: in
-            cnpj_basico: '99999999'
-            group_name: Test Group
-            role: controlador
-            source_doc: Test Doc
-            cpf_masked: '***111***'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***222***'
-            nome_candidato: Test Candidate
-            cpf_cnpj_doador: '***111***'
-            nome_doador: Test Person
-            valor_receita: 10000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026TEST'
-            cpf_doador_masked: '***111***'
-    expect:
-      rows:
-        - person_name: Test Person
-          fact_kind: donation
-      format: dict
+    '
+  model: donation_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            'Ana Maria Silva' as person_name,\n            'in' as freeze_status,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***456***' as cpf_masked\n          union all\n          select\n            'Carlos Eduardo Santos' as person_name,\n            'in' as freeze_status,\n            '22222222' as cnpj_basico,\n            'Test Group B' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***789***' as cpf_masked"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***456***' as cpf_cnpj_doador,\n            'Ana Maria Silva' as nome_doador,\n            50000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026001' as numero_recibo_eleitoral,\n            '***456***' as cpf_doador_masked\n          union all\n          select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***789***' as cpf_cnpj_doador,\n            'Carlos Eduardo Santos' as nome_doador,\n            75000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026002' as numero_recibo_eleitoral,\n            '***789***' as cpf_doador_masked"
+    format: sql
+  expect:
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name\n          union all\n          select\n            'donation_2026002_Carlos Eduardo Santos', 'Carlos Eduardo Santos', 'donation', 'Carlos Eduardo Santos doou R$ 75000.0 para Deputado Federal Candidato A em 2026 (recibo 2026002)', 'Tribunal Superior Eleitoral', 'TSE Receitas Candidato 2026 recibo 2026002', cast(null as varchar), '***789***', '22222222', 'Test Group B'"
+    format: sql
+- name: test_donation_facts_source_not_null
+  description: 'Donation Seam 2: source_locator must never be null.
 
-  # Issue #57: CPF format mismatch fix - punctuated CPF joins 11-digit
-  - name: test_donation_facts_punctuated_cpf_joins_11_digits
-    description: |
-      Issue #57: Punctuated freeze CPF (123.456.789-01) joins TSE 11-digit CPF (12345678901).
-      Both sides normalize to 11 digits via regexp_replace + lpad.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: João Silva
-            freeze_status: in
-            cnpj_basico: '12345678'
-            group_name: Test Company
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '123.456.789-01'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***999***'
-            nome_candidato: Test Candidate
-            cpf_cnpj_doador: '12345678901'
-            nome_doador: JOAO SILVA
-            valor_receita: 1000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026TEST001'
-            cpf_doador_masked: '12345678901'
-    expect:
-      rows:
-        - person_name: João Silva
-          fact_kind: donation
-          cpf_masked: '123.456.789-01'
-      format: dict
+    '
+  model: donation_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***456***' as cpf_cnpj_doador,\n            'Ana Maria Silva' as nome_doador,\n            50000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026001' as numero_recibo_eleitoral,\n            '***456***' as cpf_doador_masked"
+    format: sql
+  expect:
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+- name: test_donation_facts_only_freeze_status_in
+  description: 'Donation Seam 3: Only freeze_status=in persons publish donation facts.
 
-  # Issue #57: Last-5-only overlap must NOT match
-  - name: test_donation_facts_last_5_only_must_not_match
-    description: |
-      Issue #57: Last-5-only overlap must NOT match.
-      Freeze CPF 999.888.777-01 vs TSE CPF 12345677701 must not join.
-      Only full 11-digit match is valid.
-    model: donation_facts
-    given:
-      - input: ref('freeze_persons_with_forbes')
-        rows:
-          - person_name: Maria Santos
-            freeze_status: in
-            cnpj_basico: '87654321'
-            group_name: Another Company
-            role: controlador
-            source_doc: CVM FRE 2026
-            cpf_masked: '999.888.777-01'
-      - input: ref('tse_donations_2026')
-        rows:
-          - ano: 2026
-            cpf_candidato: '***999***'
-            nome_candidato: Test Candidate
-            cpf_cnpj_doador: '12345677701'
-            nome_doador: OUTRA PESSOA
-            valor_receita: 2000.00
-            tipo_receita: Doação
-            fonte_receita: Pessoa física
-            numero_recibo_eleitoral: '2026TEST002'
-            cpf_doador_masked: '12345677701'
-    expect:
-      rows: []
+    review/hole/skip_soe/candidato_forbes do NOT publish.
 
-  # Issue #57: Published CPF never contains 11 consecutive digits
-  - name: test_published_facts_cpf_masked_no_11_consecutive_digits
-    description: |
-      Issue #57: Published_facts row never contains 11 consecutive digits in cpf_masked.
-      CPF is masked as ***NNN*** (stars + last-3 + stars).
-    model: published_facts
-    given:
-      - input: ref('identity_facts')
-        rows: []
-      - input: ref('control_edge_facts')
-        rows: []
-      - input: ref('donation_facts')
-        rows:
-          - fact_id: donation_TEST_João Silva
-            person_name: João Silva
-            fact_kind: donation
-            value: João Silva doou R$ 1000.0 para Test Candidate em 2026 (recibo TEST)
-            source_publisher: Tribunal Superior Eleitoral
-            source_locator: TSE Receitas Candidato 2026 recibo TEST
-            source_retrieved_at: null
-            cpf_masked: '123.456.789-01'
-            cnpj_basico: '12345678'
-            group_name: Test Company
-      - input: ref('association_facts')
-        rows: []
-    expect:
-      rows:
-        - fact_id: donation_TEST_João Silva
-          person_name: João Silva
-          cpf_masked: '***901***'
-          fact_kind: donation
-      format: dict
+    '
+  model: donation_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Test Group B', '22222222', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Pedro Costa', 'candidato_forbes', cast(null as varchar), cast(null as varchar), 'Forbes 2026', cast(null as varchar), cast(null as boolean), '***123***', 'review', cast(null as varchar)\n          union all\n          select\n            cast(null as integer), 'Test Group C', '33333333', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Maria Santos', cast(null as varchar), cast(null as varchar), cast(null as varchar), 'CVM FRE 2026', cast(null as varchar), cast(null as boolean), '***999***', 'hole', cast(null as varchar)"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***456***' as cpf_cnpj_doador,\n            'Ana Maria Silva' as nome_doador,\n            50000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026001' as numero_recibo_eleitoral,\n            '***456***' as cpf_doador_masked\n          union all\n          select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***123***' as cpf_cnpj_doador,\n            'Pedro Costa' as nome_doador,\n            25000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026002' as numero_recibo_eleitoral,\n            '***123***' as cpf_doador_masked"
+    format: sql
+  expect:
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+- name: test_donation_facts_no_full_cpf
+  description: 'Donation Seam 4: No full CPF (11 digits) in donation facts.
+
+    '
+  model: donation_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***456***' as cpf_cnpj_doador,\n            'Ana Maria Silva' as nome_doador,\n            50000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026001' as numero_recibo_eleitoral,\n            '***456***' as cpf_doador_masked"
+    format: sql
+  expect:
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+- name: test_association_facts_no_emit_without_supporting_facts
+  description: 'Association Seam 1: Association without supporting fact_ids does NOT emit.
+
+    '
+  model: association_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Test Group B', '22222222', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Carlos Eduardo Santos', 'controlador', cast(null as varchar), cast(null as varchar), 'CVM FRE 2026', cast(null as varchar), cast(null as boolean), '***789***', 'in', cast(null as varchar)"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
+    format: sql
+  expect:
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            NULL::VARCHAR[] as supporting_fact_ids
+          where false"
+    format: sql
+- name: test_association_facts_shared_control
+  description: 'Association Seam 2: Shared control creates association with supporting fact_ids.
+
+    '
+  model: association_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Test Group B', '22222222', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Carlos Eduardo Santos', 'controlador', cast(null as varchar), cast(null as varchar), 'CVM FRE 2026', cast(null as varchar), cast(null as boolean), '***789***', 'in', cast(null as varchar)"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            'control_edge_11111111_Ana Maria Silva_socio' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'control_edge' as fact_kind,\n            'Ana Maria Silva é sócio de Test Group Shared' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '99999999' as cnpj_basico,\n            'Test Group Shared' as group_name,\n            'socio' as edge_label\n          union all\n          select\n            'control_edge_99999999_Carlos Eduardo Santos_socio', 'Carlos Eduardo Santos', 'control_edge', 'Carlos Eduardo Santos é sócio de Test Group Shared', 'RF', 'RF QSA', cast(null as varchar), '***789***', '99999999', 'Test Group Shared', 'socio'"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
+    format: sql
+  expect:
+    rows: "select\n            'association_shared_control_Ana Maria Silva_Carlos Eduardo Santos_99999999_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from control facts: control_edge_11111111_Ana Maria Silva_socio, control_edge_99999999_Carlos Eduardo Santos_socio' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio'] as supporting_fact_ids\n          union all\n          select\n            'association_shared_control_Ana Maria Silva_Carlos Eduardo Santos_99999999_for_Carlos Eduardo Santos',\n            'Carlos Eduardo Santos',\n            'association',\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999',\n            'Billionaire Watcher (derived)',\n            'Derived from control facts: control_edge_11111111_Ana Maria Silva_socio, control_edge_99999999_Carlos Eduardo Santos_socio',\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            ARRAY['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']"
+    format: sql
+- name: test_association_facts_co_donation
+  description: 'Association Seam 3: Co-donation creates association with supporting fact_ids.
+
+    '
+  model: association_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Test Group B', '22222222', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Carlos Eduardo Santos', 'controlador', cast(null as varchar), cast(null as varchar), 'CVM FRE 2026', cast(null as varchar), cast(null as boolean), '***789***', 'in', cast(null as varchar)"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name\n          union all\n          select\n            'donation_2026002_Carlos Eduardo Santos' as fact_id,\n            'Carlos Eduardo Santos' as person_name,\n            'donation' as fact_kind,\n            'Carlos Eduardo Santos doou R$ 75000.0 para Deputado Federal Candidato A em 2026 (recibo 2026002)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026002' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***789***' as cpf_masked,\n            '22222222' as cnpj_basico,\n            'Test Group B' as group_name"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***456***' as cpf_cnpj_doador,\n            'Ana Maria Silva' as nome_doador,\n            50000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026001' as numero_recibo_eleitoral,\n            '***456***' as cpf_doador_masked\n          union all\n          select\n            2026 as ano,\n            '***234***' as cpf_candidato,\n            'Deputado Federal Candidato A' as nome_candidato,\n            '***789***' as cpf_cnpj_doador,\n            'Carlos Eduardo Santos' as nome_doador,\n            75000.0 as valor_receita,\n            'Doação' as tipo_receita,\n            'Pessoa física' as fonte_receita,\n            '2026002' as numero_recibo_eleitoral,\n            '***789***' as cpf_doador_masked"
+    format: sql
+  expect:
+    rows: "select\n            'association_co_donation_Ana Maria Silva_Carlos Eduardo Santos_2026_Deputado Federal Candidato A_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from donation facts: donation_2026001_Ana Maria Silva, donation_2026002_Carlos Eduardo Santos' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos'] as supporting_fact_ids\n          union all\n          select\n            'association_co_donation_Ana Maria Silva_Carlos Eduardo Santos_2026_Deputado Federal Candidato A_for_Carlos Eduardo Santos',\n            'Carlos Eduardo Santos',\n            'association',\n            'Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026',\n            'Billionaire Watcher (derived)',\n            'Derived from donation facts: donation_2026001_Ana Maria Silva, donation_2026002_Carlos Eduardo Santos',\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            ARRAY['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos']"
+    format: sql
+- name: test_no_candidate_cpf_in_value_or_fact_id
+  description: 'PM Review: No candidate CPF in value or fact_id.
+
+    Live TSE has full CPF. Public fields use candidate name only.
+
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    format: sql
+    fixture: empty_identity_facts
+  - input: ref('control_edge_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            'association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from donation facts' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos'] as supporting_fact_ids"
+    format: sql
+  expect:
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_id,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'association_co_donation_Ana_Carlos_2026_Deputado_Federal_Candidato_A_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_id,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos doaram para Deputado Federal Candidato A em 2026' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from donation facts' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['donation_2026001_Ana Maria Silva', 'donation_2026002_Carlos Eduardo Santos'] as supporting_fact_ids"
+    format: sql
+- name: test_published_association_has_supporting_fact_ids
+  description: 'PM Review: supporting_fact_ids must be a column on published_facts.
+
+    Null on identity/control/donation. Populated on associations.
+
+    '
+  model: published_facts
+  given:
+  - input: ref('identity_facts')
+    rows: "select\n            'identity_001' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'identity' as fact_kind,\n            'Ana Maria Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026' as value,\n            'TSE' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
+    format: sql
+  - input: ref('association_facts')
+    rows: "select\n            'association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from control facts' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['control_edge_001', 'control_edge_002'] as supporting_fact_ids"
+    format: sql
+  expect:
+    rows: "select\n            'identity_001' as fact_id,\n            'Ana Maria Silva' as person_id,\n            'identity' as fact_kind,\n            'Ana Maria Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_id,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026' as value,\n            'TSE' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            NULL::VARCHAR[] as supporting_fact_ids\n          union all\n          select\n            'association_shared_control_Ana_Carlos_99999999_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_id,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from control facts' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['control_edge_001', 'control_edge_002'] as supporting_fact_ids"
+    format: sql
+- name: test_association_publishes_on_both_persons
+  description: 'PM Review: Association publishes on both freeze persons.
+
+    Two rows per association (one for each person_name), same supporting_fact_ids.
+
+    '
+  model: association_facts
+  given:
+  - input: ref('freeze_persons_with_forbes')
+    rows: "select\n            cast(null as integer) as group_rank,\n            'Test Group A' as group_name,\n            '11111111' as cnpj_basico,\n            cast(null as varchar) as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            cast(null as boolean) as listed_flag,\n            cast(null as boolean) as soe_flag,\n            cast(null as varchar) as controlador_tipo,\n            'Ana Maria Silva' as person_name,\n            'controlador' as role,\n            cast(null as varchar) as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            cast(null as varchar) as fre_item,\n            cast(null as boolean) as hole,\n            '***456***' as cpf_masked,\n            'in' as freeze_status,\n            cast(null as varchar) as notes\n          union all\n          select\n            cast(null as integer), 'Test Group B', '22222222', cast(null as varchar), cast(null as varchar), cast(null as boolean), cast(null as boolean), cast(null as varchar), 'Carlos Eduardo Santos', 'controlador', cast(null as varchar), cast(null as varchar), 'CVM FRE 2026', cast(null as varchar), cast(null as boolean), '***789***', 'in', cast(null as varchar)"
+    format: sql
+  - input: ref('control_edge_facts')
+    rows: "select\n            'control_edge_11111111_Ana Maria Silva_socio' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'control_edge' as fact_kind,\n            'Ana Maria Silva é sócio de Test Group Shared' as value,\n            'RF' as source_publisher,\n            'RF QSA' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '99999999' as cnpj_basico,\n            'Test Group Shared' as group_name,\n            'socio' as edge_label\n          union all\n          select\n            'control_edge_99999999_Carlos Eduardo Santos_socio', 'Carlos Eduardo Santos', 'control_edge', 'Carlos Eduardo Santos é sócio de Test Group Shared', 'RF', 'RF QSA', cast(null as varchar), '***789***', '99999999', 'Test Group Shared', 'socio'"
+    format: sql
+  - input: ref('donation_facts')
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
+    format: sql
+  - input: ref('tse_donations_2026')
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
+    format: sql
+  expect:
+    rows: "select\n            'association_shared_control_Ana Maria Silva_Carlos Eduardo Santos_99999999_for_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999' as value,\n            'Billionaire Watcher (derived)' as source_publisher,\n            'Derived from control facts: control_edge_11111111_Ana Maria Silva_socio, control_edge_99999999_Carlos Eduardo Santos_socio' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            cast(null as varchar) as cpf_masked,\n            cast(null as varchar) as cnpj_basico,\n            cast(null as varchar) as group_name,\n            ARRAY['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio'] as supporting_fact_ids\n          union all\n          select\n            'association_shared_control_Ana Maria Silva_Carlos Eduardo Santos_99999999_for_Carlos Eduardo Santos',\n            'Carlos Eduardo Santos',\n            'association',\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999',\n            'Billionaire Watcher (derived)',\n            'Derived from control facts: control_edge_11111111_Ana Maria Silva_socio, control_edge_99999999_Carlos Eduardo Santos_socio',\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            cast(null as varchar),\n            ARRAY['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']"
+    format: sql

@@ -8,7 +8,7 @@ with source as (
 
 cleaned as (
     select
-        lpad(regexp_replace(cast(CNPJ_Companhia as string), r'[^\d]', ''), 14, '0') as CNPJ_Companhia,
+        lpad(regexp_replace(cast(CNPJ_Companhia as string), '[^0-9]', ''), 14, '0') as CNPJ_Companhia,
         cast(Data_Referencia as date) as Data_Referencia,
         cast(Versao as int64) as Versao,
         cast(ID_Documento as int64) as ID_Documento,
@@ -22,11 +22,11 @@ cleaned as (
         cast(Tipo_Pessoa_Acionista_Relacionado as string) as Tipo_Pessoa_Acionista_Relacionado,
         cast(CPF_CNPJ_Acionista_Relacionado as string) as CPF_CNPJ_Acionista_Relacionado,
         cast(Quantidade_Acao_Ordinaria_Circulacao as int64) as Quantidade_Acao_Ordinaria_Circulacao,
-        cast(Percentual_Acao_Ordinaria_Circulacao as float64) as Percentual_Acao_Ordinaria_Circulacao,
+        cast(Percentual_Acao_Ordinaria_Circulacao as double) as Percentual_Acao_Ordinaria_Circulacao,
         cast(Quantidade_Acao_Preferencial_Circulacao as int64) as Quantidade_Acao_Preferencial_Circulacao,
-        cast(Percentual_Acao_Preferencial_Circulacao as float64) as Percentual_Acao_Preferencial_Circulacao,
+        cast(Percentual_Acao_Preferencial_Circulacao as double) as Percentual_Acao_Preferencial_Circulacao,
         cast(Quantidade_Total_Acoes_Circulacao as int64) as Quantidade_Total_Acoes_Circulacao,
-        cast(Percentual_Total_Acoes_Circulacao as float64) as Percentual_Total_Acoes_Circulacao,
+        cast(Percentual_Total_Acoes_Circulacao as double) as Percentual_Total_Acoes_Circulacao,
         cast(Nacionalidade as string) as Nacionalidade,
         cast(Sigla_UF as string) as Sigla_UF,
         cast(Residente_Exterior as string) as Residente_Exterior,

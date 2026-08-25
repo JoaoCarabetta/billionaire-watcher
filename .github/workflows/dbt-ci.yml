@@ -1,0 +1,72 @@
+name: dbt CI
+
+on:
+  pull_request:
+    paths:
+      - 'transform/**'
+      - '.github/workflows/dbt-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'transform/**'
+      - '.github/workflows/dbt-ci.yml'
+
+jobs:
+  dbt-parse-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-bigquery and dbt-duckdb
+        run: |
+          pip install dbt-bigquery==1.8.2
+          pip install dbt-duckdb
+
+      - name: Create CI profiles.yml
+        run: |
+          mkdir -p $HOME/.dbt
+          cat > $HOME/.dbt/profiles.yml << 'EOF'
+          billionaire_watcher:
+            target: dev
+            outputs:
+              dev:
+                type: bigquery
+                method: oauth
+                project: dummy-project
+                dataset: dummy_dataset
+                location: US
+                threads: 1
+              test:
+                type: duckdb
+                path: ":memory:"
+          EOF
+
+      - name: Install dbt packages
+        working-directory: transform
+        run: dbt deps
+
+      - name: Run dbt parse
+        working-directory: transform
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /dev/null
+        run: dbt parse --target test
+
+      - name: Run dbt unit tests
+        working-directory: transform
+        run: |
+          dbt test --select test_type:unit --target test --log-level info 2>&1 | tee /tmp/test_output.txt
+          exit_code=${PIPESTATUS[0]}
+          if [ $exit_code -ne 0 ]; then
+            echo "=== Unit tests failed with exit code $exit_code ==="
+            echo "=== Last 100 lines of output ==="
+            tail -n 100 /tmp/test_output.txt
+            exit $exit_code
+          fi

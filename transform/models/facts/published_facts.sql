@@ -14,7 +14,11 @@ with identity_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('identity_facts') }}
 ),
 
@@ -30,7 +34,11 @@ control_edge_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('control_edge_facts') }}
 ),
 
@@ -46,7 +54,11 @@ donation_facts as (
         cpf_masked,
         cnpj_basico,
         group_name,
+        {% if target.type == 'duckdb' %}
+        NULL::VARCHAR[] as supporting_fact_ids
+        {% else %}
         cast(null as array<string>) as supporting_fact_ids
+        {% endif %}
     from {{ ref('donation_facts') }}
 ),
 
@@ -76,8 +88,6 @@ all_facts as (
     select * from association_facts
 ),
 
--- FIX #57: Mask CPF in published output (never emit 11 consecutive digits)
--- Mask as ***NNN*** (stars + last-3 + stars)
 masked_facts as (
     select
         fact_id,
@@ -87,11 +97,21 @@ masked_facts as (
         source_publisher,
         source_locator,
         source_retrieved_at,
-        concat(
-            '***',
-            right(regexp_replace(cpf_masked, r'[^0-9]', ''), 3),
-            '***'
-        ) as cpf_masked,
+        case
+            when cpf_masked is null then null
+            else concat(
+                '***',
+                right(
+                    {% if target.type == 'duckdb' %}
+                    regexp_replace(cpf_masked, '[^0-9]', '', 'g')
+                    {% else %}
+                    regexp_replace(cpf_masked, r'[^0-9]', '')
+                    {% endif %}
+                    , 3
+                ),
+                '***'
+            )
+        end as cpf_masked,
         cnpj_basico,
         group_name,
         supporting_fact_ids

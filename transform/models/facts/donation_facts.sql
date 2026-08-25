@@ -36,14 +36,14 @@ tse_2026 as (
 -- Receipt coverage: 2014 numero_recibo_eleitoral / 2018 numero_recibo_doacao / 2022 numero_documento_doacao
 -- LEFT JOIN to emit named hole when candidatos.nome missing (not silent drop)
 tse_closed_cycles as (
-    {% if target.name == 'test' %}
+    {% if target.name in ('test', 'ci') %}
     -- Unit tests: empty CTE (no live BD calls in tests)
     select
         cast(null as int64) as ano,
         cast(null as string) as nome_candidato,
         cast(null as string) as nome_doador,
         cast(null as string) as cpf_doador_masked,
-        cast(null as float64) as valor_receita,
+        cast(null as double) as valor_receita,
         cast(null as string) as tipo_receita,
         cast(null as string) as fonte_receita,
         cast(null as string) as numero_recibo_eleitoral
@@ -94,7 +94,7 @@ freeze_normalized as (
         cpf_masked,
         cnpj_basico,
         group_name,
-        lpad(regexp_replace(cpf_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+        lpad(regexp_replace(cpf_masked, '[^0-9]', ''), 11, '0') as cpf_digits
     from freeze_persons
 ),
 
@@ -107,7 +107,7 @@ tse_normalized as (
         valor_receita,
         tipo_receita,
         numero_recibo_eleitoral,
-        lpad(regexp_replace(cpf_doador_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+        lpad(regexp_replace(cpf_doador_masked, '[^0-9]', ''), 11, '0') as cpf_digits
     from all_tse_donations
 ),
 
