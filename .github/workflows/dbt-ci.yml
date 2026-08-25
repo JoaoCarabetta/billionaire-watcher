@@ -57,7 +57,7 @@ jobs:
         working-directory: transform
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /dev/null
-        run: dbt parse
+        run: dbt parse --target test
 
       - name: Run dbt unit tests
         working-directory: transform
