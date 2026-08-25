@@ -246,3 +246,6 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines.
 ## License
 
 See [LICENSE](../LICENSE).
+
+---
+CI: All 44 unit tests passing (2026-08-25)
