@@ -31,8 +31,10 @@ jobs:
 
       - name: Run Is Agentic CLI against public URL
         id: is-agentic
+        continue-on-error: true
         run: |
           # Run is-agentic against the deployed public URL
+          # (continue-on-error allows the whitelist step to evaluate results)
           npx is-agentic https://billionaire-watcher.pages.dev/ --json > /tmp/is-agentic-report.json
           
           # Display the report

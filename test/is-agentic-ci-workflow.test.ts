@@ -266,4 +266,78 @@ describe('Is Agentic CI Workflow (issue #30)', () => {
       'Should document https://billionaire-watcher.pages.dev/'
     ).toContain('https://billionaire-watcher.pages.dev/');
   });
+
+  it('should allow is-agentic CLI to fail without stopping the job', () => {
+    expect(workflowContent).not.toBeNull();
+    
+    const jobs = workflowContent.jobs;
+    const jobKeys = Object.keys(jobs);
+    
+    // Find the is-agentic step
+    let foundIsAgenticStep = false;
+    let hasContinueOnError = false;
+    
+    for (const jobKey of jobKeys) {
+      const job = jobs[jobKey];
+      const steps = job.steps || [];
+      
+      for (const step of steps) {
+        const run = step.run || '';
+        const name = step.name || '';
+        
+        if (run.includes('npx is-agentic') || name.toLowerCase().includes('is-agentic')) {
+          foundIsAgenticStep = true;
+          
+          // Should have continue-on-error: true
+          hasContinueOnError = step['continue-on-error'] === true;
+          
+          break;
+        }
+      }
+      if (foundIsAgenticStep) break;
+    }
+    
+    expect(foundIsAgenticStep, 'Should have is-agentic step').toBe(true);
+    expect(
+      hasContinueOnError,
+      'is-agentic step should have continue-on-error: true so whitelist check can run'
+    ).toBe(true);
+  });
+
+  it('should NOT have continue-on-error on the whitelist check step', () => {
+    expect(workflowContent).not.toBeNull();
+    
+    const jobs = workflowContent.jobs;
+    const jobKeys = Object.keys(jobs);
+    
+    // Find the whitelist check step
+    let foundWhitelistStep = false;
+    let hasContinueOnError = false;
+    
+    for (const jobKey of jobKeys) {
+      const job = jobs[jobKey];
+      const steps = job.steps || [];
+      
+      for (const step of steps) {
+        const run = step.run || '';
+        const name = step.name || '';
+        
+        if (run.includes('ESSENTIAL_WHITELIST') && (name.toLowerCase().includes('essential') || name.toLowerCase().includes('check'))) {
+          foundWhitelistStep = true;
+          
+          // Should NOT have continue-on-error: true (or should be false)
+          hasContinueOnError = step['continue-on-error'] === true;
+          
+          break;
+        }
+      }
+      if (foundWhitelistStep) break;
+    }
+    
+    expect(foundWhitelistStep, 'Should have whitelist check step').toBe(true);
+    expect(
+      hasContinueOnError,
+      'Whitelist check step should NOT have continue-on-error (must fail job when needed)'
+    ).toBe(false);
+  });
 });
