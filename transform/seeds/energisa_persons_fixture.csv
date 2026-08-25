@@ -1,0 +1,6 @@
+person_id,node_kind,name,cpf,cpf_masked,provisional_name_key
+p1,person,Ana Costa Fictícia,12345678901,***901,
+p2,person,Bruno Silva Teste,,,Bruno Silva Teste_1
+p3,person,Bruno Silva Teste,,,Bruno Silva Teste_2
+p4,person,Carlos Souza Exemplo,98765432109,***109,
+p5,person,Diana Oliveira Teste,,,Diana Oliveira Teste_1
