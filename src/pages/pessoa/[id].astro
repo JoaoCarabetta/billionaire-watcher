@@ -13,7 +13,8 @@ import {
   getDerivedAssociationsByPersonId,
   getCandidateByCpf,
   formatCurrency,
-  redactCPF
+  redactCPF,
+  shouldUsePublishedFacts
 } from '../../utils/fixtures';
 import type { Person, Source } from '../../types';
 
@@ -199,6 +200,12 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
           {identityFacts.map((fact) => (
             <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
           ))}
+          {/* Show CPF if any identity fact has it */}
+          {identityFacts.some(f => f.cpf) && (
+            <div class="fact cpf-fact">
+              <span class="fact-value">CPF: {identityFacts.find(f => f.cpf)?.cpf}</span>
+            </div>
+          )}
         </section>
       )}
 
@@ -230,7 +237,8 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
         </section>
       )}
 
-      {rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
+      {/* Only show CVM hole on old fixture path when RF edges exist but no CVM controls */}
+      {!shouldUsePublishedFacts() && rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
         <section>
           <h2>Controle Acionário</h2>
           <div class="missing-control">

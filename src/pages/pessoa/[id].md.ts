@@ -59,6 +59,11 @@ export const GET: APIRoute = ({ props }: any) => {
       const citationNum = getCitationNumber(fact.source);
       markdown += `- ${fact.value} [${citationNum}]\n`;
     }
+    // Add CPF if any identity fact has it
+    const cpf = identityFacts.find(f => f.cpf)?.cpf;
+    if (cpf) {
+      markdown += `- CPF: ${cpf}\n`;
+    }
     markdown += `\n`;
   }
   

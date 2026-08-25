@@ -206,6 +206,147 @@ describe('Published Facts Build Integration', () => {
     });
   });
 
+  describe('PM Spec: Association facts must be rendered', () => {
+    it('should render association fact with citation in João Silva dossier', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Must have association section
+      expect(html).toMatch(/associações/i);
+      
+      // Must have the association value from the published fact
+      expect(html).toContain('Relação entre João Silva e Maria Santos através de investimentos cruzados');
+      
+      // Must have citation for the association
+      expect(html).toMatch(/\[\d+\]/);
+    });
+  });
+
+  describe('PM Spec: No CVM hole when control edges exist', () => {
+    it('should not show "Informações sobre controle acionário não identificadas" when control_edge exists', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Must NOT have the CVM hole text
+      expect(html).not.toContain('Informações sobre controle acionário não identificadas');
+    });
+  });
+
+  describe('PM Spec: No invented facts or text', () => {
+    it('should not invent "Eleições Municipais" cycle text', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Must not invent election cycle text
+      expect(html).not.toContain('Eleições Municipais');
+    });
+    
+    it('should not invent CPF identity fact that borrows another source', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // If CPF appears, it must only be from a fact that has cpf_masked
+      // Check that CPF isn't listed as a separate identity fact with wrong source
+      if (html.includes('***000***')) {
+        // The CPF should appear inline with other identity facts, not as standalone
+        // It should not have a citation to a source that doesn't mention CPF
+        const identitySection = html.match(/<section[^>]*>[\s\S]*?<h2[^>]*>Identidade[\s\S]*?<\/section>/i);
+        if (identitySection) {
+          // CPF should not be listed as "CPF: ***000*** [citation]" separate from the facts that have it
+          expect(identitySection[0]).not.toMatch(/CPF:?\s*\*\*\*\d{3}\*\*\*\s*\[\d+\]/);
+        }
+      }
+    });
+    
+    it('should only show cpf_masked when the published row itself carries it', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      // Maria Santos has no cpf_masked in published facts - must not show CPF
+      const mariaDossierPath = path.join(distPath, 'pessoa', 'Maria Santos', 'index.html');
+      const mariaHtml = fs.readFileSync(mariaDossierPath, 'utf-8');
+      
+      // Must not show any ***NNN*** format
+      expect(mariaHtml).not.toMatch(/\*\*\*\d{3}\*\*\*/);
+    });
+  });
+
+  describe('PM Spec: CPF masking in all formats', () => {
+    it('should have ***NNN*** in HTML, never 11 digits', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Must have masked CPF
+      expect(html).toContain('***000***');
+      
+      // Must not have 11 consecutive digits in body (excluding URLs)
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/);
+      if (bodyMatch) {
+        const bodyText = bodyMatch[1].replace(/<a[^>]*href="[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+        expect(bodyText).not.toMatch(/\d{11}/);
+      }
+    });
+    
+    it('should have ***NNN*** in markdown mirror', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const mdPath = path.join(distPath, 'pessoa', 'João Silva.md');
+      const md = fs.readFileSync(mdPath, 'utf-8');
+      
+      // Must have masked CPF in markdown
+      expect(md).toContain('***000***');
+      
+      // Must not have 11 consecutive digits
+      expect(md).not.toMatch(/\d{11}/);
+    });
+    
+    it('should have ***NNN*** in JSON-LD', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Extract JSON-LD
+      const jsonLdMatch = html.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
+      expect(jsonLdMatch).toBeTruthy();
+      
+      if (jsonLdMatch) {
+        const jsonLd = jsonLdMatch[1];
+        // If CPF appears in JSON-LD, it must be masked
+        if (jsonLd.includes('***')) {
+          expect(jsonLd).toContain('***000***');
+        }
+        // Must not have 11 consecutive digits
+        expect(jsonLd).not.toMatch(/\d{11}/);
+      }
+    });
+  });
+
   describe('Is Agentic content-no-js check (500+ characters)', () => {
     it('should have 500+ characters of real cited text in home page static HTML', () => {
       const homePath = path.join(distPath, 'index.html');

@@ -17,6 +17,9 @@ import {
   type PublishedFact
 } from './published-facts-loader';
 
+// Re-export for components
+export { shouldUsePublishedFacts };
+
 export function getFacts(): Fact[] {
   return factsData.filter(fact => fact.source !== undefined);
 }
@@ -47,11 +50,7 @@ function convertPublishedFactsToAssociations(): DerivedAssociation[] {
   const facts = loadPublishedFacts();
   
   return facts
-    .filter((fact: PublishedFact) => 
-      fact.fact_kind === 'association' && 
-      fact.supporting_fact_ids && 
-      fact.supporting_fact_ids.length > 0
-    )
+    .filter((fact: PublishedFact) => fact.fact_kind === 'association')
     .map((fact: PublishedFact) => {
       // Determine association type from value
       let type: 'politician' | 'freeze_person' = 'freeze_person';
@@ -61,17 +60,30 @@ function convertPublishedFactsToAssociations(): DerivedAssociation[] {
         type = 'freeze_person';
       }
       
+      // Parse supporting_fact_ids (comma-separated string) into array
+      const supportingIds = fact.supporting_fact_ids 
+        ? fact.supporting_fact_ids.split(',').map(id => id.trim())
+        : [];
+      
       return {
         id: fact.fact_id,
         person_id: fact.person_id,
         association_type: type,
         description: fact.value,
-        parent_donation_ids: fact.supporting_fact_ids || []
+        parent_donation_ids: supportingIds,
+        source: publishedFactToSource(fact)
       };
     });
 }
 
 export function getDerivedAssociationsByPersonId(personId: string): DerivedAssociation[] {
+  // When using published facts, use the association facts directly
+  if (shouldUsePublishedFacts()) {
+    const allAssociations = getDerivedAssociations();
+    return allAssociations.filter(a => a.person_id === personId);
+  }
+  
+  // Old fixture path: derive associations from donations
   const freeze = getFreeze();
   const person = freeze.find(p => p.person_id === personId);
   if (!person) return [];
@@ -268,23 +280,6 @@ function convertPublishedFactsToIdentityFacts(): IdentityFact[] {
         cpf: fact.cpf_masked || undefined
       });
     }
-    
-    // Create CPF identity fact for facts that have cpf_masked
-    if (fact.cpf_masked && !personsWithCpf.has(fact.person_id)) {
-      personsWithCpf.add(fact.person_id);
-      // Find the first fact with source for this person
-      const sourceFact = facts.find(f => f.person_id === fact.person_id && f.source_locator);
-      if (sourceFact) {
-        result.push({
-          id: `cpf-${fact.person_id}`,
-          person_id: fact.person_id,
-          field: 'cpf',
-          value: fact.cpf_masked,
-          source: publishedFactToSource(sourceFact),
-          cpf: fact.cpf_masked
-        });
-      }
-    }
   }
   
   return result;
@@ -378,8 +373,8 @@ function convertPublishedFactsToDonations(): Donation[] {
       const candidateName = candidateMatch ? candidateMatch[1].trim() : '';
       const year = yearMatch ? parseInt(yearMatch[1]) : 0;
       
-      // Extract cycle from source_locator
-      const cycle = `Eleições Municipais ${year}`;
+      // Use source_locator as cycle (don't invent text)
+      const cycle = fact.source_locator || '';
       
       return {
         id: fact.fact_id,

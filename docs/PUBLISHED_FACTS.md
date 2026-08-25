@@ -4,34 +4,37 @@ This document describes how to build the Astro static site from published Facts 
 
 ## Overview
 
-The site can be built from two sources:
-1. **Git fixtures** (default) - for development and testing
-2. **Published Facts** - for production builds from `gs://billionairewatcher-landing/publish/facts/latest/`
+The site MUST be built from published Facts for production:
+- **Production**: `PUBLISHED_FACTS_DIR` pointing to `gs://billionairewatcher-landing/publish/facts/latest/`
+- **Tests**: `USE_PUBLISHED_FACTS=true` uses git fixture at `test/fixtures/published-facts.json`
+- **Old fixtures**: `ALLOW_OLD_FIXTURES=true` for legacy tests (not for production)
 
 ## Building with Published Facts
 
-### Environment Variables
+### Production Build (Required)
 
-Set either:
-- `PUBLISHED_FACTS_DIR=/path/to/facts` - points to a directory containing published facts JSON/JSONL files
-- `USE_PUBLISHED_FACTS=true` - uses the git fixture at `test/fixtures/published-facts.json`
-
-### Example: Production Build
+Production builds **require** `PUBLISHED_FACTS_DIR` to point to a non-empty directory containing published facts. The build will fail if:
+- `PUBLISHED_FACTS_DIR` is not set
+- `PUBLISHED_FACTS_DIR` points to a non-existent directory
+- `PUBLISHED_FACTS_DIR` points to an empty directory
+- `USE_PUBLISHED_FACTS` is used instead (test-only)
 
 ```bash
 # Fetch published facts from GCS
 gsutil -m cp -r gs://billionairewatcher-landing/publish/facts/latest/ ./published-facts/
 
-# Build the site
+# Build the site (will fail if directory is empty)
 PUBLISHED_FACTS_DIR=./published-facts npm run build
 ```
 
-### Example: Test Build
+### Test Build
 
 ```bash
-# Build with published facts fixture
+# Build with published facts fixture (test-only)
 USE_PUBLISHED_FACTS=true npm run build
 ```
+
+**Important**: `USE_PUBLISHED_FACTS` is test-only and will fail in `NODE_ENV=production`.
 
 ## Published Facts Contract
 
@@ -39,50 +42,102 @@ The published facts schema (from `transform/models/facts/published_facts.sql`):
 
 ```sql
 fact_id              string      -- Unique fact identifier
-person_id            string      -- Person identifier (aliased from person_name)
-fact_kind            string      -- Type of fact (nome, nacionalidade, rf_socio, etc.)
-value                string      -- Fact value
+person_id            string      -- Person name (used as identifier)
+fact_kind            string      -- One of: identity, control_edge, donation, association
+value                string      -- Fact value (raw field for identity, full sentence for others)
 source_publisher     string      -- Source publisher name
-source_locator       string      -- Source URL
-source_retrieved_at  string      -- Retrieval date (ISO format)
-cpf_masked           string?     -- Masked CPF (***NNN***)
+source_locator       string      -- Source document/URL
+source_retrieved_at  string?     -- Retrieval date (ISO format, optional)
+cpf_masked           string?     -- Masked CPF (***NNN***) - only when present in source
 cnpj_basico          string?     -- CNPJ basic (8 digits)
 group_name           string?     -- Company name for control edges
-supporting_fact_ids  string[]?   -- Parent fact IDs for derived facts
+supporting_fact_ids  string?     -- Comma-separated fact IDs for associations
+```
+
+### The Four Fact Kinds
+
+Published facts use exactly four `fact_kind` values:
+
+#### 1. `identity`
+Raw identity fields (name, role, group_name). The `value` is the raw field, not a sentence.
+
+Example:
+```json
+{
+  "fact_id": "identity_12345678_João Silva_name",
+  "person_id": "João Silva",
+  "fact_kind": "identity",
+  "value": "João Silva",
+  "source_publisher": "Receita Federal do Brasil",
+  "source_locator": "Receita Federal QSA",
+  "cpf_masked": "***000***",
+  "cnpj_basico": "12345678",
+  "group_name": "Empresa XYZ Ltda."
+}
+```
+
+#### 2. `control_edge`
+Pre-written sentences about company control relationships.
+
+Example:
+```json
+{
+  "fact_id": "control_edge_12345678_João Silva_socio",
+  "person_id": "João Silva",
+  "fact_kind": "control_edge",
+  "value": "João Silva é sócio de Empresa XYZ Ltda. (CNPJ 12345678)",
+  "source_publisher": "Receita Federal do Brasil",
+  "source_locator": "Receita Federal QSA",
+  "cnpj_basico": "12345678",
+  "group_name": "Empresa XYZ Ltda."
+}
+```
+
+#### 3. `donation`
+Political donation records with full sentence in `value`.
+
+Example:
+```json
+{
+  "fact_id": "donation_recibo-2020-001_João Silva",
+  "person_id": "João Silva",
+  "fact_kind": "donation",
+  "value": "João Silva doou R$ 100000 para Fernanda Almeida em 2020 (recibo recibo-2020-001)",
+  "source_publisher": "Tribunal Superior Eleitoral",
+  "source_locator": "TSE Receitas Candidato 2020 recibo recibo-2020-001"
+}
+```
+
+#### 4. `association`
+Derived associations between people with supporting fact IDs.
+
+Example:
+```json
+{
+  "fact_id": "association_cross_investment_João Silva_Maria Santos",
+  "person_id": "João Silva",
+  "fact_kind": "association",
+  "value": "Relação entre João Silva e Maria Santos através de investimentos cruzados",
+  "source_publisher": "Receita Federal do Brasil",
+  "source_locator": "Receita Federal QSA análise consolidada",
+  "supporting_fact_ids": "control_edge_12345678_João Silva_socio,control_edge_11222333_Maria Santos_socio"
+}
 ```
 
 ### Freeze List
 
-When using published facts, the freeze list (list of persons with dossiers) is derived from the facts themselves:
-- One person per unique `person_id`
-- Person name taken from the `nome` fact
-- All persons with at least one fact get a dossier
+When using published facts, the freeze list is derived from the facts themselves:
+- One person per unique `person_id` (person_id IS the person name)
+- Only persons with `freeze_status=in` in the SQL model
+- All persons in published facts get a dossier
 
 ### CPF Masking
 
-CPF values are masked as `***NNN***` (three visible digits) in the published facts.
+Cadastro de Pessoas Físicas (CPF) appears only as `***NNN***` (three visible digits):
 - Never render 11-digit CPF on any page
 - Never render formatted CPF (`123.456.789-00`)
-- Only render masked format when present in `cpf_masked` field
-
-### Fact Kinds
-
-Identity facts:
-- `nome` - Full name
-- `nacionalidade` - Nationality
-- `data_nascimento` - Birth date
-- `cpf` - CPF (always masked)
-
-Control edge facts:
-- `rf_socio` - RF partner edge (Receita Federal company partnership)
-
-Donation facts:
-- `donation_personal` - Personal political donation
-- `donation_cnpj` - Company political donation
-
-Association facts:
-- `association_politician` - Association with politician (via donations)
-- `association_freeze_person` - Association with another freeze person
+- Only render masked format when present in `cpf_masked` field of a fact
+- Do not invent CPF facts or borrow sources from other facts
 
 ## File Formats
 
@@ -124,13 +179,15 @@ The `src/utils/fixtures.ts` file acts as an adapter:
 
 ### Conversion Functions
 
-- `convertPublishedFactsToIdentityFacts()` - Converts identity fact kinds to `IdentityFact[]`
-- `convertPublishedFactsToRFPartnerEdges()` - Converts `rf_socio` facts to `RFPartnerEdge[]`
+- `convertPublishedFactsToIdentityFacts()` - Converts `identity` facts to `IdentityFact[]`
+- `convertPublishedFactsToRFPartnerEdges()` - Converts `control_edge` facts to `RFPartnerEdge[]`
+- `convertPublishedFactsToDonations()` - Converts `donation` facts to `Donation[]`
+- `convertPublishedFactsToAssociations()` - Converts `association` facts to `DerivedAssociation[]`
 - `getPublishedFactsFreeze()` - Derives freeze list from published facts
 
 ### CNPJ Format
 
-Published facts store `cnpj_basico` (8 digits). The loader reconstructs the full CNPJ format with placeholder suffix `/0001-99` for display purposes.
+Published facts store `cnpj_basico` (8 digits). Use this value as-is. Do not invent CNPJ suffixes.
 
 ## Future Work
 

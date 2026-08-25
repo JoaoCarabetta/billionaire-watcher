@@ -1,6 +1,6 @@
 ---
 import type { DerivedAssociation, Source, Candidate } from '../types';
-import { getDonations, getCandidateByCpf, getFreeze, redactCPF } from '../utils/fixtures';
+import { getDonations, getCandidateByCpf, getFreeze, redactCPF, shouldUsePublishedFacts } from '../utils/fixtures';
 
 interface Props {
   association: DerivedAssociation;
@@ -9,30 +9,40 @@ interface Props {
 
 const { association, citationMap } = Astro.props;
 
-// Get parent donations
-const allDonations = getDonations();
-const parentDonations = association.parent_donation_ids
-  .map(id => allDonations.find(d => d.id === id))
-  .filter(d => d !== undefined);
+let citationNumbers: number[] = [];
 
-if (parentDonations.length === 0) {
-  throw new Error(`Derived association ${association.id} has no valid parent donations`);
-}
-
-// Get unique citation numbers from parent donation sources
-const uniqueSources = new Map<string, Source>();
-for (const donation of parentDonations) {
-  if (!uniqueSources.has(donation.source.locator)) {
-    uniqueSources.set(donation.source.locator, donation.source);
+// Published facts associations have source directly
+if (shouldUsePublishedFacts() && association.source) {
+  const citationNum = citationMap.get(association.source.locator);
+  if (citationNum) {
+    citationNumbers = [citationNum];
   }
-}
+} else {
+  // Old fixture path: get citations from parent donations
+  const allDonations = getDonations();
+  const parentDonations = association.parent_donation_ids
+    .map(id => allDonations.find(d => d.id === id))
+    .filter(d => d !== undefined);
 
-const citationNumbers = Array.from(uniqueSources.values())
-  .map(source => citationMap.get(source.locator))
-  .filter((n): n is number => n !== undefined);
+  if (parentDonations.length === 0) {
+    throw new Error(`Derived association ${association.id} has no valid parent donations`);
+  }
 
-if (citationNumbers.length === 0) {
-  throw new Error(`Derived association ${association.id} has no citation numbers`);
+  // Get unique citation numbers from parent donation sources
+  const uniqueSources = new Map<string, Source>();
+  for (const donation of parentDonations) {
+    if (!uniqueSources.has(donation.source.locator)) {
+      uniqueSources.set(donation.source.locator, donation.source);
+    }
+  }
+
+  citationNumbers = Array.from(uniqueSources.values())
+    .map(source => citationMap.get(source.locator))
+    .filter((n): n is number => n !== undefined);
+
+  if (citationNumbers.length === 0) {
+    throw new Error(`Derived association ${association.id} has no citation numbers`);
+  }
 }
 
 // Get candidate or freeze person for link

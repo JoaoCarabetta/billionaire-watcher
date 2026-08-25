@@ -35,6 +35,7 @@ export function loadPublishedFacts(): PublishedFact[] {
 
   const publishedFactsDir = process.env.PUBLISHED_FACTS_DIR;
   const usePublishedFacts = process.env.USE_PUBLISHED_FACTS;
+  const nodeEnv = process.env.NODE_ENV;
   
   let facts: PublishedFact[];
   
@@ -49,12 +50,32 @@ export function loadPublishedFacts(): PublishedFact[] {
     if (fs.existsSync(fixtureFile)) {
       const fixtureData = fs.readFileSync(fixtureFile, 'utf-8');
       facts = JSON.parse(fixtureData);
+      
+      if (!facts || facts.length === 0) {
+        throw new Error(`PUBLISHED_FACTS_DIR points to empty fixture file: ${fixtureFile}`);
+      }
     } else {
       facts = loadFromDirectory(publishedFactsDir);
+      
+      if (!facts || facts.length === 0) {
+        throw new Error(`PUBLISHED_FACTS_DIR is empty (no fact files found): ${publishedFactsDir}`);
+      }
     }
   } else if (usePublishedFacts) {
     // Test mode: use git fixture
+    // USE_PUBLISHED_FACTS is test-only
+    // It should fail in production unless we're in a test runner context
+    if (nodeEnv === 'production' && !process.env.VITEST) {
+      throw new Error(
+        'USE_PUBLISHED_FACTS is test-only and cannot be used in production. ' +
+        'Set PUBLISHED_FACTS_DIR to a non-empty directory containing published facts.'
+      );
+    }
+    
     const fixturePath = path.join(process.cwd(), 'test', 'fixtures', 'published-facts.json');
+    if (!fs.existsSync(fixturePath)) {
+      throw new Error(`Published facts fixture not found: ${fixturePath}`);
+    }
     const fixtureData = fs.readFileSync(fixturePath, 'utf-8');
     facts = JSON.parse(fixtureData);
   } else {
@@ -65,6 +86,10 @@ export function loadPublishedFacts(): PublishedFact[] {
   
   // Filter to only facts with source_locator
   cachedFacts = facts.filter(fact => fact.source_locator);
+  
+  if (cachedFacts.length === 0 && publishedFactsDir) {
+    throw new Error(`No published facts with source_locator found in: ${publishedFactsDir}`);
+  }
   
   return cachedFacts;
 }

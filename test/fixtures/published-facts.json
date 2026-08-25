@@ -180,5 +180,18 @@
     "cnpj_basico": "55666777",
     "group_name": "DEF Holdings",
     "supporting_fact_ids": null
+  },
+  {
+    "fact_id": "association_cross_investment_João Silva_Maria Santos",
+    "person_id": "João Silva",
+    "fact_kind": "association",
+    "value": "Relação entre João Silva e Maria Santos através de investimentos cruzados",
+    "source_publisher": "Receita Federal do Brasil",
+    "source_locator": "Receita Federal QSA análise consolidada",
+    "source_retrieved_at": null,
+    "cpf_masked": null,
+    "cnpj_basico": null,
+    "group_name": null,
+    "supporting_fact_ids": "control_edge_12345678_João Silva_socio,control_edge_11222333_Maria Santos_socio"
   }
 ]
