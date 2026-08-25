@@ -9,6 +9,13 @@ import candidatesData from '../../test/fixtures/candidates.json';
 import methodologyFactsData from '../../test/fixtures/methodology-facts.json';
 import fs from 'fs';
 import path from 'path';
+import { 
+  shouldUsePublishedFacts, 
+  getPublishedFactsFreeze,
+  getPublishedFactsByPersonId,
+  publishedFactToSource,
+  type PublishedFact
+} from './published-facts-loader';
 
 export function getFacts(): Fact[] {
   return factsData.filter(fact => fact.source !== undefined);
@@ -133,6 +140,11 @@ export function redactCPF(text: string): string {
 }
 
 export function getFreeze(): Person[] {
+  // Use published facts freeze if enabled
+  if (shouldUsePublishedFacts()) {
+    return getPublishedFactsFreeze();
+  }
+  
   try {
     const freezePath = path.join(process.cwd(), 'test', 'fixtures', 'freeze.csv');
     const freezeContent = fs.readFileSync(freezePath, 'utf-8');
@@ -159,6 +171,9 @@ export function getFreeze(): Person[] {
 }
 
 export function getIdentityFacts(): IdentityFact[] {
+  if (shouldUsePublishedFacts()) {
+    return convertPublishedFactsToIdentityFacts();
+  }
   return identityFactsData.filter(fact => fact.source !== undefined) as IdentityFact[];
 }
 
@@ -166,12 +181,85 @@ export function getIdentityFactsByPersonId(personId: string): IdentityFact[] {
   return getIdentityFacts().filter(fact => fact.person_id === personId);
 }
 
+/**
+ * Convert published facts to identity facts format.
+ * Only includes identity fact kinds (nome, nacionalidade, data_nascimento, etc.)
+ * For facts with cpf_masked, creates a CPF identity fact.
+ */
+function convertPublishedFactsToIdentityFacts(): IdentityFact[] {
+  const { loadPublishedFacts } = require('./published-facts-loader');
+  const facts = loadPublishedFacts();
+  
+  const identityFactKinds = ['nome', 'nacionalidade', 'data_nascimento', 'cpf'];
+  const result: IdentityFact[] = [];
+  
+  // Track which persons have CPF masked facts
+  const personsWithCpf = new Set<string>();
+  
+  for (const fact of facts) {
+    // Add regular identity facts
+    if (identityFactKinds.includes(fact.fact_kind)) {
+      result.push({
+        id: fact.fact_id,
+        person_id: fact.person_id,
+        field: fact.fact_kind,
+        value: fact.value,
+        source: publishedFactToSource(fact),
+        cpf: fact.cpf_masked || undefined
+      });
+    }
+    
+    // Create CPF identity fact for facts that have cpf_masked
+    if (fact.cpf_masked && !personsWithCpf.has(fact.person_id)) {
+      personsWithCpf.add(fact.person_id);
+      result.push({
+        id: `cpf-${fact.person_id}`,
+        person_id: fact.person_id,
+        field: 'cpf',
+        value: fact.cpf_masked,
+        source: publishedFactToSource(fact),
+        cpf: fact.cpf_masked
+      });
+    }
+  }
+  
+  return result;
+}
+
 export function getRFPartnerEdges(): RFPartnerEdge[] {
+  if (shouldUsePublishedFacts()) {
+    return convertPublishedFactsToRFPartnerEdges();
+  }
   return rfPartnerEdgesData.filter(edge => edge.source !== undefined) as RFPartnerEdge[];
 }
 
 export function getRFPartnerEdgesByPersonId(personId: string): RFPartnerEdge[] {
   return getRFPartnerEdges().filter(edge => edge.person_id === personId);
+}
+
+/**
+ * Convert published facts to RF partner edges format.
+ * Only includes rf_socio fact kinds.
+ */
+function convertPublishedFactsToRFPartnerEdges(): RFPartnerEdge[] {
+  const { loadPublishedFacts } = require('./published-facts-loader');
+  const facts = loadPublishedFacts();
+  
+  return facts
+    .filter((fact: PublishedFact) => fact.fact_kind === 'rf_socio' && fact.cnpj_basico && fact.group_name)
+    .map((fact: PublishedFact) => {
+      // Format CNPJ basico back to full format with placeholder for suffix
+      const cnpjFormatted = fact.cnpj_basico!.replace(/(\d{2})(\d{3})(\d{3})/, '$1.$2.$3/0001-99');
+      
+      return {
+        id: fact.fact_id,
+        person_id: fact.person_id,
+        company_cnpj: cnpjFormatted,
+        company_name: fact.group_name!,
+        relationship: fact.value,
+        source: publishedFactToSource(fact)
+      };
+    });
 }
 
 export function getCVMFREControls(): CVMFREControl[] {

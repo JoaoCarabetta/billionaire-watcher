@@ -184,7 +184,12 @@ describe('Tracer: TSE 2026 Donations with Refresh', () => {
 
     it('should only create dossiers for persons in freeze.csv', () => {
       const pessoaDir = path.join(distPath, 'pessoa');
-      const personDirs = fs.readdirSync(pessoaDir);
+      const entries = fs.readdirSync(pessoaDir);
+      // Filter to only directories (not .md files)
+      const personDirs = entries.filter(entry => {
+        const fullPath = path.join(pessoaDir, entry);
+        return fs.statSync(fullPath).isDirectory();
+      });
       
       // Should only have p1, p2, p3 from freeze.csv
       expect(personDirs).toEqual(expect.arrayContaining(['p1', 'p2', 'p3']));
@@ -234,7 +239,12 @@ describe('Tracer: TSE 2026 Donations with Refresh', () => {
 
     it('should NOT create new freeze person for weak name-only 2026 candidate match', () => {
       const pessoaDir = path.join(distPath, 'pessoa');
-      const personDirs = fs.readdirSync(pessoaDir);
+      const entries = fs.readdirSync(pessoaDir);
+      // Filter to only directories (not .md files)
+      const personDirs = entries.filter(entry => {
+        const fullPath = path.join(pessoaDir, entry);
+        return fs.statSync(fullPath).isDirectory();
+      });
       
       // Marina Costa is not in freeze, should not get a dossier
       expect(personDirs).not.toContain('marina-costa');
