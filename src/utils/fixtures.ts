@@ -14,6 +14,7 @@ import {
   getPublishedFactsFreeze,
   getPublishedFactsByPersonId,
   publishedFactToSource,
+  loadPublishedFacts,
   type PublishedFact
 } from './published-facts-loader';
 
@@ -45,8 +46,7 @@ export function getDerivedAssociations(): DerivedAssociation[] {
  * Convert published facts to DerivedAssociations format.
  * Real published facts use fact_kind='association' with supporting_fact_ids.
  */
-function convertPublishedFactsToAssociations(): DerivedAssociation[] {
-  const { loadPublishedFacts } = require('./published-facts-loader');
+export function convertPublishedFactsToAssociations(): DerivedAssociation[] {
   const facts = loadPublishedFacts();
   
   return facts
@@ -262,7 +262,6 @@ export function getIdentityFactsByPersonId(personId: string): IdentityFact[] {
  * Real published facts use fact_kind='identity' with value as raw field (name, role, group_name).
  */
 function convertPublishedFactsToIdentityFacts(): IdentityFact[] {
-  const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
   const result: IdentityFact[] = [];
@@ -311,7 +310,6 @@ export function getRFPartnerEdgesByPersonId(personId: string): RFPartnerEdge[] {
  * Extract company name and relationship from sentence and cnpj_basico/group_name fields.
  */
 function convertPublishedFactsToRFPartnerEdges(): RFPartnerEdge[] {
-  const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
   return facts
@@ -353,7 +351,6 @@ export function getCVMFREControls(): CVMFREControl[] {
  * Convert control_edge facts to CVM FRE control format.
  */
 function convertPublishedFactsToCVMControls(): CVMFREControl[] {
-  const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
   return facts
@@ -395,7 +392,6 @@ export function getDonations(): Donation[] {
  * Extract donation details from sentence.
  */
 function convertPublishedFactsToDonations(): Donation[] {
-  const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
   return facts
