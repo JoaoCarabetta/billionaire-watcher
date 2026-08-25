@@ -1,0 +1,89 @@
+name: Is Agentic CI
+
+# Runs Is Agentic CLI against the deployed public URL: https://billionaire-watcher.pages.dev/
+# Fails only on Essential tier issues, not Recommended API/OAuth/MCP gaps.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - '.github/workflows/is-agentic-ci.yml'
+  schedule:
+    # Run on weekdays at 9am UTC (Monday-Friday)
+    - cron: '0 9 * * 1-5'
+
+jobs:
+  is-agentic-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run Is Agentic CLI against public URL
+        id: is-agentic
+        run: |
+          # Run is-agentic against the deployed public URL
+          npx is-agentic https://billionaire-watcher.pages.dev/ --json > /tmp/is-agentic-report.json
+          
+          # Display the report
+          echo "=== Is Agentic Report ==="
+          cat /tmp/is-agentic-report.json | jq '.'
+
+      - name: Check for Essential tier failures
+        run: |
+          # Parse the JSON report and check for Essential tier failures
+          # Fail ONLY on Essential tier issues with result="failed"
+          # Do NOT fail on Recommended tier issues (API/OAuth/MCP gaps)
+          
+          ESSENTIAL_FAILURES=$(cat /tmp/is-agentic-report.json | jq -r '
+            .issues[] | 
+            select(.tier == "essential" and .result == "failed") | 
+            .id
+          ')
+          
+          if [ -n "$ESSENTIAL_FAILURES" ]; then
+            echo "=== Essential tier failures detected ==="
+            cat /tmp/is-agentic-report.json | jq -r '
+              .issues[] | 
+              select(.tier == "essential" and .result == "failed") | 
+              "❌ \(.id): \(.name)\n   \(.details)\n   Recommendation: \(.recommendation)\n"
+            '
+            
+            echo ""
+            echo "Essential checks must pass. See report at:"
+            cat /tmp/is-agentic-report.json | jq -r '.report_url'
+            
+            exit 1
+          else
+            echo "✅ All Essential tier checks passed or are partial"
+            
+            # Show score and any Recommended issues (informational only)
+            echo ""
+            echo "Score: $(cat /tmp/is-agentic-report.json | jq -r '.score') - $(cat /tmp/is-agentic-report.json | jq -r '.score_label')"
+            
+            RECOMMENDED_COUNT=$(cat /tmp/is-agentic-report.json | jq -r '.issues[] | select(.tier == "recommended") | .id' | wc -l)
+            if [ "$RECOMMENDED_COUNT" -gt 0 ]; then
+              echo ""
+              echo "ℹ️  $RECOMMENDED_COUNT Recommended improvements available (not blocking):"
+              cat /tmp/is-agentic-report.json | jq -r '
+                .issues[] | 
+                select(.tier == "recommended") | 
+                "  • \(.name) (\(.id))"
+              '
+            fi
+            
+            echo ""
+            echo "Full report: $(cat /tmp/is-agentic-report.json | jq -r '.report_url')"
+            
+            exit 0
+          fi
