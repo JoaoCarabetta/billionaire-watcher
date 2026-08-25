@@ -35,6 +35,7 @@ models:
     graph:
       +schema: billionaire_watcher
       +materialized: table
+      +enabled: "{{ target.name in ['test', 'ci'] }}"
       +meta:
         location: US
 
