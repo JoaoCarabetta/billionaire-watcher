@@ -26,7 +26,26 @@ unit_tests:
     rows: "select\n            'Test Forbes Person' as person_name,\n            2026 as forbes_year,\n            5.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            '11111111' as cnpj_basico,\n            'Consta da lista Forbes 2026' as notes,\n            'Forbes 2026' as source_doc"
     format: sql
   - input: ref('freeze_persons')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
     format: sql
   expect:
     rows: "select\n            'Test Forbes Person' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status"
@@ -45,7 +64,26 @@ unit_tests:
     rows: "select\n            'Forbes With Control Doc' as person_name,\n            2026 as forbes_year,\n            10.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            true as control_doc_available,\n            '22222222' as cnpj_basico,\n            'Consta da lista Forbes 2026 com controle documentado' as notes,\n            'Forbes 2026; FRE 6.1' as source_doc"
     format: sql
   - input: ref('freeze_persons')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
     format: sql
   expect:
     rows: "select\n            'Forbes With Control Doc' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status"
@@ -62,10 +100,31 @@ unit_tests:
     rows: "select\n            'Celebrity Athlete' as person_name,\n            2026 as forbes_year,\n            1.0 as estimated_wealth_usd_billions,\n            false as brazil_operations_nexus,\n            false as control_doc_available,\n            cast(null as varchar) as cnpj_basico,\n            'Celebrity athlete. No documentable control.' as notes,\n            'Forbes 2026' as source_doc"
     format: sql
   - input: ref('freeze_persons')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
     format: sql
   expect:
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as dummy_col
+          where false"
     format: sql
 - name: test_forbes_no_duplicate_if_in_positional_freeze
   description: 'FORBES SEAM TEST 5: A person already in positional freeze
@@ -82,7 +141,9 @@ unit_tests:
     rows: "select\n            5 as group_rank,\n            'Existing Company' as group_name,\n            '33333333' as cnpj_basico,\n            'Valor 1000 FY2024' as ranking_source,\n            cast(null as varchar) as receita_fy2024_brl,\n            true as listed_flag,\n            false as soe_flag,\n            'listed' as controlador_tipo,\n            'Already In Freeze' as person_name,\n            'controlador' as role,\n            'acionista_controlador' as edge_label,\n            cast(null as varchar) as acordo_acionistas,\n            'CVM FRE 2026' as source_doc,\n            '6.1' as fre_item,\n            false as hole,\n            '***999999**' as cpf_masked,\n            'in' as freeze_status,\n            'Positional controller' as notes"
     format: sql
   expect:
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as dummy_col
+          where false"
     format: sql
 - name: test_forbes_no_full_cpf_no_bilionario_phrase
   description: 'FORBES SEAM TEST 6: Output must not contain full CPF (only cpf_masked).
@@ -96,7 +157,26 @@ unit_tests:
     rows: "select\n            'Forbes Person Clean' as person_name,\n            2026 as forbes_year,\n            6.0 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            '44444444' as cnpj_basico,\n            'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões' as notes,\n            'Forbes 2026' as source_doc"
     format: sql
   - input: ref('freeze_persons')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
     format: sql
   expect:
     rows: "select\n            'Forbes Person Clean' as person_name,\n            'candidato_forbes' as role,\n            'review' as freeze_status,\n            cast(null as varchar) as cpf_masked,\n            'Consta da lista Forbes 2026 com patrimônio estimado de US$ 6.0 bilhões' as notes"
@@ -115,8 +195,29 @@ unit_tests:
     rows: "select\n            'Forbes Nexus No CNPJ' as person_name,\n            2026 as forbes_year,\n            8.5 as estimated_wealth_usd_billions,\n            true as brazil_operations_nexus,\n            false as control_doc_available,\n            cast(null as varchar) as cnpj_basico,\n            'Consta da lista Forbes 2026. Brazil-nexus via investments but no documentable control of identified Brazil-operating group.' as notes,\n            'Forbes 2026' as source_doc"
     format: sql
   - input: ref('freeze_persons')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as group_rank,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as ranking_source,
+            cast(null as varchar) as receita_fy2024_brl,
+            cast(null as boolean) as listed_flag,
+            cast(null as boolean) as soe_flag,
+            cast(null as varchar) as controlador_tipo,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as role,
+            cast(null as varchar) as edge_label,
+            cast(null as varchar) as acordo_acionistas,
+            cast(null as varchar) as source_doc,
+            cast(null as varchar) as fre_item,
+            cast(null as boolean) as hole,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as freeze_status,
+            cast(null as varchar) as notes
+          where false"
     format: sql
   expect:
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as dummy_col
+          where false"
     format: sql

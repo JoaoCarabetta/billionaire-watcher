@@ -255,16 +255,52 @@ unit_tests:
     rows: "select\n            'Ana Maria Silva' as person_name,\n            'in' as freeze_status,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***456***' as cpf_masked\n          union all\n          select\n            'Carlos Eduardo Santos' as person_name,\n            'in' as freeze_status,\n            '22222222' as cnpj_basico,\n            'Test Group B' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***789***' as cpf_masked"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
     format: sql
   - input: ref('donation_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
     format: sql
   - input: ref('tse_donations_2026')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
     format: sql
   expect:
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as dummy_col
+          where false"
     format: sql
 - name: test_association_facts_shared_control
   description: 'Association Seam 2: Shared control creates association with supporting fact_ids.
@@ -280,10 +316,32 @@ unit_tests:
       \ as cnpj_basico,\n            'Test Group Shared' as group_name"
     format: sql
   - input: ref('donation_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
     format: sql
   - input: ref('tse_donations_2026')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
     format: sql
   expect:
     rows: "select\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            'Ana Maria Silva e Carlos Eduardo Santos compartilham controle de empresa CNPJ 99999999' as value"
@@ -298,7 +356,19 @@ unit_tests:
     rows: "select\n            'Ana Maria Silva' as person_name,\n            'in' as freeze_status,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***456***' as cpf_masked\n          union all\n          select\n            'Carlos Eduardo Santos' as person_name,\n            'in' as freeze_status,\n            '22222222' as cnpj_basico,\n            'Test Group B' as group_name,\n            'controlador' as role,\n            'CVM FRE 2026' as source_doc,\n            '***789***' as cpf_masked"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
     format: sql
   - input: ref('donation_facts')
     rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name\n          union all\n          select\n            'donation_2026002_Carlos Eduardo Santos' as fact_id,\n            'Carlos Eduardo Santos' as person_name,\n            'donation' as fact_kind,\n            'Carlos Eduardo Santos doou R$ 75000.0 para Deputado Federal Candidato A em 2026 (recibo 2026002)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas\
@@ -322,7 +392,19 @@ unit_tests:
     rows: select null as dummy_col where false
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
     format: sql
   - input: ref('donation_facts')
     rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026 (recibo 2026001)' as value,\n            'Tribunal Superior Eleitoral' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
@@ -345,7 +427,19 @@ unit_tests:
     rows: "select\n            'identity_001' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'identity' as fact_kind,\n            'Ana Maria Silva' as value,\n            'CVM' as source_publisher,\n            'CVM FRE 2026' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
     format: sql
   - input: ref('control_edge_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name,
+            cast(null as varchar) as edge_label
+          where false"
     format: sql
   - input: ref('donation_facts')
     rows: "select\n            'donation_2026001_Ana Maria Silva' as fact_id,\n            'Ana Maria Silva' as person_name,\n            'donation' as fact_kind,\n            'Ana Maria Silva doou R$ 50000.0 para Deputado Federal Candidato A em 2026' as value,\n            'TSE' as source_publisher,\n            'TSE Receitas Candidato 2026 recibo 2026001' as source_locator,\n            cast(null as varchar) as source_retrieved_at,\n            '***456***' as cpf_masked,\n            '11111111' as cnpj_basico,\n            'Test Group A' as group_name"
@@ -372,10 +466,32 @@ unit_tests:
       \ as cnpj_basico,\n            'Test Group Shared' as group_name"
     format: sql
   - input: ref('donation_facts')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as varchar) as fact_id,
+            cast(null as varchar) as person_name,
+            cast(null as varchar) as fact_kind,
+            cast(null as varchar) as value,
+            cast(null as varchar) as source_publisher,
+            cast(null as varchar) as source_locator,
+            cast(null as varchar) as source_retrieved_at,
+            cast(null as varchar) as cpf_masked,
+            cast(null as varchar) as cnpj_basico,
+            cast(null as varchar) as group_name
+          where false"
     format: sql
   - input: ref('tse_donations_2026')
-    rows: select null as dummy_col where false
+    rows: "select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_candidato,
+            cast(null as varchar) as nome_candidato,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador,
+            cast(null as double) as valor_receita,
+            cast(null as varchar) as tipo_receita,
+            cast(null as varchar) as fonte_receita,
+            cast(null as varchar) as numero_recibo_eleitoral,
+            cast(null as varchar) as cpf_doador_masked
+          where false"
     format: sql
   expect:
     rows: "select\n            'Ana Maria Silva' as person_name,\n            'association' as fact_kind,\n            '['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']' as supporting_fact_ids\n          union all\n          select\n            'Carlos Eduardo Santos' as person_name,\n            'association' as fact_kind,\n            '['control_edge_11111111_Ana Maria Silva_socio', 'control_edge_99999999_Carlos Eduardo Santos_socio']' as supporting_fact_ids"
