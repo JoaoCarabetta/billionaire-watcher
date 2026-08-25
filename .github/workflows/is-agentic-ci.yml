@@ -42,30 +42,50 @@ jobs:
       - name: Check for Essential tier failures
         run: |
           # Parse the JSON report and check for Essential tier failures
-          # Fail ONLY on Essential tier issues with result="failed"
-          # Do NOT fail on Recommended tier issues (API/OAuth/MCP gaps)
+          # Fail ONLY on Essential issues that match checks we already apply (issue #29):
+          # - content-no-js (SSR HTML content)
+          # - agent-friendly-404 (Real 404 page)
+          # Do NOT fail on other Essential checks or Recommended tier (API/OAuth/MCP gaps)
           
-          ESSENTIAL_FAILURES=$(cat /tmp/is-agentic-report.json | jq -r '
+          # Whitelist of Essential IDs we apply (from agent-readiness.test.ts)
+          ESSENTIAL_WHITELIST='["content-no-js", "agent-friendly-404"]'
+          
+          WHITELISTED_FAILURES=$(cat /tmp/is-agentic-report.json | jq -r --argjson whitelist "$ESSENTIAL_WHITELIST" '
             .issues[] | 
-            select(.tier == "essential" and .result == "failed") | 
+            select(.tier == "essential" and .result == "failed" and ([.id] | inside($whitelist))) | 
             .id
           ')
           
-          if [ -n "$ESSENTIAL_FAILURES" ]; then
-            echo "=== Essential tier failures detected ==="
-            cat /tmp/is-agentic-report.json | jq -r '
+          if [ -n "$WHITELISTED_FAILURES" ]; then
+            echo "=== Essential failures detected (from agent-readiness checks) ==="
+            cat /tmp/is-agentic-report.json | jq -r --argjson whitelist "$ESSENTIAL_WHITELIST" '
               .issues[] | 
-              select(.tier == "essential" and .result == "failed") | 
+              select(.tier == "essential" and .result == "failed" and ([.id] | inside($whitelist))) | 
               "❌ \(.id): \(.name)\n   \(.details)\n   Recommendation: \(.recommendation)\n"
             '
             
             echo ""
-            echo "Essential checks must pass. See report at:"
+            echo "Essential checks we apply must pass. See report at:"
             cat /tmp/is-agentic-report.json | jq -r '.report_url'
             
             exit 1
           else
-            echo "✅ All Essential tier checks passed or are partial"
+            echo "✅ All whitelisted Essential checks passed or are partial"
+            
+            # Show any non-whitelisted Essential issues (informational only)
+            NON_WHITELISTED=$(cat /tmp/is-agentic-report.json | jq -r --argjson whitelist "$ESSENTIAL_WHITELIST" '
+              [.issues[] | select(.tier == "essential" and .result == "failed" and ([.id] | inside($whitelist) | not))] | length
+            ')
+            
+            if [ "$NON_WHITELISTED" -gt 0 ]; then
+              echo ""
+              echo "ℹ️  $NON_WHITELISTED other Essential issues (not blocking):"
+              cat /tmp/is-agentic-report.json | jq -r --argjson whitelist "$ESSENTIAL_WHITELIST" '
+                .issues[] | 
+                select(.tier == "essential" and .result == "failed" and ([.id] | inside($whitelist) | not)) | 
+                "  • \(.name) (\(.id))"
+              '
+            fi
             
             # Show score and any Recommended issues (informational only)
             echo ""

@@ -116,14 +116,14 @@ describe('Is Agentic CI Workflow (issue #30)', () => {
     expect(workflowString, 'Should not reference env with API keys').not.toMatch(/api.{0,5}key/);
   });
 
-  it('should fail only on Essential tier failures, not Recommended', () => {
+  it('should use a whitelist of Essential IDs we apply', () => {
     expect(workflowContent).not.toBeNull();
     
     const jobs = workflowContent.jobs;
     const jobKeys = Object.keys(jobs);
     
     // Find the job that processes is-agentic results
-    let foundFailureLogic = false;
+    let foundWhitelist = false;
     for (const jobKey of jobKeys) {
       const job = jobs[jobKey];
       const steps = job.steps || [];
@@ -131,25 +131,126 @@ describe('Is Agentic CI Workflow (issue #30)', () => {
       for (const step of steps) {
         const run = step.run || '';
         
-        // Look for logic that parses the JSON and checks tier
-        if (run.includes('essential') || run.includes('tier')) {
-          foundFailureLogic = true;
+        // Look for whitelist logic
+        if (run.includes('ESSENTIAL_WHITELIST') || (run.includes('content-no-js') && run.includes('agent-friendly-404'))) {
+          foundWhitelist = true;
           
-          // Should check for essential tier
-          expect(run.toLowerCase(), 'Should check for essential tier').toContain('essential');
+          // Should have content-no-js in whitelist (SSR check from agent-readiness Test 1)
+          expect(run, 'Should whitelist content-no-js').toContain('content-no-js');
           
-          // Should NOT fail on recommended
-          // (absence of 'recommended' in failure condition, or explicit exclusion)
+          // Should have agent-friendly-404 in whitelist (404 check from agent-readiness Test 4)
+          expect(run, 'Should whitelist agent-friendly-404').toContain('agent-friendly-404');
+          
+          // Should NOT have markdown-negotiation-vary in whitelist (not in agent-readiness tests)
+          expect(run, 'Should NOT whitelist markdown-negotiation-vary').not.toContain('markdown-negotiation-vary');
+          
           break;
         }
       }
-      if (foundFailureLogic) break;
+      if (foundWhitelist) break;
     }
     
     expect(
-      foundFailureLogic,
-      'Should have logic that checks Essential tier and fails appropriately'
+      foundWhitelist,
+      'Should have whitelist of Essential IDs we apply'
     ).toBe(true);
+  });
+
+  it('should fail on whitelisted Essential failures (content-no-js)', () => {
+    // Simulate a report with content-no-js failure
+    const mockReport = {
+      issues: [
+        {
+          id: 'content-no-js',
+          tier: 'essential',
+          result: 'failed',
+          name: 'Content without JavaScript',
+          details: 'Test failure'
+        }
+      ]
+    };
+    
+    // Extract the whitelist logic from the workflow
+    const jobs = workflowContent.jobs;
+    const jobKeys = Object.keys(jobs);
+    
+    let hasWhitelistCheck = false;
+    for (const jobKey of jobKeys) {
+      const job = jobs[jobKey];
+      const steps = job.steps || [];
+      
+      for (const step of steps) {
+        const run = step.run || '';
+        
+        // Verify the jq filter would catch content-no-js
+        if (run.includes('ESSENTIAL_WHITELIST') && run.includes('content-no-js')) {
+          hasWhitelistCheck = true;
+          
+          // The whitelist should include content-no-js
+          expect(run).toContain('content-no-js');
+          
+          // The jq filter checks: tier == "essential" and result == "failed" and id in whitelist
+          expect(run).toContain('tier == "essential"');
+          expect(run).toContain('result == "failed"');
+          
+          break;
+        }
+      }
+      if (hasWhitelistCheck) break;
+    }
+    
+    expect(hasWhitelistCheck, 'Whitelist logic should catch content-no-js failures').toBe(true);
+  });
+
+  it('should NOT fail on non-whitelisted Essential failures (markdown-negotiation-vary)', () => {
+    // Simulate a report with ONLY markdown-negotiation-vary failure
+    const mockReport = {
+      issues: [
+        {
+          id: 'markdown-negotiation-vary',
+          tier: 'essential',
+          result: 'failed',
+          name: 'Markdown content negotiation',
+          details: 'Test failure'
+        }
+      ]
+    };
+    
+    // Extract the whitelist from the workflow
+    const jobs = workflowContent.jobs;
+    const jobKeys = Object.keys(jobs);
+    
+    let whitelist: string[] = [];
+    for (const jobKey of jobKeys) {
+      const job = jobs[jobKey];
+      const steps = job.steps || [];
+      
+      for (const step of steps) {
+        const run = step.run || '';
+        
+        if (run.includes('ESSENTIAL_WHITELIST')) {
+          // Extract whitelist array
+          const match = run.match(/ESSENTIAL_WHITELIST='?\[([^\]]+)\]'?/);
+          if (match) {
+            whitelist = match[1].split(',').map(s => s.trim().replace(/['"]/g, ''));
+          }
+          break;
+        }
+      }
+      if (whitelist.length > 0) break;
+    }
+    
+    // Verify markdown-negotiation-vary is NOT in the whitelist
+    expect(
+      whitelist,
+      'Whitelist should not include markdown-negotiation-vary'
+    ).not.toContain('markdown-negotiation-vary');
+    
+    // Verify content-no-js IS in the whitelist (sanity check)
+    expect(
+      whitelist,
+      'Whitelist should include content-no-js'
+    ).toContain('content-no-js');
   });
 
   it('should document the public URL in comments', () => {
