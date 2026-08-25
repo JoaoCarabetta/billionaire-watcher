@@ -28,9 +28,9 @@ donation_facts as (
         person_name,
         -- Extract year from source_locator
         -- Format: "TSE Receitas Candidato {ano} recibo {numero_recibo_eleitoral}"
-        regexp_extract(source_locator, 'TSE Receitas Candidato (\\d{4})') as ano,
+        regexp_extract(source_locator, 'TSE Receitas Candidato (\d{4})', 1) as ano,
         -- Extract receipt to join back to seed for candidate name
-        regexp_extract(source_locator, 'recibo (\\S+)') as numero_recibo_eleitoral
+        regexp_extract(source_locator, 'recibo (\S+)', 1) as numero_recibo_eleitoral
     from {{ ref('donation_facts') }}
     where source_locator like 'TSE Receitas%'
 ),
