@@ -94,7 +94,7 @@ freeze_normalized as (
         cpf_masked,
         cnpj_basico,
         group_name,
-        lpad(regexp_replace(cpf_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+        lpad(regexp_replace(cpf_masked, '[^0-9]', ''), 11, '0') as cpf_digits
     from freeze_persons
 ),
 
@@ -107,7 +107,7 @@ tse_normalized as (
         valor_receita,
         tipo_receita,
         numero_recibo_eleitoral,
-        lpad(regexp_replace(cpf_doador_masked, r'[^0-9]', ''), 11, '0') as cpf_digits
+        lpad(regexp_replace(cpf_doador_masked, '[^0-9]', ''), 11, '0') as cpf_digits
     from all_tse_donations
 ),
 
