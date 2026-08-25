@@ -56,7 +56,8 @@ const allSources: Source[] = [
   ...identityFacts.filter(f => f.source).map(f => f.source!),
   ...rfPartnerEdges.filter(e => e.source).map(e => e.source),
   ...cvmFreControls.filter(c => c.source).map(c => c.source),
-  ...donations.map(d => d.source)
+  ...donations.map(d => d.source),
+  ...associations.filter(a => a.source).map(a => a.source!)
 ];
 
 // Assign numbers to unique sources by first appearance

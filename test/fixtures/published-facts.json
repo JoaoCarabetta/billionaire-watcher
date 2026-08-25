@@ -192,6 +192,6 @@
     "cpf_masked": null,
     "cnpj_basico": null,
     "group_name": null,
-    "supporting_fact_ids": "control_edge_12345678_João Silva_socio,control_edge_11222333_Maria Santos_socio"
+    "supporting_fact_ids": ["control_edge_12345678_João Silva_socio", "control_edge_11222333_Maria Santos_socio"]
   }
 ]

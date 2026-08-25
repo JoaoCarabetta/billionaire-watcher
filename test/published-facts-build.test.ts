@@ -65,6 +65,20 @@ describe('Published Facts Build Integration', () => {
       const dossierPath = path.join(distPath, 'pessoa', 'Ana Lima', 'index.html');
       expect(fs.existsSync(dossierPath), `Dossier page for Ana Lima should exist`).toBe(true);
     });
+    
+    it('should NOT build dossier for TSE-only candidates (no published facts)', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      // Fernanda Almeida and Marina Costa are only mentioned in donations
+      // but have no published facts themselves - no dossier URLs
+      const fernandaPath = path.join(distPath, 'pessoa', 'Fernanda Almeida');
+      const marinaPath = path.join(distPath, 'pessoa', 'Marina Costa');
+      
+      expect(fs.existsSync(fernandaPath)).toBe(false);
+      expect(fs.existsSync(marinaPath)).toBe(false);
+    });
 
     it('should list João Silva, Maria Santos, Ana Lima on home page', () => {
       const homePath = path.join(distPath, 'index.html');
@@ -219,11 +233,8 @@ describe('Published Facts Build Integration', () => {
       // Must have association section
       expect(html).toMatch(/associações/i);
       
-      // Must have the association value from the published fact
-      expect(html).toContain('Relação entre João Silva e Maria Santos através de investimentos cruzados');
-      
-      // Must have citation for the association
-      expect(html).toMatch(/\[\d+\]/);
+      // Association value must be followed by [n] citation marker (may be in a <sup> tag)
+      expect(html).toMatch(/Relação entre João Silva e Maria Santos através de investimentos cruzados[^<]*<[^>]*>\[\d+\]/);
     });
   });
 

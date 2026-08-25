@@ -60,9 +60,12 @@ function convertPublishedFactsToAssociations(): DerivedAssociation[] {
         type = 'freeze_person';
       }
       
-      // Parse supporting_fact_ids (comma-separated string) into array
+      // supporting_fact_ids is an array (string[]) in real published facts
+      // Accept string for backwards compatibility
       const supportingIds = fact.supporting_fact_ids 
-        ? fact.supporting_fact_ids.split(',').map(id => id.trim())
+        ? (Array.isArray(fact.supporting_fact_ids)
+            ? fact.supporting_fact_ids
+            : fact.supporting_fact_ids.split(',').map((id: string) => id.trim()))
         : [];
       
       return {

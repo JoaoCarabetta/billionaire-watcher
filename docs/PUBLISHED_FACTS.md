@@ -51,7 +51,7 @@ source_retrieved_at  string?     -- Retrieval date (ISO format, optional)
 cpf_masked           string?     -- Masked CPF (***NNN***) - only when present in source
 cnpj_basico          string?     -- CNPJ basic (8 digits)
 group_name           string?     -- Company name for control edges
-supporting_fact_ids  string?     -- Comma-separated fact IDs for associations
+supporting_fact_ids  string[]?   -- Array of fact IDs for associations
 ```
 
 ### The Four Fact Kinds
@@ -109,7 +109,7 @@ Example:
 ```
 
 #### 4. `association`
-Derived associations between people with supporting fact IDs.
+Derived associations between people with supporting fact IDs (array of fact_id strings).
 
 Example:
 ```json
@@ -120,7 +120,7 @@ Example:
   "value": "Relação entre João Silva e Maria Santos através de investimentos cruzados",
   "source_publisher": "Receita Federal do Brasil",
   "source_locator": "Receita Federal QSA análise consolidada",
-  "supporting_fact_ids": "control_edge_12345678_João Silva_socio,control_edge_11222333_Maria Santos_socio"
+  "supporting_fact_ids": ["control_edge_12345678_João Silva_socio", "control_edge_11222333_Maria Santos_socio"]
 }
 ```
 
