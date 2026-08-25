@@ -19,3 +19,11 @@ Features:
 - `llms.txt` explaining archive structure and navigation
 - Real 404 page (not soft-404 SPA)
 - Visible citations in HTML text
+
+### Continuous Validation
+
+The [Is Agentic CI workflow](.github/workflows/is-agentic-ci.yml) runs automatically to verify agent-readiness on the deployed site at https://billionaire-watcher.pages.dev/
+
+- **Triggers:** Push to main (site files) + weekday schedule
+- **Command:** `npx is-agentic https://billionaire-watcher.pages.dev/ --json`
+- **Failure Policy:** Fails only on Essential tier issues; Recommended API/OAuth/MCP gaps do not block
