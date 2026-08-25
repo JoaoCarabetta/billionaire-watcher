@@ -21,6 +21,16 @@ unit_tests:
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
             cast(null as string) as provisional_name_key
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -65,6 +75,16 @@ unit_tests:
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
             cast(null as string) as provisional_name_key
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -115,6 +135,16 @@ unit_tests:
             'Bruno Silva Teste' as name,
             cast(null as string) as cpf,
             'Bruno Silva Teste_2' as provisional_name_key
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -167,6 +197,16 @@ unit_tests:
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
             cast(null as string) as provisional_name_key
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -215,6 +255,32 @@ unit_tests:
           select '02260956' as node_id, 'company' as node_kind
           union all
           select '00864214' as node_id, 'company' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -259,6 +325,32 @@ unit_tests:
           select 'Diana Oliveira Teste_1' as node_id, 'person' as node_kind
           union all
           select '44556677' as node_id, 'company' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -384,6 +476,32 @@ unit_tests:
           select '33445566' as node_id, 'company' as node_kind
           union all
           select '12345678' as node_id, 'fund' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -570,6 +688,32 @@ unit_tests:
           select '00000001' as node_id, 'outros' as node_kind
           union all
           select '00864214' as node_id, 'company' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -666,6 +810,32 @@ unit_tests:
           select '02260956' as node_id, 'company' as node_kind
           union all
           select '00864214' as node_id, 'company' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -705,7 +875,9 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             '2026-08-14' as source_retrieved_at
-          union all
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
           select
             'Carlos Botelho QSA_1' as from_id,
             '00864214' as to_id,
@@ -726,6 +898,16 @@ unit_tests:
           select '00864214' as node_id, 'company' as node_kind
           union all
           select 'Carlos Botelho QSA_1' as node_id, 'person' as node_kind
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -775,6 +957,16 @@ unit_tests:
             'Diana Oliveira Teste' as name,
             cast(null as string) as cpf,
             'Diana Oliveira Teste_1' as provisional_name_key
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
@@ -859,6 +1051,32 @@ unit_tests:
           select '12345678901' as node_id, 'person' as node_kind
           union all
           select '55667788' as node_id, 'company' as node_kind
+      - input: ref('qsa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '99999999999' as from_id,
+            '99999999' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Empty' as source_doc,
+            'Empty' as source_locator,
+            '2000-01-01' as source_retrieved_at
+          where false
+      - input: ref('qsa_companies_fixture')
+        format: sql
+        rows: |
+          select '99999999' as cnpj_basico, 'company' as node_kind, 'Empty' as name
+          where false
+      - input: ref('qsa_persons_fixture')
+        format: sql
+        rows: |
+          select '99999999999' as node_id, 'person' as node_kind, 'Empty' as name, '99999999999' as cpf, cast(null as string) as provisional_name_key
+          where false
     expect:
       format: sql
       rows: |
