@@ -26,6 +26,9 @@ export function getFactById(id: string): Fact | undefined {
 }
 
 export function getDerivedAssociations(): DerivedAssociation[] {
+  if (shouldUsePublishedFacts()) {
+    return convertPublishedFactsToAssociations();
+  }
   return associationsData.filter(assoc => 
     assoc.parent_donation_ids.length > 0 &&
     assoc.parent_donation_ids.every(donationId => {
@@ -33,6 +36,39 @@ export function getDerivedAssociations(): DerivedAssociation[] {
       return donation !== undefined;
     })
   );
+}
+
+/**
+ * Convert published facts to DerivedAssociations format.
+ * Real published facts use fact_kind='association' with supporting_fact_ids.
+ */
+function convertPublishedFactsToAssociations(): DerivedAssociation[] {
+  const { loadPublishedFacts } = require('./published-facts-loader');
+  const facts = loadPublishedFacts();
+  
+  return facts
+    .filter((fact: PublishedFact) => 
+      fact.fact_kind === 'association' && 
+      fact.supporting_fact_ids && 
+      fact.supporting_fact_ids.length > 0
+    )
+    .map((fact: PublishedFact) => {
+      // Determine association type from value
+      let type: 'politician' | 'freeze_person' = 'freeze_person';
+      if (fact.value.includes('compartilham controle')) {
+        type = 'freeze_person';
+      } else if (fact.value.includes('doaram para')) {
+        type = 'freeze_person';
+      }
+      
+      return {
+        id: fact.fact_id,
+        person_id: fact.person_id,
+        association_type: type,
+        description: fact.value,
+        parent_donation_ids: fact.supporting_fact_ids || []
+      };
+    });
 }
 
 export function getDerivedAssociationsByPersonId(personId: string): DerivedAssociation[] {
@@ -135,8 +171,18 @@ export function getDerivedAssociationsByPersonId(personId: string): DerivedAssoc
 }
 
 export function redactCPF(text: string): string {
-  return text.replace(/\d{3}\.\d{3}\.\d{3}-\d{2}/g, '[CPF REDACTED]')
-             .replace(/\d{11}/g, '[CPF REDACTED]');
+  // Replace formatted CPF (123.456.789-00) with ***NNN***
+  text = text.replace(/\d{3}\.\d{3}\.(\d{3})-\d{2}/g, (match, last3) => {
+    return `***${last3}***`;
+  });
+  
+  // Replace 11-digit CPF with ***NNN***
+  text = text.replace(/(\d{11})/g, (match) => {
+    const last3 = match.slice(-3);
+    return `***${last3}***`;
+  });
+  
+  return text;
 }
 
 export function getFreeze(): Person[] {
@@ -183,26 +229,31 @@ export function getIdentityFactsByPersonId(personId: string): IdentityFact[] {
 
 /**
  * Convert published facts to identity facts format.
- * Only includes identity fact kinds (nome, nacionalidade, data_nascimento, etc.)
- * For facts with cpf_masked, creates a CPF identity fact.
+ * Real published facts use fact_kind='identity' with value as raw field (name, role, group_name).
  */
 function convertPublishedFactsToIdentityFacts(): IdentityFact[] {
   const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
-  const identityFactKinds = ['nome', 'nacionalidade', 'data_nascimento', 'cpf'];
   const result: IdentityFact[] = [];
-  
-  // Track which persons have CPF masked facts
   const personsWithCpf = new Set<string>();
   
   for (const fact of facts) {
-    // Add regular identity facts
-    if (identityFactKinds.includes(fact.fact_kind)) {
+    if (fact.fact_kind === 'identity') {
+      // Infer field type from fact_id pattern (identity_{cnpj}_{person}_{field})
+      let field = 'unknown';
+      if (fact.fact_id.includes('_name')) {
+        field = 'nome';
+      } else if (fact.fact_id.includes('_role')) {
+        field = 'role';
+      } else if (fact.fact_id.includes('_group')) {
+        field = 'group_name';
+      }
+      
       result.push({
         id: fact.fact_id,
         person_id: fact.person_id,
-        field: fact.fact_kind,
+        field: field,
         value: fact.value,
         source: publishedFactToSource(fact),
         cpf: fact.cpf_masked || undefined
@@ -212,14 +263,18 @@ function convertPublishedFactsToIdentityFacts(): IdentityFact[] {
     // Create CPF identity fact for facts that have cpf_masked
     if (fact.cpf_masked && !personsWithCpf.has(fact.person_id)) {
       personsWithCpf.add(fact.person_id);
-      result.push({
-        id: `cpf-${fact.person_id}`,
-        person_id: fact.person_id,
-        field: 'cpf',
-        value: fact.cpf_masked,
-        source: publishedFactToSource(fact),
-        cpf: fact.cpf_masked
-      });
+      // Find the first fact with source for this person
+      const sourceFact = facts.find(f => f.person_id === fact.person_id && f.source_locator);
+      if (sourceFact) {
+        result.push({
+          id: `cpf-${fact.person_id}`,
+          person_id: fact.person_id,
+          field: 'cpf',
+          value: fact.cpf_masked,
+          source: publishedFactToSource(sourceFact),
+          cpf: fact.cpf_masked
+        });
+      }
     }
   }
   
@@ -239,30 +294,45 @@ export function getRFPartnerEdgesByPersonId(personId: string): RFPartnerEdge[] {
 
 /**
  * Convert published facts to RF partner edges format.
- * Only includes rf_socio fact kinds.
+ * Real published facts use fact_kind='control_edge' with value as complete sentence.
+ * Extract company name and relationship from sentence and cnpj_basico/group_name fields.
  */
 function convertPublishedFactsToRFPartnerEdges(): RFPartnerEdge[] {
   const { loadPublishedFacts } = require('./published-facts-loader');
   const facts = loadPublishedFacts();
   
   return facts
-    .filter((fact: PublishedFact) => fact.fact_kind === 'rf_socio' && fact.cnpj_basico && fact.group_name)
+    .filter((fact: PublishedFact) => fact.fact_kind === 'control_edge' && fact.cnpj_basico && fact.group_name)
     .map((fact: PublishedFact) => {
-      // Format CNPJ basico back to full format with placeholder for suffix
-      const cnpjFormatted = fact.cnpj_basico!.replace(/(\d{2})(\d{3})(\d{3})/, '$1.$2.$3/0001-99');
+      // Extract relationship from sentence (e.g., "João Silva é sócio de...")
+      let relationship = 'sócio'; // default
+      if (fact.value.includes('é acionista controlador')) {
+        relationship = 'acionista controlador';
+      } else if (fact.value.includes('é administrador')) {
+        relationship = 'administrador';
+      } else if (fact.value.includes('é sócio')) {
+        relationship = 'sócio';
+      }
+      
+      // Use cnpj_basico as is (8 digits), don't invent suffixes
+      const cnpjFormatted = fact.cnpj_basico!;
       
       return {
         id: fact.fact_id,
         person_id: fact.person_id,
         company_cnpj: cnpjFormatted,
         company_name: fact.group_name!,
-        relationship: fact.value,
+        relationship: relationship,
         source: publishedFactToSource(fact)
       };
     });
 }
 
 export function getCVMFREControls(): CVMFREControl[] {
+  if (shouldUsePublishedFacts()) {
+    // CVM FRE controls are in control_edge facts, not separate
+    return [];
+  }
   return cvmFreControlData.filter(control => control.source !== undefined) as CVMFREControl[];
 }
 
@@ -271,7 +341,51 @@ export function getCVMFREControlsByPersonId(personId: string): CVMFREControl[] {
 }
 
 export function getDonations(): Donation[] {
+  if (shouldUsePublishedFacts()) {
+    return convertPublishedFactsToDonations();
+  }
   return donationsData as Donation[];
+}
+
+/**
+ * Convert published facts to Donations format.
+ * Real published facts use fact_kind='donation' with value as complete sentence.
+ * Extract donation details from sentence.
+ */
+function convertPublishedFactsToDonations(): Donation[] {
+  const { loadPublishedFacts } = require('./published-facts-loader');
+  const facts = loadPublishedFacts();
+  
+  return facts
+    .filter((fact: PublishedFact) => fact.fact_kind === 'donation')
+    .map((fact: PublishedFact) => {
+      // Parse sentence: "João Silva doou R$ 100000 para Fernanda Almeida em 2020 (recibo recibo-2020-001)"
+      const amountMatch = fact.value.match(/R\$\s*([\d]+)/);
+      // Fix regex: capture everything between "para" and "em", non-greedy
+      const candidateMatch = fact.value.match(/para\s+(.+?)\s+em/);
+      const yearMatch = fact.value.match(/em\s+(\d{4})/);
+      
+      const amount = amountMatch ? parseInt(amountMatch[1]) : 0;
+      const candidateName = candidateMatch ? candidateMatch[1].trim() : '';
+      const year = yearMatch ? parseInt(yearMatch[1]) : 0;
+      
+      // Extract cycle from source_locator
+      const cycle = `Eleições Municipais ${year}`;
+      
+      return {
+        id: fact.fact_id,
+        donor_type: 'person' as const,
+        donor_cpf: fact.cpf_masked,
+        donor_name: fact.person_id,
+        candidate_cpf: '', // Not available in published facts
+        candidate_name: candidateName,
+        candidate_numero: '',
+        amount: amount,
+        year: year,
+        cycle: cycle,
+        source: publishedFactToSource(fact)
+      };
+    });
 }
 
 export function getCandidates(): Candidate[] {
@@ -279,12 +393,19 @@ export function getCandidates(): Candidate[] {
 }
 
 export function getDonationsByPersonId(personId: string): Donation[] {
+  const donations = getDonations();
+  
+  // When using published facts, donations are already person-specific
+  if (shouldUsePublishedFacts()) {
+    return donations.filter(d => d.donor_name === personId);
+  }
+  
+  // Old fixture logic
   const freeze = getFreeze();
   const person = freeze.find(p => p.person_id === personId);
   if (!person) return [];
   
   const personCpf = person.cpf?.replace(/\D/g, '');
-  const donations = getDonations();
   
   // Get CNPJs from RF partner edges (existing #3 control chain)
   const rfPartnerEdges = getRFPartnerEdgesByPersonId(personId);

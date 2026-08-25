@@ -118,7 +118,7 @@ export function publishedFactToSource(fact: PublishedFact): PublishedFactsSource
 
 /**
  * Get freeze list from published facts.
- * Returns unique persons, using the name fact as person_name.
+ * Returns unique persons, using person_id as person_name (they're the same in real data).
  */
 export function getPublishedFactsFreeze(): Person[] {
   const facts = loadPublishedFacts();
@@ -126,12 +126,9 @@ export function getPublishedFactsFreeze(): Person[] {
   
   for (const fact of facts) {
     if (!personMap.has(fact.person_id)) {
-      // Find name fact for this person
-      const nameFact = facts.find(f => f.person_id === fact.person_id && f.fact_kind === 'nome');
-      
       personMap.set(fact.person_id, {
         person_id: fact.person_id,
-        person_name: nameFact?.value || fact.person_id,
+        person_name: fact.person_id, // person_id IS the person name in real data
         group_name: '',
         role: ''
       });
@@ -143,7 +140,9 @@ export function getPublishedFactsFreeze(): Person[] {
 
 /**
  * Check if we should use published facts loader.
- * Returns true if PUBLISHED_FACTS_DIR is set or if USE_PUBLISHED_FACTS=true.
+ * Returns true if PUBLISHED_FACTS_DIR is set.
+ * Production builds MUST set PUBLISHED_FACTS_DIR or fail.
+ * Tests opt-in by setting USE_PUBLISHED_FACTS env var.
  */
 export function shouldUsePublishedFacts(): boolean {
   return !!(process.env.PUBLISHED_FACTS_DIR || process.env.USE_PUBLISHED_FACTS);

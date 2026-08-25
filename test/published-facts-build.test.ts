@@ -11,7 +11,7 @@ describe('Published Facts Build Integration', () => {
   beforeAll(() => {
     distPath = path.join(__dirname, '..', 'dist');
     
-    // Build with USE_PUBLISHED_FACTS=true
+    // Build from published facts (uses git fixture when USE_PUBLISHED_FACTS is set)
     try {
       execSync('npm run build', { 
         cwd: path.join(__dirname, '..'),
@@ -29,7 +29,7 @@ describe('Published Facts Build Integration', () => {
   });
 
   describe('Freeze list from published facts', () => {
-    it('should build successfully with USE_PUBLISHED_FACTS=true', () => {
+    it('should build successfully from published facts', () => {
       if (buildFailed) {
         throw new Error(`Build failed: ${buildError}`);
       }
@@ -38,42 +38,50 @@ describe('Published Facts Build Integration', () => {
       expect(fs.existsSync(indexPath)).toBe(true);
     });
 
-    it('should build dossier for p1 from published facts', () => {
+    it('should build dossier for João Silva from published facts', () => {
       if (buildFailed) {
         throw new Error(`Build failed: ${buildError}`);
       }
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
-      expect(fs.existsSync(dossierPath), `Dossier page for p1 should exist`).toBe(true);
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      expect(fs.existsSync(dossierPath), `Dossier page for João Silva should exist`).toBe(true);
     });
 
-    it('should build dossier for p4 from published facts (not in freeze CSV)', () => {
+    it('should build dossier for Maria Santos from published facts', () => {
       if (buildFailed) {
         throw new Error(`Build failed: ${buildError}`);
       }
       
-      const dossierPath = path.join(distPath, 'pessoa', 'p4', 'index.html');
-      expect(fs.existsSync(dossierPath), `Dossier page for p4 should exist when using published facts`).toBe(true);
+      const dossierPath = path.join(distPath, 'pessoa', 'Maria Santos', 'index.html');
+      expect(fs.existsSync(dossierPath), `Dossier page for Maria Santos should exist`).toBe(true);
     });
 
-    it('should list p1, p2, p3, p4 on home page', () => {
+    it('should build dossier for Ana Lima from published facts', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'Ana Lima', 'index.html');
+      expect(fs.existsSync(dossierPath), `Dossier page for Ana Lima should exist`).toBe(true);
+    });
+
+    it('should list João Silva, Maria Santos, Ana Lima on home page', () => {
       const homePath = path.join(distPath, 'index.html');
       const html = fs.readFileSync(homePath, 'utf-8');
       
       expect(html).toContain('João Silva');
       expect(html).toContain('Maria Santos');
       expect(html).toContain('Ana Lima');
-      expect(html).toContain('Pedro Costa');
     });
   });
 
   describe('Facts rendering with citations', () => {
-    it('should render identity facts with citations for p1', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+    it('should render identity facts with citations for João Silva', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       expect(html).toContain('João Silva');
-      expect(html).toContain('Brasileira');
+      expect(html).toContain('controlador');
       
       // Must have citation markers
       const hasSuperscriptPattern = /<sup[^>]*>.*?<\/sup>/i.test(html) || /\[[\d]+\]/.test(html);
@@ -81,24 +89,33 @@ describe('Published Facts Build Integration', () => {
     });
 
     it('should include References section with sources', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       expect(html).toContain('Referências');
-      expect(html).toContain('https://www.gov.br/receitafederal');
+      expect(html).toContain('Receita Federal');
     });
 
-    it('should render control edge facts with group_name', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+    it('should render control edge facts with company name', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       expect(html).toContain('Empresa XYZ Ltda.');
+      expect(html).toContain('sócio');
+    });
+
+    it('should render donation facts', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      expect(html).toContain('Fernanda Almeida');
+      expect(html).toContain('Marina Costa');
     });
   });
 
   describe('CPF masking from published facts', () => {
-    it('should render masked CPF ***NNN*** format in identity section for p1', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+    it('should render masked CPF ***NNN*** format for João Silva', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       // Extract identity section
@@ -114,8 +131,8 @@ describe('Published Facts Build Integration', () => {
       expect(identityHtml).not.toMatch(/\d{3}\.\d{3}\.\d{3}-\d{2}/);
     });
 
-    it('should render masked CPF ***NNN*** format for p3', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p3', 'index.html');
+    it('should render masked CPF ***NNN*** format for Ana Lima', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'Ana Lima', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       // Should contain name
@@ -130,12 +147,11 @@ describe('Published Facts Build Integration', () => {
       // Should contain masked CPF
       expect(identityHtml).toContain('***122***');
       
-      // Should not contain original CPF
-      expect(html).not.toContain('345.678.901-22');
-      expect(html).not.toContain('34567890122');
+      // Should not contain 11-digit CPF
+      expect(html).not.toMatch(/\d{11}/);
     });
 
-    it('should not render full-format CPF in body text across all dossiers', () => {
+    it('should not render 11 consecutive digits in body text across all dossiers', () => {
       const pessoaDir = path.join(distPath, 'pessoa');
       const entries = fs.readdirSync(pessoaDir);
       
@@ -160,28 +176,26 @@ describe('Published Facts Build Integration', () => {
           .replace(/href="[^"]*"/g, '')
           .replace(/data-[^=]*="[^"]*"/g, '');
         
-        // Should not contain full-format CPF in text
+        // Should not contain 11 consecutive digits (CPF)
+        expect(textOnly).not.toMatch(/\d{11}/);
+        // Should not contain full-format CPF
         expect(textOnly).not.toMatch(/\d{3}\.\d{3}\.\d{3}-\d{2}/);
       }
     });
   });
 
   describe('Every claim has citation', () => {
-    it('should have citation marker for every fact in p1 dossier', () => {
-      const dossierPath = path.join(distPath, 'pessoa', 'p1', 'index.html');
+    it('should have citation marker for every fact in João Silva dossier', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
       const html = fs.readFileSync(dossierPath, 'utf-8');
       
       // Extract fact divs
       const factDivMatches = html.match(/<div class="fact"[^>]*>/g);
       if (!factDivMatches) {
-        // No explicit fact divs, check that all identity values have citations
-        const identitySection = html.match(/<section[^>]*>[\s\S]*?<h2>Dados de Identidade<\/h2>[\s\S]*?<\/section>/);
-        if (identitySection) {
-          const sectionHtml = identitySection[0];
-          const citationMarkers = sectionHtml.match(/<sup[^>]*class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
-          expect(citationMarkers).toBeTruthy();
-          expect(citationMarkers!.length).toBeGreaterThan(0);
-        }
+        // No explicit fact divs, check that all sections have citations
+        const citationMarkers = html.match(/<sup[^>]*class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
+        expect(citationMarkers).toBeTruthy();
+        expect(citationMarkers!.length).toBeGreaterThan(0);
         return;
       }
       

@@ -30,27 +30,37 @@ describe('Published Facts Loader', () => {
   });
 
   describe('getPublishedFactsByPersonId()', () => {
-    it('should return facts for person p1', () => {
-      const facts = getPublishedFactsByPersonId('p1');
+    it('should return facts for person João Silva', () => {
+      const facts = getPublishedFactsByPersonId('João Silva');
       
       expect(facts.length).toBeGreaterThan(0);
-      expect(facts.every(f => f.person_id === 'p1')).toBe(true);
+      expect(facts.every(f => f.person_id === 'João Silva')).toBe(true);
     });
 
     it('should include identity facts', () => {
-      const facts = getPublishedFactsByPersonId('p1');
-      const nameFact = facts.find(f => f.fact_kind === 'nome');
+      const facts = getPublishedFactsByPersonId('João Silva');
+      const identityFacts = facts.filter(f => f.fact_kind === 'identity');
       
+      expect(identityFacts.length).toBeGreaterThan(0);
+      const nameFact = identityFacts.find(f => f.value === 'João Silva');
       expect(nameFact).toBeDefined();
-      expect(nameFact?.value).toBe('João Silva');
     });
 
     it('should include control edge facts', () => {
-      const facts = getPublishedFactsByPersonId('p1');
-      const rfFact = facts.find(f => f.fact_kind === 'rf_socio');
+      const facts = getPublishedFactsByPersonId('João Silva');
+      const controlFacts = facts.filter(f => f.fact_kind === 'control_edge');
       
-      expect(rfFact).toBeDefined();
-      expect(rfFact?.group_name).toBe('Empresa XYZ Ltda.');
+      expect(controlFacts.length).toBeGreaterThan(0);
+      expect(controlFacts[0].value).toContain('é sócio de');
+      expect(controlFacts[0].group_name).toBe('Empresa XYZ Ltda.');
+    });
+
+    it('should include donation facts', () => {
+      const facts = getPublishedFactsByPersonId('João Silva');
+      const donationFacts = facts.filter(f => f.fact_kind === 'donation');
+      
+      expect(donationFacts.length).toBeGreaterThan(0);
+      expect(donationFacts[0].value).toContain('doou');
     });
   });
 
@@ -63,36 +73,38 @@ describe('Published Facts Loader', () => {
       expect(freeze[0]).toHaveProperty('person_name');
     });
 
-    it('should include p1, p2, p3 from published facts', () => {
+    it('should include João Silva, Maria Santos, Ana Lima from published facts', () => {
       const freeze = getPublishedFactsFreeze();
       const personIds = freeze.map(p => p.person_id);
       
-      expect(personIds).toContain('p1');
-      expect(personIds).toContain('p2');
-      expect(personIds).toContain('p3');
+      expect(personIds).toContain('João Silva');
+      expect(personIds).toContain('Maria Santos');
+      expect(personIds).toContain('Ana Lima');
     });
 
-    it('should use name fact value as person_name', () => {
+    it('should use person_id as person_name', () => {
       const freeze = getPublishedFactsFreeze();
-      const p1 = freeze.find(p => p.person_id === 'p1');
+      const joao = freeze.find(p => p.person_id === 'João Silva');
       
-      expect(p1?.person_name).toBe('João Silva');
+      expect(joao?.person_name).toBe('João Silva');
     });
 
-    it('should include p4 even if not in freeze CSV', () => {
+    it('should only include persons with facts', () => {
       const freeze = getPublishedFactsFreeze();
-      const personIds = freeze.map(p => p.person_id);
       
-      expect(personIds).toContain('p4');
+      expect(freeze.length).toBe(3); // Only João Silva, Maria Santos, Ana Lima
     });
   });
 
   describe('CPF masking', () => {
     it('should only render masked CPF format ***NNN***', () => {
-      const facts = getPublishedFactsByPersonId('p1');
-      const cpfFact = facts.find(f => f.cpf_masked);
+      const facts = getPublishedFactsByPersonId('João Silva');
+      const cpfFacts = facts.filter(f => f.cpf_masked);
       
-      expect(cpfFact?.cpf_masked).toMatch(/^\*\*\*\d{3}\*\*\*$/);
+      expect(cpfFacts.length).toBeGreaterThan(0);
+      for (const fact of cpfFacts) {
+        expect(fact.cpf_masked).toMatch(/^\*\*\*\d{3}\*\*\*$/);
+      }
     });
 
     it('should not contain 11-digit CPF in any fact value', () => {
@@ -101,6 +113,16 @@ describe('Published Facts Loader', () => {
       for (const fact of facts) {
         expect(fact.value).not.toMatch(/\d{11}/);
         expect(fact.value).not.toMatch(/\d{3}\.\d{3}\.\d{3}-\d{2}/);
+      }
+    });
+
+    it('should not contain 11 consecutive digits in cpf_masked', () => {
+      const facts = loadPublishedFacts();
+      
+      for (const fact of facts) {
+        if (fact.cpf_masked) {
+          expect(fact.cpf_masked).not.toMatch(/\d{11}/);
+        }
       }
     });
   });
