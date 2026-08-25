@@ -205,4 +205,112 @@ describe('Published Facts Build Integration', () => {
       expect(citationMarkers!.length).toBeGreaterThanOrEqual(factDivMatches.length);
     });
   });
+
+  describe('Is Agentic content-no-js check (500+ characters)', () => {
+    it('should have 500+ characters of real cited text in home page static HTML', () => {
+      const homePath = path.join(distPath, 'index.html');
+      const html = fs.readFileSync(homePath, 'utf-8');
+      
+      // Extract body content
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/);
+      expect(bodyMatch).toBeTruthy();
+      
+      const bodyHtml = bodyMatch![1];
+      
+      // Remove script tags, style tags, and HTML tags to get text content
+      const textContent = bodyHtml
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      expect(textContent.length).toBeGreaterThanOrEqual(500);
+      
+      // Must contain person names (real content)
+      expect(textContent).toContain('João Silva');
+      
+      // Must not contain 11-digit CPF
+      expect(textContent).not.toMatch(/\d{11}/);
+    });
+
+    it('should have 500+ characters of real cited text in João Silva dossier static HTML', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Extract body content
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/);
+      expect(bodyMatch).toBeTruthy();
+      
+      const bodyHtml = bodyMatch![1];
+      
+      // Remove script tags, style tags, and HTML tags to get text content
+      const textContent = bodyHtml
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      expect(textContent.length).toBeGreaterThanOrEqual(500);
+      
+      // Must contain real facts (person name, company, role)
+      expect(textContent).toContain('João Silva');
+      expect(textContent).toContain('Empresa XYZ Ltda.');
+      expect(textContent).toContain('controlador');
+      
+      // Must contain citations (Wikipedia-style numbered refs)
+      expect(textContent).toMatch(/\[\d+\]/);
+      expect(textContent).toContain('Referências');
+      
+      // Must not contain 11-digit CPF (only masked ***NNN***)
+      expect(textContent).not.toMatch(/\d{11}/);
+      expect(textContent).toMatch(/\*\*\*\d{3}\*\*\*/);
+    });
+
+    it('should have citations in static HTML, not behind JavaScript', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Check that References section exists in HTML
+      expect(html).toContain('<h2');
+      expect(html).toContain('Referências');
+      expect(html).toContain('<ol');
+      expect(html).toContain('<li');
+      
+      // Check that citation markers exist in HTML
+      const citationMarkers = html.match(/<sup[^>]*class="citation-marker"[^>]*>\[\d+\]<\/sup>/g);
+      expect(citationMarkers).toBeTruthy();
+      expect(citationMarkers!.length).toBeGreaterThan(0);
+      
+      // No Astro islands (no client: directives)
+      expect(html).not.toContain('client:load');
+      expect(html).not.toContain('client:visible');
+      expect(html).not.toContain('client:idle');
+      expect(html).not.toContain('client:only');
+    });
+
+    it('should not have empty shell that fills in later', () => {
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Check that facts are already in HTML (not fetched client-side)
+      expect(html).toContain('João Silva');
+      expect(html).toContain('controlador');
+      expect(html).toContain('Empresa XYZ Ltda.');
+      
+      // Check that there's no placeholder content
+      expect(html).not.toContain('Loading...');
+      expect(html).not.toContain('Carregando...');
+      
+      // No fetch calls in scripts
+      const scriptMatches = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+      if (scriptMatches) {
+        for (const script of scriptMatches) {
+          expect(script).not.toContain('fetch(');
+          expect(script).not.toContain('axios');
+        }
+      }
+    });
+  });
 });
