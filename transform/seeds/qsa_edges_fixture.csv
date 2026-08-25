@@ -3,9 +3,9 @@ from_id,to_id,edge_kind,edge_role,pct_capital,pct_votos,qty_ordinarias,qty_prefe
 77889900,00864214,participacao,,4.2,3.1,,,Energisa QSA minority Opportunity,QSA fixture,2026-08-20
 Gestora QSA_1,66778899,participacao,socio,,,,,Squadra QSA gestora,QSA fixture,2026-08-20
 Adm QSA_1,77889900,participacao,socio,,,,,Opportunity QSA administrador,QSA fixture,2026-08-20
-João Botelho_1,99887766,participacao,socio,40.0,40.0,,,Multisetor QSA socio 1,QSA fixture,2026-08-20
-Maria Botelho_1,99887766,participacao,socio,35.0,35.0,,,Multisetor QSA socio 2,QSA fixture,2026-08-20
-Pedro Botelho_1,99887766,participacao,socio,25.0,25.0,,,Multisetor QSA socio 3,QSA fixture,2026-08-20
+Fictício A_1,99887766,participacao,socio,40.0,40.0,,,Multisetor QSA socio 1,QSA fixture,2026-08-20
+Fictícia B_1,99887766,participacao,socio,35.0,35.0,,,Multisetor QSA socio 2,QSA fixture,2026-08-20
+Fictício C_1,99887766,participacao,socio,25.0,25.0,,,Multisetor QSA socio 3,QSA fixture,2026-08-20
 11122233344,55667788,participacao,socio,50.0,50.0,,,Itacatu QSA additional socio,QSA fixture,2026-08-20
 22233344455,11223344,participacao,socio,30.0,30.0,,,Nova Gipar QSA additional socio,QSA fixture,2026-08-20
 88990011,00864214,participacao,,3.8,2.9,,,BNDESPAR minority in Energisa,QSA fixture,2026-08-20

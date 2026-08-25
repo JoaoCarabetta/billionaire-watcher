@@ -3,6 +3,6 @@ node_id,node_kind,name,cpf,provisional_name_key
 22233344455,person,Fernanda Lima Teste,22233344455,
 Gestora QSA_1,person,Gestora Squadra Nome,,Gestora QSA_1
 Adm QSA_1,person,Administrador Opportunity Nome,,Adm QSA_1
-João Botelho_1,person,João Botelho,,João Botelho_1
-Maria Botelho_1,person,Maria Botelho,,Maria Botelho_1
-Pedro Botelho_1,person,Pedro Botelho,,Pedro Botelho_1
+Fictício A_1,person,Sócio Exemplo A,,Fictício A_1
+Fictícia B_1,person,Sócia Exemplo B,,Fictícia B_1
+Fictício C_1,person,Sócio Exemplo C,,Fictício C_1
