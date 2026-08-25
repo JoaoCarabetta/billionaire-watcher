@@ -86,6 +86,36 @@ all_facts as (
     select * from donation_facts
     union all
     select * from association_facts
+),
+
+masked_facts as (
+    select
+        fact_id,
+        person_name,
+        fact_kind,
+        value,
+        source_publisher,
+        source_locator,
+        source_retrieved_at,
+        case
+            when cpf_masked is null then null
+            else concat(
+                '***',
+                right(
+                    {% if target.type == 'duckdb' %}
+                    regexp_replace(cpf_masked, '[^0-9]', '', 'g')
+                    {% else %}
+                    regexp_replace(cpf_masked, r'[^0-9]', '')
+                    {% endif %}
+                    , 3
+                ),
+                '***'
+            )
+        end as cpf_masked,
+        cnpj_basico,
+        group_name,
+        supporting_fact_ids
+    from all_facts
 )
 
 select
@@ -100,7 +130,7 @@ select
     cnpj_basico,
     group_name,
     supporting_fact_ids
-from all_facts
+from masked_facts
 -- Final assertion: fact_id must be unique and source must exist
 where fact_id is not null
   and source_locator is not null
