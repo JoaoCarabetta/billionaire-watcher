@@ -180,6 +180,29 @@ all_holdings as (
     select * from four_hop_holdings
     union all
     select * from five_hop_holdings
+),
+
+summed_holdings as (
+    select
+        person_node_id,
+        person_name,
+        cpf_masked,
+        company_node_id,
+        company_name,
+        sum(pct_economica_pessoa) as pct_economica_pessoa,
+        sum(pct_votos_pessoa) as pct_votos_pessoa,
+        min(path_length) as min_path_length,
+        max(path_length) as max_path_length,
+        count(*) as path_count,
+        count(pct_economica_pessoa) as complete_capital_paths,
+        count(pct_votos_pessoa) as complete_voting_paths
+    from all_holdings
+    group by
+        person_node_id,
+        person_name,
+        cpf_masked,
+        company_node_id,
+        company_name
 )
 
 select
@@ -188,8 +211,16 @@ select
     cpf_masked,
     company_node_id,
     company_name,
-    pct_economica_pessoa,
-    pct_votos_pessoa,
-    path_length
-from all_holdings
-order by company_node_id, person_node_id, path_length
+    case
+        when complete_capital_paths = 0 then null
+        else pct_economica_pessoa
+    end as pct_economica_pessoa,
+    case
+        when complete_voting_paths = 0 then null
+        else pct_votos_pessoa
+    end as pct_votos_pessoa,
+    min_path_length,
+    max_path_length,
+    path_count
+from summed_holdings
+order by company_node_id, person_node_id

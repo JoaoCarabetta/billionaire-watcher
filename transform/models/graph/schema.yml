@@ -93,7 +93,7 @@ models:
       Derived person holdings: pct_economica_pessoa and pct_votos_pessoa.
       Computed only on complete paths (product of capital % and product of voting %).
       Incomplete path (any hop has null percent) → null person percents.
-      Sum of disjoint complete paths is allowed.
+      Disjoint complete paths are summed by person × company.
     columns:
       - name: person_node_id
         description: Person node ID
@@ -114,11 +114,19 @@ models:
         tests:
           - not_null
       - name: pct_economica_pessoa
-        description: Economic share percentage (product of capital % on complete path, null if incomplete)
+        description: Economic share percentage (sum of complete path products, null if all paths incomplete)
       - name: pct_votos_pessoa
-        description: Voting power percentage (product of voting % on complete path, null if incomplete)
-      - name: path_length
-        description: Number of hops in the path
+        description: Voting power percentage (sum of complete path products, null if all paths incomplete)
+      - name: min_path_length
+        description: Minimum number of hops across all paths
+        tests:
+          - not_null
+      - name: max_path_length
+        description: Maximum number of hops across all paths
+        tests:
+          - not_null
+      - name: path_count
+        description: Total number of paths from person to company
         tests:
           - not_null
 
