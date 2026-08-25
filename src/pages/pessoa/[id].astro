@@ -200,10 +200,10 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
           {identityFacts.map((fact) => (
             <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
           ))}
-          {/* Show CPF if any identity fact has it */}
-          {identityFacts.some(f => f.cpf) && (
+          {/* Show CPF if any identity fact has it OR if person has cpf from freeze.csv */}
+          {(identityFacts.some(f => f.cpf) || person.cpf) && (
             <div class="fact cpf-fact">
-              <span class="fact-value">CPF: {identityFacts.find(f => f.cpf)?.cpf}</span>
+              <span class="fact-value">CPF: {redactCPF(identityFacts.find(f => f.cpf)?.cpf || person.cpf || '')}</span>
             </div>
           )}
         </section>

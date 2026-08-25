@@ -59,10 +59,10 @@ export const GET: APIRoute = ({ props }: any) => {
       const citationNum = getCitationNumber(fact.source);
       markdown += `- ${fact.value} [${citationNum}]\n`;
     }
-    // Add CPF if any identity fact has it
-    const cpf = identityFacts.find(f => f.cpf)?.cpf;
+    // Add CPF if any identity fact has it OR if person has cpf from freeze.csv
+    const cpf = identityFacts.find(f => f.cpf)?.cpf || person.cpf;
     if (cpf) {
-      markdown += `- CPF: ${cpf}\n`;
+      markdown += `- CPF: ${redactCPF(cpf)}\n`;
     }
     markdown += `\n`;
   }

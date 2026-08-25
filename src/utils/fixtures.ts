@@ -114,12 +114,15 @@ export function getDerivedAssociationsByPersonId(personId: string): DerivedAssoc
     const years = [...new Set(candidateDonations.map(d => d.year))].sort();
     const yearText = years.length === 1 ? years[0].toString() : `${years[0]}-${years[years.length - 1]}`;
     
+    // Use last 3 digits of CPF for ID (redacted form)
+    const cpfLast3 = candidateCpf.slice(-3);
+    
     associations.push({
-      id: `assoc-politician-${personId}-${candidateCpf}`,
+      id: `assoc-politician-${personId}-${cpfLast3}`,
       person_id: personId,
       associated_candidate_cpf: candidate.cpf,
       association_type: 'politician',
-      description: `Doou ${formatCurrency(totalAmount)} para ${candidate.name} (${yearText})`,
+      description: `Doou ${formatCurrency(totalAmount)} para ${redactCPF(candidate.name)} (${yearText})`,
       parent_donation_ids: candidateDonations.map(d => d.id)
     });
   }
@@ -184,7 +187,10 @@ export function getDerivedAssociationsByPersonId(personId: string): DerivedAssoc
 
 export function redactCPF(text: string): string {
   // Replace formatted CPF (123.456.789-00) with ***NNN***
-  text = text.replace(/\d{3}\.\d{3}\.(\d{3})-\d{2}/g, (match, last3) => {
+  // Extract last 3 digits from the 11-digit number
+  text = text.replace(/\d{3}\.\d{3}\.(\d{3})-(\d{2})/g, (match, group3, group4) => {
+    // Last 3 digits are: last digit of group3 + both digits of group4
+    const last3 = group3.slice(-1) + group4;
     return `***${last3}***`;
   });
   
