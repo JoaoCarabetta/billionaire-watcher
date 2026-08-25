@@ -19,7 +19,8 @@ describe('Published Facts Build Integration', () => {
         encoding: 'utf-8',
         env: {
           ...process.env,
-          USE_PUBLISHED_FACTS: 'true'
+          USE_PUBLISHED_FACTS: 'true',
+          VITEST: 'true'
         }
       });
     } catch (error: any) {
@@ -238,6 +239,22 @@ describe('Published Facts Build Integration', () => {
       // Must NOT have the CVM hole text
       expect(html).not.toContain('Informações sobre controle acionário não identificadas');
     });
+    
+    it('should map control_edge facts to CVM control objects', () => {
+      if (buildFailed) {
+        throw new Error(`Build failed: ${buildError}`);
+      }
+      
+      const dossierPath = path.join(distPath, 'pessoa', 'João Silva', 'index.html');
+      const html = fs.readFileSync(dossierPath, 'utf-8');
+      
+      // Must have CVM control section (not just RF edges)
+      expect(html).toMatch(/Controle Acionário.*CVM/i);
+      
+      // Must show control from control_edge fact
+      expect(html).toContain('Empresa XYZ Ltda.');
+      expect(html).toContain('sócio');
+    });
   });
 
   describe('PM Spec: No invented facts or text', () => {
@@ -323,7 +340,7 @@ describe('Published Facts Build Integration', () => {
       expect(md).not.toMatch(/\d{11}/);
     });
     
-    it('should have ***NNN*** in JSON-LD', () => {
+    it('should have ***NNN*** in JSON-LD Person schema', () => {
       if (buildFailed) {
         throw new Error(`Build failed: ${buildError}`);
       }
@@ -337,11 +354,14 @@ describe('Published Facts Build Integration', () => {
       
       if (jsonLdMatch) {
         const jsonLd = jsonLdMatch[1];
-        // If CPF appears in JSON-LD, it must be masked
-        if (jsonLd.includes('***')) {
-          expect(jsonLd).toContain('***000***');
-        }
-        // Must not have 11 consecutive digits
+        const schema = JSON.parse(jsonLd);
+        
+        // João Silva has cpf_masked in published facts
+        // Must have CPF field with masked value
+        expect(schema).toHaveProperty('taxID');
+        expect(schema.taxID).toBe('***000***');
+        
+        // Must not have 11 consecutive digits anywhere in JSON-LD
         expect(jsonLd).not.toMatch(/\d{11}/);
       }
     });

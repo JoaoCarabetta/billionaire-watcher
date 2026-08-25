@@ -42,6 +42,11 @@ const associations = getDerivedAssociationsByPersonId(person.person_id);
 const nameFact = identityFacts.find(f => f.field === 'nome');
 const pageTitle = nameFact ? nameFact.value : person.person_name;
 
+// Get CPF for JSON-LD (masked format)
+// Both identity facts and freeze CSV cpf need redaction for old fixtures
+const cpfFromFacts = identityFacts.find(f => f.cpf)?.cpf;
+const cpfForJsonLd = cpfFromFacts ? redactCPF(cpfFromFacts) : (person.cpf ? redactCPF(person.cpf) : null);
+
 // Build citation map: unique sources by first appearance, numbered sequentially
 const citationMap = new Map<string, number>();
 let nextCitationNumber = 1;
@@ -75,7 +80,8 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
       "@context": "https://schema.org",
       "@type": "Person",
       "name": pageTitle,
-      "url": `https://billionaire-watcher.pages.dev/pessoa/${person.person_id}/`
+      "url": `https://billionaire-watcher.pages.dev/pessoa/${person.person_id}/`,
+      ...(cpfForJsonLd ? { "taxID": cpfForJsonLd } : {})
     })} />
     <style>
       * {
@@ -237,8 +243,8 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
         </section>
       )}
 
-      {/* Only show CVM hole on old fixture path when RF edges exist but no CVM controls */}
-      {!shouldUsePublishedFacts() && rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
+      {/* Show CVM hole only when RF edges exist but no CVM controls */}
+      {rfPartnerEdges.length > 0 && cvmFreControls.length === 0 && (
         <section>
           <h2>Controle Acionário</h2>
           <div class="missing-control">

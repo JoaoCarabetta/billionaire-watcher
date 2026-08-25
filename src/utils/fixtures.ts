@@ -340,10 +340,39 @@ function convertPublishedFactsToRFPartnerEdges(): RFPartnerEdge[] {
 
 export function getCVMFREControls(): CVMFREControl[] {
   if (shouldUsePublishedFacts()) {
-    // CVM FRE controls are in control_edge facts, not separate
-    return [];
+    // Map control_edge facts to CVM control objects
+    return convertPublishedFactsToCVMControls();
   }
   return cvmFreControlData.filter(control => control.source !== undefined) as CVMFREControl[];
+}
+
+/**
+ * Convert control_edge facts to CVM FRE control format.
+ */
+function convertPublishedFactsToCVMControls(): CVMFREControl[] {
+  const { loadPublishedFacts } = require('./published-facts-loader');
+  const facts = loadPublishedFacts();
+  
+  return facts
+    .filter((fact: PublishedFact) => fact.fact_kind === 'control_edge')
+    .map((fact: PublishedFact) => {
+      // Extract company name and relationship from the control_edge value
+      // Format: "João Silva é sócio de Empresa XYZ Ltda. (CNPJ 12345678)"
+      const companyMatch = fact.value.match(/de\s+(.+?)\s+\(CNPJ/);
+      const relationshipMatch = fact.value.match(/é\s+(\w+)\s+de/);
+      
+      const companyName = companyMatch ? companyMatch[1] : fact.group_name || '';
+      const relationship = relationshipMatch ? relationshipMatch[1] : 'sócio';
+      
+      return {
+        id: fact.fact_id,
+        person_id: fact.person_id,
+        company_name: companyName,
+        control_type: relationship,
+        control_description: fact.value,
+        source: publishedFactToSource(fact)
+      };
+    });
 }
 
 export function getCVMFREControlsByPersonId(personId: string): CVMFREControl[] {
