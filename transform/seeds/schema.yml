@@ -144,3 +144,120 @@ seeds:
           - unique
       - name: cpf_doador_masked
         description: Donor masked CPF (no full CPF)
+
+  - name: energisa_companies_fixture
+    description: |
+      Energisa control graph companies fixture (FIXTURE/SEED ONLY, NOT LIVE CVM OR RECEITA).
+      Test data for control graph node/edge transform. Includes Energisa, Gipar, holdings, fund, minorities, outros.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        cnpj_basico: STRING
+        node_kind: STRING
+        name: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ básico (STRING with leading zeros)
+        tests:
+          - not_null
+          - unique
+      - name: node_kind
+        description: Node type (company, fund, or outros)
+        tests:
+          - not_null
+      - name: name
+        description: Company, fund, or outros acionistas name
+        tests:
+          - not_null
+
+  - name: energisa_persons_fixture
+    description: |
+      Energisa control graph persons fixture (FIXTURE/SEED ONLY, fake person names).
+      Test data for control graph node/edge transform. Includes persons with CPF, without CPF, and homonyms.
+      node_id is the resolved key (CPF when present, else provisional_name_key).
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        node_id: STRING
+        node_kind: STRING
+        name: STRING
+        cpf: STRING
+        provisional_name_key: STRING
+    columns:
+      - name: node_id
+        description: Person node ID (CPF when present, else provisional_name_key)
+        tests:
+          - not_null
+          - unique
+      - name: node_kind
+        description: Node type (person)
+        tests:
+          - not_null
+      - name: name
+        description: Person name (fake names for testing)
+        tests:
+          - not_null
+      - name: cpf
+        description: Person CPF (11 digits, warehouse only) when present
+      - name: provisional_name_key
+        description: Provisional name key for persons without CPF
+
+  - name: energisa_edges_fixture
+    description: |
+      Energisa control graph edges fixture (FIXTURE/SEED ONLY, participacao edges).
+      Test data for control graph transform. Includes edges with/without percents, cycle, fund edges with roles.
+      from_id and to_id use resolved node_ids (CPF or provisional_name_key for persons, cnpj_basico for companies).
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        from_id: STRING
+        to_id: STRING
+        edge_kind: STRING
+        edge_role: STRING
+        pct_capital: FLOAT64
+        pct_votos: FLOAT64
+        qty_ordinarias: INT64
+        qty_preferenciais: INT64
+        source_doc: STRING
+        source_locator: STRING
+        source_retrieved_at: STRING
+    columns:
+      - name: from_id
+        description: Source node (resolved node_id)
+        tests:
+          - not_null
+      - name: to_id
+        description: Target node (resolved node_id)
+        tests:
+          - not_null
+      - name: edge_kind
+        description: Edge type (participacao)
+        tests:
+          - not_null
+      - name: edge_role
+        description: Edge role (gestora, administrador, or null for regular participacao)
+      - name: pct_capital
+        description: Total capital percentage (nullable)
+      - name: pct_votos
+        description: Voting percentage (nullable)
+      - name: qty_ordinarias
+        description: Quantity of ordinary shares (nullable)
+      - name: qty_preferenciais
+        description: Quantity of preferred shares (nullable)
+      - name: source_doc
+        description: Source document citation
+        tests:
+          - not_null
+      - name: source_locator
+        description: Source document locator
+      - name: source_retrieved_at
+        description: Source retrieval date

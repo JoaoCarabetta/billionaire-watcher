@@ -1,0 +1,596 @@
+unit_tests:
+  - name: test_graph_nodes_company_key_8_digit_cnpj
+    description: |
+      Verify company key is CNPJ básico (8-digit STRING lpad).
+      Energisa CNPJ básico '00864214'.
+    model: graph_nodes
+    given:
+      - input: ref('energisa_companies_fixture')
+        format: sql
+        rows: |
+          select
+            '00864214' as cnpj_basico,
+            'company' as node_kind,
+            'Energisa S.A.' as name
+      - input: ref('energisa_persons_fixture')
+        format: sql
+        rows: |
+          select
+            '12345678901' as node_id,
+            'person' as node_kind,
+            'Ana Costa Fictícia' as name,
+            '12345678901' as cpf,
+            cast(null as string) as provisional_name_key
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as node_id,
+          'company' as node_kind,
+          'Energisa S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '00864214' as cnpj_basico
+        union all
+        select
+          '12345678901' as node_id,
+          'person' as node_kind,
+          'Ana Costa Fictícia' as name,
+          '12345678901' as cpf,
+          '***901***' as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          cast(null as string) as cnpj_basico
+
+  - name: test_graph_nodes_person_key_cpf_when_present
+    description: |
+      Verify person key is CPF (11 digits) when present.
+      Person with CPF uses CPF as node_id.
+      CPF masked as ***901*** (stars + last-3 + stars).
+    model: graph_nodes
+    given:
+      - input: ref('energisa_companies_fixture')
+        format: sql
+        rows: |
+          select
+            '00864214' as cnpj_basico,
+            'company' as node_kind,
+            'Energisa S.A.' as name
+      - input: ref('energisa_persons_fixture')
+        format: sql
+        rows: |
+          select
+            '12345678901' as node_id,
+            'person' as node_kind,
+            'Ana Costa Fictícia' as name,
+            '12345678901' as cpf,
+            cast(null as string) as provisional_name_key
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as node_id,
+          'company' as node_kind,
+          'Energisa S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '00864214' as cnpj_basico
+        union all
+        select
+          '12345678901' as node_id,
+          'person' as node_kind,
+          'Ana Costa Fictícia' as name,
+          '12345678901' as cpf,
+          '***901***' as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          cast(null as string) as cnpj_basico
+
+  - name: test_graph_nodes_person_key_provisional_without_cpf
+    description: |
+      Verify person key is provisional_name_key when CPF is absent.
+      Two identical names without CPF stay two nodes.
+    model: graph_nodes
+    given:
+      - input: ref('energisa_companies_fixture')
+        format: sql
+        rows: |
+          select
+            '00864214' as cnpj_basico,
+            'company' as node_kind,
+            'Energisa S.A.' as name
+      - input: ref('energisa_persons_fixture')
+        format: sql
+        rows: |
+          select
+            'Bruno Silva Teste_1' as node_id,
+            'person' as node_kind,
+            'Bruno Silva Teste' as name,
+            cast(null as string) as cpf,
+            'Bruno Silva Teste_1' as provisional_name_key
+          union all
+          select
+            'Bruno Silva Teste_2' as node_id,
+            'person' as node_kind,
+            'Bruno Silva Teste' as name,
+            cast(null as string) as cpf,
+            'Bruno Silva Teste_2' as provisional_name_key
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as node_id,
+          'company' as node_kind,
+          'Energisa S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '00864214' as cnpj_basico
+        union all
+        select
+          'Bruno Silva Teste_1' as node_id,
+          'person' as node_kind,
+          'Bruno Silva Teste' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          'Bruno Silva Teste_1' as provisional_name_key,
+          cast(null as string) as cnpj_basico
+        union all
+        select
+          'Bruno Silva Teste_2' as node_id,
+          'person' as node_kind,
+          'Bruno Silva Teste' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          'Bruno Silva Teste_2' as provisional_name_key,
+          cast(null as string) as cnpj_basico
+
+  - name: test_graph_nodes_cpf_masked_format
+    description: |
+      Verify published person field is ***NNN*** (stars + last-3 + stars).
+      Ana Costa has cpf_masked '***901***' derived from CPF 12345678901.
+    model: graph_nodes
+    given:
+      - input: ref('energisa_companies_fixture')
+        format: sql
+        rows: |
+          select
+            '00864214' as cnpj_basico,
+            'company' as node_kind,
+            'Energisa S.A.' as name
+      - input: ref('energisa_persons_fixture')
+        format: sql
+        rows: |
+          select
+            '12345678901' as node_id,
+            'person' as node_kind,
+            'Ana Costa Fictícia' as name,
+            '12345678901' as cpf,
+            cast(null as string) as provisional_name_key
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as node_id,
+          'company' as node_kind,
+          'Energisa S.A.' as name,
+          cast(null as string) as cpf,
+          cast(null as string) as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          '00864214' as cnpj_basico
+        union all
+        select
+          '12345678901' as node_id,
+          'person' as node_kind,
+          'Ana Costa Fictícia' as name,
+          '12345678901' as cpf,
+          '***901***' as cpf_masked,
+          cast(null as string) as provisional_name_key,
+          cast(null as string) as cnpj_basico
+
+  - name: test_graph_edges_gipar_energisa_single_edge
+    description: |
+      Verify Gipar→Energisa is one control/participacao edge with two percents.
+      27.74% total capital, 62.45% voting shares (published IR 14 Aug 2026).
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            '2026-08-14' as source_retrieved_at
+    expect:
+      format: sql
+      rows: |
+        select
+          '02260956' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          27.74 as pct_capital,
+          62.45 as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_edges_hop_without_percent_keeps_edge
+    description: |
+      Verify hop without percent keeps the edge.
+      Both pct_capital and pct_votos are null (not zero).
+      Diana → Minoritário Alpha has no percents.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            'Diana Oliveira Teste_1' as from_id,
+            '44556677' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Minoritário hop without percent' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+    expect:
+      format: sql
+      rows: |
+        select
+          'Diana Oliveira Teste_1' as from_id,
+          '44556677' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Minoritário hop without percent' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_cycles_real_ring
+    description: |
+      Verify cycle detection: walk returns to a company already seen, stops, records ring.
+      Itacatu ↔ Nova Gipar is a two-hop ring (55667788 → 11223344 → 55667788).
+      Model detects both directions of the ring.
+    model: graph_cycles
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '55667788' as from_id,
+            '11223344' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Nova Gipar structure' as source_doc,
+            'FAQ' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+          union all
+          select
+            '11223344' as from_id,
+            '55667788' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Cycle ring return edge' as source_doc,
+            'fixture' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select
+            '55667788' as node_id,
+            'company' as node_kind,
+            'Itacatu Participações S.A.' as name,
+            cast(null as string) as cpf,
+            cast(null as string) as cpf_masked,
+            cast(null as string) as provisional_name_key,
+            '55667788' as cnpj_basico
+          union all
+          select
+            '11223344' as node_id,
+            'company' as node_kind,
+            'Nova Gipar Holding S.A.' as name,
+            cast(null as string) as cpf,
+            cast(null as string) as cpf_masked,
+            cast(null as string) as provisional_name_key,
+            '11223344' as cnpj_basico
+    expect:
+      format: sql
+      rows: |
+        select
+          '55667788' as cycle_start,
+          ['55667788', '11223344'] as cycle_path
+        union all
+        select
+          '11223344' as cycle_start,
+          ['11223344', '55667788'] as cycle_path
+
+  - name: test_graph_edges_fund_gestora_administrador_roles
+    description: |
+      Verify fund node has gestora and administrador edges with edge_role labels.
+      No invented cotistas (zero rows with edge_role 'cotista').
+      Fund 12345678 has edge_role='gestora' from 22334455 and edge_role='administrador' from 33445566.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '22334455' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'gestora' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Fund gestora' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+          union all
+          select
+            '33445566' as from_id,
+            '12345678' as to_id,
+            'participacao' as edge_kind,
+            'administrador' as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Fund administrador' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+    expect:
+      format: sql
+      rows: |
+        select
+          '22334455' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'gestora' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Fund gestora' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '33445566' as from_id,
+          '12345678' as to_id,
+          'participacao' as edge_kind,
+          'administrador' as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Fund administrador' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_person_holdings_complete_path_only
+    description: |
+      Verify derived person fields only on complete paths.
+      Ana (12345678901) → Itacatu (70%) → Nova Gipar (50%) → Gipar (100%) → Energisa (27.74% capital, 62.45% votes).
+      Model returns all paths; this test checks all 4 hops.
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select '12345678901' as from_id, '55667788' as to_id, 70.0 as pct_capital, 70.0 as pct_votos
+          union all
+          select '55667788' as from_id, '11223344' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+          union all
+          select '11223344' as from_id, '02260956' as to_id, 100.0 as pct_capital, 100.0 as pct_votos
+          union all
+          select '02260956' as from_id, '00864214' as to_id, 27.74 as pct_capital, 62.45 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
+          union all
+          select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '11223344' as node_id, 'company' as node_kind, 'Nova Gipar Holding S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '02260956' as node_id, 'company' as node_kind, 'Gipar S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '00864214' as node_id, 'company' as node_kind, 'Energisa S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '55667788' as company_node_id,
+          'Itacatu Participações S.A.' as company_name,
+          70.0 as pct_economica_pessoa,
+          70.0 as pct_votos_pessoa,
+          1 as path_length
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '11223344' as company_node_id,
+          'Nova Gipar Holding S.A.' as company_name,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
+          2 as path_length
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '02260956' as company_node_id,
+          'Gipar S.A.' as company_name,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
+          3 as path_length
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '00864214' as company_node_id,
+          'Energisa S.A.' as company_name,
+          9.709 as pct_economica_pessoa,
+          21.8575 as pct_votos_pessoa,
+          4 as path_length
+
+  - name: test_graph_person_holdings_incomplete_path_null
+    description: |
+      Verify incomplete path (hop without percent) produces null person percents.
+      Diana → Minoritário Alpha (no percent) → Energisa (5% capital, 3.2% votes).
+      Product should be null because first hop has null percents.
+      Model returns both the 1-hop (to Alpha) and 2-hop (to Energisa) paths.
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select 'Diana Oliveira Teste_1' as from_id, '44556677' as to_id, cast(null as double) as pct_capital, cast(null as double) as pct_votos
+          union all
+          select '44556677' as from_id, '00864214' as to_id, 5.0 as pct_capital, 3.2 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select 'Diana Oliveira Teste_1' as node_id, 'person' as node_kind, 'Diana Oliveira Teste' as name, cast(null as string) as cpf_masked
+          union all
+          select '44556677' as node_id, 'company' as node_kind, 'Minoritário Alpha S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '00864214' as node_id, 'company' as node_kind, 'Energisa S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          'Diana Oliveira Teste_1' as person_node_id,
+          'Diana Oliveira Teste' as person_name,
+          cast(null as string) as cpf_masked,
+          '44556677' as company_node_id,
+          'Minoritário Alpha S.A.' as company_name,
+          cast(null as double) as pct_economica_pessoa,
+          cast(null as double) as pct_votos_pessoa,
+          1 as path_length
+        union all
+        select
+          'Diana Oliveira Teste_1' as person_node_id,
+          'Diana Oliveira Teste' as person_name,
+          cast(null as string) as cpf_masked,
+          '00864214' as company_node_id,
+          'Energisa S.A.' as company_name,
+          cast(null as double) as pct_economica_pessoa,
+          cast(null as double) as pct_votos_pessoa,
+          2 as path_length
+
+  - name: test_graph_edges_float_stop_no_children
+    description: |
+      Verify "outros acionistas" / free float has no children.
+      Outros node (00000001) → Energisa edge exists but outros has zero outgoing edges.
+      No person has a direct edge to Energisa (only through Gipar).
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '00000001' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as double) as pct_capital,
+            cast(null as double) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Float/outros acionistas' as source_doc,
+            'fixture' as source_locator,
+            '2026-08-14' as source_retrieved_at
+    expect:
+      format: sql
+      rows: |
+        select
+          '00000001' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          cast(null as double) as pct_capital,
+          cast(null as double) as pct_votos,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
+          'Float/outros acionistas' as source_doc,
+          'fixture' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_person_holdings_stops_at_cycle
+    description: |
+      Verify walk stops when returning to a node already on the path.
+      Ana (12345678901) → Itacatu (70%) plus ring Itacatu ↔ Nova Gipar.
+      Expect 1-hop Ana → Itacatu and 2-hop Ana → Nova Gipar.
+      Do NOT expect 3-hop back to Itacatu (walk stops at cycle).
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select '12345678901' as from_id, '55667788' as to_id, 70.0 as pct_capital, 70.0 as pct_votos
+          union all
+          select '55667788' as from_id, '11223344' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+          union all
+          select '11223344' as from_id, '55667788' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
+          union all
+          select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '11223344' as node_id, 'company' as node_kind, 'Nova Gipar Holding S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '55667788' as company_node_id,
+          'Itacatu Participações S.A.' as company_name,
+          70.0 as pct_economica_pessoa,
+          70.0 as pct_votos_pessoa,
+          1 as path_length
+        union all
+        select
+          '12345678901' as person_node_id,
+          'Ana Costa Fictícia' as person_name,
+          '***901***' as cpf_masked,
+          '11223344' as company_node_id,
+          'Nova Gipar Holding S.A.' as company_name,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
+          2 as path_length
