@@ -261,3 +261,44 @@ seeds:
         description: Source document locator
       - name: source_retrieved_at
         description: Source retrieval date
+
+  - name: energisa_prices_fixture
+    description: |
+      Energisa stock prices fixture (FIXTURE/SEED ONLY, NOT LIVE BOLSA).
+      Test data for dated listed price facts. Fake tickers and prices for unit tests.
+      Business-day append: multiple dates for same ticker/class test daily accumulation.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        cnpj_basico: STRING
+        ticker: STRING
+        classe: STRING
+        preco: FLOAT64
+        preco_date: STRING
+        source: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ básico (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: ticker
+        description: Stock ticker symbol (fake for testing)
+        tests:
+          - not_null
+      - name: classe
+        description: Share class (ordinaria or preferencial)
+        tests:
+          - not_null
+      - name: preco
+        description: Stock price (fixture price, not live)
+        tests:
+          - not_null
+      - name: preco_date
+        description: Price date (YYYY-MM-DD)
+        tests:
+          - not_null
+      - name: source
+        description: Price source (Brasil Bolsa Balcão)

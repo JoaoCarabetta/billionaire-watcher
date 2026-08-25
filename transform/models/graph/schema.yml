@@ -121,3 +121,48 @@ models:
         description: Number of hops in the path
         tests:
           - not_null
+
+  - name: graph_listed_prices
+    description: |
+      Dated listed price facts: ticker, class, price, quantity, product, date, source.
+      Business-day run appends a new row (does not overwrite yesterday).
+      Quantity comes from the listed hop (IR/FRE table) in graph_edges.
+      Product is quantity × price (Brasil Bolsa Balcão).
+      Unlisted companies: no price row.
+      Product is not copied to person node if any hop has null percent (see graph_person_holdings).
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ básico (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: ticker
+        description: Stock ticker symbol
+        tests:
+          - not_null
+      - name: classe
+        description: Share class (ordinaria or preferencial)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ordinaria', 'preferencial']
+      - name: preco
+        description: Stock price from Brasil Bolsa Balcão
+        tests:
+          - not_null
+      - name: quantidade
+        description: Share quantity from listed hop (IR/FRE table)
+        tests:
+          - not_null
+      - name: produto
+        description: Product of quantity × price
+        tests:
+          - not_null
+      - name: preco_date
+        description: Price date (business day)
+        tests:
+          - not_null
+      - name: source
+        description: Combined source (Brasil Bolsa Balcão + IR/FRE table that gave quantity)
+        tests:
+          - not_null

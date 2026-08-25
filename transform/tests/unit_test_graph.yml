@@ -871,3 +871,270 @@ unit_tests:
           'Itacatu control' as source_doc,
           'fixture' as source_locator,
           cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_listed_prices_two_business_days_two_rows
+    description: |
+      Verify two business days produce two price rows for same ticker/class (issue #66).
+      Energisa ENGI ordinary shares on 2026-08-20 and 2026-08-21.
+      Daily append, not overwrite.
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+      - input: ref('energisa_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          union all
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.75 as preco, '2026-08-21' as preco_date, 'Brasil Bolsa Balcão' as source
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'ordinaria' as classe,
+          45.20 as preco,
+          609526325 as quantidade,
+          45.20 * 609526325 as produto,
+          cast('2026-08-20' as date) as preco_date,
+          'Brasil Bolsa Balcão + Energisa IR 14 Aug 2026 table 6.1' as source
+        union all
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'ordinaria' as classe,
+          45.75 as preco,
+          609526325 as quantidade,
+          45.75 * 609526325 as produto,
+          cast('2026-08-21' as date) as preco_date,
+          'Brasil Bolsa Balcão + Energisa IR 14 Aug 2026 table 6.1' as source
+
+  - name: test_graph_listed_prices_quantity_from_listed_hop
+    description: |
+      Verify quantity comes from the listed hop (IR/FRE table), not invented (issue #66).
+      Gipar→Energisa listed hop has 609,526,325 ordinárias and 89,144,004 preferenciais.
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+      - input: ref('energisa_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          union all
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'preferencial' as classe, 42.80 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'ordinaria' as classe,
+          45.20 as preco,
+          609526325 as quantidade,
+          45.20 * 609526325 as produto,
+          cast('2026-08-20' as date) as preco_date,
+          'Brasil Bolsa Balcão + Energisa IR 14 Aug 2026 table 6.1' as source
+        union all
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'preferencial' as classe,
+          42.80 as preco,
+          89144004 as quantidade,
+          42.80 * 89144004 as produto,
+          cast('2026-08-20' as date) as preco_date,
+          'Brasil Bolsa Balcão + Energisa IR 14 Aug 2026 table 6.1' as source
+
+  - name: test_graph_listed_prices_unlisted_company_zero_rows
+    description: |
+      Verify unlisted fixture company has zero price rows (issue #66).
+      Gipar is unlisted (no qty fields in its edges, no prices).
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '11223344' as from_id,
+            '02260956' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            100.0 as pct_capital,
+            100.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Gipar control chain' as source_doc,
+            'FAQ' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+      - input: ref('energisa_prices_fixture')
+        format: sql
+        rows: |
+          select '02260956' as cnpj_basico, 'FAKE' as ticker, 'ordinaria' as classe, 100.00 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+    expect:
+      format: sql
+      rows: |
+        select
+          cast(null as string) as cnpj_basico,
+          cast(null as string) as ticker,
+          cast(null as string) as classe,
+          cast(null as double) as preco,
+          cast(null as integer) as quantidade,
+          cast(null as double) as produto,
+          cast(null as date) as preco_date,
+          cast(null as string) as source
+        where false
+
+  - name: test_graph_listed_prices_product_computed_correctly
+    description: |
+      Verify product is quantity × price (issue #66).
+      609,526,325 ordinárias × R$ 45.20 = R$ 27,550,589,890.
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+      - input: ref('energisa_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'ordinaria' as classe,
+          45.20 as preco,
+          609526325 as quantidade,
+          27550589890.0 as produto,
+          cast('2026-08-20' as date) as preco_date,
+          'Brasil Bolsa Balcão + Energisa IR 14 Aug 2026 table 6.1' as source
+
+  - name: test_graph_edges_price_run_unchanged
+    description: |
+      Verify price-only run leaves graph edges unchanged (issue #66).
+      Adding prices does not rewrite FRE/QSA edge data.
+      Graph edges read-only from price model perspective.
+    model: graph_edges
+    given:
+      - input: ref('energisa_edges_fixture')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            '2026-08-14' as source_retrieved_at
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select '02260956' as node_id, 'company' as node_kind
+          union all
+          select '00864214' as node_id, 'company' as node_kind
+    expect:
+      format: sql
+      rows: |
+        select
+          '02260956' as from_id,
+          '00864214' as to_id,
+          'participacao' as edge_kind,
+          cast(null as string) as edge_role,
+          27.74 as pct_capital,
+          62.45 as pct_votos,
+          609526325 as qty_ordinarias,
+          89144004 as qty_preferenciais,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+
+  - name: test_graph_person_holdings_product_not_through_null_hop
+    description: |
+      Verify product is not written as person fortune when path has hole (issue #66).
+      Diana → Minoritário Alpha (no percent) → Energisa.
+      graph_person_holdings shows null percents for incomplete path.
+      This verifies fortune attribution logic prevents incomplete-path valuation.
+    model: graph_person_holdings
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select 'Diana Oliveira Teste_1' as from_id, '44556677' as to_id, cast(null as double) as pct_capital, cast(null as double) as pct_votos
+          union all
+          select '44556677' as from_id, '00864214' as to_id, 5.0 as pct_capital, 3.2 as pct_votos
+      - input: ref('graph_nodes')
+        format: sql
+        rows: |
+          select 'Diana Oliveira Teste_1' as node_id, 'person' as node_kind, 'Diana Oliveira Teste' as name, cast(null as string) as cpf_masked
+          union all
+          select '44556677' as node_id, 'company' as node_kind, 'Minoritário Alpha S.A.' as name, cast(null as string) as cpf_masked
+          union all
+          select '00864214' as node_id, 'company' as node_kind, 'Energisa S.A.' as name, cast(null as string) as cpf_masked
+    expect:
+      format: sql
+      rows: |
+        select
+          'Diana Oliveira Teste_1' as person_node_id,
+          'Diana Oliveira Teste' as person_name,
+          cast(null as string) as cpf_masked,
+          '44556677' as company_node_id,
+          'Minoritário Alpha S.A.' as company_name,
+          cast(null as double) as pct_economica_pessoa,
+          cast(null as double) as pct_votos_pessoa,
+          1 as path_length
+        union all
+        select
+          'Diana Oliveira Teste_1' as person_node_id,
+          'Diana Oliveira Teste' as person_name,
+          cast(null as string) as cpf_masked,
+          '00864214' as company_node_id,
+          'Energisa S.A.' as company_name,
+          cast(null as double) as pct_economica_pessoa,
+          cast(null as double) as pct_votos_pessoa,
+          2 as path_length
