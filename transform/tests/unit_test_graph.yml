@@ -16,11 +16,10 @@ unit_tests:
         format: sql
         rows: |
           select
-            'p1' as person_id,
+            '12345678901' as node_id,
             'person' as node_kind,
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
-            '***901' as cpf_masked,
             cast(null as string) as provisional_name_key
     expect:
       format: sql
@@ -39,7 +38,7 @@ unit_tests:
           'person' as node_kind,
           'Ana Costa Fictícia' as name,
           '12345678901' as cpf,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           cast(null as string) as provisional_name_key,
           cast(null as string) as cnpj_basico
 
@@ -47,6 +46,7 @@ unit_tests:
     description: |
       Verify person key is CPF (11 digits) when present.
       Person with CPF uses CPF as node_id.
+      CPF masked as ***901*** (stars + last-3 + stars).
     model: graph_nodes
     given:
       - input: ref('energisa_companies_fixture')
@@ -60,11 +60,10 @@ unit_tests:
         format: sql
         rows: |
           select
-            'p1' as person_id,
+            '12345678901' as node_id,
             'person' as node_kind,
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
-            '***901' as cpf_masked,
             cast(null as string) as provisional_name_key
     expect:
       format: sql
@@ -83,7 +82,7 @@ unit_tests:
           'person' as node_kind,
           'Ana Costa Fictícia' as name,
           '12345678901' as cpf,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           cast(null as string) as provisional_name_key,
           cast(null as string) as cnpj_basico
 
@@ -104,19 +103,17 @@ unit_tests:
         format: sql
         rows: |
           select
-            'p2' as person_id,
+            'Bruno Silva Teste_1' as node_id,
             'person' as node_kind,
             'Bruno Silva Teste' as name,
             cast(null as string) as cpf,
-            cast(null as string) as cpf_masked,
             'Bruno Silva Teste_1' as provisional_name_key
           union all
           select
-            'p3' as person_id,
+            'Bruno Silva Teste_2' as node_id,
             'person' as node_kind,
             'Bruno Silva Teste' as name,
             cast(null as string) as cpf,
-            cast(null as string) as cpf_masked,
             'Bruno Silva Teste_2' as provisional_name_key
     expect:
       format: sql
@@ -150,8 +147,8 @@ unit_tests:
 
   - name: test_graph_nodes_cpf_masked_format
     description: |
-      Verify published person field is ***NNN*** only (no 11-digit, no punctuated CPF).
-      Ana Costa has cpf_masked '***901'.
+      Verify published person field is ***NNN*** (stars + last-3 + stars).
+      Ana Costa has cpf_masked '***901***' derived from CPF 12345678901.
     model: graph_nodes
     given:
       - input: ref('energisa_companies_fixture')
@@ -165,11 +162,10 @@ unit_tests:
         format: sql
         rows: |
           select
-            'p1' as person_id,
+            '12345678901' as node_id,
             'person' as node_kind,
             'Ana Costa Fictícia' as name,
             '12345678901' as cpf,
-            '***901' as cpf_masked,
             cast(null as string) as provisional_name_key
     expect:
       format: sql
@@ -188,7 +184,7 @@ unit_tests:
           'person' as node_kind,
           'Ana Costa Fictícia' as name,
           '12345678901' as cpf,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           cast(null as string) as provisional_name_key,
           cast(null as string) as cnpj_basico
 
@@ -205,6 +201,7 @@ unit_tests:
             '02260956' as from_id,
             '00864214' as to_id,
             'participacao' as edge_kind,
+            cast(null as string) as edge_role,
             27.74 as pct_capital,
             62.45 as pct_votos,
             cast(null as integer) as qty_ordinarias,
@@ -219,10 +216,11 @@ unit_tests:
           '02260956' as from_id,
           '00864214' as to_id,
           'participacao' as edge_kind,
+          cast(null as string) as edge_role,
           27.74 as pct_capital,
           62.45 as pct_votos,
-          cast(null as int64) as qty_ordinarias,
-          cast(null as int64) as qty_preferenciais,
+          cast(null as integer) as qty_ordinarias,
+          cast(null as integer) as qty_preferenciais,
           'Energisa IR 14 Aug 2026' as source_doc,
           'table 6.1' as source_locator,
           cast('2026-08-14' as date) as source_retrieved_at
@@ -238,9 +236,10 @@ unit_tests:
         format: sql
         rows: |
           select
-            'p5' as from_id,
+            'Diana Oliveira Teste_1' as from_id,
             '44556677' as to_id,
             'participacao' as edge_kind,
+            cast(null as string) as edge_role,
             cast(null as double) as pct_capital,
             cast(null as double) as pct_votos,
             cast(null as integer) as qty_ordinarias,
@@ -252,9 +251,10 @@ unit_tests:
       format: sql
       rows: |
         select
-          'p5' as from_id,
+          'Diana Oliveira Teste_1' as from_id,
           '44556677' as to_id,
           'participacao' as edge_kind,
+          cast(null as string) as edge_role,
           cast(null as double) as pct_capital,
           cast(null as double) as pct_votos,
           cast(null as integer) as qty_ordinarias,
@@ -263,49 +263,77 @@ unit_tests:
           'fixture' as source_locator,
           cast('2026-08-14' as date) as source_retrieved_at
 
-  - name: test_graph_cycles_self_loop
+  - name: test_graph_cycles_real_ring
     description: |
-      Verify cycle detection: walk stops, cycle recorded, edges kept.
-      Multisetor → Multisetor is a self-loop cycle.
+      Verify cycle detection: walk returns to a company already seen, stops, records ring.
+      Itacatu ↔ Nova Gipar is a two-hop ring (55667788 → 11223344 → 55667788).
+      Model detects both directions of the ring.
     model: graph_cycles
     given:
       - input: ref('graph_edges')
         format: sql
         rows: |
           select
-            '99887766' as from_id,
-            '99887766' as to_id,
+            '55667788' as from_id,
+            '11223344' as to_id,
             'participacao' as edge_kind,
-            cast(null as double) as pct_capital,
-            cast(null as double) as pct_votos,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
             cast(null as integer) as qty_ordinarias,
             cast(null as integer) as qty_preferenciais,
-            'Cycle test edge' as source_doc,
+            'Nova Gipar structure' as source_doc,
+            'FAQ' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+          union all
+          select
+            '11223344' as from_id,
+            '55667788' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Cycle ring return edge' as source_doc,
             'fixture' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
       - input: ref('graph_nodes')
         format: sql
         rows: |
           select
-            '99887766' as node_id,
+            '55667788' as node_id,
             'company' as node_kind,
-            'Multisetor Holding S.A.' as name,
+            'Itacatu Participações S.A.' as name,
             cast(null as string) as cpf,
             cast(null as string) as cpf_masked,
             cast(null as string) as provisional_name_key,
-            '99887766' as cnpj_basico
+            '55667788' as cnpj_basico
+          union all
+          select
+            '11223344' as node_id,
+            'company' as node_kind,
+            'Nova Gipar Holding S.A.' as name,
+            cast(null as string) as cpf,
+            cast(null as string) as cpf_masked,
+            cast(null as string) as provisional_name_key,
+            '11223344' as cnpj_basico
     expect:
       format: sql
       rows: |
         select
-          '99887766' as cycle_start,
-          ['99887766'] as cycle_path
+          '55667788' as cycle_start,
+          ['55667788', '11223344'] as cycle_path
+        union all
+        select
+          '11223344' as cycle_start,
+          ['11223344', '55667788'] as cycle_path
 
-  - name: test_graph_edges_fund_gestora_administrador_only
+  - name: test_graph_edges_fund_gestora_administrador_roles
     description: |
-      Verify fund node has gestora and administrador edges only.
-      No invented cotistas (zero rows with kind 'cotista').
-      Fund 12345678 has edges from gestora 22334455 and administrador 33445566.
+      Verify fund node has gestora and administrador edges with edge_role labels.
+      No invented cotistas (zero rows with edge_role 'cotista').
+      Fund 12345678 has edge_role='gestora' from 22334455 and edge_role='administrador' from 33445566.
     model: graph_edges
     given:
       - input: ref('energisa_edges_fixture')
@@ -315,6 +343,7 @@ unit_tests:
             '22334455' as from_id,
             '12345678' as to_id,
             'participacao' as edge_kind,
+            'gestora' as edge_role,
             cast(null as double) as pct_capital,
             cast(null as double) as pct_votos,
             cast(null as integer) as qty_ordinarias,
@@ -327,6 +356,7 @@ unit_tests:
             '33445566' as from_id,
             '12345678' as to_id,
             'participacao' as edge_kind,
+            'administrador' as edge_role,
             cast(null as double) as pct_capital,
             cast(null as double) as pct_votos,
             cast(null as integer) as qty_ordinarias,
@@ -341,6 +371,7 @@ unit_tests:
           '22334455' as from_id,
           '12345678' as to_id,
           'participacao' as edge_kind,
+          'gestora' as edge_role,
           cast(null as double) as pct_capital,
           cast(null as double) as pct_votos,
           cast(null as integer) as qty_ordinarias,
@@ -353,6 +384,7 @@ unit_tests:
           '33445566' as from_id,
           '12345678' as to_id,
           'participacao' as edge_kind,
+          'administrador' as edge_role,
           cast(null as double) as pct_capital,
           cast(null as double) as pct_votos,
           cast(null as integer) as qty_ordinarias,
@@ -364,16 +396,14 @@ unit_tests:
   - name: test_graph_person_holdings_complete_path_only
     description: |
       Verify derived person fields only on complete paths.
-      Ana → Itacatu (70%) → Nova Gipar (50%) → Gipar (100%) → Energisa (27.74% capital, 62.45% votes).
-      Model returns all paths; this test checks the 4-hop path to Energisa.
-      Product: 70 × 50 × 100 × 27.74 / 1000000 = 9.709% capital.
-      Product: 70 × 50 × 100 × 62.45 / 1000000 = 21.8575% votes.
+      Ana (12345678901) → Itacatu (70%) → Nova Gipar (50%) → Gipar (100%) → Energisa (27.74% capital, 62.45% votes).
+      Model returns all paths; this test checks all 4 hops.
     model: graph_person_holdings
     given:
       - input: ref('graph_edges')
         format: sql
         rows: |
-          select 'p1' as from_id, '55667788' as to_id, 70.0 as pct_capital, 70.0 as pct_votos
+          select '12345678901' as from_id, '55667788' as to_id, 70.0 as pct_capital, 70.0 as pct_votos
           union all
           select '55667788' as from_id, '11223344' as to_id, 50.0 as pct_capital, 50.0 as pct_votos
           union all
@@ -383,7 +413,7 @@ unit_tests:
       - input: ref('graph_nodes')
         format: sql
         rows: |
-          select 'p1' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901' as cpf_masked
+          select '12345678901' as node_id, 'person' as node_kind, 'Ana Costa Fictícia' as name, '***901***' as cpf_masked
           union all
           select '55667788' as node_id, 'company' as node_kind, 'Itacatu Participações S.A.' as name, cast(null as string) as cpf_masked
           union all
@@ -396,39 +426,39 @@ unit_tests:
       format: sql
       rows: |
         select
-          'p1' as person_node_id,
+          '12345678901' as person_node_id,
           'Ana Costa Fictícia' as person_name,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           '55667788' as company_node_id,
           'Itacatu Participações S.A.' as company_name,
-          cast(70.0 as decimal) as pct_economica_pessoa,
-          cast(70.0 as decimal) as pct_votos_pessoa,
+          70.0 as pct_economica_pessoa,
+          70.0 as pct_votos_pessoa,
           1 as path_length
         union all
         select
-          'p1' as person_node_id,
+          '12345678901' as person_node_id,
           'Ana Costa Fictícia' as person_name,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           '11223344' as company_node_id,
           'Nova Gipar Holding S.A.' as company_name,
-          cast(35.0 as decimal) as pct_economica_pessoa,
-          cast(35.0 as decimal) as pct_votos_pessoa,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
           2 as path_length
         union all
         select
-          'p1' as person_node_id,
+          '12345678901' as person_node_id,
           'Ana Costa Fictícia' as person_name,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           '02260956' as company_node_id,
           'Gipar S.A.' as company_name,
-          cast(35.0 as decimal) as pct_economica_pessoa,
-          cast(35.0 as decimal) as pct_votos_pessoa,
+          35.0 as pct_economica_pessoa,
+          35.0 as pct_votos_pessoa,
           3 as path_length
         union all
         select
-          'p1' as person_node_id,
+          '12345678901' as person_node_id,
           'Ana Costa Fictícia' as person_name,
-          '***901' as cpf_masked,
+          '***901***' as cpf_masked,
           '00864214' as company_node_id,
           'Energisa S.A.' as company_name,
           9.709 as pct_economica_pessoa,
@@ -446,13 +476,13 @@ unit_tests:
       - input: ref('graph_edges')
         format: sql
         rows: |
-          select 'p5' as from_id, '44556677' as to_id, cast(null as double) as pct_capital, cast(null as double) as pct_votos
+          select 'Diana Oliveira Teste_1' as from_id, '44556677' as to_id, cast(null as double) as pct_capital, cast(null as double) as pct_votos
           union all
           select '44556677' as from_id, '00864214' as to_id, 5.0 as pct_capital, 3.2 as pct_votos
       - input: ref('graph_nodes')
         format: sql
         rows: |
-          select 'p5' as node_id, 'person' as node_kind, 'Diana Oliveira Teste' as name, cast(null as string) as cpf_masked
+          select 'Diana Oliveira Teste_1' as node_id, 'person' as node_kind, 'Diana Oliveira Teste' as name, cast(null as string) as cpf_masked
           union all
           select '44556677' as node_id, 'company' as node_kind, 'Minoritário Alpha S.A.' as name, cast(null as string) as cpf_masked
           union all
@@ -461,7 +491,7 @@ unit_tests:
       format: sql
       rows: |
         select
-          'p5' as person_node_id,
+          'Diana Oliveira Teste_1' as person_node_id,
           'Diana Oliveira Teste' as person_name,
           cast(null as string) as cpf_masked,
           '44556677' as company_node_id,
@@ -471,7 +501,7 @@ unit_tests:
           1 as path_length
         union all
         select
-          'p5' as person_node_id,
+          'Diana Oliveira Teste_1' as person_node_id,
           'Diana Oliveira Teste' as person_name,
           cast(null as string) as cpf_masked,
           '00864214' as company_node_id,
@@ -483,17 +513,18 @@ unit_tests:
   - name: test_graph_edges_float_stop_no_children
     description: |
       Verify "outros acionistas" / free float has no children.
-      Bruno Silva (p3) → Energisa edge exists but has no further children.
-      This test verifies the edge exists as a leaf (no outgoing edges from float person).
+      Outros node (00000001) → Energisa edge exists but outros has zero outgoing edges.
+      No person has a direct edge to Energisa (only through Gipar).
     model: graph_edges
     given:
       - input: ref('energisa_edges_fixture')
         format: sql
         rows: |
           select
-            'p3' as from_id,
+            '00000001' as from_id,
             '00864214' as to_id,
             'participacao' as edge_kind,
+            cast(null as string) as edge_role,
             cast(null as double) as pct_capital,
             cast(null as double) as pct_votos,
             cast(null as integer) as qty_ordinarias,
@@ -505,9 +536,10 @@ unit_tests:
       format: sql
       rows: |
         select
-          'p3' as from_id,
+          '00000001' as from_id,
           '00864214' as to_id,
           'participacao' as edge_kind,
+          cast(null as string) as edge_role,
           cast(null as double) as pct_capital,
           cast(null as double) as pct_votos,
           cast(null as integer) as qty_ordinarias,

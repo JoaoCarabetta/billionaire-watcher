@@ -1,15 +1,15 @@
-from_id,to_id,edge_kind,pct_capital,pct_votos,qty_ordinarias,qty_preferenciais,source_doc,source_locator,source_retrieved_at
-02260956,00864214,participacao,27.74,62.45,,,Energisa IR 14 Aug 2026,table 6.1,2026-08-14
-11223344,02260956,participacao,100.0,100.0,,,Gipar control chain,FAQ,2026-08-14
-55667788,11223344,participacao,50.0,50.0,,,Nova Gipar structure,FAQ,2026-08-14
-99887766,11223344,participacao,50.0,50.0,,,Nova Gipar structure,FAQ,2026-08-14
-p1,55667788,participacao,70.0,70.0,,,Itacatu control,fixture,2026-08-14
-p4,55667788,participacao,30.0,30.0,,,Itacatu control,fixture,2026-08-14
-p2,99887766,participacao,100.0,100.0,,,Multisetor control,fixture,2026-08-14
-p5,44556677,participacao,,,,,Minoritário hop without percent,fixture,2026-08-14
-44556677,00864214,participacao,5.0,3.2,,,Energisa minority,table 6.1,2026-08-14
-22334455,12345678,participacao,,,,,Fund gestora,fixture,2026-08-14
-33445566,12345678,participacao,,,,,Fund administrador,fixture,2026-08-14
-12345678,00864214,participacao,2.1,1.5,,,Energisa fund position,table 6.1,2026-08-14
-99887766,99887766,participacao,,,,,Cycle test edge,fixture,2026-08-14
-p3,00864214,participacao,,,,,Float/outros acionistas,fixture,2026-08-14
+from_id,to_id,edge_kind,edge_role,pct_capital,pct_votos,qty_ordinarias,qty_preferenciais,source_doc,source_locator,source_retrieved_at
+02260956,00864214,participacao,,27.74,62.45,,,Energisa IR 14 Aug 2026,table 6.1,2026-08-14
+11223344,02260956,participacao,,100.0,100.0,,,Gipar control chain,FAQ,2026-08-14
+55667788,11223344,participacao,,50.0,50.0,,,Nova Gipar structure,FAQ,2026-08-14
+99887766,11223344,participacao,,50.0,50.0,,,Nova Gipar structure,FAQ,2026-08-14
+12345678901,55667788,participacao,,70.0,70.0,,,Itacatu control,fixture,2026-08-14
+98765432109,55667788,participacao,,30.0,30.0,,,Itacatu control,fixture,2026-08-14
+Bruno Silva Teste_1,99887766,participacao,,100.0,100.0,,,Multisetor control,fixture,2026-08-14
+Diana Oliveira Teste_1,44556677,participacao,,,,,,Minoritário hop without percent,fixture,2026-08-14
+44556677,00864214,participacao,,5.0,3.2,,,Energisa minority,table 6.1,2026-08-14
+22334455,12345678,participacao,gestora,,,,,Fund gestora,fixture,2026-08-14
+33445566,12345678,participacao,administrador,,,,,Fund administrador,fixture,2026-08-14
+12345678,00864214,participacao,,2.1,1.5,,,Energisa fund position,table 6.1,2026-08-14
+11223344,55667788,participacao,,50.0,50.0,,,Cycle ring return edge,fixture,2026-08-14
+00000001,00864214,participacao,,,,,,Float/outros acionistas,fixture,2026-08-14

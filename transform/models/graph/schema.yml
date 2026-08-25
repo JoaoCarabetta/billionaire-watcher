@@ -3,10 +3,11 @@ version: 2
 models:
   - name: graph_nodes
     description: |
-      Control graph nodes: companies, persons, funds, state entities.
+      Control graph nodes: companies, persons, funds, state entities, outros.
       Company key = CNPJ básico (8-digit STRING lpad).
       Person key = CPF (11 digits) when present; otherwise provisional_name_key.
       Two identical names without CPF stay two nodes (no homonym merge).
+      CPF masked as ***NNN*** (stars + last-3 + stars) derived from warehouse cpf.
     columns:
       - name: node_id
         description: Unique node identifier (cnpj_basico for companies, cpf or provisional_name_key for persons)
@@ -14,12 +15,12 @@ models:
           - not_null
           - unique
       - name: node_kind
-        description: Node type (person, company, fund, state)
+        description: Node type (person, company, fund, state, outros)
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['person', 'company', 'fund', 'state']
+                values: ['person', 'company', 'fund', 'state', 'outros']
       - name: name
         description: Node name
         tests:
@@ -27,24 +28,25 @@ models:
       - name: cpf
         description: Person CPF (11 digits, warehouse only) when present
       - name: cpf_masked
-        description: Published masked CPF (***NNN*** format only, no full CPF)
+        description: Published masked CPF (***NNN*** format with trailing stars, no full CPF)
       - name: provisional_name_key
         description: Provisional name key for persons without CPF
       - name: cnpj_basico
-        description: Company CNPJ básico (8-digit STRING lpad) when node is company or fund
+        description: Company CNPJ básico (8-digit STRING lpad) when node is company, fund, or outros
 
   - name: graph_edges
     description: |
       Control graph edges: participacao relationships.
       Missing percent is NULL, not zero.
       Hop without percent keeps the edge (both percents null on that path).
+      edge_role labels fund relationships (gestora, administrador).
     columns:
       - name: from_id
-        description: Source node ID
+        description: Source node ID (resolved node_id)
         tests:
           - not_null
       - name: to_id
-        description: Target node ID
+        description: Target node ID (resolved node_id)
         tests:
           - not_null
       - name: edge_kind
@@ -54,6 +56,8 @@ models:
           - accepted_values:
               arguments:
                 values: ['participacao']
+      - name: edge_role
+        description: Edge role (gestora, administrador, or null for regular participacao)
       - name: pct_capital
         description: Total capital percentage (nullable; null means missing, not zero)
       - name: pct_votos
@@ -74,7 +78,7 @@ models:
   - name: graph_cycles
     description: |
       Cycles detected in the control graph.
-      A cycle occurs when a CNPJ básico repeats in a path.
+      A cycle occurs when a CNPJ básico repeats in a path (real rings, not only self-loops).
       Walk stops at cycle; edges of the ring are kept.
     columns:
       - name: cycle_start
@@ -82,7 +86,7 @@ models:
         tests:
           - not_null
       - name: cycle_path
-        description: Ordered list of CNPJ básico that repeated
+        description: Ordered list of CNPJ básico that formed the ring
 
   - name: graph_person_holdings
     description: |

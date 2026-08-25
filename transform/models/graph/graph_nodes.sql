@@ -1,6 +1,7 @@
 -- graph_nodes.sql
--- Control graph nodes: companies, persons, funds, state entities
+-- Control graph nodes: companies, persons, funds, state entities, outros
 -- Union of all node types with standardized node_id and node_kind
+-- CPF masked as ***NNN*** (stars + last-3 + stars) derived from warehouse cpf
 
 with companies as (
     select
@@ -16,11 +17,15 @@ with companies as (
 
 persons as (
     select
-        coalesce(cpf, provisional_name_key, person_id) as node_id,
+        node_id,
         node_kind,
         name,
         cpf,
-        cpf_masked,
+        case
+            when cpf is not null
+            then concat('***', substr(cpf, 9, 3), '***')
+            else null
+        end as cpf_masked,
         provisional_name_key,
         cast(null as string) as cnpj_basico
     from {{ ref('energisa_persons_fixture') }}

@@ -1,6 +1,7 @@
 -- graph_cycles.sql
 -- Detect cycles in the control graph
 -- A cycle occurs when a CNPJ básico appears more than once in a path
+-- Records the ordered list of cnpj_basico that repeated (the ring)
 
 with edges as (
     select
@@ -17,15 +18,17 @@ nodes as (
     from {{ ref('graph_nodes') }}
 ),
 
--- Find self-loops (direct cycles)
-self_loops as (
+-- Find two-hop rings: A → B → A
+two_hop_rings as (
     select
-        e.from_id as cycle_start,
-        [e.from_id] as cycle_path
-    from edges e
-    inner join nodes n1 on e.from_id = n1.node_id
-    inner join nodes n2 on e.to_id = n2.node_id
-    where e.from_id = e.to_id
+        e1.from_id as cycle_start,
+        [n1.cnpj_basico, n2.cnpj_basico] as cycle_path
+    from edges e1
+    inner join edges e2 on e1.to_id = e2.from_id
+    inner join nodes n1 on e1.from_id = n1.node_id
+    inner join nodes n2 on e1.to_id = n2.node_id
+    where e2.to_id = e1.from_id
+      and e1.from_id != e1.to_id
       and n1.cnpj_basico is not null
       and n2.cnpj_basico is not null
 )
@@ -33,4 +36,4 @@ self_loops as (
 select
     cycle_start,
     cycle_path
-from self_loops
+from two_hop_rings

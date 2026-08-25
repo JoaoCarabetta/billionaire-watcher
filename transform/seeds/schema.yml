@@ -148,7 +148,7 @@ seeds:
   - name: energisa_companies_fixture
     description: |
       Energisa control graph companies fixture (FIXTURE/SEED ONLY, NOT LIVE CVM OR RECEITA).
-      Test data for control graph node/edge transform. Includes Energisa, Gipar, holdings, fund, minorities.
+      Test data for control graph node/edge transform. Includes Energisa, Gipar, holdings, fund, minorities, outros.
       
       PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
       Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
@@ -165,11 +165,11 @@ seeds:
           - not_null
           - unique
       - name: node_kind
-        description: Node type (company or fund)
+        description: Node type (company, fund, or outros)
         tests:
           - not_null
       - name: name
-        description: Company or fund name
+        description: Company, fund, or outros acionistas name
         tests:
           - not_null
 
@@ -177,21 +177,21 @@ seeds:
     description: |
       Energisa control graph persons fixture (FIXTURE/SEED ONLY, fake person names).
       Test data for control graph node/edge transform. Includes persons with CPF, without CPF, and homonyms.
+      node_id is the resolved key (CPF when present, else provisional_name_key).
       
       PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
       Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
     config:
       enabled: "{{ target.name in ['test', 'ci'] }}"
       column_types:
-        person_id: STRING
+        node_id: STRING
         node_kind: STRING
         name: STRING
         cpf: STRING
-        cpf_masked: STRING
         provisional_name_key: STRING
     columns:
-      - name: person_id
-        description: Person node ID (fixture internal key)
+      - name: node_id
+        description: Person node ID (CPF when present, else provisional_name_key)
         tests:
           - not_null
           - unique
@@ -205,15 +205,14 @@ seeds:
           - not_null
       - name: cpf
         description: Person CPF (11 digits, warehouse only) when present
-      - name: cpf_masked
-        description: Published masked CPF (***NNN*** format only)
       - name: provisional_name_key
         description: Provisional name key for persons without CPF
 
   - name: energisa_edges_fixture
     description: |
       Energisa control graph edges fixture (FIXTURE/SEED ONLY, participacao edges).
-      Test data for control graph transform. Includes edges with/without percents, cycle, fund edges.
+      Test data for control graph transform. Includes edges with/without percents, cycle, fund edges with roles.
+      from_id and to_id use resolved node_ids (CPF or provisional_name_key for persons, cnpj_basico for companies).
       
       PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
       Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
@@ -223,6 +222,7 @@ seeds:
         from_id: STRING
         to_id: STRING
         edge_kind: STRING
+        edge_role: STRING
         pct_capital: FLOAT64
         pct_votos: FLOAT64
         qty_ordinarias: INT64
@@ -232,17 +232,19 @@ seeds:
         source_retrieved_at: STRING
     columns:
       - name: from_id
-        description: Source node (person_id, cnpj_basico, or company id)
+        description: Source node (resolved node_id)
         tests:
           - not_null
       - name: to_id
-        description: Target node (cnpj_basico or company id)
+        description: Target node (resolved node_id)
         tests:
           - not_null
       - name: edge_kind
         description: Edge type (participacao)
         tests:
           - not_null
+      - name: edge_role
+        description: Edge role (gestora, administrador, or null for regular participacao)
       - name: pct_capital
         description: Total capital percentage (nullable)
       - name: pct_votos
