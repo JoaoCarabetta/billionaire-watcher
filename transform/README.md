@@ -295,3 +295,4 @@ See [LICENSE](../LICENSE).
 CI: All 44 unit tests passing (2026-08-25)
 
 <!-- ci-retrigger: 2026-08-25 -->
+# CI test 1787619945
