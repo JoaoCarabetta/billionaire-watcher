@@ -302,3 +302,123 @@ seeds:
           - not_null
       - name: source
         description: Price source (Brasil Bolsa Balcão)
+        tests:
+          - not_null
+
+  - name: qsa_companies_fixture
+    description: |
+      QSA (Receita Federal Quadro Societário) companies fixture (FIXTURE/SEED ONLY, NOT LIVE RECEITA).
+      Test data for QSA-based graph recursion. Includes state companies (BNDESPAR, União), named minorities (Squadra, Opportunity), unlisted holdings.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        cnpj_basico: STRING
+        node_kind: STRING
+        name: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ básico (STRING with leading zeros) or state identifier
+        tests:
+          - not_null
+          - unique
+      - name: node_kind
+        description: Node type (company or state)
+        tests:
+          - not_null
+      - name: name
+        description: Company or state entity name
+        tests:
+          - not_null
+
+  - name: qsa_persons_fixture
+    description: |
+      QSA persons fixture (FIXTURE/SEED ONLY, fake person names).
+      Test data for QSA-based graph recursion. Includes sócios (partners) with/without CPF.
+      node_id is the resolved key (CPF when present, else provisional_name_key).
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        node_id: STRING
+        node_kind: STRING
+        name: STRING
+        cpf: STRING
+        provisional_name_key: STRING
+    columns:
+      - name: node_id
+        description: Person node ID (CPF when present, else provisional_name_key)
+        tests:
+          - not_null
+          - unique
+      - name: node_kind
+        description: Node type (person)
+        tests:
+          - not_null
+      - name: name
+        description: Person name (fake names for testing)
+        tests:
+          - not_null
+      - name: cpf
+        description: Person CPF (11 digits, warehouse only) when present
+      - name: provisional_name_key
+        description: Provisional name key for persons without CPF
+
+  - name: qsa_edges_fixture
+    description: |
+      QSA edges fixture (FIXTURE/SEED ONLY, sócio/participacao edges from Receita Federal QSA).
+      Test data for QSA-based graph recursion. Includes company-person and company-company edges from QSA data.
+      QSA sócio edges use edge_role='socio' (never 'dono' or 'UBO').
+      from_id and to_id use resolved node_ids.
+      
+      PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
+      Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
+    config:
+      enabled: "{{ target.name in ['test', 'ci'] }}"
+      column_types:
+        from_id: STRING
+        to_id: STRING
+        edge_kind: STRING
+        edge_role: STRING
+        pct_capital: FLOAT64
+        pct_votos: FLOAT64
+        qty_ordinarias: INT64
+        qty_preferenciais: INT64
+        source_doc: STRING
+        source_locator: STRING
+        source_retrieved_at: STRING
+    columns:
+      - name: from_id
+        description: Source node (resolved node_id)
+        tests:
+          - not_null
+      - name: to_id
+        description: Target node (resolved node_id)
+        tests:
+          - not_null
+      - name: edge_kind
+        description: Edge type (participacao)
+        tests:
+          - not_null
+      - name: edge_role
+        description: Edge role (socio for QSA partners, or null for participacao; never dono/UBO)
+      - name: pct_capital
+        description: Total capital percentage (nullable)
+      - name: pct_votos
+        description: Voting percentage (nullable)
+      - name: qty_ordinarias
+        description: Quantity of ordinary shares (nullable)
+      - name: qty_preferenciais
+        description: Quantity of preferred shares (nullable)
+      - name: source_doc
+        description: Source document citation (QSA fixture)
+        tests:
+          - not_null
+      - name: source_locator
+        description: Source document locator
+      - name: source_retrieved_at
+        description: Source retrieval date

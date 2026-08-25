@@ -1,7 +1,8 @@
 -- graph_edges.sql
 -- Control graph edges: participacao relationships with nullable percents
 -- Missing percent is NULL, not zero; hop without percent keeps edge
--- edge_role labels fund relationships (gestora, administrador)
+-- edge_role labels fund relationships (gestora, administrador) and QSA sócio relationships
+-- QSA sócio edges use edge_role='socio' (never 'dono' or 'UBO')
 -- CVM FRE/IR statement of control wins over QSA for who controls a listed company:
 --   Filter out person→listed direct edges from QSA when FRE/IR control exists
 
@@ -19,6 +20,22 @@ with all_edges as (
         source_locator,
         cast(source_retrieved_at as date) as source_retrieved_at
     from {{ ref('energisa_edges_fixture') }}
+    
+    union all
+    
+    select
+        from_id,
+        to_id,
+        edge_kind,
+        edge_role,
+        pct_capital,
+        pct_votos,
+        qty_ordinarias,
+        qty_preferenciais,
+        source_doc,
+        source_locator,
+        cast(source_retrieved_at as date) as source_retrieved_at
+    from {{ ref('qsa_edges_fixture') }}
 ),
 
 nodes as (
