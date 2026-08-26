@@ -1,0 +1,497 @@
+unit_tests:
+  - name: test_valor_universo_hop_roots_ativo_itausa_and_group_exclusion
+    description: |
+      Hop roots are inventory ATIVO with a prefix-8 key, plus Itaúsa when it
+      is cadastro ATIVO and not a Valor ranking row. Globo stays a group even
+      if inventory calls it ATIVO. Natura & Co closed is not a hop root and
+      does not mint a Natura Cosméticos ATIVO hop key. Dexco is not the
+      Votorantim seed.
+    model: valor_universo_hop_roots
+    given:
+      - input: ref('valor_cadastro_inventory')
+        format: sql
+        rows: |
+          select
+            'Dexco' as company_name,
+            '97837181' as cnpj_basico,
+            'industrial' as ranking_family,
+            165 as valor_rank,
+            'ATIVO' as cadastro_situation,
+            cast(false as boolean) as already_on_graph,
+            cast(false as boolean) as is_votorantim_seed,
+            'Dexco S.A.' as razao_social
+          union all select
+            'Votorantim Cimentos', '84444444', 'industrial', 54, 'ATIVO',
+            cast(false as boolean), cast(true as boolean), 'Votorantim Cimentos S.A.'
+          union all select
+            'Globo', '11111111', 'industrial', 81, 'ATIVO',
+            cast(false as boolean), cast(false as boolean),
+            'Globo Comunicação e Participações S.A.'
+          union all select
+            'Natura & Co.', '33333333', 'industrial', 60, 'closed',
+            cast(false as boolean), cast(false as boolean),
+            'Natura & Co Holding S.A.'
+          union all select
+            'Ambev', '07526557', 'industrial', 11, 'ATIVO',
+            cast(true as boolean), cast(false as boolean), 'Ambev S.A.'
+      - input: ref('valor_launch_add_list')
+        format: sql
+        rows: |
+          select 'Itaúsa' as spec_name, 'Itaúsa' as match_empresa, 'Itaúsa S.A.' as match_razao, false as is_votorantim_seed
+          union all select 'Votorantim Cimentos', 'Votorantim Cimentos', 'Votorantim Cimentos S.A.', true
+          union all select 'Natura Cosméticos', 'Natura & Co.', 'Natura & Co Holding S.A.', false
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        rows: |
+          select '61600181000100' as CNPJ_CIA, 'ITAUSA S.A.' as DENOM_SOCIAL, 'ITAUSA' as DENOM_COMERC, 'ATIVO' as SIT
+          union all select '71673990000177', 'NATURA COSMETICOS S.A.', 'NATURA COSMETICOS', 'ATIVO'
+      - input: ref('live_graph_company_cnpj_basicos')
+        format: sql
+        rows: |
+          select '07526557' as cnpj_basico
+      - input: ref('valor_group_not_dono')
+        format: sql
+        rows: |
+          select 'Globo' as empresa
+          union all select 'Record'
+          union all select 'Havan'
+          union all select 'Folha'
+    expect:
+      format: sql
+      rows: |
+        select
+          'Dexco' as company_name,
+          '97837181' as cnpj_basico,
+          'industrial' as ranking_family,
+          165 as valor_rank,
+          cast(false as boolean) as already_on_graph,
+          cast(false as boolean) as skip_redraw,
+          cast(false as boolean) as is_votorantim_seed,
+          'Dexco S.A.' as razao_social,
+          'inventory_ativo' as root_origin
+        union all select
+          'Votorantim Cimentos', '84444444', 'industrial', 54,
+          cast(false as boolean), cast(false as boolean), cast(true as boolean),
+          'Votorantim Cimentos S.A.', 'inventory_ativo'
+        union all select
+          'Ambev', '07526557', 'industrial', 11,
+          cast(true as boolean), cast(true as boolean), cast(false as boolean),
+          'Ambev S.A.', 'inventory_ativo'
+        union all select
+          'Itaúsa', '61600181', cast(null as varchar), cast(null as integer),
+          cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          'Itaúsa S.A.', 'launch_extra'
+
+  - name: test_valor_universo_hop_roots_itausa_explicit_hole
+    description: |
+      Itaúsa on the launch list with no Valor row and no cadastro ATIVO match
+      is an explicit hole. A CANCELADA cadastro row does not mint a hop key.
+      An 11-digit cadastro document is dropped rather than padded into /0001.
+    model: valor_universo_hop_roots
+    given:
+      - input: ref('valor_cadastro_inventory')
+        format: sql
+        rows: |
+          select
+            'Dexco' as company_name,
+            '97837181' as cnpj_basico,
+            'industrial' as ranking_family,
+            165 as valor_rank,
+            'ATIVO' as cadastro_situation,
+            cast(false as boolean) as already_on_graph,
+            cast(false as boolean) as is_votorantim_seed,
+            'Dexco S.A.' as razao_social
+      - input: ref('valor_launch_add_list')
+        format: sql
+        rows: |
+          select 'Itaúsa' as spec_name, 'Itaúsa' as match_empresa, 'Itaúsa S.A.' as match_razao, false as is_votorantim_seed
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        rows: |
+          select '61600181000100' as CNPJ_CIA, 'ITAUSA S.A.' as DENOM_SOCIAL, 'ITAUSA' as DENOM_COMERC, 'CANCELADA' as SIT
+          union all select '12345678901', 'ITAUSA S.A.', 'ITAUSA', 'ATIVO'
+      - input: ref('live_graph_company_cnpj_basicos')
+        format: sql
+        rows: |
+          select '07526557' as cnpj_basico
+      - input: ref('valor_group_not_dono')
+        format: sql
+        rows: |
+          select 'Globo' as empresa
+    expect:
+      format: sql
+      rows: |
+        select
+          'Dexco' as company_name,
+          '97837181' as cnpj_basico,
+          'industrial' as ranking_family,
+          165 as valor_rank,
+          cast(false as boolean) as already_on_graph,
+          cast(false as boolean) as skip_redraw,
+          cast(false as boolean) as is_votorantim_seed,
+          'Dexco S.A.' as razao_social,
+          'inventory_ativo' as root_origin
+        union all select
+          'Itaúsa', cast(null as varchar), cast(null as varchar), cast(null as integer),
+          cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          'Itaúsa S.A.', 'launch_hole'
+
+  - name: test_valor_universo_fre_hops_hop_correct_dexco_not_votorantim
+    description: |
+      Latest ID_Documento only. Direct Dexco holders sum to 100. The related
+      person is their own Formulário row listed under the vehicle, so they
+      point at the vehicle, not at Dexco, and are a name key rather than an
+      11-digit Cadastro. An older document is ignored. Votorantim is a
+      different seed and receives no Dexco hop. Closed Natura FRE for a
+      Cosméticos key is not in the root set so it does not land.
+    model: valor_universo_fre_hops
+    given:
+      - input: ref('valor_universo_hop_roots')
+        format: sql
+        rows: |
+          select
+            'Dexco' as company_name,
+            '97837181' as cnpj_basico,
+            cast(false as boolean) as already_on_graph,
+            cast(false as boolean) as skip_redraw,
+            cast(false as boolean) as is_votorantim_seed,
+            'Dexco S.A.' as razao_social
+          union all select
+            'Votorantim Cimentos', '84444444',
+            cast(false as boolean), cast(false as boolean), cast(true as boolean),
+            'Votorantim Cimentos S.A.'
+          union all select
+            'Ambev', '07526557',
+            cast(true as boolean), cast(true as boolean), cast(false as boolean),
+            'Ambev S.A.'
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        rows: |
+          select
+            '97837181000100' as CNPJ_Companhia,
+            100 as ID_Documento,
+            cast('2024-12-31' as date) as Data_Referencia,
+            9 as ID_Acionista,
+            'Documento Velho Ficticio' as Acionista,
+            'PJ' as Tipo_Pessoa_Acionista,
+            '19999999000100' as CPF_CNPJ_Acionista,
+            cast(null as integer) as ID_Acionista_Relacionado,
+            cast(null as varchar) as Acionista_Relacionado,
+            cast(null as varchar) as Tipo_Pessoa_Acionista_Relacionado,
+            cast(null as varchar) as CPF_CNPJ_Acionista_Relacionado,
+            1 as Quantidade_Acao_Ordinaria_Circulacao,
+            100.0 as Percentual_Acao_Ordinaria_Circulacao,
+            0 as Quantidade_Acao_Preferencial_Circulacao,
+            0.0 as Percentual_Acao_Preferencial_Circulacao,
+            1 as Quantidade_Total_Acoes_Circulacao,
+            100.0 as Percentual_Total_Acoes_Circulacao
+          union all select
+            '97837181000100', 200, cast('2025-12-31' as date), 1,
+            'Veiculo Ficticio Dexco', 'PJ', '20000000000100',
+            cast(null as integer), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), 400, 40.0, 0, 0.0, 400, 40.0
+          union all select
+            '97837181000100', 200, cast('2025-12-31' as date), 11,
+            'Pessoa Ficticia Dexco', 'PF', '12345678901',
+            1, 'Veiculo Ficticio Dexco', 'PJ', '20000000000100',
+            400, 40.0, 0, 0.0, 400, 40.0
+          union all select
+            '97837181000100', 200, cast('2025-12-31' as date), 2,
+            'Outros acionistas', 'PJ', cast(null as varchar),
+            cast(null as integer), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), 600, 60.0, 0, 0.0, 600, 60.0
+          union all select
+            '07526557000100', 300, cast('2025-12-31' as date), 1,
+            'Outros acionistas', 'PJ', cast(null as varchar),
+            cast(null as integer), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), 100, 100.0, 0, 0.0, 100, 100.0
+          union all select
+            '71673990000177', 400, cast('2025-12-31' as date), 1,
+            'Pessoa Ficticia Natura', 'PF', '98765432100',
+            cast(null as integer), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), 100, 100.0, 0, 0.0, 100, 100.0
+    expect:
+      format: sql
+      rows: |
+        select
+          'Dexco' as seed_name,
+          '97837181' as seed_cnpj_basico,
+          '20000000' as from_id,
+          '97837181' as to_id,
+          'company' as from_kind,
+          'Veiculo Ficticio Dexco' as from_name,
+          'company' as to_kind,
+          'Dexco' as to_name,
+          'participacao' as edge_kind,
+          cast(null as varchar) as edge_role,
+          40.0 as pct_capital,
+          40.0 as pct_votos,
+          400 as qty_ordinarias,
+          0 as qty_preferenciais,
+          cast(true as boolean) as is_listed_hop,
+          200 as ID_Documento,
+          1 as ID_Acionista,
+          cast(null as integer) as ID_Acionista_Relacionado,
+          'CVM FRE 2026 item 6.1 ID_Documento 200' as source_doc,
+          'ID_Acionista 1' as source_locator,
+          cast('2025-12-31' as date) as source_retrieved_at,
+          cast(false as boolean) as already_on_graph,
+          cast(false as boolean) as skip_redraw,
+          cast(false as boolean) as is_votorantim_seed
+        union all select
+          'Dexco', '97837181', 'outros-97837181', '97837181', 'outros',
+          'Outros acionistas', 'company', 'Dexco', 'participacao',
+          cast(null as varchar), 60.0, 60.0, 600, 0, cast(true as boolean),
+          200, 2, cast(null as integer),
+          'CVM FRE 2026 item 6.1 ID_Documento 200', 'ID_Acionista 2',
+          cast('2025-12-31' as date), cast(false as boolean),
+          cast(false as boolean), cast(false as boolean)
+        union all select
+          'Dexco', '97837181', 'PESSOAFICTICIADEXCO', '20000000', 'person',
+          'Pessoa Ficticia Dexco', 'company', 'Veiculo Ficticio Dexco',
+          'participacao', cast(null as varchar), 40.0, 40.0,
+          cast(null as integer), cast(null as integer), cast(false as boolean),
+          200, 11, 1,
+          'CVM FRE 2026 item 6.1 ID_Documento 200',
+          'ID_Acionista 11 relacionado 1',
+          cast('2025-12-31' as date), cast(false as boolean),
+          cast(false as boolean), cast(false as boolean)
+        union all select
+          'Ambev', '07526557', 'outros-07526557', '07526557', 'outros',
+          'Outros acionistas', 'company', 'Ambev', 'participacao',
+          cast(null as varchar), 100.0, 100.0, 100, 0, cast(true as boolean),
+          300, 1, cast(null as integer),
+          'CVM FRE 2026 item 6.1 ID_Documento 300', 'ID_Acionista 1',
+          cast('2025-12-31' as date), cast(true as boolean),
+          cast(true as boolean), cast(false as boolean)
+
+  - name: test_valor_universo_fre_coverage_incoming_and_holes
+    description: |
+      Incoming capital about 100 is hops_landed. A missing FRE book is an
+      explicit hole. Incoming far from 100 is a hole even when hops exist.
+      Already-on-graph stays skip_redraw. A launch hole with no key stays a
+      hole. Dexco is not tagged Votorantim.
+    model: valor_universo_fre_coverage
+    given:
+      - input: ref('valor_universo_hop_roots')
+        format: sql
+        rows: |
+          select
+            'Dexco' as company_name,
+            '97837181' as cnpj_basico,
+            'industrial' as ranking_family,
+            165 as valor_rank,
+            'inventory_ativo' as root_origin,
+            cast(false as boolean) as already_on_graph,
+            cast(false as boolean) as skip_redraw,
+            cast(false as boolean) as is_votorantim_seed
+          union all select
+            'Ambev', '07526557', 'industrial', 11, 'inventory_ativo',
+            cast(true as boolean), cast(true as boolean), cast(false as boolean)
+          union all select
+            'Votorantim Cimentos', '84444444', 'industrial', 54, 'inventory_ativo',
+            cast(false as boolean), cast(false as boolean), cast(true as boolean)
+          union all select
+            'Buraco Incoming', '12222222', 'industrial', 90, 'inventory_ativo',
+            cast(false as boolean), cast(false as boolean), cast(false as boolean)
+          union all select
+            'Itaúsa', cast(null as varchar), cast(null as varchar),
+            cast(null as integer), 'launch_hole',
+            cast(false as boolean), cast(false as boolean), cast(false as boolean)
+      - input: ref('valor_universo_fre_hops')
+        format: sql
+        rows: |
+          select
+            '97837181' as seed_cnpj_basico,
+            'Dexco' as seed_name,
+            40.0 as pct_capital,
+            cast(true as boolean) as is_listed_hop,
+            cast(false as boolean) as skip_redraw,
+            cast(false as boolean) as already_on_graph
+          union all select
+            '97837181', 'Dexco', 60.0, cast(true as boolean),
+            cast(false as boolean), cast(false as boolean)
+          union all select
+            '97837181', 'Dexco', 40.0, cast(false as boolean),
+            cast(false as boolean), cast(false as boolean)
+          union all select
+            '07526557', 'Ambev', 100.0, cast(true as boolean),
+            cast(true as boolean), cast(true as boolean)
+          union all select
+            '12222222', 'Buraco Incoming', 10.0, cast(true as boolean),
+            cast(false as boolean), cast(false as boolean)
+    expect:
+      format: sql
+      rows: |
+        select
+          'Dexco' as company_name,
+          '97837181' as cnpj_basico,
+          'industrial' as ranking_family,
+          165 as valor_rank,
+          'inventory_ativo' as root_origin,
+          cast(false as boolean) as already_on_graph,
+          cast(false as boolean) as skip_redraw,
+          cast(false as boolean) as is_votorantim_seed,
+          2 as listed_hop_count,
+          100.0 as incoming_pct_capital,
+          'hops' as hop_status,
+          cast(null as varchar) as hole_reason
+        union all select
+          'Ambev', '07526557', 'industrial', 11, 'inventory_ativo',
+          cast(true as boolean), cast(true as boolean), cast(false as boolean),
+          1, 100.0, 'hops', cast(null as varchar)
+        union all select
+          'Votorantim Cimentos', '84444444', 'industrial', 54, 'inventory_ativo',
+          cast(false as boolean), cast(false as boolean), cast(true as boolean),
+          0, cast(null as double), 'hole', 'no_fre_latest'
+        union all select
+          'Buraco Incoming', '12222222', 'industrial', 90, 'inventory_ativo',
+          cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          1, 10.0, 'hole', 'incoming_not_about_100'
+        union all select
+          'Itaúsa', cast(null as varchar), cast(null as varchar),
+          cast(null as integer), 'launch_hole',
+          cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          0, cast(null as double), 'hole', 'no_cadastro_key'
+
+  - name: test_valor_universo_closed_qsa_groups_socio_never_dono
+    description: |
+      Closed QSA is sócio only. Globo, Record, Havan, and Folha stay groups.
+      Officer names do not mint dono. Percent stays null. Globo without a
+      key is an explicit empty group row, not an invented /0001. Closed
+      rows have no FRE book (this model does not read FRE). An 11-digit
+      partner document is stored as documento, not as cnpj_basico.
+    model: valor_universo_closed_qsa
+    given:
+      - input: ref('valor_cadastro_inventory')
+        format: sql
+        rows: |
+          select
+            'Globo' as company_name,
+            cast(null as varchar) as cnpj_basico,
+            'industrial' as ranking_family,
+            81 as valor_rank,
+            'closed' as cadastro_situation,
+            'Globo Comunicação e Participações S.A.' as razao_social
+          union all select
+            'Record', cast(null as varchar), 'industrial', 354, 'closed',
+            'Rádio e Televisão Record S.A.'
+          union all select
+            'Havan', '55555555', 'industrial', 119, 'closed', 'Havan S.A.'
+          union all select
+            'Dexco', '97837181', 'industrial', 165, 'ATIVO', 'Dexco S.A.'
+      - input: ref('valor_group_not_dono')
+        format: sql
+        rows: |
+          select 'Globo' as empresa
+          union all select 'Record'
+          union all select 'Havan'
+          union all select 'Folha'
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            '55555555' as cnpj_basico,
+            '2' as tipo,
+            'PESSOA FICTICIA HAVAN' as nome,
+            '***246810**' as documento,
+            '05' as qualificacao,
+            cast('2010-01-01' as date) as data_entrada_sociedade
+          union all
+          select
+            cast('2026-01-11' as date),
+            '97837181',
+            '2',
+            'PESSOA FICTICIA DEXCO QSA',
+            '12345678901',
+            '22',
+            cast('2015-01-01' as date)
+    expect:
+      format: sql
+      rows: |
+        with expected_without_query as (
+          select
+            'Havan' as company_name,
+            '55555555' as cnpj_basico,
+            'industrial' as ranking_family,
+            119 as valor_rank,
+            'Havan S.A.' as razao_social,
+            cast(true as boolean) as stay_group,
+            '2' as tipo,
+            'PESSOA FICTICIA HAVAN' as nome,
+            '***246810**' as documento,
+            '05' as qualificacao,
+            cast('2010-01-01' as date) as data_entrada_sociedade,
+            'socio' as edge_role,
+            cast(null as double) as percent,
+            1 as partner_count
+          union all select
+            'Globo', cast(null as varchar), 'industrial', 81,
+            'Globo Comunicação e Participações S.A.',
+            cast(true as boolean), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), cast(null as varchar), cast(null as date),
+            'socio', cast(null as double), 0
+          union all select
+            'Record', cast(null as varchar), 'industrial', 354,
+            'Rádio e Televisão Record S.A.',
+            cast(true as boolean), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), cast(null as varchar), cast(null as date),
+            'socio', cast(null as double), 0
+          union all select
+            'Folha', cast(null as varchar), cast(null as varchar),
+            cast(null as integer), 'Folha',
+            cast(true as boolean), cast(null as varchar), cast(null as varchar),
+            cast(null as varchar), cast(null as varchar), cast(null as date),
+            'socio', cast(null as double), 0
+        )
+        select
+          expected_without_query.*,
+          case
+            when cnpj_basico is null then concat(
+              'closed group ', company_name,
+              ': no Cadastro key; Quadro de Socios is socio only, never dono'
+            )
+            else concat(
+              'SELECT tipo, nome, documento, qualificacao, data_entrada_sociedade ',
+              'FROM basedosdados.br_me_cnpj.socios WHERE data = DATE ',
+              chr(39), '2026-01-11', chr(39),
+              ' AND LPAD(CAST(cnpj_basico AS STRING), 8, ',
+              chr(39), '0', chr(39), ') = ',
+              chr(39), cnpj_basico, chr(39)
+            )
+          end as source_query
+        from expected_without_query
+
+  - name: test_valor_universo_hop_counts_formula
+    description: |
+      Counts are derived. hops_landed plus explicit_holes equals hop_roots.
+      already_on_graph_skipped counts skip_redraw roots even when hops
+      landed. closed_qsa_partner_rows sums per-company partner_count, not
+      duplicated partner rows.
+    model: valor_universo_hop_counts
+    given:
+      - input: ref('valor_universo_fre_coverage')
+        format: sql
+        rows: |
+          select 'hops' as hop_status, cast(true as boolean) as skip_redraw
+          union all select 'hops', cast(false as boolean)
+          union all select 'hole', cast(false as boolean)
+          union all select 'hole', cast(true as boolean)
+      - input: ref('valor_universo_closed_qsa')
+        format: sql
+        rows: |
+          select 'Globo' as company_name, 0 as partner_count
+          union all select 'Havan', 2
+          union all select 'Havan', 2
+          union all select 'Folha', 0
+    expect:
+      format: sql
+      rows: |
+        select
+          4 as hop_roots,
+          2 as hops_landed,
+          2 as explicit_holes,
+          2 as already_on_graph_skipped,
+          3 as closed_qsa_companies,
+          2 as closed_qsa_partner_rows

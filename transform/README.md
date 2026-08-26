@@ -135,6 +135,28 @@ Votorantim seed. XP is not on the launch add-list. No public HTML, no
 (ATIVO in universe, already on graph, named launch add-list size, leftover
 after launch).
 
+### Valor universe hop extract (Issue #141)
+
+Warehouse hop extract for **all cadastro ATIVO** rows in the #140 universe
+(not the named 14-row launch list). Closed Valor rows get a Quadro de Sócios
+sócio slice, never a Formulário book and never dono. No public HTML, no
+`/grafo`.
+
+| Model | Grain |
+|-------|-------|
+| `valor_universo_hop_roots` | ATIVO inventory key, plus Itaúsa if cadastro ATIVO and not a Valor row |
+| `valor_universo_fre_hops` | Hop-correct FRE 6.1 edge (latest `ID_Documento`) |
+| `valor_universo_fre_coverage` | One row per hop root (`hops` if incoming capital in [99.5, 100.5], else hole) |
+| `valor_universo_closed_qsa` | Sócio row per closed/group company, or one explicit empty row |
+| `valor_universo_hop_counts` | One summary row |
+
+Hop-correct: direct holders (no parent named) point at the listed seed
+(incoming capital about 100); a holder listed under another name points at
+that parent. Company keys are prefix-8.
+Eleven-digit documents are person name keys, never a padded `/0001`.
+Already-on-graph roots still extract hops and set `skip_redraw`. Globo,
+Record, Havan, and Folha stay groups.
+
 ### Freeze Models (Issue #25)
 
 Freeze walk models implementing grupo × pessoa natural × papel per issue #22 spec:

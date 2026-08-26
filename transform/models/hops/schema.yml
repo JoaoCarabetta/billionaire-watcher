@@ -1,0 +1,242 @@
+version: 2
+
+models:
+  - name: valor_universo_hop_roots
+    description: |
+      ATIVO hop roots for the Valor 1000 2025 industrial 1–500 ∪ banks ∪
+      insurers universe (issue #141). Inventory cadastro ATIVO with a
+      prefix-8 key, plus launch-list names that are cadastro ATIVO but not
+      a Valor ranking row (Itaúsa). Globo, Record, Havan, and Folha stay
+      groups and are never hop roots. Already-on-graph roots set
+      skip_redraw so Coder does not redraw a second public tree. No
+      invented /0001. No public HTML or /grafo.
+    columns:
+      - name: company_name
+        description: Valor brand name, or the launch-list spec name for extras.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: cnpj_basico
+        description: |
+          8-digit company key when known. Null on an explicit launch hole
+          (Itaúsa with no cadastro ATIVO). Never 11-digit. Never a 14-digit
+          full CNPJ.
+      - name: ranking_family
+        description: industrial, banks, or insurers; null on a launch extra.
+      - name: valor_rank
+        description: Rank inside that ranking family; null on a launch extra.
+      - name: already_on_graph
+        description: True when the company key is already a live graph company node.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: skip_redraw
+        description: True iff already_on_graph. Coder skips a second public tree.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: is_votorantim_seed
+        description: True only for the Votorantim Cimentos seed. Dexco stays false.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: razao_social
+        description: Legal name from the Valor row or launch match.
+      - name: root_origin
+        description: inventory_ativo, launch_extra, or launch_hole.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+    tests:
+      - dbt_utils.expression_is_true:
+          name: valor_universo_hop_roots_key_is_eight_digits
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+      - dbt_utils.expression_is_true:
+          name: valor_universo_hop_roots_dexco_is_not_votorantim
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "company_name != 'Dexco' or is_votorantim_seed = false"
+
+  - name: valor_universo_fre_hops
+    description: |
+      Hop-correct Formulário 6.1 extract for ATIVO hop roots. Latest
+      ID_Documento only. Direct holders (no parent named) point at the
+      listed seed (incoming capital about 100). A holder listed under
+      another name points at that parent, not at the listed seed. Company from_id is prefix-8 of a 14-digit Cadastro.
+      Eleven-digit documents are person name keys, never a padded /0001.
+      edge_role is null on FRE hops (never dono or UBO). Closed rows have
+      no FRE book. No public HTML or /grafo.
+    columns:
+      - name: seed_cnpj_basico
+        description: Prefix-8 of the ATIVO hop root.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: from_id
+        description: Holder key (prefix-8 company, name key person, outros-<seed>).
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: to_id
+        description: Parent key. Listed hops point at the seed.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: from_kind
+        description: person, company, or outros.
+      - name: edge_role
+        description: Null on FRE hops. Never dono or UBO.
+      - name: pct_capital
+        description: Published total-capital percent. Null means missing, not zero.
+      - name: is_listed_hop
+        description: True when the hop points at the listed seed.
+      - name: skip_redraw
+        description: True when the seed is already on the live graph.
+    tests:
+      - dbt_utils.expression_is_true:
+          name: valor_universo_fre_hops_never_dono_or_ubo
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "edge_role is null or (edge_role != 'dono' and edge_role != 'UBO')"
+      - dbt_utils.expression_is_true:
+          name: valor_universo_fre_hops_no_eleven_digit_from_id
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "from_id is null or length(from_id) != 11 or from_id != regexp_replace(from_id, '[^0-9]', '')"
+      - dbt_utils.expression_is_true:
+          name: valor_universo_fre_hops_seed_is_eight_digits
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "length(seed_cnpj_basico) = 8"
+
+  - name: valor_universo_fre_coverage
+    description: |
+      One row per hop root. hop_status is hops when listed incoming capital
+      is in [99.5, 100.5], else hole. already_on_graph roots stay in the
+      count with skip_redraw true. No public HTML or /grafo.
+    columns:
+      - name: company_name
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: hop_status
+        description: hops or hole.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+          - accepted_values:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+              arguments:
+                values: ['hops', 'hole']
+      - name: skip_redraw
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+
+  - name: valor_universo_closed_qsa
+    description: |
+      Quadro de Sócios slice for closed Valor rows and for Globo, Record,
+      Havan, and Folha. Sócio only, never dono or UBO. Percent always null.
+      Groups stay groups; officer names do not mint a person dono. Closed
+      rows have no Formulário book. A company with no Receita rows emits
+      one explicit zero-count row. No invented /0001. No public HTML.
+    columns:
+      - name: company_name
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: edge_role
+        description: Always socio. Never dono or UBO.
+      - name: percent
+        description: Always null. Receita has no ownership-percentage column.
+      - name: stay_group
+        description: True for Globo, Record, Havan, and Folha.
+      - name: partner_count
+        description: Source-row count; zero marks an explicit empty result.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+    tests:
+      - dbt_utils.expression_is_true:
+          name: valor_universo_closed_qsa_never_invents_percent
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "percent is null"
+      - dbt_utils.expression_is_true:
+          name: valor_universo_closed_qsa_socio_never_dono_or_ubo
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "edge_role = 'socio'"
+      - dbt_utils.expression_is_true:
+          name: valor_universo_closed_qsa_key_is_eight_digits
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+
+  - name: valor_universo_hop_counts
+    description: |
+      One-row summary of the issue #141 hop extract. hops_landed, explicit
+      holes, already_on_graph_skipped, closed_qsa_companies, closed_qsa_partner_rows.
+    columns:
+      - name: hop_roots
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: hops_landed
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: explicit_holes
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: already_on_graph_skipped
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: closed_qsa_companies
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: closed_qsa_partner_rows
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"

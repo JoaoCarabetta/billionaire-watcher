@@ -211,6 +211,28 @@ seeds:
               - ranking_family
               - valor_rank
 
+  - name: valor_group_not_dono
+    description: |
+      Spec-closed groups from issue #139/#141 that stay groups. Quadro de
+      Sócios is sócio only, never dono. Globo, Record, Havan, and Folha do
+      not explode into an invented person dono. Folha is named even though
+      it is not a Valor 1–500 ranking row. No Formulário hop from this seed.
+    config:
+      enabled: true
+      column_types:
+        empresa: STRING
+        notes: STRING
+    columns:
+      - name: empresa
+        description: Valor brand name (or spec group name) that stays a group
+        tests:
+          - not_null
+          - unique
+      - name: notes
+        description: Why this row is a group, not a person-dono book
+        tests:
+          - not_null
+
   - name: live_graph_company_cnpj_basicos
     description: |
       Read-only prefix-8 extract of live graph company nodes from
