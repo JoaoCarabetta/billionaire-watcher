@@ -160,5 +160,131 @@
       "locator": "https://billionaire-watcher.pages.dev/api/facts/latest/index.json",
       "retrieved_at": "2026-08-25"
     }
+  },
+  {
+    "id": "metod-lacuna-valor-bancos-seguradoras",
+    "value": "Valor Econômico também publica rankings separados dos 100 maiores bancos e das 50 maiores seguradoras; o ranking industrial das 1000 maiores não é a única lista.",
+    "source": {
+      "publisher": "Valor Econômico",
+      "locator": "https://infograficos.valor.globo.com/valor1000/2025",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-lacuna-pessoa-entrada",
+    "value": "Uma pessoa entra no grafo só quando o nome consta do Formulário de Referência de uma companhia aberta já semente ou do Quadro de Sócios de uma sociedade brasileira já presente no grafo.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-lacuna-sa-qsa-nao-acionistas",
+    "value": "Em sociedade anônima, o Quadro de Sócios público deve informar diretores e administradores e não deverá informar acionistas.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www38.receita.fazenda.gov.br/cadsincnac/jsp/coleta/ajuda/topicos/Quem_esta_obrigado_a_informar_o_QSA.htm",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-lacuna-sa-fechada-ausencia",
+    "value": "Em sociedade anônima fechada, a ausência do nome no quadro público é lacuna visível, não inferência de controle.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-lacuna-hang-macedo-frias-maggi",
+    "value": "Luciano Hang não consta como administrador na Havan S.A.; Edir Macedo não consta na Rádio e Televisão Record S.A.; Luiz Frias e Maria Frias não constam na Empresa Folha da Manhã S.A. nem no Universo Online S.A.; Blairo Maggi, Itamar Locks e Hugo Ribeiro não constam na André Maggi Participações.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/cnpjreva_solicitacao.asp",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-lacuna-limitada-hop",
+    "value": "Em sociedade limitada, o hop do sócio pessoa jurídica pode nomear pessoa física como sócio: Boticário Produtos de Beleza cita Miguel Gellert Krigsner e Artur Noemio Grynbaum; Fertipar Fertilizantes do Paraná cita Alceu Elias Feldmann como sócio-administrador.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/cnpjreva_solicitacao.asp",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-lacuna-sede-exterior",
+    "value": "Sede no exterior não tem tabela oficial brasileira de controlador pessoa física; a cadeia estrangeira ou a lacuna visível substituem a invenção.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-limitacao-nao-ranking-forbes",
+    "value": "O grafo não é um ranking de patrimônio e não copia a lista Forbes.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-limitacao-fatia-nao-fortuna",
+    "value": "A fatia citada de capital ou de votos vezes o valor de bolsa datado de uma companhia aberta não é fortuna.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/116",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-limitacao-bloco-sem-percentual",
+    "value": "Não se reparte igualmente um bloco sem percentual citado, nem se inventa quantidade de ações.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
+  },
+  {
+    "id": "metod-limitacao-valor1000-fora-versao",
+    "value": "Percorrer as mil linhas do ranking industrial Valor 1000 e desenhá-las no grafo está fora desta versão; o mapa tabular dessas empresas não é o passeio.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/136",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-repetir-fre-equivalente",
+    "value": "Repetir o método noutro país começa pela tabela oficial de controlador da companhia aberta daquele foro, equivalente ao Formulário de Referência seção 6.1.",
+    "source": {
+      "publisher": "CVM - Comissão de Valores Mobiliários",
+      "locator": "https://dados.cvm.gov.br/dataset/cia_aberta-doc-fre",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-repetir-qsa-equivalente",
+    "value": "Para sociedade fechada, usa-se a tabela oficial de sócios e administradores daquele foro, equivalente ao Quadro de Sócios da Receita Federal.",
+    "source": {
+      "publisher": "Receita Federal do Brasil",
+      "locator": "https://www.gov.br/pt-br/servicos/consultar-cadastro-nacional-de-pessoas-juridicas",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-repetir-revista-revisao",
+    "value": "Lista de revista de patrimônios entra só como rede de revisão de candidatos, nunca como motor do passeio.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/22",
+      "retrieved_at": "2026-10-04"
+    }
   }
 ]
