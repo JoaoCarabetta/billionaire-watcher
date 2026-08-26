@@ -3082,6 +3082,21 @@
       "id": "p-f5bde2d4",
       "kind": "person",
       "label": "ZAIRA ZIMMERMANN DA SILVA FERNANDES"
+    },
+    {
+      "id": "10630748000121",
+      "kind": "company",
+      "label": "Opportunity Partners Participações Ltda."
+    },
+    {
+      "id": "36163277000182",
+      "kind": "company",
+      "label": "Santa Luzia Comercial e Participações Ltda."
+    },
+    {
+      "id": "00806334000157",
+      "kind": "company",
+      "label": "Opportunity Holders Participações Ltda."
     }
   ],
   "edges": [
@@ -8386,6 +8401,24 @@
       "source": "FRE Ambev 161030",
       "pct_capital": 50.0,
       "pct_votos": 50.0
+    },
+    {
+      "from": "10630748000121",
+      "to": "05395883000108",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "36163277000182",
+      "to": "05395883000108",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "00806334000157",
+      "to": "33857830000199",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
     }
   ]
 }
