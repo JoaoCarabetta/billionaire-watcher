@@ -5,6 +5,12 @@
 -- Product is not written if any hop to a person has null percent (handled by graph_person_holdings)
 -- Unlisted companies: no price row
 
+{% if target.name in ['test', 'ci'] %}
+    {% set listed_prices_relation = ref('listed_prices_fixture') %}
+{% else %}
+    {% set listed_prices_relation = ref('b3_listed_prices') %}
+{% endif %}
+
 with listed_hops as (
     select
         to_id as cnpj_basico,
@@ -24,7 +30,7 @@ prices as (
         preco,
         cast(preco_date as date) as preco_date,
         source as price_source
-    from {{ ref('listed_prices_fixture') }}
+    from {{ listed_prices_relation }}
 ),
 
 -- Ordinary shares with prices

@@ -1,8 +1,8 @@
 cnpj_basico,ticker,classe,preco,preco_date,source
-00864214,ENGI,ordinaria,45.20,2026-08-20,Brasil Bolsa Balcão
-00864214,ENGI,preferencial,42.80,2026-08-20,Brasil Bolsa Balcão
-00864214,ENGI,ordinaria,45.75,2026-08-21,Brasil Bolsa Balcão
-00864214,ENGI,preferencial,43.10,2026-08-21,Brasil Bolsa Balcão
+00864214,ENGI3,ordinaria,45.20,2026-08-20,Brasil Bolsa Balcão
+00864214,ENGI4,preferencial,42.80,2026-08-20,Brasil Bolsa Balcão
+00864214,ENGI3,ordinaria,45.75,2026-08-21,Brasil Bolsa Balcão
+00864214,ENGI4,preferencial,43.10,2026-08-21,Brasil Bolsa Balcão
 07689002,EMBR3,ordinaria,58.10,2026-08-25,Recorded fixture quote
 33592510,VALE3,ordinaria,73.10,2026-08-25,Recorded fixture quote
 03220438,EQTL3,ordinaria,36.40,2026-08-25,Recorded fixture quote
@@ -16,7 +16,6 @@ cnpj_basico,ticker,classe,preco,preco_date,source
 06057223,ASAI3,ordinaria,10.10,2026-08-25,Recorded fixture quote
 02916265,JBSS3,ordinaria,39.60,2026-08-25,Recorded fixture quote
 33453598,RAIZ4,preferencial,1.20,2026-08-25,Recorded fixture quote
-07043628,CLARO,ordinaria,10.20,2026-08-25,Recorded fixture quote
 33611500,GGBR3,ordinaria,16.30,2026-08-25,Recorded fixture quote
 33611500,GGBR4,preferencial,17.40,2026-08-25,Recorded fixture quote
 50746577,CSAN3,ordinaria,6.90,2026-08-25,Recorded fixture quote

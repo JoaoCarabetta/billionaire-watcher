@@ -1109,7 +1109,7 @@ unit_tests:
   - name: test_graph_listed_prices_two_business_days_two_rows
     description: |
       Verify two business days produce two price rows for same ticker/class (issue #66).
-      Energisa ENGI ordinary shares on 2026-08-20 and 2026-08-21.
+      Energisa ENGI3 ordinary shares on 2026-08-20 and 2026-08-21.
       Daily append, not overwrite.
     model: graph_listed_prices
     given:
@@ -1131,15 +1131,15 @@ unit_tests:
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
           union all
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.75 as preco, '2026-08-21' as preco_date, 'Brasil Bolsa Balcão' as source
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.75 as preco, '2026-08-21' as preco_date, 'Brasil Bolsa Balcão' as source
     expect:
       format: sql
       rows: |
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI3' as ticker,
           'ordinaria' as classe,
           45.20 as preco,
           609526325 as quantidade,
@@ -1149,7 +1149,7 @@ unit_tests:
         union all
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI3' as ticker,
           'ordinaria' as classe,
           45.75 as preco,
           609526325 as quantidade,
@@ -1181,15 +1181,15 @@ unit_tests:
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
           union all
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'preferencial' as classe, 42.80 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          select '00864214' as cnpj_basico, 'ENGI4' as ticker, 'preferencial' as classe, 42.80 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
     expect:
       format: sql
       rows: |
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI3' as ticker,
           'ordinaria' as classe,
           45.20 as preco,
           609526325 as quantidade,
@@ -1199,7 +1199,7 @@ unit_tests:
         union all
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI4' as ticker,
           'preferencial' as classe,
           42.80 as preco,
           89144004 as quantidade,
@@ -1310,7 +1310,7 @@ unit_tests:
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
           union all
           select '33592510', 'VALE3', 'ordinaria', 73.10, '2026-08-25', 'Recorded fixture quote'
           union all
@@ -1322,7 +1322,7 @@ unit_tests:
       rows: |
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI3' as ticker,
           'ordinaria' as classe,
           45.20 as preco,
           609526325 as quantidade,
@@ -1440,13 +1440,13 @@ unit_tests:
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
-          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
     expect:
       format: sql
       rows: |
         select
           '00864214' as cnpj_basico,
-          'ENGI' as ticker,
+          'ENGI3' as ticker,
           'ordinaria' as classe,
           45.20 as preco,
           609526325 as quantidade,
