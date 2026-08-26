@@ -336,7 +336,8 @@ describe('Built pages include the registrar (issue #157)', () => {
     expect(grafoSrc).not.toMatch(/location\.hash/);
     expect(grafoSrc).not.toMatch(/history\.(pushState|replaceState)/);
     expect(grafoSrc).not.toMatch(/searchParams/);
-    expect(fs.existsSync(path.join(distPath, 'empresa'))).toBe(false);
+    expect(grafoSrc).not.toMatch(/\/pessoa\//);
+    expect(grafoSrc).not.toMatch(/\/empresa\//);
     const llms = fs.readFileSync(path.join(distPath, 'llms.txt'), 'utf-8');
     expect(llms).toMatch(/\/metodologia\//);
     expect(llms).toMatch(/\/grafo\//);
