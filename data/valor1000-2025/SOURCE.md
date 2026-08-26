@@ -16,6 +16,17 @@
 
 - `ranking.csv` - All 1000 companies in the Valor 1000 2025 ranking
 - `top50.csv` - Top 50 companies from the ranking (used for freeze ranking input, see issue #23)
+- `bancos.csv` - Valor 1000 2025 banks ranking (100 rows). Public JSON `Bancos2025.json` (same S3 bucket as the industrial ranking; not a paywall scrape). Retrieved 2026-08-26.
+- `seguradoras.csv` - Valor 1000 2025 insurers ranking, ramos gerais (50 rows). Public JSON `Seguros2025.json`. Retrieved 2026-08-26.
+
+## Financial ranking URLs (2026-08-26)
+
+- **Banks page**: https://infograficos.valor.globo.com/valor1000/rankings/os-100-maiores-bancos/2025
+- **Banks JSON**: https://infovalorbucket.s3.amazonaws.com/arquivos/valor-1000/2025/os-100-maiores-bancos/Bancos2025.json
+- **Insurers page**: https://infograficos.valor.globo.com/valor1000/rankings/as-50-maiores-seguradoras-ramos-gerais/2025
+- **Insurers JSON**: https://infovalorbucket.s3.amazonaws.com/arquivos/valor-1000/2025/as-50-maiores-seguradoras-ramos-gerais/Seguros2025.json
+
+Issue #140 inventory uses industrial ranks 1–500 plus these two financial files. Industrial 501–1000 stay out of that universe.
 
 ## Notes
 

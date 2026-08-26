@@ -1,0 +1,15 @@
+spec_name,match_empresa,match_razao,is_votorantim_seed
+Itaú Unibanco Holding,Itaú Unibanco,Itaú Unibanco Holding S.A.,false
+Itaúsa,Itaúsa,Itaúsa S.A.,false
+Banco BTG Pactual,BTG Pactual,Banco BTG Pactual S.A.,false
+Banco Bradesco,Bradesco,Banco Bradesco S.A.,false
+Banco Daycoval,Daycoval,Banco Daycoval S.A.,false
+Porto Seguro,Porto Seguro,Porto Seguro S.A.,false
+Natura Cosméticos,Natura & Co.,Natura & Co Holding S.A.,false
+Grendene,Grendene,Grendene S.A.,false
+MRV Engenharia,MRV&CO,MRV Engenharia e Participações S.A.,false
+Multiplan,Multiplan Empreendimentos,Multiplan Empreendimentos Imobiliários S.A.,false
+Eurofarma,Eurofarma,Eurofarma Laboratórios S.A.,false
+Votorantim Cimentos,Votorantim Cimentos,Votorantim Cimentos S.A.,true
+Companhia Brasileira de Alumínio,CBA,Companhia Brasileira de Alumínio,false
+Auren,Auren,Auren Energia S.A.,false

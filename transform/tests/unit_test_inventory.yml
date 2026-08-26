@@ -1,0 +1,218 @@
+unit_tests:
+  - name: test_valor_cadastro_inventory_known_good_locks
+    description: |
+      Known-good inventory seam. Globo 81 and Record 354 are closed with no
+      Formulário hop even when they are absent from cadastro (known-closed
+      overlay). Duplicate identical cadastro rows still yield one Dexco key.
+      Dexco is ATIVO and is not tagged Votorantim. XP is cancelled
+      and is not on the launch add-list. Votorantim Cimentos is the Votorantim
+      seed. Auren Participações does not inherit the Auren add-list tag.
+      Launch match is exact empresa/razão, not a substring.
+    model: valor_cadastro_inventory
+    given:
+      - input: ref('valor_rankings_2025')
+        format: sql
+        rows: |
+          select 'industrial' as ranking_family, 81 as valor_rank, 'Globo' as empresa, 'Globo Comunicação e Participações S.A.' as razao_social
+          union all select 'industrial', 354, 'Record', 'Rádio e Televisão Record S.A.'
+          union all select 'industrial', 165, 'Dexco', 'Dexco S.A.'
+          union all select 'industrial', 54, 'Votorantim Cimentos', 'Votorantim Cimentos S.A.'
+          union all select 'banks', 11, 'Banco XP', 'Banco XP S.A.'
+          union all select 'banks', 17, 'Daycoval', 'Banco Daycoval S.A.'
+          union all select 'industrial', 317, 'Auren Participações', 'Auren Participações S.A.'
+          union all select 'industrial', 169, 'Auren', 'Auren Energia S.A.'
+      - input: ref('top50_flags_seed')
+        format: sql
+        rows: |
+          select 1 as rank_2024, '33000167' as cnpj_basico
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        rows: |
+          select '83333333000100' as CNPJ_CIA, 'DEXCO S.A.' as DENOM_SOCIAL, 'DEXCO' as DENOM_COMERC, 'ATIVO' as SIT
+          union all select '83333333000100', 'DEXCO S.A.', 'DEXCO', 'ATIVO'
+          union all select '84444444000100', 'VOTORANTIM CIMENTOS S.A.', 'VOTORANTIM CIMENTOS', 'ATIVO'
+          union all select '85555555000100', 'BANCO XP S.A.', 'BANCO XP', 'CANCELADA'
+          union all select '86666666000100', 'BANCO DAYCOVAL S.A.', 'DAYCOVAL', 'ATIVO'
+          union all select '87777777000100', 'AUREN PARTICIPACOES S.A.', 'AUREN PARTICIPACOES', 'ATIVO'
+          union all select '88888888000100', 'AUREN ENERGIA S.A.', 'AUREN', 'ATIVO'
+      - input: ref('valor_launch_add_list')
+        format: sql
+        rows: |
+          select 'Votorantim Cimentos' as spec_name, 'Votorantim Cimentos' as match_empresa, 'Votorantim Cimentos S.A.' as match_razao, true as is_votorantim_seed
+          union all select 'Banco Daycoval', 'Daycoval', 'Banco Daycoval S.A.', false
+          union all select 'Auren', 'Auren', 'Auren Energia S.A.', false
+          union all select 'Itaúsa', 'Itaúsa', 'Itaúsa S.A.', false
+      - input: ref('live_graph_company_cnpj_basicos')
+        format: sql
+        rows: |
+          select '33000167' as cnpj_basico
+      - input: ref('valor_known_closed')
+        format: sql
+        rows: |
+          select 'industrial' as ranking_family, 81 as valor_rank
+          union all select 'industrial', 354
+    expect:
+      format: sql
+      rows: |
+        select
+          'Globo' as company_name,
+          cast(null as varchar) as cnpj_basico,
+          'industrial' as ranking_family,
+          81 as valor_rank,
+          'closed' as cadastro_situation,
+          cast(false as boolean) as already_on_graph,
+          cast(false as boolean) as formulario_hop,
+          cast(false as boolean) as on_launch_add_list,
+          cast(false as boolean) as is_votorantim_seed,
+          cast(null as double) as percent,
+          'Globo Comunicação e Participações S.A.' as razao_social
+        union all select
+          'Record', cast(null as varchar), 'industrial', 354, 'closed',
+          cast(false as boolean), cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          cast(null as double), 'Rádio e Televisão Record S.A.'
+        union all select
+          'Dexco', '83333333', 'industrial', 165, 'ATIVO',
+          cast(false as boolean), cast(true as boolean), cast(false as boolean), cast(false as boolean),
+          cast(null as double), 'Dexco S.A.'
+        union all select
+          'Votorantim Cimentos', '84444444', 'industrial', 54, 'ATIVO',
+          cast(false as boolean), cast(true as boolean), cast(true as boolean), cast(true as boolean),
+          cast(null as double), 'Votorantim Cimentos S.A.'
+        union all select
+          'Banco XP', '85555555', 'banks', 11, 'closed',
+          cast(false as boolean), cast(false as boolean), cast(false as boolean), cast(false as boolean),
+          cast(null as double), 'Banco XP S.A.'
+        union all select
+          'Daycoval', '86666666', 'banks', 17, 'ATIVO',
+          cast(false as boolean), cast(true as boolean), cast(true as boolean), cast(false as boolean),
+          cast(null as double), 'Banco Daycoval S.A.'
+        union all select
+          'Auren Participações', '87777777', 'industrial', 317, 'ATIVO',
+          cast(false as boolean), cast(true as boolean), cast(false as boolean), cast(false as boolean),
+          cast(null as double), 'Auren Participações S.A.'
+        union all select
+          'Auren', '88888888', 'industrial', 169, 'ATIVO',
+          cast(false as boolean), cast(true as boolean), cast(true as boolean), cast(false as boolean),
+          cast(null as double), 'Auren Energia S.A.'
+
+  - name: test_valor_cadastro_inventory_prefix_eight_no_invented_suffix
+    description: |
+      Prefix-8 of a 14-digit cadastro CNPJ is the company key. A decoy 14-digit
+      value that only contains the eight-digit key as a substring does not
+      match. An unmatched Valor row keeps a null key rather than an invented
+      /0001 suffix. An 11-digit Cadastro row that matches on name is dropped
+      rather than padded into a fake prefix-8. percent stays null.
+    model: valor_cadastro_inventory
+    given:
+      - input: ref('valor_rankings_2025')
+        format: sql
+        rows: |
+          select 'industrial' as ranking_family, 2 as valor_rank, 'JBS' as empresa, 'JBS S.A.' as razao_social
+          union all select 'industrial', 500, 'Empresa Ficticia Sem Cadastro', 'Empresa Ficticia Sem Cadastro S.A.'
+          union all select 'industrial', 90, 'Empresa Ficticia Nomeada', 'Empresa Ficticia Nomeada S.A.'
+          union all select 'industrial', 91, 'Onze Cia', 'Onze Digitos Nao E Cia'
+      - input: ref('top50_flags_seed')
+        format: sql
+        rows: |
+          select 2 as rank_2024, '02916265' as cnpj_basico
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        rows: |
+          select '02916265000160' as CNPJ_CIA, 'JBS SA' as DENOM_SOCIAL, 'JBS' as DENOM_COMERC, 'ATIVO' as SIT
+          union all select '99029162659999', 'DECOY SUBSTRING SA', 'DECOY', 'ATIVO'
+          union all select '11223344000199', 'EMPRESA FICTICIA NOMEADA S.A.', 'NOMEADA', 'ATIVO'
+          union all select '12345678901', 'ONZE DIGITOS NAO E CIA', 'ONZE', 'ATIVO'
+      - input: ref('valor_launch_add_list')
+        format: sql
+        rows: |
+          select 'Itaúsa' as spec_name, 'Itaúsa' as match_empresa, 'Itaúsa S.A.' as match_razao, false as is_votorantim_seed
+      - input: ref('live_graph_company_cnpj_basicos')
+        format: sql
+        rows: |
+          select '02916265' as cnpj_basico
+      - input: ref('valor_known_closed')
+        format: sql
+        rows: |
+          select 'industrial' as ranking_family, 81 as valor_rank
+    expect:
+      format: sql
+      rows: |
+        select
+          'JBS' as company_name,
+          '02916265' as cnpj_basico,
+          'industrial' as ranking_family,
+          2 as valor_rank,
+          'ATIVO' as cadastro_situation,
+          cast(true as boolean) as already_on_graph,
+          cast(true as boolean) as formulario_hop,
+          cast(false as boolean) as on_launch_add_list,
+          cast(false as boolean) as is_votorantim_seed,
+          cast(null as double) as percent,
+          'JBS S.A.' as razao_social
+        union all select
+          'Empresa Ficticia Sem Cadastro',
+          cast(null as varchar),
+          'industrial',
+          500,
+          cast(null as varchar),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(null as double),
+          'Empresa Ficticia Sem Cadastro S.A.'
+        union all select
+          'Empresa Ficticia Nomeada',
+          '11223344',
+          'industrial',
+          90,
+          'ATIVO',
+          cast(false as boolean),
+          cast(true as boolean),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(null as double),
+          'Empresa Ficticia Nomeada S.A.'
+        union all select
+          'Onze Cia',
+          cast(null as varchar),
+          'industrial',
+          91,
+          cast(null as varchar),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(false as boolean),
+          cast(null as double),
+          'Onze Digitos Nao E Cia'
+
+  - name: test_valor_cadastro_inventory_counts_leftover_formula
+    description: |
+      Counts are derived. launch_add_list_size is the named seed size, not the
+      count of inventory rows flagged on the add-list (Itaúsa can sit on the
+      seed without a Valor row). leftover is ATIVO and not on the graph and
+      not on the add-list. Closed rows do not inflate ATIVO or leftover.
+    model: valor_cadastro_inventory_counts
+    given:
+      - input: ref('valor_cadastro_inventory')
+        format: sql
+        rows: |
+          select 'ATIVO' as cadastro_situation, cast(true as boolean) as already_on_graph, cast(false as boolean) as on_launch_add_list
+          union all select 'ATIVO', cast(false as boolean), cast(true as boolean)
+          union all select 'ATIVO', cast(false as boolean), cast(false as boolean)
+          union all select 'ATIVO', cast(false as boolean), cast(false as boolean)
+          union all select 'closed', cast(false as boolean), cast(false as boolean)
+      - input: ref('valor_launch_add_list')
+        format: sql
+        rows: |
+          select 'Itaúsa' as spec_name
+          union all select 'Banco Daycoval'
+          union all select 'Votorantim Cimentos'
+    expect:
+      format: sql
+      rows: |
+        select
+          4 as ativo_in_universe,
+          1 as already_on_graph,
+          3 as launch_add_list_size,
+          2 as leftover_after_launch

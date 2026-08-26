@@ -121,6 +121,20 @@ where s.data = date '2026-01-11'
   ) = '<owner_cnpj_basico>'
 ```
 
+### Valor × cadastro inventory (Issue #140)
+
+`valor_cadastro_inventory` is a warehouse table, not a graph. Universe =
+Valor 1000 2025 industrial ranks 1–500 ∪ banks 2025 ∪ insurers 2025.
+Join is prefix-8 of the cadastro CNPJ when a top-50 flags key exists,
+otherwise normalized razão social. Never invent `/0001`. `percent` is
+always null. Globo 81 and Record 354 stay as closed rows. Dexco is not a
+Votorantim seed. XP is not on the launch add-list. No public HTML, no
+`/grafo`.
+
+`valor_cadastro_inventory_counts` emits the four leftover-planning counts
+(ATIVO in universe, already on graph, named launch add-list size, leftover
+after launch).
+
 ### Freeze Models (Issue #25)
 
 Freeze walk models implementing grupo × pessoa natural × papel per issue #22 spec:
