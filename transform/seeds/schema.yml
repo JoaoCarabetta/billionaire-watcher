@@ -54,6 +54,27 @@ seeds:
         tests:
           - not_null
 
+  - name: gestora_cnpj_basicos
+    description: |
+      Seven issue #97 asset-manager CNPJ básicos used for the bounded Receita
+      partner ingest. This is warehouse input, not a test fixture, and remains
+      separate from the freeze, issue #88 vehicle, and issue #92 unlisted keys.
+    config:
+      enabled: true
+      column_types:
+        cnpj_basico: STRING
+        gestora_name: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit asset-manager CNPJ básico with leading zeros preserved.
+        tests:
+          - not_null
+          - unique
+      - name: gestora_name
+        description: Human-readable asset-manager name supplied by issue #97.
+        tests:
+          - not_null
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:
