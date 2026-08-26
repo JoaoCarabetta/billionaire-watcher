@@ -33,6 +33,27 @@ seeds:
         tests:
           - not_null
 
+  - name: unlisted_owned_cnpj_basicos
+    description: |
+      Nine issue #92 unlisted owned-company CNPJ básicos used for a bounded
+      Receita QSA ingest. This warehouse input remains separate from both the
+      fifty freeze roots and the nine issue #88 control vehicles.
+    config:
+      enabled: true
+      column_types:
+        cnpj_basico: STRING
+        company_name: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit company CNPJ básico with leading zeros preserved.
+        tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: Human-readable legal name supplied by issue #92.
+        tests:
+          - not_null
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:
