@@ -3097,6 +3097,16 @@
       "id": "00806334000157",
       "kind": "company",
       "label": "Opportunity Holders Participações Ltda."
+    },
+    {
+      "id": "p-da3e3836",
+      "kind": "person",
+      "label": "JOAQUIM DA SILVA FERREIRA"
+    },
+    {
+      "id": "p-e1365405",
+      "kind": "person",
+      "label": "EDUARDO DE ALMEIDA SANTOS"
     }
   ],
   "edges": [
@@ -8418,6 +8428,18 @@
       "from": "00806334000157",
       "to": "33857830000199",
       "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "p-da3e3836",
+      "to": "41020034000125",
+      "kind": "person_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "p-e1365405",
+      "to": "72116353000162",
+      "kind": "person_owns",
       "source": "Receita / Quadro de Sócios 2026-01-11"
     }
   ]
