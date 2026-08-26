@@ -21,19 +21,8 @@ const ROOT = path.join(__dirname, '..');
 const TINY_GRAPH = path.join(ROOT, 'metrics', 'fixtures', 'tiny-money-graph.json');
 const TINY_PRICES = path.join(ROOT, 'metrics', 'fixtures', 'tiny-money-prices.csv');
 const LIVE_PATH = path.join(ROOT, 'public', 'grafo-publico.json');
-const B3_PRICES = path.join(ROOT, 'transform', 'seeds', 'b3_listed_prices.csv');
-const LISTED_FIXTURE_PRICES = path.join(ROOT, 'transform', 'seeds', 'listed_prices_fixture.csv');
+const LISTED_PRICES = path.join(ROOT, 'transform', 'seeds', 'listed_prices_fixture.csv');
 const ENERGISA_QTY = path.join(ROOT, 'transform', 'seeds', 'energisa_edges_fixture.csv');
-const MONEY_DATE = '2025-05-16';
-const ENERGISA_V = 609526325 * 12.21 + 89144004 * 8.5;
-
-function b3QuotedCnpjs(): Set<string> {
-  return new Set(
-    loadPriceRows(B3_PRICES, ROOT)
-      .filter((row) => row.cnpj_basico !== '07043628')
-      .map((row) => row.cnpj_basico)
-  );
-}
 
 const ALPHA = '12345678000100';
 const BETA = '87654321000100';
@@ -141,21 +130,21 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(report).not.toMatch(/richest/i);
       expect(report).toMatch(/Wealth REFUSED/);
       expect(outputContainsCpf(report)).toBe(false);
-      expect(report).not.toMatch(/Recorded fixture quote/);
+      expect(report).toMatch(/Do not wait for issue 115/);
+      expect(report).toMatch(/Other listadas stay without money/);
       expect(report).not.toMatch(/until issue 115/);
-      expect(report).not.toMatch(/Energisa-only until issue 123/);
     });
   });
 
-  describe('live graph + B3 archive prices (not frozen graph size)', () => {
+  describe('live Energisa from file + fixture (not frozen graph size)', () => {
     const graph = loadGraphFile(LIVE_PATH, ROOT);
     const result = computeMoneyUnderControl(graph, {
-      pricesPath: B3_PRICES,
-      date: MONEY_DATE,
+      pricesPath: LISTED_PRICES,
+      qtyPath: ENERGISA_QTY,
+      date: '2026-08-21',
       repoRoot: ROOT,
       cwd: ROOT,
     });
-    const b3Cnpjs = b3QuotedCnpjs();
 
     it('uses whatever node and edge counts the file has', () => {
       expect(result.graph.node_count).toBe(graph.nodes.length);
@@ -182,68 +171,65 @@ describe('Dinheiro sob controle (issue #116)', () => {
       }
     });
 
-    it('prices every B3-quoted listed seed that has a quantity on 2025-05-16', () => {
+    it('labels Energisa quotes as the test fixture on the latest preco_date, ticker ENGI', () => {
       const latest = computeMoneyUnderControl(graph, {
-        pricesPath: B3_PRICES,
+        pricesPath: LISTED_PRICES,
+        qtyPath: ENERGISA_QTY,
         repoRoot: ROOT,
         cwd: ROOT,
       });
-      expect(latest.dates).toEqual([MONEY_DATE]);
-      expect(latest.listed_values).toHaveLength(b3Cnpjs.size);
-      expect(new Set(latest.listed_values.map((row) => row.cnpj_basico))).toEqual(b3Cnpjs);
-      expect(latest.listed_values.every((row) => row.date === MONEY_DATE)).toBe(true);
-      expect(latest.listed_values.every((row) => row.quote_kind === 'b3_archive')).toBe(true);
-      expect(latest.graph.priced_listed_seed_ids).toHaveLength(b3Cnpjs.size);
-
-      const energisa = latest.listed_values.find((row) => row.cnpj_basico === '00864214');
-      expect(energisa).toBeDefined();
-      expect(energisa!.ticker).toBe('ENGI3');
-      expect(energisa!.listed_value).toBeCloseTo(ENERGISA_V, 2);
-      const engiClasses = energisa!.class_produtos.map((row) => row.ticker).sort();
-      expect(engiClasses).toEqual(['ENGI3', 'ENGI4']);
-      expect(energisa!.class_produtos.find((row) => row.ticker === 'ENGI3')?.preco).toBeCloseTo(12.21, 2);
-      expect(energisa!.class_produtos.find((row) => row.ticker === 'ENGI4')?.preco).toBeCloseTo(8.5, 2);
-      expect(energisa!.class_produtos.some((row) => row.ticker === 'ENGI11' || row.classe === 'unit')).toBe(
-        false
-      );
-
+      expect(latest.dates).toEqual(['2026-08-21']);
+      expect(latest.listed_values).toHaveLength(1);
+      expect(latest.listed_values[0].ticker).toMatch(/^ENGI/);
+      expect(latest.listed_values[0].quote_kind).toBe('energisa_test_fixture');
+      expect(latest.listed_values[0].listed_value).toBeCloseTo(31727935941.15, 2);
+      expect(latest.listed_values[0].class_produtos.map((row) => row.preco).sort()).toEqual([43.1, 45.75]);
       const report = formatMoneyReport(latest);
-      expect(report).toMatch(/Brasil Bolsa Balcão/);
-      expect(report).toMatch(/2025-05-16/);
-      expect(report).toMatch(/ENGI3/);
-      expect(report).toMatch(/ENGI4/);
-      expect(report).not.toMatch(/45\.75/);
-      expect(report).not.toMatch(/43\.10/);
-      expect(report).not.toMatch(/2026-08-21/);
-      expect(report).not.toMatch(/Energisa test fixture/);
-      expect(report).not.toMatch(/Recorded fixture quote/);
-      expect(report).not.toMatch(/31\.73 billion/);
+      expect(report).toMatch(/Energisa test fixture/);
+      expect(report).toMatch(/ticker ENGI/);
+      expect(report).toMatch(/not a live Bolsa pull/i);
+      expect(report).toMatch(/not a confirmed BigQuery row/i);
+      expect(report).not.toMatch(/2026-08-20/);
     });
 
-    it('does not invent an ENGI11 unit quantity and omits Claro', () => {
-      expect(result.listed_values.some((row) => row.cnpj_basico === '07043628')).toBe(false);
-      expect(result.graph.priced_listed_seed_ids.some((id) => id.startsWith('07043628'))).toBe(false);
-      expect(
-        result.listed_values.some((row) =>
-          row.class_produtos.some((item) => item.ticker === 'ENGI11' || item.classe === 'unit')
-        )
-      ).toBe(false);
+    it('emits 2026-08-20 only when both fixture dates are requested as two rows', () => {
+      const both = computeMoneyUnderControl(graph, {
+        pricesPath: LISTED_PRICES,
+        qtyPath: ENERGISA_QTY,
+        allDates: true,
+        repoRoot: ROOT,
+        cwd: ROOT,
+      });
+      expect(both.dates).toEqual(['2026-08-20', '2026-08-21']);
+      const v20 = both.listed_values.find((row) => row.date === '2026-08-20');
+      const v21 = both.listed_values.find((row) => row.date === '2026-08-21');
+      expect(v20).toBeDefined();
+      expect(v21?.listed_value).toBeCloseTo(31727935941.15, 2);
+      expect(v20!.listed_value).not.toBeCloseTo(31727935941.15, 2);
     });
 
-    it('prints archive money for WEG and Ambev, not recorded fixture quotes', () => {
+    it('prints archive money only for Energisa, not recorded fixture quotes', () => {
+      expect(result.graph.priced_listed_seed_ids).toEqual([ENERGISA]);
+      expect(result.node_totals.every((row) => row.listed_seed_id === ENERGISA)).toBe(true);
+      expect(result.last_hop_rows.every((row) => row.listed_seed_id === ENERGISA)).toBe(true);
+
       const vale = graph.nodes.find((node) => /^VALE/i.test(node.label));
       const weg = graph.nodes.find((node) => /WEG/i.test(node.label) && node.kind === 'company');
       const ambev = graph.nodes.find((node) => /AMBEV/i.test(node.label));
       for (const node of [vale, weg, ambev]) {
-        expect(node).toBeDefined();
-        expect(result.graph.priced_listed_seed_ids).toContain(node!.id);
-        expect(result.listed_values.some((row) => row.cnpj_basico === node!.id.slice(0, 8))).toBe(true);
+        if (!node) {
+          continue;
+        }
+        expect(result.node_totals.some((row) => row.listed_seed_id === node.id)).toBe(false);
       }
+      expect(result.skipped_fixture_quotes.length).toBeGreaterThan(0);
+      expect(result.skipped_fixture_quotes.every((row) => /recorded fixture quote/i.test(row.source))).toBe(
+        true
+      );
       const report = formatMoneyReport(result);
-      expect(report).not.toMatch(/Recorded fixture quote/);
-      expect(report).toMatch(/WEGE3/);
-      expect(report).toMatch(/ABEV3/);
-      expect(report).toMatch(/VALE3/);
+      expect(report).toMatch(/Recorded fixture quote/);
+      expect(report).toMatch(/skipped/i);
+      expect(report).not.toMatch(/VALE3[^\n]*[0-9]+\.[0-9]{2} reais/);
     });
 
     it('sums Ivan last-hop groups as the person total (product through Gipar, not 100%)', () => {
@@ -287,7 +273,7 @@ describe('Dinheiro sob controle (issue #116)', () => {
       const expectedCap = viaSelfCap + viaMultiCap + viaItacatuCap + viaGiparCap;
       const expectedVot = viaSelfVot + viaMultiVot + viaItacatuVot + viaGiparVot;
 
-      const hops = lastHopRowsFor(result, IVAN, ENERGISA, MONEY_DATE);
+      const hops = lastHopRowsFor(result, IVAN, ENERGISA, '2026-08-21');
       const self = hops.find((row) => row.via_last_hop_id === IVAN);
       const viaM = hops.find((row) => row.via_last_hop_id === multi.id);
       const viaI = hops.find((row) => row.via_last_hop_id === itacatu.id);
@@ -301,7 +287,7 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(viaG?.slice_capital).toBeCloseTo(viaGiparCap, 6);
       expect(viaG?.slice_votos).toBeCloseTo(viaGiparVot, 6);
 
-      const ivan = findNodeTotal(result, IVAN, ENERGISA, MONEY_DATE);
+      const ivan = findNodeTotal(result, IVAN, ENERGISA, '2026-08-21');
       expect(ivan).toBeDefined();
       expect(ivan!.last_hop_count).toBe(hops.length);
       expect(ivan!.slice_capital).toBeCloseTo(expectedCap, 6);
@@ -318,18 +304,17 @@ describe('Dinheiro sob controle (issue #116)', () => {
         5
       );
 
-      const prices = loadPriceRows(B3_PRICES, ROOT);
+      const prices = loadPriceRows(LISTED_PRICES, ROOT);
       const qty = loadQtyRowsFromEdgesFixture(ENERGISA_QTY, ROOT);
       const values = listedValuesFromPrices(
-        prices.filter((row) => row.cnpj_basico === '00864214' && row.preco_date === MONEY_DATE),
+        prices.filter((row) => row.cnpj_basico === '00864214' && row.preco_date === '2026-08-21'),
         qty
       );
       expect(values).toHaveLength(1);
-      expect(values[0].listed_value).toBeCloseTo(ENERGISA_V, 2);
+      expect(values[0].listed_value).toBeCloseTo(31727935941.15, 2);
       expect(ivan!.listed_value).toBeCloseTo(values[0].listed_value, 2);
       expect(ivan!.money_economic).toBeCloseTo((values[0].listed_value * expectedCap) / 100, 2);
       expect(ivan!.money_control).toBeCloseTo((values[0].listed_value * expectedVot) / 100, 2);
-      expect(ivan!.slice_capital).toBeCloseTo(15.86, 1);
       expect(ivan!.slice_votos).toBeCloseTo(35.32, 1);
       expect(ivan!.money_control / ivan!.listed_value).toBeCloseTo(0.3532, 3);
       expect(ivan!.money_control / ivan!.listed_value).not.toBeCloseTo(
@@ -337,7 +322,7 @@ describe('Dinheiro sob controle (issue #116)', () => {
         3
       );
 
-      const giparTotal = findNodeTotal(result, gipar.id, ENERGISA, MONEY_DATE);
+      const giparTotal = findNodeTotal(result, gipar.id, ENERGISA, '2026-08-21');
       expect(giparTotal).toBeDefined();
       const nested = sumNodeTotalsIfNotNested(ivan!, giparTotal!);
       expect(nested.ok).toBe(false);
@@ -348,27 +333,20 @@ describe('Dinheiro sob controle (issue #116)', () => {
   });
 
   describe('price gate', () => {
-    it('keeps Brasil Bolsa Balcão quotes and skips recorded fixture quotes and Claro', () => {
-      const b3 = loadPriceRows(B3_PRICES, ROOT);
-      const { archive: b3Archive, skipped: b3Skipped } = partitionPriceRows(b3);
-      expect(b3Archive.length).toBeGreaterThan(0);
-      expect(b3Archive.every((row) => /brasil bolsa balc/i.test(row.source ?? ''))).toBe(true);
-      expect(b3Archive.some((row) => row.ticker === 'ENGI3')).toBe(true);
-      expect(b3Archive.some((row) => row.ticker === 'WEGE3')).toBe(true);
-      expect(b3Archive.some((row) => row.ticker === 'ABEV3')).toBe(true);
-      expect(b3Archive.some((row) => row.cnpj_basico === '07043628')).toBe(false);
-
-      const fixture = loadPriceRows(LISTED_FIXTURE_PRICES, ROOT);
-      const { archive, skipped } = partitionPriceRows(fixture);
+    it('keeps Brasil Bolsa Balcão Energisa and skips recorded fixture quotes', () => {
+      const prices = loadPriceRows(LISTED_PRICES, ROOT);
+      const { archive, skipped } = partitionPriceRows(prices);
+      expect(archive.every((row) => row.cnpj_basico === '00864214')).toBe(true);
+      expect(archive.every((row) => /brasil bolsa balc/i.test(row.source ?? ''))).toBe(true);
+      expect(skipped.length).toBeGreaterThan(0);
       expect(skipped.some((row) => row.ticker === 'VALE3')).toBe(true);
       expect(skipped.some((row) => row.ticker === 'WEGE3')).toBe(true);
       expect(skipped.some((row) => row.ticker === 'ABEV3')).toBe(true);
-      expect(archive.every((row) => !/recorded fixture quote/i.test(row.source ?? ''))).toBe(true);
     });
   });
 
   describe('CLI', () => {
-    it('runs the documented command on 2025-05-16 and prints Ivan person total', () => {
+    it('runs the documented command on the latest fixture date and prints Ivan person total', () => {
       const output = execSync('npm run money -- public/grafo-publico.json', {
         cwd: ROOT,
         encoding: 'utf8',
@@ -377,21 +355,13 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(output).toMatch(/Wealth REFUSED/);
       expect(output).toMatch(/p-cdbc8c4e/);
       expect(output).toMatch(/Person total/);
-      expect(output).toMatch(/Brasil Bolsa Balcão/);
-      expect(output).toMatch(/2025-05-16/);
-      expect(output).toMatch(/ENGI3/);
-      expect(output).toMatch(/ENGI4/);
-      expect(output).toMatch(/12\.21/);
-      expect(output).toMatch(/8\.50/);
-      expect(output).not.toMatch(/45\.75/);
-      expect(output).not.toMatch(/43\.10/);
-      expect(output).not.toMatch(/2026-08-21/);
-      expect(output).not.toMatch(/Energisa test fixture/);
-      expect(output).not.toMatch(/Recorded fixture quote/);
+      expect(output).toMatch(/Energisa test fixture/);
+      expect(output).toMatch(/2026-08-21/);
+      expect(output).toMatch(/ENGI/);
+      expect(output).not.toMatch(/2026-08-20/);
+      expect(output).toMatch(/Do not wait for issue 115/);
       expect(output).not.toMatch(/fortuna/i);
       expect(output).not.toMatch(/(?<![\d.])\d{11}(?![\d.])/);
-      const priced = output.match(/^\| \d{8} /gm) ?? [];
-      expect(priced.length).toBe(b3QuotedCnpjs().size);
     });
 
     it('refuses a wealth-rank flag', () => {

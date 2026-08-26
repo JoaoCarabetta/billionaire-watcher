@@ -6,7 +6,7 @@ O comando lê `grafo-publico.json` (`nodes` + `edges`) do tamanho que o arquivo 
 
 ## Como rodar
 
-Na raiz do repositório (Brasil Bolsa Balcão, 2025-05-16):
+Na raiz do repositório (latest Energisa fixture date, 2026-08-21):
 
 ```sh
 npm run money -- public/grafo-publico.json
@@ -21,19 +21,24 @@ npm run money -- public/grafo-publico.json --json
 Data explícita:
 
 ```sh
-npm run money -- public/grafo-publico.json --date 2025-05-16
+npm run money -- public/grafo-publico.json --date 2026-08-21
 ```
 
-## Fonte de preço (Brasil Bolsa Balcão)
+As duas datas da fixture como duas linhas (append-by-day; inclui 2026-08-20):
 
-- Preços: `transform/seeds/b3_listed_prices.csv`. Unadjusted PREULT from B3 COTAHIST_A2025.ZIP. Source label **Brasil Bolsa Balcão**. Date on every money row: **2025-05-16**.
-- Energisa: **ENGI3** 12.21 and **ENGI4** 8.50 × `graph_edges` quantities (609526325 ordinary, 89144004 preferred; Energisa IR 14 Aug 2026 table 6.1).
-- **ENGI11** is a unit. No money without a unit quantity. The script does not invent that quantity.
-- Other listadas: same B3 quotes × CVM FRE item 17.1 capital quantities on or before the quote date (`metrics/listed_capital_quantities.csv`). Quote without quantity → no money.
-- Claro Telecom Participações (`cnpj_basico` 07043628): no Bolsa class; omitted.
-- Recorded fixture quotes are skipped and never printed.
+```sh
+npm run money -- public/grafo-publico.json --all-dates
+```
 
-Energisa V from the command = **8200040462.25** (ENGI3 12.21 × 609526325 + ENGI4 8.50 × 89144004).
+## Fonte de preço (fixture de teste)
+
+Não é pull ao vivo da Bolsa. Não é linha confirmada no BigQuery.
+
+- Preços: Energisa *test fixture* (hoje em `transform/seeds/listed_prices_fixture.csv`, ticker **ENGI**). Latest `preco_date` **2026-08-21**: ordinária 45.75, preferencial 43.10.
+- Quantidades: `transform/seeds/energisa_edges_fixture.csv` — 609526325 ordinárias, 89144004 preferenciais (Energisa IR 14 Aug 2026 table 6.1).
+- V = 45.75 × 609526325 + 43.10 × 89144004 = **31727935941.15**.
+
+O comando sem `--date` e sem `--all-dates` usa só essa data latest. 2026-08-20 só entra se `--all-dates` (duas linhas) ou `--date 2026-08-20`.
 
 ## O que cada coluna significa
 
@@ -51,9 +56,7 @@ Ivan Müller Botelho através da Gipar é um grupo de último salto. A Gipar tem
 ## O que não dá para precificar
 
 - Veículos não listados (Gipar, Nova Gipar, Itacatu, Multisetor, LTD, …): não têm V. Só entra a fatia citada de uma semente listada precificada.
-- Cotação B3 sem quantidade: sem dinheiro (não se inventa número de ações).
-- ENGI11 sem quantidade de unit: sem dinheiro.
-- Claro: sem classe na Bolsa.
+- Outras cias abertas: **ficam sem dinheiro**. Não esperar a issue 115. Data Engineer é dono da 115. Issue 115 / PR 120 é *recorded fixture quote* (teste). Não é valor de arquivo. Vale, WEG, Ambev e o restante não recebem coluna de dinheiro neste PR.
 - Buraco no caminho: sem dinheiro naquele caminho.
 - Outros e tesouraria: sem dinheiro.
 - Cotistas de fundo: não estão no arquivo.
@@ -63,24 +66,24 @@ Ivan Müller Botelho através da Gipar é um grupo de último salto. A Gipar tem
 
 Wealth REFUSED.
 
-## Worked example (from `npm run money -- public/grafo-publico.json`)
+## Worked example (from `npm run money -- public/grafo-publico.json --date 2026-08-21`)
 
-IVAN MÜLLER BOTELHO `p-cdbc8c4e` → ENERGISA S.A. `00864214000106` on 2025-05-16.
+IVAN MÜLLER BOTELHO `p-cdbc8c4e` → ENERGISA S.A. `00864214000106` on 2026-08-21.
 
-Brasil Bolsa Balcão. ENGI3 12.21 and ENGI4 8.50 × graph_edges quantities.
+Energisa test fixture, ticker ENGI. Not a live Bolsa pull. Not a confirmed BigQuery row.
 
-V = 8200040462.25 reais.
+V = 31727935941.15 reais (ON 45.75 × 609526325 + PN 43.10 × 89144004).
 
-Last-hop groups (command output):
+Last-hop groups:
 
-- self (direct FRE): 0.387% capital / 0.208% votes → economic 31734156.59 / control 17056084.16
-- Multisetor: 0.235% / 0.156% → 19270758.47 / 12789302.17
-- Itacatu: 0.011% / 0.006% → 876880.27 / 501074.44
-- Gipar: 15.226% / 34.950% → 1248576860.03 / 2865925764.20 (product; he does not take Gipar at 100%)
+- self (direct FRE): 0.387% capital / 0.208% votes → economic 122787112.09 / control 65994106.76
+- Multisetor: 0.235% / 0.156% → 74563216.25 / 49484897.27
+- Itacatu: 0.011% / 0.006% → 3392861.45 / 1938777.97
+- Gipar: 15.226% / 34.950% → 4831045263.12 / 11088958582.26 (product; he does not take Gipar at 100%)
 
-Person total (sum of groups): 15.859% capital / 35.320% votes → economic 1300458655.36 reais (1.30 billion reais); control 2896272224.98 reais (2.90 billion reais).
+Person total (sum of groups): 15.859% capital / 35.320% votes → economic 5031788452.91 reais (5.03 billion reais); control 11206376364.26 reais (11.21 billion reais).
 
-Do not add Gipar 2.18 billion economic / 5.02 billion control on top of Ivan 1.30 / 2.90. Those Gipar reais already contain Ivan-through-Gipar.
+Do not add Gipar 8.45 billion economic / 19.41 billion control on top of Ivan 5.03 / 11.21. Those Gipar reais already contain Ivan-through-Gipar.
 
 ## Testes
 

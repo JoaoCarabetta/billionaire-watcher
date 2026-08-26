@@ -73,7 +73,7 @@ npx vitest run test/grafo-metrics.test.ts
 
 ## Dinheiro sob controle
 
-Sibling command (issue 116). Brasil Bolsa Balcão quotes on 2025-05-16 (`transform/seeds/b3_listed_prices.csv`). Energisa uses ENGI3/ENGI4 × graph_edges quantities. See `metrics/MONEY.md`.
+Sibling command (issue 116). Energisa test fixture. Other listadas stay without money. Do not wait for issue 115. See `metrics/MONEY.md`.
 
 ```sh
 npm run money -- public/grafo-publico.json
