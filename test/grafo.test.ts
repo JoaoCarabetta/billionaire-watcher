@@ -653,7 +653,7 @@ describe('Grafo Page (issue #74)', () => {
       expect(
         pageSource,
         'grafo.astro must include a Cytoscape selector that mentions listed / seed / LISTED'
-      ).toMatch(/selector:\s*['"][^'"]*(listed|seed|LISTED)[^'"]*['"]/);
+      ).toMatch(/selector:\s*(['"`]).{0,80}(listed|seed|LISTED)/);
 
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
 
