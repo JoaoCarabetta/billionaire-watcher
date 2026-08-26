@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
+import { firstMainBlockText, h1Text } from './ficha-html';
 import { withoutJsonLdAndPageTools } from './page-tools-html';
 
 const ENERGISA_ID = '00864214000106';
@@ -60,6 +61,40 @@ describe('Built /empresa/ fichas and sitemap (issue #148)', () => {
     expect(html).not.toContain(String(LAST_HOP_SLICE));
     const withoutJsonLd = html.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
     expect(withoutJsonLd).not.toMatch(/<script/);
+  });
+
+  it('Energisa lead names companhia aberta and Ivan or a visible hole; entrada list stays below (issue #161)', () => {
+    if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+    const html = fs.readFileSync(empresaDistPath(distPath, ENERGISA_ID), 'utf-8');
+    expect(h1Text(html)).toMatch(/ENERGISA/);
+    expect(html.indexOf('<h1>')).toBeLessThan(html.indexOf('<main>'));
+    const lead = firstMainBlockText(html);
+    expect(lead).toMatch(/é companhia aberta/);
+    expect(lead).toMatch(/IVAN MÜLLER BOTELHO|lacuna vis[ií]vel/i);
+    expect(lead).not.toMatch(/é um empresário/i);
+    expect(html).not.toMatch(/<script(?![^>]*type="application\/ld\+json")/i);
+    const entradaIdx = html.indexOf('<h2>Entrada</h2>');
+    const resumoIdx = html.indexOf('class="resumo"');
+    expect(entradaIdx).toBeGreaterThan(-1);
+    expect(resumoIdx).toBeGreaterThan(-1);
+    expect(resumoIdx).toBeLessThan(entradaIdx);
+    expect(html).toMatch(/Gipar/i);
+    expect(html).toMatch(/26,646/);
+    expect(html).toMatch(/FRE Energisa 160981/);
+    expect(html).toMatch(/IVAN MÜLLER BOTELHO/);
+  });
+
+  it('Record lead is sociedade anônima fechada and the Quadro hole; no Edir Macedo (issue #161)', () => {
+    if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+    const html = fs.readFileSync(empresaDistPath(distPath, RECORD_ID), 'utf-8');
+    expect(h1Text(html)).toMatch(/Record/i);
+    const lead = firstMainBlockText(html);
+    expect(lead).toMatch(/é sociedade an[oô]nima fechada/);
+    expect(lead).toMatch(/Quadro de S[oó]cios/);
+    expect(lead).toMatch(/n[aã]o nomeia acionistas/i);
+    expect(lead).not.toMatch(/Edir Macedo/i);
+    expect(html).not.toMatch(/Edir Macedo/i);
+    expect(html).not.toMatch(/<script(?![^>]*type="application\/ld\+json")/i);
   });
 
   it('builds /empresa/record/index.html with visible hole; Quadro de Sócios does not name shareholders; no diretor person', () => {
@@ -146,6 +181,7 @@ describe('Built /empresa/ fichas and sitemap (issue #148)', () => {
       expect(html).not.toMatch(/\/grafo\//);
       expect(html).not.toMatch(/\/pessoa\//);
       expect(html).not.toMatch(/\bUBO\b/i);
+      expect(html).not.toMatch(/\bdono\b/i);
       expect(html).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
       expect(html).not.toContain(String(LAST_HOP_SLICE));
     }

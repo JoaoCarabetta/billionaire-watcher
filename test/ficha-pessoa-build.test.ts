@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { firstMainBlockText, h1Text } from './ficha-html';
 import { withoutJsonLdAndPageTools } from './page-tools-html';
 
 const IVAN_ID = 'p-cdbc8c4e';
@@ -59,9 +60,46 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
     expect(html).not.toContain(String(LAST_HOP_SLICE));
   });
 
+  it('Ivan lead is the cited nexo resumo in static HTML, not a biography (issue #161)', () => {
+    if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+    const html = withoutJsonLdAndPageTools(fs.readFileSync(pessoaDistPath(distPath, IVAN_ID), 'utf-8'));
+    expect(h1Text(html)).toMatch(/IVAN MÜLLER BOTELHO/);
+    expect(html.indexOf('<h1>')).toBeLessThan(html.indexOf('<main>'));
+    const lead = firstMainBlockText(html);
+    expect(lead).toMatch(/figura como acionista controlador/);
+    expect(lead).toMatch(/ENERGISA/);
+    expect(lead).toMatch(/Formul[aá]rio 6\.1|FRE/);
+    expect(lead).toMatch(/Fatia citada de capital/);
+    expect(containsLiteralOrPtBr(lead, 1300458655.36)).toBe(true);
+    expect(containsLiteralOrPtBr(lead, 2896272224.98)).toBe(true);
+    expect(lead).toMatch(/16 de maio de 2025/);
+    expect(lead).toContain('Não é uma fortuna.');
+    expect(lead).not.toMatch(/é um empresário/i);
+    expect(lead).not.toMatch(/o bili?on[aá]rio/i);
+    expect(html).not.toMatch(/é um empresário/i);
+    expect(html).not.toMatch(/o bili?on[aá]rio/i);
+    expect(html).not.toMatch(/<script/);
+  });
+
+  it('Joaquim lead is sócio-administrador of Nova Futura and has no money sentence (issue #161)', () => {
+    if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+    const html = withoutJsonLdAndPageTools(fs.readFileSync(pessoaDistPath(distPath, JOAQUIM_ID), 'utf-8'));
+    expect(h1Text(html)).toMatch(/JOAQUIM DA SILVA FERREIRA/);
+    const lead = firstMainBlockText(html);
+    expect(lead).toMatch(/figura como s[oó]cio-administrador/);
+    expect(lead).toMatch(/NOVA FUTURA/);
+    expect(lead).not.toMatch(/Fatia citada/);
+    expect(lead).not.toMatch(/R\$/);
+    expect(lead).not.toContain('Não é uma fortuna.');
+    expect(html).not.toMatch(/<script/);
+  });
+
   it('keeps freeze page p1 at 200 under ALLOW_OLD_FIXTURES', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     expect(fs.existsSync(pessoaDistPath(distPath, 'p1'))).toBe(true);
+    const freezeHtml = fs.readFileSync(pessoaDistPath(distPath, 'p1'), 'utf-8');
+    expect(freezeHtml).not.toMatch(/class="resumo"/);
+    expect(freezeHtml).not.toMatch(/é um empresário/i);
   });
 
   it('does not build Muffato name slug or p-faf6d605', () => {
@@ -71,10 +109,11 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
     expect(fs.existsSync(pessoaDistPath(distPath, 'EVERTON%20MUFFATO'))).toBe(false);
   });
 
-  it('builds Joaquim p-da3e3836 and does not build Eduardo p-e1365405', () => {
+  it('builds Joaquim p-da3e3836 and does not build Eduardo p-e1365405 or Muffato, so they have no resumo', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     expect(fs.existsSync(pessoaDistPath(distPath, JOAQUIM_ID))).toBe(true);
     expect(fs.existsSync(pessoaDistPath(distPath, EDUARDO_ID))).toBe(false);
+    expect(fs.existsSync(pessoaDistPath(distPath, MUFFATO_ID))).toBe(false);
   });
 
   it('does not mint tesouraria, outros, or União as /pessoa/ pages', () => {
@@ -123,6 +162,7 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
       expect(html).not.toContain(String(LAST_HOP_SLICE));
       expect(html).not.toMatch(/ver no grafo/i);
       expect(html).not.toMatch(/ver dossi[eê]/i);
+      expect(html).not.toMatch(/\bdono\b/i);
     }
   });
 

@@ -4,6 +4,7 @@ import path from 'path';
 import { LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
 import { mintCitedEmpresas, renderEmpresaFichaHtml } from '../src/lib/mint-empresa';
 import type { GrafoData } from '../src/lib/grafo-elements';
+import { firstMainBlockText, h1Text } from './ficha-html';
 
 const ENERGISA_ID = '00864214000106';
 const GIPAR_ID = '02260956000158';
@@ -128,6 +129,23 @@ describe('Mint cited /empresa/ fichas (issue #148)', () => {
       expect(html).not.toMatch(/<script(?![^>]*type="application\/ld\+json")/i);
     });
 
+    it('Energisa lead names companhia aberta and Ivan or a visible hole; entrada list stays below (issue #161)', () => {
+      const html = renderEmpresaFichaHtml(energisa);
+      expect(h1Text(html)).toMatch(/ENERGISA/);
+      expect(html.indexOf('<h1>')).toBeLessThan(html.indexOf('<main>'));
+      const lead = firstMainBlockText(html);
+      expect(lead).toMatch(/é companhia aberta/);
+      expect(lead).toMatch(/IVAN MÜLLER BOTELHO|lacuna vis[ií]vel/i);
+      const entradaIdx = html.indexOf('<h2>Entrada</h2>');
+      const resumoIdx = html.indexOf('class="resumo"');
+      expect(entradaIdx).toBeGreaterThan(-1);
+      expect(resumoIdx).toBeGreaterThan(-1);
+      expect(resumoIdx).toBeLessThan(entradaIdx);
+      expect(html).toMatch(/Gipar/i);
+      expect(html).toMatch(/26,646/);
+      expect(html).toMatch(/FRE Energisa 160981/);
+    });
+
     it('Energisa HTML shows Gipar and Ivan as entrada labels with formatted percent, without /pessoa/ or /grafo/ links', () => {
       const html = renderEmpresaFichaHtml(energisa);
       expect(html).toMatch(/Gipar/i);
@@ -152,6 +170,27 @@ describe('Mint cited /empresa/ fichas (issue #148)', () => {
       expect(html).toMatch(/lacuna vis[ií]vel/i);
       expect(html).not.toMatch(/Edir Macedo/i);
       expect(html).not.toMatch(/\/pessoa\//);
+    });
+
+    it('Record lead is the closed S.A. Quadro hole and does not name Edir Macedo (issue #161)', () => {
+      const html = renderEmpresaFichaHtml(record);
+      expect(h1Text(html)).toMatch(/Record/i);
+      const lead = firstMainBlockText(html);
+      expect(lead).toMatch(/é sociedade an[oô]nima fechada/);
+      expect(lead).toMatch(/Quadro de S[oó]cios/);
+      expect(lead).toMatch(/n[aã]o nomeia acionistas/i);
+      expect(lead).not.toMatch(/Edir Macedo/i);
+    });
+
+    it('listed seed without a minted controlador leads with companhia aberta and a visible hole', () => {
+      const embraer = minted.find((empresa) => empresa.id === '07689002000189');
+      expect(embraer).toBeDefined();
+      expect(embraer!.controlador_label).toBeNull();
+      const html = renderEmpresaFichaHtml(embraer!);
+      const lead = firstMainBlockText(html);
+      expect(lead).toMatch(/é companhia aberta/);
+      expect(lead).toMatch(/lacuna vis[ií]vel/i);
+      expect(lead).not.toMatch(/IVAN MÜLLER BOTELHO/);
     });
 
     it('company HTML has no money block, no UBO, no biography voice, no eleven-digit Cadastro', () => {

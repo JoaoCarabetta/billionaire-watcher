@@ -195,6 +195,41 @@ function renderEntradaList(entradas: EmpresaEntrada[]): string {
   );
 }
 
+function renderResumoSection(sentences: string[]): string {
+  if (sentences.length === 0) {
+    return '';
+  }
+  return (
+    '<section class="resumo">' +
+      sentences.map((sentence) => '<p>' + escapeHtml(sentence) + '</p>').join('') +
+    '</section>'
+  );
+}
+
+/**
+ * Template nexo only. Listed: type + controlador or a visible hole.
+ * Closed S.A. group: the Quadro hole. No Wikipedia, no model prose.
+ */
+export function empresaResumoSentences(empresa: CitedEmpresa): string[] {
+  if (empresa.type === 'closed_sa_group') {
+    if (!empresa.quadro_does_not_name_shareholders) {
+      return [];
+    }
+    return [
+      empresa.legal_name + ' é sociedade anônima fechada.',
+      'O Quadro de Sócios não nomeia acionistas.',
+    ];
+  }
+
+  const sentences = [empresa.legal_name + ' é companhia aberta.'];
+  if (empresa.controlador_label) {
+    sentences.push(empresa.controlador_label + ' figura como acionista controlador no Formulário.');
+  } else {
+    sentences.push('Lacuna visível.');
+  }
+  return sentences;
+}
+
 export function renderEmpresaFichaHtml(empresa: CitedEmpresa): string {
   const idLine =
     empresa.company_id && /^\d{14}$/.test(empresa.company_id)
@@ -218,6 +253,7 @@ export function renderEmpresaFichaHtml(empresa: CitedEmpresa): string {
           '.back-link{display:inline-block;margin-bottom:1rem;font-size:.9rem}' +
           '.ficha-field{color:#666;font-size:.85rem}' +
           'section{margin:2rem 0}' +
+          '.resumo p{margin:0 0 .75rem}' +
           'ul{list-style:none;padding:0}' +
           'li{margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid #eee}' +
           '.missing-control{padding:1rem;background:#fff3cd;border-left:3px solid #ffc107;color:#856404;margin-top:.5rem}' +
@@ -228,6 +264,7 @@ export function renderEmpresaFichaHtml(empresa: CitedEmpresa): string {
         '<a href="/" class="back-link">← Voltar para o índice</a>' +
         '<header><h1>' + escapeHtml(empresa.legal_name) + '</h1></header>' +
         '<main>' +
+          renderResumoSection(empresaResumoSentences(empresa)) +
           fieldLine('Tipo', typeLabel(empresa.type)) +
           idLine +
           renderControlador(empresa) +
