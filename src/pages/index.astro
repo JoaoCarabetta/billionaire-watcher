@@ -1,6 +1,7 @@
 ---
 import { getFreeze, getIdentityFactsByPersonId, getRFPartnerEdgesByPersonId } from '../utils/fixtures';
 import type { Source } from '../types';
+import PageTools from '../components/PageTools.astro';
 
 const freezePersons = getFreeze();
 
@@ -228,5 +229,6 @@ const getCitationNumber = (source: Source | undefined) => {
         </p>
       </footer>
     </main>
+    <PageTools />
   </body>
 </html>

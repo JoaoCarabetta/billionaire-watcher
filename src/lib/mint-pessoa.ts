@@ -260,7 +260,11 @@ function renderMoneyBlock(money: PersonMoney | null): string {
   );
 }
 
-export function renderFichaHtml(pessoa: CitedPessoa, money: PersonMoney | null): string {
+export function renderFichaHtml(
+  pessoa: CitedPessoa,
+  money: PersonMoney | null,
+  extraBodyHtml = ''
+): string {
   const dateIso = money?.date || pessoa.date;
   const dateLine = dateIso ? fieldLine('Data', formatDatePt(dateIso)) : '';
 
@@ -294,6 +298,7 @@ export function renderFichaHtml(pessoa: CitedPessoa, money: PersonMoney | null):
           renderMoneyBlock(money) +
           '<footer><p><a href="/metodologia">Metodologia →</a></p></footer>' +
         '</main>' +
+        extraBodyHtml +
       '</body>' +
     '</html>'
   );
