@@ -35,12 +35,12 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 95 nodes', () => {
+    it('should have exactly 97 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(95);
+      expect(json.nodes.length).toBe(97);
     });
 
     it('should have exactly 25 person nodes', () => {
@@ -51,12 +51,12 @@ describe('Grafo Page (issue #74)', () => {
       expect(personNodes.length).toBe(25);
     });
 
-    it('should have exactly 44 edges', () => {
+    it('should have exactly 60 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(44);
+      expect(json.edges.length).toBe(60);
     });
 
     it('should have all edges resolve to existing nodes', () => {
@@ -109,7 +109,6 @@ describe('Grafo Page (issue #74)', () => {
       const uniqueIds = new Set(personIds);
       
       expect(uniqueIds.size).toBe(personIds.length);
-      expect(uniqueIds.size).toBe(25);
     });
 
     it('should have unique person names', () => {
@@ -121,7 +120,6 @@ describe('Grafo Page (issue #74)', () => {
       const uniqueNames = new Set(personNames);
       
       expect(uniqueNames.size).toBe(personNames.length);
-      expect(uniqueNames.size).toBe(25);
     });
 
     it('Maria do Carmo, Cíntia, and Mônica are three distinct nodes', () => {
@@ -161,6 +159,119 @@ describe('Grafo Page (issue #74)', () => {
     });
   });
 
+  describe('Test 2 (issue #80): Energisa incoming sums and hop correctness', () => {
+    it('should have capital sum to Energisa between 99.999 and 100.001', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const energisaId = '00864214000106';
+      const incomingEdges = json.edges.filter((e: any) => e.to === energisaId);
+      
+      const capitalSum = incomingEdges.reduce((sum: number, edge: any) => {
+        return sum + (edge.pct_capital || 0);
+      }, 0);
+      
+      expect(
+        capitalSum,
+        `Capital sum to Energisa should be ~100, got ${capitalSum}`
+      ).toBeGreaterThanOrEqual(99.999);
+      expect(
+        capitalSum,
+        `Capital sum to Energisa should be ~100, got ${capitalSum}`
+      ).toBeLessThanOrEqual(100.001);
+    });
+
+    it('should have votes sum to Energisa between 99.999 and 100.001', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const energisaId = '00864214000106';
+      const incomingEdges = json.edges.filter((e: any) => e.to === energisaId);
+      
+      const votosSum = incomingEdges.reduce((sum: number, edge: any) => {
+        return sum + (edge.pct_votos || 0);
+      }, 0);
+      
+      expect(
+        votosSum,
+        `Votes sum to Energisa should be ~100, got ${votosSum}`
+      ).toBeGreaterThanOrEqual(99.999);
+      expect(
+        votosSum,
+        `Votes sum to Energisa should be ~100, got ${votosSum}`
+      ).toBeLessThanOrEqual(100.001);
+    });
+
+    it('Mônica Perez Botelho should point to MCLC with 52.004 capital, not to Energisa', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const monicaId = 'p-ea4eb254';
+      const mclcId = '59206795000131';
+      const energisaId = '00864214000106';
+      
+      const monicaToMclc = json.edges.find(
+        (e: any) => e.from === monicaId && e.to === mclcId
+      );
+      
+      expect(monicaToMclc, 'Mônica → MCLC edge should exist').toBeDefined();
+      expect(monicaToMclc.pct_capital).toBe(52.004);
+      
+      const monicaToEnergisa52 = json.edges.find(
+        (e: any) => e.from === monicaId && e.to === energisaId && e.pct_capital === 52.004
+      );
+      
+      expect(
+        monicaToEnergisa52,
+        'Mônica should NOT have a 52.004% edge to Energisa directly'
+      ).toBeUndefined();
+    });
+
+    it('Gipar should point to Energisa with 26.646 capital and 61.162 votes', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const giparId = '02260956000158';
+      const energisaId = '00864214000106';
+      
+      const giparToEnergisa = json.edges.find(
+        (e: any) => e.from === giparId && e.to === energisaId
+      );
+      
+      expect(giparToEnergisa, 'Gipar → Energisa edge should exist').toBeDefined();
+      expect(giparToEnergisa.pct_capital).toBe(26.646);
+      expect(giparToEnergisa.pct_votos).toBe(61.162);
+    });
+
+    it('Outros acionistas should be a leaf on Energisa (42.467 / 22.429) with no children', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const outrosId = 'outros-energisa';
+      const energisaId = '00864214000106';
+      
+      const outrosToEnergisa = json.edges.find(
+        (e: any) => e.from === outrosId && e.to === energisaId
+      );
+      
+      expect(outrosToEnergisa, 'Outros acionistas → Energisa edge should exist').toBeDefined();
+      expect(outrosToEnergisa.pct_capital).toBe(42.467);
+      expect(outrosToEnergisa.pct_votos).toBe(22.429);
+      
+      const edgesFromOutros = json.edges.filter((e: any) => e.from === outrosId);
+      expect(
+        edgesFromOutros.length,
+        'Outros acionistas should have exactly one outgoing edge (to Energisa)'
+      ).toBe(1);
+      
+      const edgesToOutros = json.edges.filter((e: any) => e.to === outrosId);
+      expect(
+        edgesToOutros.length,
+        'Outros acionistas should have no incoming edges (is a leaf)'
+      ).toBe(0);
+    });
+  });
+
   describe('Test 2: Static URL after build', () => {
     it('should have grafo-publico.json in dist/', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
@@ -186,7 +297,7 @@ describe('Grafo Page (issue #74)', () => {
   });
 
   describe('Test 3: /grafo build output is 200-shaped', () => {
-    it('should pass all 44 edges with unique IDs to Cytoscape', () => {
+    it('should pass all edges with unique IDs to Cytoscape', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
@@ -196,16 +307,11 @@ describe('Grafo Page (issue #74)', () => {
       // Extract edge elements
       const edges = elements.filter(el => el.data.source !== undefined);
       
-      // Assert edge count equals JSON edge count (44)
+      // Assert edge count equals JSON edge count
       expect(
         edges.length,
         `Edge count must equal json.edges.length. Got ${edges.length}, expected ${json.edges.length}`
       ).toBe(json.edges.length);
-      
-      expect(
-        edges.length,
-        `Should have exactly 44 edges (spec requirement)`
-      ).toBe(44);
       
       // Assert all edge IDs are unique
       const edgeIds = edges.map(e => e.data.id);
@@ -213,7 +319,7 @@ describe('Grafo Page (issue #74)', () => {
       expect(
         uniqueEdgeIds.size,
         `Edge IDs must be unique. Got ${edgeIds.length} edges but only ${uniqueEdgeIds.size} unique IDs`
-      ).toBe(44);
+      ).toBe(json.edges.length);
       
       // Assert source/target are the JSON from/to
       edges.forEach((edge, index) => {
@@ -233,27 +339,27 @@ describe('Grafo Page (issue #74)', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
-      // Find Monica's Energisa edge in the JSON
-      const monicaEdge = json.edges.find(
-        (e: any) => e.from === 'p-ea4eb254' && e.to === '00864214000106'
+      // Find Gipar's Energisa edge in the JSON (has both capital and votes)
+      const giparEdge = json.edges.find(
+        (e: any) => e.from === '02260956000158' && e.to === '00864214000106'
       );
       
-      expect(monicaEdge).toBeDefined();
-      expect(monicaEdge.pct_capital).toBe(52.004);
-      expect(monicaEdge.pct_votos).toBe(3.982);
+      expect(giparEdge).toBeDefined();
+      expect(giparEdge.pct_capital).toBe(26.646);
+      expect(giparEdge.pct_votos).toBe(61.162);
       
       // Build Cytoscape elements
       const elements = buildCytoscapeElements(json);
       const edges = elements.filter(el => el.data.source !== undefined);
       
-      // Find Monica's edge in Cytoscape elements
-      const monicaCytoscapeEdge = edges.find(
-        (e: any) => e.data.source === 'p-ea4eb254' && e.data.target === '00864214000106'
+      // Find Gipar's edge in Cytoscape elements
+      const giparCytoscapeEdge = edges.find(
+        (e: any) => e.data.source === '02260956000158' && e.data.target === '00864214000106'
       );
       
-      expect(monicaCytoscapeEdge).toBeDefined();
-      expect(monicaCytoscapeEdge!.data.label).toContain('52.004');
-      expect(monicaCytoscapeEdge!.data.label).toContain('3.982');
+      expect(giparCytoscapeEdge).toBeDefined();
+      expect(giparCytoscapeEdge!.data.label).toContain('26.646');
+      expect(giparCytoscapeEdge!.data.label).toContain('61.162');
     });
 
     it('should have dist/grafo/index.html', () => {
