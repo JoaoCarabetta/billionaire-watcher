@@ -266,6 +266,9 @@ describe('Metodologia Page', () => {
       'Luciano Hang não consta como administrador na Havan S.A.; Edir Macedo não consta na Rádio e Televisão Record S.A.; Luiz Frias e Maria Frias não constam na Empresa Folha da Manhã S.A. nem no Universo Online S.A.; Blairo Maggi, Itamar Locks e Hugo Ribeiro não constam na André Maggi Participações.',
       'Em sociedade limitada, o hop do sócio pessoa jurídica pode nomear pessoa física como sócio: Boticário Produtos de Beleza cita Miguel Gellert Krigsner e Artur Noemio Grynbaum; Fertipar Fertilizantes do Paraná cita Alceu Elias Feldmann como sócio-administrador.',
       'Sede no exterior não tem tabela oficial brasileira de controlador pessoa física; a cadeia estrangeira ou a lacuna visível substituem a invenção.',
+      'Não existe tabela nacional pública do acionista atual de sociedade anônima fechada. O livro de registro de ações nominativas fica na companhia.',
+      'Na Junta Comercial, os livros de sociedade anônima são autenticados e não arquivados; o quadro público informa diretores, não acionistas.',
+      'A relação de subscritores e o estatuto arquivados na Junta são foto da constituição, não o livro corrente.',
       'O grafo não é um ranking de patrimônio e não copia a lista Forbes.',
       'A fatia citada de capital ou de votos vezes o valor de bolsa datado de uma companhia aberta não é fortuna.',
       'Não se reparte igualmente um bloco sem percentual citado, nem se inventa quantidade de ações.',
@@ -297,6 +300,20 @@ describe('Metodologia Page', () => {
       expect(builtHtml).toContain('não é fortuna');
       expect(builtHtml).toContain('noutro país');
       expect(builtHtml).toContain('sem percentual citado');
+      expect(builtHtml).toContain('tabela nacional pública');
+      expect(builtHtml).toContain('autenticados e não arquivados');
+      expect(builtHtml).toContain('foto da constituição');
+    });
+
+    it('should publish livro de ações facts under Lacunas', () => {
+      const lacunasStart = builtHtml.search(/<h2[^>]*>.*?Lacunas.*?<\/h2>/);
+      const limitacoesStart = builtHtml.search(/<h2[^>]*>.*?Limitações.*?<\/h2>/);
+      expect(lacunasStart).toBeGreaterThan(-1);
+      expect(limitacoesStart).toBeGreaterThan(lacunasStart);
+      const lacunasHtml = builtHtml.slice(lacunasStart, limitacoesStart);
+      expect(lacunasHtml).toContain('tabela nacional pública');
+      expect(lacunasHtml).toContain('autenticados e não arquivados');
+      expect(lacunasHtml).toContain('foto da constituição');
     });
 
     it('should publish every new sentence verbatim with a matching citation marker and footer', () => {
