@@ -36,36 +36,36 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 403 nodes', () => {
+    it('should have exactly 524 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(403);
+      expect(json.nodes.length).toBe(524);
     });
 
-    it('should have exactly 146 person nodes', () => {
+    it('should have exactly 197 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(146);
+      expect(personNodes.length).toBe(197);
     });
 
-    it('should have exactly 492 edges', () => {
+    it('should have exactly 665 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(492);
+      expect(json.edges.length).toBe(665);
     });
 
-    it('should have the thirty-one listed company ids', () => {
+    it('should have the thirty-three listed company ids', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       const nodeIds = new Set(json.nodes.map((n: { id: string }) => n.id));
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(31);
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
       for (const id of LISTED_COMPANY_IDS) {
         expect(nodeIds.has(id), `listed company ${id} should be present`).toBe(true);
       }
@@ -246,9 +246,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const companyNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'company');
 
-      expect(json.nodes.length).toBe(403);
-      expect(json.edges.length).toBe(492);
-      expect(companyNodes.length).toBe(257);
+      expect(json.nodes.length).toBe(524);
+      expect(json.edges.length).toBe(665);
+      expect(companyNodes.length).toBe(327);
 
       for (const company of HOLE_COMPANIES) {
         const node = json.nodes.find((n: { id: string }) => n.id === company.id);
@@ -296,7 +296,7 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = new Set(personNodes.map((n: { id: string }) => n.id));
 
-      expect(personNodes.length).toBe(146);
+      expect(personNodes.length).toBe(197);
       for (const id of FROZEN_PERSON_IDS) {
         expect(personIds.has(id), `frozen person ${id} should remain`).toBe(true);
       }
@@ -305,11 +305,11 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(true);
     });
 
-    it('page copy names 403 nodes and 492 edges', () => {
+    it('page copy names 524 nodes and 665 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('403 nós, 492 arestas');
-      expect(page).not.toContain('111 nós, 130 arestas');
+      expect(page).toContain('524 nós, 665 arestas');
+      expect(page).not.toContain('403 nós, 492 arestas');
     });
   });
 
@@ -675,14 +675,14 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(true);
     });
 
-    it('buildCytoscapeElements tags exactly the thirty-one listed ids', () => {
+    it('buildCytoscapeElements tags exactly the thirty-three listed ids', () => {
       const json = loadCommittedGrafo();
       const elements = buildCytoscapeElements(json);
       const nodes = elements.filter((el) => el.data.source === undefined);
       const listedNodes = nodes.filter(isTaggedListed);
       const listedIds = listedNodes.map((el) => el.data.id).sort();
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(31);
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
       expect(listedIds).toEqual([...LISTED_COMPANY_IDS].sort());
 
       for (const el of listedNodes) {
@@ -796,7 +796,6 @@ describe('Grafo Page (issue #74)', () => {
       '03853896000140',
       '24990777000109',
     ] as const;
-    const HELD_OUT_PREFIXES = ['07526557', '84429695'] as const;
     const GIPAR_ID = '02260956000158';
     const MAMS_ID = '61563585000142';
     const UNIAO_IDS = ['00394460000141', '00394460040950'] as const;
@@ -830,21 +829,11 @@ describe('Grafo Page (issue #74)', () => {
       }
     });
 
-    it('has JBS and has no Ambev or WEG node or hop', () => {
+    it('has JBS from #103/#105', () => {
       const json = loadCommittedGrafo();
       const jbs = json.nodes.find((n: { id: string }) => n.id === '02916265000160');
       expect(jbs, 'JBS node 02916265000160 must exist').toBeDefined();
       expect(jbs.kind).toBe('company');
-
-      const ids = [
-        ...json.nodes.map((n: { id: string }) => n.id),
-        ...json.edges.map((e: { from: string }) => e.from),
-        ...json.edges.map((e: { to: string }) => e.to),
-      ];
-      for (const prefix of HELD_OUT_PREFIXES) {
-        const hit = ids.find((id: string) => id.startsWith(prefix));
-        expect(hit, `no node/edge id may start with ${prefix}`).toBeUndefined();
-      }
     });
 
     it('each of the thirty-one listed seeds has incoming capital in [99.5, 100.5]', () => {
@@ -867,9 +856,9 @@ describe('Grafo Page (issue #74)', () => {
       }
     });
 
-    it('LISTED_COMPANY_IDS has length 31 and tags exactly those ids as listed companies', () => {
+    it('LISTED_COMPANY_IDS has length 33 and tags exactly those ids as listed companies', () => {
       const json = loadCommittedGrafo();
-      expect(LISTED_COMPANY_IDS).toHaveLength(31);
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
       for (const id of EXISTING_ELEVEN) {
         expect(LISTED_COMPANY_IDS, `must keep existing listed id ${id}`).toContain(id);
       }
@@ -937,7 +926,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy matches the post-union node and edge counts and has no fortuna', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('403 nós, 492 arestas');
+      expect(page).toContain('524 nós, 665 arestas');
       expect(page).not.toMatch(/fortuna/i);
     });
   });
@@ -1323,35 +1312,45 @@ describe('Grafo Page (issue #74)', () => {
 
     const FROZEN_PERSON_IDS_UNION = [
       'p-0054a089', 'p-010e2551', 'p-02f52298', 'p-031cab91', 'p-050ee925',
-      'p-06305882', 'p-0f5c431e', 'p-0fab5b2d', 'p-10813f9e', 'p-11e495ad',
-      'p-1282fcb3', 'p-1305d0ba', 'p-1348ab32', 'p-134ca0da', 'p-1459b3e2',
-      'p-147c3c83', 'p-147f9b49', 'p-166c2e76', 'p-16b64a1a', 'p-1b0a077e',
-      'p-1b38d073', 'p-1b487d80', 'p-1d00cce0', 'p-1d9e434d', 'p-1dfdd2d0',
-      'p-1ecc43b8', 'p-1ffa9e7e', 'p-20fd468b', 'p-2491a4ba', 'p-2504f2c4',
-      'p-25fe52ce', 'p-27a7f3ee', 'p-27f97b5a', 'p-29ad3177', 'p-2ab994b8',
-      'p-2ad67f5f', 'p-2bb82ca0', 'p-2c7d71b2', 'p-2cdc324b', 'p-33ab3cce',
-      'p-35b92c94', 'p-3626b31f', 'p-36ac01c2', 'p-392bfe45', 'p-39dcf5fb',
-      'p-3cebed6c', 'p-3d9739a9', 'p-3e6b7d53', 'p-40894d2d', 'p-40f90cbf',
-      'p-43b383b5', 'p-45485941', 'p-4850ff53', 'p-4906483b', 'p-4f3f270f',
-      'p-5438e9c8', 'p-543bce99', 'p-561b3bc9', 'p-582ebdb4', 'p-5a3a3ade',
-      'p-5aebb94f', 'p-5c6eb6c7', 'p-6094b0a0', 'p-611d831b', 'p-617ea2b3',
-      'p-620c94a1', 'p-62540a56', 'p-65d1af58', 'p-6686dd35', 'p-66e24efd',
-      'p-710dd63a', 'p-71c9adb5', 'p-73a733cc', 'p-74b6bde7', 'p-74cd4e86',
-      'p-7636b07f', 'p-793faab4', 'p-7a7bf0bd', 'p-7b86ae04', 'p-7e21753e',
-      'p-7edeec49', 'p-7f3fc508', 'p-7fc3be74', 'p-7fdafcf3', 'p-831e3028',
-      'p-848bf0ce', 'p-859f7d99', 'p-85c0959b', 'p-887e054b', 'p-8db5e3f1',
-      'p-8dd8d5d2', 'p-8e8923a7', 'p-8f4b2205', 'p-8fb82e01', 'p-9e358fc7',
-      'p-9ee93418', 'p-a382ee76', 'p-a54160d7', 'p-a55190d2', 'p-a64df172',
-      'p-a7b24f91', 'p-a8a4e8c0', 'p-a8c1e5f9', 'p-a941080d', 'p-ab5dac7a',
-      'p-ab969513', 'p-b01f59e4', 'p-b33b7ca8', 'p-b57fc592', 'p-b7719454',
-      'p-b9db9330', 'p-babf54a7', 'p-bb882ad3', 'p-bceb16ac', 'p-bd91e3be',
-      'p-c053ac2c', 'p-c42eece6', 'p-c63f4853', 'p-ca22e731', 'p-ca645ca0',
-      'p-cb00e854', 'p-cd7a4b97', 'p-cdbc8c4e', 'p-cf538a76', 'p-d02e2ddd',
-      'p-d49364c9', 'p-d5231da6', 'p-d584d2cc', 'p-d5b7fd2a', 'p-dbce5574',
-      'p-dbf7401a', 'p-dfe70769', 'p-dfef8e07', 'p-e2ecb2dd', 'p-e31b35c3',
-      'p-ea4eb254', 'p-ee7b22d1', 'p-f25ff412', 'p-f3c190ea', 'p-f42e6571',
-      'p-f511f986', 'p-f53dc520', 'p-f5f008f9', 'p-f8603dda', 'p-faf6d605',
-      'p-fffd4a1c',
+      'p-06305882', 'p-076d45ba', 'p-0f5c431e', 'p-0fab5b2d', 'p-10813f9e',
+      'p-11e495ad', 'p-11f498af', 'p-1282fcb3', 'p-1305d0ba', 'p-1348ab32',
+      'p-134ca0da', 'p-1459b3e2', 'p-147c3c83', 'p-147f9b49', 'p-166c2e76',
+      'p-16b64a1a', 'p-1b0a077e', 'p-1b38d073', 'p-1b487d80', 'p-1d00cce0',
+      'p-1d9e434d', 'p-1dfdd2d0', 'p-1ecc43b8', 'p-1ffa9e7e', 'p-20fd468b',
+      'p-2491a4ba', 'p-2504f2c4', 'p-25fe52ce', 'p-27a7f3ee', 'p-27f97b5a',
+      'p-282759a0', 'p-29ad3177', 'p-2ab994b8', 'p-2ad67f5f', 'p-2bb4f2eb',
+      'p-2bb82ca0', 'p-2c7d71b2', 'p-2cdc324b', 'p-31bac9d8', 'p-32dad2d4',
+      'p-33ab3cce', 'p-35b92c94', 'p-3626b31f', 'p-36ac01c2', 'p-392bfe45',
+      'p-39dcf5fb', 'p-3cebed6c', 'p-3d9739a9', 'p-3e6b7d53', 'p-3ecbbd0d',
+      'p-40894d2d', 'p-40f90cbf', 'p-43b383b5', 'p-4434558b', 'p-45485941',
+      'p-456b3f14', 'p-4850ff53', 'p-4906483b', 'p-4cc09360', 'p-4cda88be',
+      'p-4f3f270f', 'p-4fb39d12', 'p-518695aa', 'p-5438e9c8', 'p-543bce99',
+      'p-561b3bc9', 'p-582ebdb4', 'p-5a0a21d8', 'p-5a3a3ade', 'p-5aebb94f',
+      'p-5c6eb6c7', 'p-5cde9c56', 'p-608cdb5e', 'p-6094b0a0', 'p-611d831b',
+      'p-617ea2b3', 'p-620c94a1', 'p-62540a56', 'p-6268ea61', 'p-65d1af58',
+      'p-6686dd35', 'p-66e24efd', 'p-6ae2426d', 'p-6ef9cde6', 'p-710dd63a',
+      'p-7152d85a', 'p-71c9adb5', 'p-73a733cc', 'p-74b6bde7', 'p-74cd4e86',
+      'p-7636b07f', 'p-76790c38', 'p-793faab4', 'p-7a7bf0bd', 'p-7b86ae04',
+      'p-7c6eb583', 'p-7e21753e', 'p-7edeec49', 'p-7f3fc508', 'p-7fc3be74',
+      'p-7fdafcf3', 'p-831e3028', 'p-835a4a65', 'p-848bf0ce', 'p-84b28972',
+      'p-859f7d99', 'p-85c0959b', 'p-887e054b', 'p-894d72f9', 'p-8db5e3f1',
+      'p-8dd8d5d2', 'p-8e8923a7', 'p-8f4b2205', 'p-8fb82e01', 'p-98140f41',
+      'p-9da277e0', 'p-9e358fc7', 'p-9ee93418', 'p-a1a9881b', 'p-a382ee76',
+      'p-a54160d7', 'p-a55190d2', 'p-a64df172', 'p-a7b24f91', 'p-a8a4e8c0',
+      'p-a8c1e5f9', 'p-a941080d', 'p-a99f0348', 'p-aa39c8e3', 'p-ab5dac7a',
+      'p-ab969513', 'p-abccab28', 'p-b01f59e4', 'p-b33b7ca8', 'p-b57fc592',
+      'p-b7719454', 'p-b9db9330', 'p-babf54a7', 'p-bb882ad3', 'p-bceb16ac',
+      'p-bd91e3be', 'p-beb48096', 'p-bebcf1da', 'p-c053ac2c', 'p-c42eece6',
+      'p-c63f4853', 'p-ca22e731', 'p-ca645ca0', 'p-cb00e854', 'p-cbb7fdd7',
+      'p-cd7a4b97', 'p-cdbc8c4e', 'p-cf17dea2', 'p-cf538a76', 'p-d02bceb2',
+      'p-d02e2ddd', 'p-d09d0ee6', 'p-d3cc9ed4', 'p-d49364c9', 'p-d5231da6',
+      'p-d584d2cc', 'p-d5b7fd2a', 'p-d91896df', 'p-d96d26db', 'p-dbce5574',
+      'p-dbf7401a', 'p-dd3cf03b', 'p-dfe70769', 'p-dfef8e07', 'p-e2ecb2dd',
+      'p-e31b35c3', 'p-e685cd09', 'p-e8022ca0', 'p-ea4eb254', 'p-eb101ae8',
+      'p-ed3f85fd', 'p-edaa3573', 'p-ee7b22d1', 'p-f25ff412', 'p-f3bdf8a1',
+      'p-f3c190ea', 'p-f42e6571', 'p-f48ec877', 'p-f511f986', 'p-f53dc520',
+      'p-f5bde2d4', 'p-f5f008f9', 'p-f8603dda', 'p-fad7000a', 'p-faf6d605',
+      'p-ff819c3f', 'p-fffd4a1c',
     ] as const;
 
     const FROZEN_TESOURARIA_IDS = [
@@ -1363,6 +1362,7 @@ describe('Grafo Page (issue #74)', () => {
       'tesouraria-24990777', 'tesouraria-33256439', 'tesouraria-33453598',
       'tesouraria-33611500', 'tesouraria-47960950', 'tesouraria-50746577',
       'tesouraria-61585865', 'tesouraria-67620377',
+      'tesouraria-07526557', 'tesouraria-84429695',
     ] as const;
 
     function loadCommittedGrafo() {
@@ -1451,14 +1451,14 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(false);
     });
 
-    it('keeps 403 nodes, 492 edges, 146 person ids, and draws no partner-name edges', () => {
+    it('keeps 524 nodes, 665 edges, 197 person ids, and draws no partner-name edges', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id).sort();
 
-      expect(json.nodes.length).toBe(403);
-      expect(json.edges.length).toBe(492);
-      expect(personNodes.length).toBe(146);
+      expect(json.nodes.length).toBe(524);
+      expect(json.edges.length).toBe(665);
+      expect(personNodes.length).toBe(197);
       expect(personIds).toEqual([...FROZEN_PERSON_IDS_UNION].sort());
 
       const partnerNames = new Set(allPartnerNames(json));
@@ -1493,6 +1493,221 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.readFileSync(homePath, 'utf-8')).not.toMatch(/<script/);
       expect(fs.readFileSync(metodologiaPath, 'utf-8')).not.toMatch(/<script/);
       expect(fs.readFileSync(doacoesPath, 'utf-8')).not.toMatch(/<script/);
+    });
+  });
+
+  describe('Test (issue #113): WEG and Ambev listed trees', () => {
+    const WEG_ID = '84429695000111';
+    const AMBEV_ID = '07526557000100';
+    const PREVIOUS_THIRTY_ONE = [
+      '00864214000106',
+      '07689002000189',
+      '33592510000154',
+      '03220438000173',
+      '34274233000102',
+      '07415333000120',
+      '01838723000127',
+      '17155730000164',
+      '01083200000118',
+      '43776517000180',
+      '06057223000171',
+      '02916265000160',
+      '33453598000123',
+      '07043628000113',
+      '33611500000119',
+      '50746577000115',
+      '06047087000139',
+      '02558157000162',
+      '61585865000151',
+      '42150391000170',
+      '47960950000121',
+      '33042730000104',
+      '33256439000139',
+      '67620377000114',
+      '16404287000155',
+      '02429144000193',
+      '00001180000126',
+      '16670085000155',
+      '33000167000101',
+      '03853896000140',
+      '24990777000109',
+    ] as const;
+    const GIPAR_ID = '02260956000158';
+    const GESTORA_IDS = [
+      '11752203000150',
+      '72116353000162',
+      '14406534000127',
+      '41020034000125',
+      '05395883000108',
+      '33857830000199',
+      '09267871000140',
+    ] as const;
+    const HOLE_COMPANY_IDS = [
+      '61563585000142',
+      '02049012000136',
+      '23349343000161',
+      '07544616000172',
+      '39513958000111',
+      '42601461000160',
+      '43347650000110',
+      '45278506000103',
+      '58534632000115',
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function isTaggedListed(el: { data: { listed?: boolean | string; seed?: string } }): boolean {
+      return el.data.listed === true || el.data.listed === 'true' || el.data.seed === 'listed';
+    }
+
+    function incomingCapital(json: { edges: Array<{ to: string; pct_capital?: number }> }, id: string) {
+      const incoming = json.edges.filter((e) => e.to === id);
+      const capitalSum = incoming.reduce(
+        (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
+        0
+      );
+      return { incoming, capitalSum };
+    }
+
+    it('has WEG S.A. and AMBEV S.A. as company nodes', () => {
+      const json = loadCommittedGrafo();
+      const weg = json.nodes.find((n: { id: string }) => n.id === WEG_ID);
+      const ambev = json.nodes.find((n: { id: string }) => n.id === AMBEV_ID);
+      expect(weg, 'WEG 84429695000111 should exist').toBeDefined();
+      expect(weg.kind).toBe('company');
+      expect(weg.label).toBe('WEG S.A.');
+      expect(ambev, 'Ambev 07526557000100 should exist').toBeDefined();
+      expect(ambev.kind).toBe('company');
+      expect(ambev.label).toBe('AMBEV S.A.');
+    });
+
+    it('incoming capital is 100.000 to WEG (52 hops) and 99.999 to Ambev (5 hops)', () => {
+      const json = loadCommittedGrafo();
+      const weg = incomingCapital(json, WEG_ID);
+      expect(weg.incoming.length, 'WEG incoming hop count').toBe(52);
+      expect(weg.capitalSum).toBe(100);
+      expect(weg.capitalSum).toBeGreaterThanOrEqual(99.5);
+      expect(weg.capitalSum).toBeLessThanOrEqual(100.5);
+
+      const ambev = incomingCapital(json, AMBEV_ID);
+      expect(ambev.incoming.length, 'Ambev incoming hop count').toBe(5);
+      expect(ambev.capitalSum).toBe(99.999);
+      expect(ambev.capitalSum).toBeGreaterThanOrEqual(99.5);
+      expect(ambev.capitalSum).toBeLessThanOrEqual(100.5);
+    });
+
+    it('LISTED_COMPANY_IDS has length 33 and tags exactly those ids as listed companies', () => {
+      const json = loadCommittedGrafo();
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      for (const id of PREVIOUS_THIRTY_ONE) {
+        expect(LISTED_COMPANY_IDS, `must keep existing listed id ${id}`).toContain(id);
+      }
+      expect(LISTED_COMPANY_IDS).toContain(WEG_ID);
+      expect(LISTED_COMPANY_IDS).toContain(AMBEV_ID);
+
+      const elements = buildCytoscapeElements(json);
+      const nodes = elements.filter((el) => el.data.source === undefined);
+      const listedNodes = nodes.filter(isTaggedListed);
+      expect(listedNodes.map((el) => el.data.id).sort()).toEqual([...LISTED_COMPANY_IDS].sort());
+      for (const el of listedNodes) {
+        expect(el.data.kind, `listed node ${el.data.id} must stay kind=company`).toBe('company');
+      }
+    });
+
+    it('Gipar, tesouraria, hole companies, x- slugs, and the seven gestoras are not tagged listed', () => {
+      const json = loadCommittedGrafo();
+      const elements = buildCytoscapeElements(json);
+      const nodes = elements.filter((el) => el.data.source === undefined);
+      const byId = new Map(nodes.map((el) => [el.data.id, el]));
+
+      expect(isTaggedListed(byId.get(GIPAR_ID)!), 'Gipar must stay ordinary company color').toBe(false);
+
+      const tesouraria = nodes.filter((el) => el.data.id.startsWith('tesouraria-'));
+      expect(tesouraria.length).toBeGreaterThan(0);
+      for (const el of tesouraria) {
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+
+      for (const holeId of HOLE_COMPANY_IDS) {
+        const hole = byId.get(holeId);
+        expect(hole, `hole company ${holeId} should exist`).toBeDefined();
+        expect(isTaggedListed(hole!), `hole company ${holeId} must not be tagged listed`).toBe(false);
+      }
+
+      const xSlugs = nodes.filter((el) => el.data.id.startsWith('x-'));
+      expect(xSlugs.length, 'foreign x- slugs should be on the page').toBeGreaterThan(0);
+      for (const el of xSlugs) {
+        expect(el.data.kind, `${el.data.id} stays kind=company`).toBe('company');
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+      const abInbev = xSlugs.filter((el) => /inbev/i.test(el.data.id) || /inbev/i.test(el.data.label ?? ''));
+      expect(abInbev.length, 'AB InBev holdings should be x- slugs').toBeGreaterThan(0);
+      for (const el of abInbev) {
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+
+      for (const gestoraId of GESTORA_IDS) {
+        const gestora = byId.get(gestoraId);
+        expect(gestora, `gestora ${gestoraId} should exist`).toBeDefined();
+        expect(gestora!.data.kind).toBe('company');
+        expect(isTaggedListed(gestora!), `gestora ${gestoraId} must not be tagged listed`).toBe(false);
+      }
+    });
+
+    it('committed JSON has zero eleven-digit Cadastro', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const jsonText = fs.readFileSync(jsonPath, 'utf-8');
+      expect(jsonText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
+      expect(jsonText).not.toContain('***');
+    });
+
+    it('page copy matches the post-union node and edge counts and has no fortuna', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const page = fs.readFileSync(pagePath, 'utf-8');
+      expect(page).toContain('524 nós, 665 arestas');
+      expect(page).not.toContain('403 nós, 492 arestas');
+      expect(page).not.toMatch(/fortuna/i);
+    });
+
+    it('keeps #98 gestora partners: Squadra 11, Lazard [], Dynamo tesouraria name', () => {
+      const json = loadCommittedGrafo();
+      const squadra = json.nodes.find((n: { id: string }) => n.id === '09267871000140');
+      const lazard = json.nodes.find((n: { id: string }) => n.id === '14406534000127');
+      const dynamo = json.nodes.find((n: { id: string }) => n.id === '72116353000162');
+
+      expect(squadra.partners).toHaveLength(11);
+      expect(lazard.partners).toEqual([]);
+      const tesourariaRow = dynamo.partners.find(
+        (p: { nome: string }) => p.nome === 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA'
+      );
+      expect(tesourariaRow, 'Dynamo partners must include the tesouraria name').toBeDefined();
+      expect(tesourariaRow.qualificacao).toBe('63');
+      expect(tesourariaRow.qualificacao_label).toBe('Cotas Em Tesouraria');
+      expect(
+        json.nodes.some(
+          (n: { kind: string; label: string }) =>
+            n.kind === 'person' && n.label === 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA'
+        )
+      ).toBe(false);
+    });
+
+    it('each of the 33 listed seeds has incoming capital in [99.5, 100.5]', () => {
+      const json = loadCommittedGrafo();
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      for (const listedId of LISTED_COMPANY_IDS) {
+        const { capitalSum } = incomingCapital(json, listedId);
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeGreaterThanOrEqual(99.5);
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeLessThanOrEqual(100.5);
+      }
     });
   });
 });

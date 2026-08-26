@@ -200,6 +200,8 @@ export const LISTED_COMPANY_IDS = [
   '33000167000101',
   '03853896000140',
   '24990777000109',
+  '84429695000111',
+  '07526557000100',
 ] as const;
 
 function isListedCompany(id: string): boolean {

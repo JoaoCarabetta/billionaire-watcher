@@ -2477,6 +2477,611 @@
       "id": "p-b57fc592",
       "kind": "person",
       "label": "WESLEY MENDONÇA BATISTA"
+    },
+    {
+      "id": "84429695000111",
+      "kind": "company",
+      "label": "WEG S.A."
+    },
+    {
+      "id": "07526557000100",
+      "kind": "company",
+      "label": "AMBEV S.A."
+    },
+    {
+      "id": "x-ab-inbev-nederland-holding-bv",
+      "kind": "company",
+      "label": "AB InBev Nederland Holding BV"
+    },
+    {
+      "id": "x-abel-anheuser-busch-europe-limited",
+      "kind": "company",
+      "label": "ABEL- Anheuser-Busch Europe Limited"
+    },
+    {
+      "id": "x-abi-inve-holding-ltd-uk19",
+      "kind": "company",
+      "label": "ABI Inve. Holding Ltd - UK19"
+    },
+    {
+      "id": "x-abi-uk-finance",
+      "kind": "company",
+      "label": "ABI UK Finance"
+    },
+    {
+      "id": "x-abi-uk-hold-1-uk-topco-1",
+      "kind": "company",
+      "label": "ABI UK Hold 1 UK TopCo 1"
+    },
+    {
+      "id": "x-abi-uk-holding-2-uk-topco-2",
+      "kind": "company",
+      "label": "ABI UK Holding 2 UK TopCo 2"
+    },
+    {
+      "id": "26610320000157",
+      "kind": "company",
+      "label": "ASG Participações Ltda"
+    },
+    {
+      "id": "06250266000179",
+      "kind": "company",
+      "label": "Ambrew S.à.r.l"
+    },
+    {
+      "id": "26610310000111",
+      "kind": "company",
+      "label": "Analeca Participações Ltda"
+    },
+    {
+      "id": "x-anheuser-busch-inbev-sa-nv",
+      "kind": "company",
+      "label": "Anheuser-Busch InBev SA/NV"
+    },
+    {
+      "id": "tesouraria-07526557",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-84429695",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "x-br-global-investments-gp",
+      "kind": "company",
+      "label": "BR Global Investments GP"
+    },
+    {
+      "id": "x-br-global-investments-scs",
+      "kind": "company",
+      "label": "BR Global Investments SCS"
+    },
+    {
+      "id": "x-brc-s-a-r-l",
+      "kind": "company",
+      "label": "BRC S.à r.l."
+    },
+    {
+      "id": "10649623000143",
+      "kind": "company",
+      "label": "Balder Administradora Ltda"
+    },
+    {
+      "id": "x-ccchhs-holdings-ltd",
+      "kind": "company",
+      "label": "CCCHHS Holdings Ltd."
+    },
+    {
+      "id": "08703890000100",
+      "kind": "company",
+      "label": "Cladis Voigt Trejes Administradora Ltda"
+    },
+    {
+      "id": "09420895000198",
+      "kind": "company",
+      "label": "Clica Voigt Administradora Ltda"
+    },
+    {
+      "id": "80957400000129",
+      "kind": "company",
+      "label": "Dabliuve Administradora Ltda"
+    },
+    {
+      "id": "08680015000150",
+      "kind": "company",
+      "label": "Diether Werninghaus Administradora Ltda"
+    },
+    {
+      "id": "08649347000171",
+      "kind": "company",
+      "label": "Décio da Silva Administradora Ltda"
+    },
+    {
+      "id": "08680096000198",
+      "kind": "company",
+      "label": "EDUARDO AMP LUISA WERNINGHAUS ADMINISTRADORA LTDA"
+    },
+    {
+      "id": "x-eps-s-a",
+      "kind": "company",
+      "label": "EPS S.A"
+    },
+    {
+      "id": "09559591000106",
+      "kind": "company",
+      "label": "EW Administradora Eireli"
+    },
+    {
+      "id": "80957384000174",
+      "kind": "company",
+      "label": "Eggon João da Silva Administradora Ltda"
+    },
+    {
+      "id": "x-fs-holdings-limited",
+      "kind": "company",
+      "label": "FS Holdings Limited"
+    },
+    {
+      "id": "60480480000167",
+      "kind": "company",
+      "label": "Fundação Zerrenner"
+    },
+    {
+      "id": "80952849000102",
+      "kind": "company",
+      "label": "G Werninghaus Administradora Ltda"
+    },
+    {
+      "id": "09585976000148",
+      "kind": "company",
+      "label": "HDR Administradora de Bens Ltda"
+    },
+    {
+      "id": "38828979000163",
+      "kind": "company",
+      "label": "HSG Gestão Ltda"
+    },
+    {
+      "id": "08601978000110",
+      "kind": "company",
+      "label": "Heidi Behnke Administradora Ltda"
+    },
+    {
+      "id": "10607167000179",
+      "kind": "company",
+      "label": "Helana Administradora Ltda"
+    },
+    {
+      "id": "x-inbev-belgium-bv",
+      "kind": "company",
+      "label": "InBev Belgium BV"
+    },
+    {
+      "id": "x-inpar-investment-fund",
+      "kind": "company",
+      "label": "Inpar Investment Fund"
+    },
+    {
+      "id": "x-inpar-vof",
+      "kind": "company",
+      "label": "Inpar VOF"
+    },
+    {
+      "id": "06614548000108",
+      "kind": "company",
+      "label": "Interbrew International BV"
+    },
+    {
+      "id": "08710197000164",
+      "kind": "company",
+      "label": "Katia da Silva Bartsch Administradora Ltda"
+    },
+    {
+      "id": "26610316000199",
+      "kind": "company",
+      "label": "LIPEJU Participações Ltda"
+    },
+    {
+      "id": "11248565000109",
+      "kind": "company",
+      "label": "LWB Administradora Eireli"
+    },
+    {
+      "id": "10630627000180",
+      "kind": "company",
+      "label": "Lenox Administradora Ltda"
+    },
+    {
+      "id": "x-mchtco-limited",
+      "kind": "company",
+      "label": "MCHTCO Limited"
+    },
+    {
+      "id": "08605191000127",
+      "kind": "company",
+      "label": "Martin Werninghaus Administradora Ltda"
+    },
+    {
+      "id": "08649305000130",
+      "kind": "company",
+      "label": "Miriam Voigt Schwartz Administradora Ltda"
+    },
+    {
+      "id": "08647713000153",
+      "kind": "company",
+      "label": "Márcia da Silva Petry Administradora Ltda"
+    },
+    {
+      "id": "x-olia-2-ag",
+      "kind": "company",
+      "label": "Olia 2 AG"
+    },
+    {
+      "id": "x-olia-2-trust",
+      "kind": "company",
+      "label": "Olia 2 Trust"
+    },
+    {
+      "id": "outros-07526557",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-84429695",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "59046322000114",
+      "kind": "company",
+      "label": "PAULO TREJES ADMINISTRADORA LTDA"
+    },
+    {
+      "id": "26621312000106",
+      "kind": "company",
+      "label": "Pender Participações Ltda"
+    },
+    {
+      "id": "x-s-br-global-investments-limited",
+      "kind": "company",
+      "label": "S-BR Global Investments Limited"
+    },
+    {
+      "id": "26685320000116",
+      "kind": "company",
+      "label": "SWJ Participações Ltda"
+    },
+    {
+      "id": "x-santa-erika-ltd",
+      "kind": "company",
+      "label": "Santa Erika Ltd."
+    },
+    {
+      "id": "x-santa-heloisa-ltd",
+      "kind": "company",
+      "label": "Santa Heloisa Ltd."
+    },
+    {
+      "id": "x-santa-paciencia-ltd",
+      "kind": "company",
+      "label": "Santa Paciência Ltd."
+    },
+    {
+      "id": "09370501000134",
+      "kind": "company",
+      "label": "Si Voigt Administradora Ltda"
+    },
+    {
+      "id": "08680120000199",
+      "kind": "company",
+      "label": "Solange da Silva Janssen Administradora Ltda"
+    },
+    {
+      "id": "x-stichting-anheuser-busch-inbev",
+      "kind": "company",
+      "label": "Stichting Anheuser-Busch InBev"
+    },
+    {
+      "id": "10629546000160",
+      "kind": "company",
+      "label": "Tamaris Administradora Ltda"
+    },
+    {
+      "id": "08649342000149",
+      "kind": "company",
+      "label": "Tania Marisa da Silva Administradora Ltda"
+    },
+    {
+      "id": "08655197000109",
+      "kind": "company",
+      "label": "Valsi Voigt Administradora Ltda"
+    },
+    {
+      "id": "26637646000178",
+      "kind": "company",
+      "label": "Ventura Participações Ltda"
+    },
+    {
+      "id": "09414489000112",
+      "kind": "company",
+      "label": "Voigt Schwartz Administradora Ltda"
+    },
+    {
+      "id": "83489963000128",
+      "kind": "company",
+      "label": "WPA Participações e Serviços S.A."
+    },
+    {
+      "id": "20783246000194",
+      "kind": "company",
+      "label": "Watercolor Participações Ltda"
+    },
+    {
+      "id": "09420817000193",
+      "kind": "company",
+      "label": "Wernin Administradora Ltda"
+    },
+    {
+      "id": "26610323000190",
+      "kind": "company",
+      "label": "ZZS Administradora Ltda"
+    },
+    {
+      "id": "p-abccab28",
+      "kind": "person",
+      "label": "ALBERTO DA SILVA GEFFERT"
+    },
+    {
+      "id": "p-cbb7fdd7",
+      "kind": "person",
+      "label": "AMELIE VOIGT TREJES"
+    },
+    {
+      "id": "p-835a4a65",
+      "kind": "person",
+      "label": "ANA FLÁVIA DA SILVA PETRY"
+    },
+    {
+      "id": "p-d3cc9ed4",
+      "kind": "person",
+      "label": "ANNE MARIE WERNINGHAUS"
+    },
+    {
+      "id": "p-4cc09360",
+      "kind": "person",
+      "label": "ARTHUR RAINUI PEIXER BEHNKE"
+    },
+    {
+      "id": "p-bebcf1da",
+      "kind": "person",
+      "label": "BRUNA DA SILVA BARTSCH LANGSCH"
+    },
+    {
+      "id": "p-ff819c3f",
+      "kind": "person",
+      "label": "BRUNO WERNINGHAUS DE CARVALHO"
+    },
+    {
+      "id": "p-ed3f85fd",
+      "kind": "person",
+      "label": "CARLOS ALBERTO DA VEIGA SICUPIRA"
+    },
+    {
+      "id": "p-31bac9d8",
+      "kind": "person",
+      "label": "CLÁUDIO WILSON PEREIRA DE ASSIS"
+    },
+    {
+      "id": "p-4434558b",
+      "kind": "person",
+      "label": "CLÉCIO FÁBIO ZUCCO"
+    },
+    {
+      "id": "p-6ae2426d",
+      "kind": "person",
+      "label": "DANIEL RICARDO BEHNKE"
+    },
+    {
+      "id": "p-5cde9c56",
+      "kind": "person",
+      "label": "DAVI RICARDO BEHNKE"
+    },
+    {
+      "id": "p-11f498af",
+      "kind": "person",
+      "label": "DIETHER WERNINGHAUS"
+    },
+    {
+      "id": "p-2bb4f2eb",
+      "kind": "person",
+      "label": "DORA VOIGT DE ASSIS"
+    },
+    {
+      "id": "p-e8022ca0",
+      "kind": "person",
+      "label": "EDUARDO VOIGT SCHWARTZ"
+    },
+    {
+      "id": "p-a1a9881b",
+      "kind": "person",
+      "label": "EDUARDO WERNINGHAUS"
+    },
+    {
+      "id": "p-d02bceb2",
+      "kind": "person",
+      "label": "FELIPE VOIGT TREJES"
+    },
+    {
+      "id": "p-894d72f9",
+      "kind": "person",
+      "label": "FLORA TREJES"
+    },
+    {
+      "id": "p-4fb39d12",
+      "kind": "person",
+      "label": "GERD DA SILVA WERNINGHAUS"
+    },
+    {
+      "id": "p-5a0a21d8",
+      "kind": "person",
+      "label": "HEIDI BEHNKE"
+    },
+    {
+      "id": "p-dd3cf03b",
+      "kind": "person",
+      "label": "HELENA MARINA DA SILVA PETRY"
+    },
+    {
+      "id": "p-a99f0348",
+      "kind": "person",
+      "label": "HENRIQUE DA SILVA GEFFERT"
+    },
+    {
+      "id": "p-edaa3573",
+      "kind": "person",
+      "label": "JOANA ZIMMERMANN DA SILVA"
+    },
+    {
+      "id": "p-aa39c8e3",
+      "kind": "person",
+      "label": "JOAQUIM WERNINGHAUS TAVARES"
+    },
+    {
+      "id": "p-84b28972",
+      "kind": "person",
+      "label": "JORGE PAULO LEMANN"
+    },
+    {
+      "id": "p-7c6eb583",
+      "kind": "person",
+      "label": "JÚLIA DA SILVA GEFFERT DE OLIVEIRA"
+    },
+    {
+      "id": "p-32dad2d4",
+      "kind": "person",
+      "label": "LILIAN DA SILVA WERNINGHAUS"
+    },
+    {
+      "id": "p-6268ea61",
+      "kind": "person",
+      "label": "LIVIA VOIGT"
+    },
+    {
+      "id": "p-d91896df",
+      "kind": "person",
+      "label": "LUISA WERNINGHAUS BERNOLDI"
+    },
+    {
+      "id": "p-282759a0",
+      "kind": "person",
+      "label": "MAIA PEIXER BEHNKE"
+    },
+    {
+      "id": "p-76790c38",
+      "kind": "person",
+      "label": "MARIANA VOIGT SCHWARTZ GOMES"
+    },
+    {
+      "id": "p-fad7000a",
+      "kind": "person",
+      "label": "MARIANA WERNINGHAUS DE CARVALHO"
+    },
+    {
+      "id": "p-608cdb5e",
+      "kind": "person",
+      "label": "MAX VAN HOEGAERDEN HERRMANN TELLES"
+    },
+    {
+      "id": "p-076d45ba",
+      "kind": "person",
+      "label": "MELISSA WERNINGHAUS"
+    },
+    {
+      "id": "p-eb101ae8",
+      "kind": "person",
+      "label": "PAULA DA SILVA JANSSEN"
+    },
+    {
+      "id": "p-beb48096",
+      "kind": "person",
+      "label": "PAULO DARIO PARANHOS TREJES"
+    },
+    {
+      "id": "p-6ef9cde6",
+      "kind": "person",
+      "label": "PAULO TREJES"
+    },
+    {
+      "id": "p-9da277e0",
+      "kind": "person",
+      "label": "PEDRO VOIGT TREJES"
+    },
+    {
+      "id": "p-518695aa",
+      "kind": "person",
+      "label": "PEDRO WERNINGHAUS DE CARVALHO"
+    },
+    {
+      "id": "p-d09d0ee6",
+      "kind": "person",
+      "label": "RENATA DA SILVA JANSSEN DECKER"
+    },
+    {
+      "id": "p-3ecbbd0d",
+      "kind": "person",
+      "label": "RENATO RICARDO BEHNKE"
+    },
+    {
+      "id": "p-4cda88be",
+      "kind": "person",
+      "label": "RICARDO BARTSCH FILHO"
+    },
+    {
+      "id": "p-456b3f14",
+      "kind": "person",
+      "label": "RICARDO WERNINGHAUS"
+    },
+    {
+      "id": "p-d96d26db",
+      "kind": "person",
+      "label": "ROSELI WERNINGHAUS"
+    },
+    {
+      "id": "p-7152d85a",
+      "kind": "person",
+      "label": "TANIA MARISA DA SILVA"
+    },
+    {
+      "id": "p-98140f41",
+      "kind": "person",
+      "label": "THEO WERNINGHAUS TAVARES"
+    },
+    {
+      "id": "p-e685cd09",
+      "kind": "person",
+      "label": "THOMAS WERNINGHAUS TAVARES"
+    },
+    {
+      "id": "p-f48ec877",
+      "kind": "person",
+      "label": "VALSI VOIGT"
+    },
+    {
+      "id": "p-f3bdf8a1",
+      "kind": "person",
+      "label": "VITOR WERNINGHAUS DE CARVALHO"
+    },
+    {
+      "id": "p-cf17dea2",
+      "kind": "person",
+      "label": "WALTER JANSSEN NETO"
+    },
+    {
+      "id": "p-f5bde2d4",
+      "kind": "person",
+      "label": "ZAIRA ZIMMERMANN DA SILVA FERNANDES"
     }
   ],
   "edges": [
@@ -6397,6 +7002,1390 @@
       "source": "FRE Raízen 160866",
       "pct_capital": 100.0,
       "pct_votos": 100.0
+    },
+    {
+      "from": "09370501000134",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.669,
+      "pct_votos": 1.669
+    },
+    {
+      "from": "09414489000112",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.789,
+      "pct_votos": 1.789
+    },
+    {
+      "from": "09420817000193",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.72,
+      "pct_votos": 0.72
+    },
+    {
+      "from": "09420895000198",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.685,
+      "pct_votos": 1.685
+    },
+    {
+      "from": "09559591000106",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.294,
+      "pct_votos": 0.294
+    },
+    {
+      "from": "20783246000194",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.2,
+      "pct_votos": 0.2
+    },
+    {
+      "from": "26610310000111",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.158,
+      "pct_votos": 1.158
+    },
+    {
+      "from": "26610316000199",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.211,
+      "pct_votos": 0.211
+    },
+    {
+      "from": "26610320000157",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.211,
+      "pct_votos": 0.211
+    },
+    {
+      "from": "26610323000190",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.144,
+      "pct_votos": 1.144
+    },
+    {
+      "from": "26621312000106",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 1.218,
+      "pct_votos": 1.218
+    },
+    {
+      "from": "26685320000116",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.926,
+      "pct_votos": 0.926
+    },
+    {
+      "from": "38828979000163",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.155,
+      "pct_votos": 0.155
+    },
+    {
+      "from": "59046322000114",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.035,
+      "pct_votos": 0.035
+    },
+    {
+      "from": "80952849000102",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.006,
+      "pct_votos": 0.006
+    },
+    {
+      "from": "80957384000174",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.994,
+      "pct_votos": 0.994
+    },
+    {
+      "from": "83489963000128",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.088,
+      "pct_votos": 50.088
+    },
+    {
+      "from": "outros-84429695",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 34.796,
+      "pct_votos": 34.796
+    },
+    {
+      "from": "p-076d45ba",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.005,
+      "pct_votos": 0.005
+    },
+    {
+      "from": "p-11f498af",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.487,
+      "pct_votos": 0.487
+    },
+    {
+      "from": "p-282759a0",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.003,
+      "pct_votos": 0.003
+    },
+    {
+      "from": "p-2bb4f2eb",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.203,
+      "pct_votos": 0.203
+    },
+    {
+      "from": "p-31bac9d8",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.008,
+      "pct_votos": 0.008
+    },
+    {
+      "from": "p-32dad2d4",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.008,
+      "pct_votos": 0.008
+    },
+    {
+      "from": "p-3ecbbd0d",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.044,
+      "pct_votos": 0.044
+    },
+    {
+      "from": "p-4434558b",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.011,
+      "pct_votos": 0.011
+    },
+    {
+      "from": "p-4cc09360",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.003,
+      "pct_votos": 0.003
+    },
+    {
+      "from": "p-4fb39d12",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.008,
+      "pct_votos": 0.008
+    },
+    {
+      "from": "p-518695aa",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-5cde9c56",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.085,
+      "pct_votos": 0.085
+    },
+    {
+      "from": "p-6268ea61",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.02,
+      "pct_votos": 0.02
+    },
+    {
+      "from": "p-6ae2426d",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.081,
+      "pct_votos": 0.081
+    },
+    {
+      "from": "p-7152d85a",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-76790c38",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.172,
+      "pct_votos": 0.172
+    },
+    {
+      "from": "p-7c6eb583",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.222,
+      "pct_votos": 0.222
+    },
+    {
+      "from": "p-98140f41",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-9da277e0",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.126,
+      "pct_votos": 0.126
+    },
+    {
+      "from": "p-a99f0348",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.066,
+      "pct_votos": 0.066
+    },
+    {
+      "from": "p-aa39c8e3",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-abccab28",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.222,
+      "pct_votos": 0.222
+    },
+    {
+      "from": "p-cbb7fdd7",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.126,
+      "pct_votos": 0.126
+    },
+    {
+      "from": "p-cf17dea2",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.102,
+      "pct_votos": 0.102
+    },
+    {
+      "from": "p-d02bceb2",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.126,
+      "pct_votos": 0.126
+    },
+    {
+      "from": "p-d09d0ee6",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-d91896df",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.203,
+      "pct_votos": 0.203
+    },
+    {
+      "from": "p-d96d26db",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.154,
+      "pct_votos": 0.154
+    },
+    {
+      "from": "p-e685cd09",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-e8022ca0",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.172,
+      "pct_votos": 0.172
+    },
+    {
+      "from": "p-eb101ae8",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-f3bdf8a1",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-ff819c3f",
+      "to": "84429695000111",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "tesouraria-84429695",
+      "to": "84429695000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.035,
+      "pct_votos": 0.035
+    },
+    {
+      "from": "06250266000179",
+      "to": "07526557000100",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 8.316,
+      "pct_votos": 8.316
+    },
+    {
+      "from": "06614548000108",
+      "to": "07526557000100",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 54.516,
+      "pct_votos": 54.516
+    },
+    {
+      "from": "60480480000167",
+      "to": "07526557000100",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 10.397,
+      "pct_votos": 10.397
+    },
+    {
+      "from": "outros-07526557",
+      "to": "07526557000100",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 26.33,
+      "pct_votos": 26.33
+    },
+    {
+      "from": "tesouraria-07526557",
+      "to": "07526557000100",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 0.44,
+      "pct_votos": 0.44
+    },
+    {
+      "from": "x-anheuser-busch-inbev-sa-nv",
+      "to": "06250266000179",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-abi-inve-holding-ltd-uk19",
+      "to": "06614548000108",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-5cde9c56",
+      "to": "08601978000110",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-6ae2426d",
+      "to": "08601978000110",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-456b3f14",
+      "to": "08605191000127",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-fad7000a",
+      "to": "08605191000127",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-835a4a65",
+      "to": "08647713000153",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-dd3cf03b",
+      "to": "08647713000153",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-76790c38",
+      "to": "08649305000130",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-e8022ca0",
+      "to": "08649305000130",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-7c6eb583",
+      "to": "08649342000149",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-a99f0348",
+      "to": "08649342000149",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-abccab28",
+      "to": "08649342000149",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-edaa3573",
+      "to": "08649347000171",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-f5bde2d4",
+      "to": "08649347000171",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-2bb4f2eb",
+      "to": "08655197000109",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-6268ea61",
+      "to": "08655197000109",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-32dad2d4",
+      "to": "08680015000150",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-4fb39d12",
+      "to": "08680015000150",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-d3cc9ed4",
+      "to": "08680015000150",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-a1a9881b",
+      "to": "08680096000198",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-d91896df",
+      "to": "08680096000198",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-d09d0ee6",
+      "to": "08680120000199",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-eb101ae8",
+      "to": "08680120000199",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-9da277e0",
+      "to": "08703890000100",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-cbb7fdd7",
+      "to": "08703890000100",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-d02bceb2",
+      "to": "08703890000100",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-4cda88be",
+      "to": "08710197000164",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-bebcf1da",
+      "to": "08710197000164",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-2bb4f2eb",
+      "to": "09370501000134",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 6.829,
+      "pct_votos": 6.829
+    },
+    {
+      "from": "p-6268ea61",
+      "to": "09370501000134",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 6.829,
+      "pct_votos": 6.829
+    },
+    {
+      "from": "p-f48ec877",
+      "to": "09370501000134",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 86.342,
+      "pct_votos": 86.342
+    },
+    {
+      "from": "p-456b3f14",
+      "to": "09420817000193",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-fad7000a",
+      "to": "09420817000193",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-9da277e0",
+      "to": "09420895000198",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-cbb7fdd7",
+      "to": "09420895000198",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-d02bceb2",
+      "to": "09420895000198",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-a1a9881b",
+      "to": "09559591000106",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-5cde9c56",
+      "to": "09585976000148",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-6ae2426d",
+      "to": "09585976000148",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-835a4a65",
+      "to": "10607167000179",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-dd3cf03b",
+      "to": "10607167000179",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-7c6eb583",
+      "to": "10629546000160",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-a99f0348",
+      "to": "10629546000160",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-abccab28",
+      "to": "10629546000160",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-4cda88be",
+      "to": "10630627000180",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-bebcf1da",
+      "to": "10630627000180",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-edaa3573",
+      "to": "10649623000143",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-f5bde2d4",
+      "to": "10649623000143",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-d91896df",
+      "to": "11248565000109",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-d09d0ee6",
+      "to": "20783246000194",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-eb101ae8",
+      "to": "20783246000194",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "10607167000179",
+      "to": "26610310000111",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10629546000160",
+      "to": "26610316000199",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10629546000160",
+      "to": "26610320000157",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10649623000143",
+      "to": "26610323000190",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10630627000180",
+      "to": "26621312000106",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "09585976000148",
+      "to": "26637646000178",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 91.606,
+      "pct_votos": 91.606
+    },
+    {
+      "from": "p-5a0a21d8",
+      "to": "26637646000178",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 8.394,
+      "pct_votos": 8.394
+    },
+    {
+      "from": "20783246000194",
+      "to": "26685320000116",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-a99f0348",
+      "to": "38828979000163",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-6ef9cde6",
+      "to": "59046322000114",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-894d72f9",
+      "to": "59046322000114",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-beb48096",
+      "to": "59046322000114",
+      "kind": "person_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 99.999,
+      "pct_votos": 99.999
+    },
+    {
+      "from": "08601978000110",
+      "to": "80952849000102",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "08605191000127",
+      "to": "80952849000102",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "08680015000150",
+      "to": "80952849000102",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "08680096000198",
+      "to": "80952849000102",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "08647713000153",
+      "to": "80957384000174",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "08649342000149",
+      "to": "80957384000174",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "08649347000171",
+      "to": "80957384000174",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "08680120000199",
+      "to": "80957384000174",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "08710197000164",
+      "to": "80957384000174",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "08649305000130",
+      "to": "80957400000129",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "08655197000109",
+      "to": "80957400000129",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "08703890000100",
+      "to": "80957400000129",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "80952849000102",
+      "to": "83489963000128",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "80957384000174",
+      "to": "83489963000128",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "80957400000129",
+      "to": "83489963000128",
+      "kind": "company_owns",
+      "source": "FRE WEG 160163",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "x-anheuser-busch-inbev-sa-nv",
+      "to": "x-ab-inbev-nederland-holding-bv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 67.624,
+      "pct_votos": 67.624
+    },
+    {
+      "from": "x-inbev-belgium-bv",
+      "to": "x-ab-inbev-nederland-holding-bv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 32.376,
+      "pct_votos": 32.376
+    },
+    {
+      "from": "06250266000179",
+      "to": "x-abel-anheuser-busch-europe-limited",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-abi-uk-holding-2-uk-topco-2",
+      "to": "x-abi-inve-holding-ltd-uk19",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-abel-anheuser-busch-europe-limited",
+      "to": "x-abi-uk-finance",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-ab-inbev-nederland-holding-bv",
+      "to": "x-abi-uk-hold-1-uk-topco-1",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 59.14,
+      "pct_votos": 59.14
+    },
+    {
+      "from": "x-abi-uk-finance",
+      "to": "x-abi-uk-hold-1-uk-topco-1",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 9.243,
+      "pct_votos": 9.243
+    },
+    {
+      "from": "x-anheuser-busch-inbev-sa-nv",
+      "to": "x-abi-uk-hold-1-uk-topco-1",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 27.77,
+      "pct_votos": 27.77
+    },
+    {
+      "from": "x-inbev-belgium-bv",
+      "to": "x-abi-uk-hold-1-uk-topco-1",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 3.846,
+      "pct_votos": 3.846
+    },
+    {
+      "from": "x-abi-uk-hold-1-uk-topco-1",
+      "to": "x-abi-uk-holding-2-uk-topco-2",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-brc-s-a-r-l",
+      "to": "x-anheuser-busch-inbev-sa-nv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 1.306,
+      "pct_votos": 1.306
+    },
+    {
+      "from": "x-eps-s-a",
+      "to": "x-anheuser-busch-inbev-sa-nv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 3.335,
+      "pct_votos": 3.335
+    },
+    {
+      "from": "x-olia-2-ag",
+      "to": "x-anheuser-busch-inbev-sa-nv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 0.013,
+      "pct_votos": 0.013
+    },
+    {
+      "from": "x-stichting-anheuser-busch-inbev",
+      "to": "x-anheuser-busch-inbev-sa-nv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 32.838,
+      "pct_votos": 32.838
+    },
+    {
+      "from": "x-santa-erika-ltd",
+      "to": "x-br-global-investments-gp",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "x-santa-heloisa-ltd",
+      "to": "x-br-global-investments-gp",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "x-santa-paciencia-ltd",
+      "to": "x-br-global-investments-gp",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "x-br-global-investments-gp",
+      "to": "x-br-global-investments-scs",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-br-global-investments-scs",
+      "to": "x-brc-s-a-r-l",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 15.472,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "x-s-br-global-investments-limited",
+      "to": "x-brc-s-a-r-l",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 79.091,
+      "pct_votos": 93.568
+    },
+    {
+      "from": "x-santa-erika-ltd",
+      "to": "x-brc-s-a-r-l",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 3.998,
+      "pct_votos": 4.73
+    },
+    {
+      "from": "x-santa-heloisa-ltd",
+      "to": "x-brc-s-a-r-l",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 1.439,
+      "pct_votos": 1.703
+    },
+    {
+      "from": "x-fs-holdings-limited",
+      "to": "x-ccchhs-holdings-ltd",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-ed3f85fd",
+      "to": "x-fs-holdings-limited",
+      "kind": "person_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-anheuser-busch-inbev-sa-nv",
+      "to": "x-inbev-belgium-bv",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-inpar-vof",
+      "to": "x-inpar-investment-fund",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-84b28972",
+      "to": "x-inpar-vof",
+      "kind": "person_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 99.6,
+      "pct_votos": 99.6
+    },
+    {
+      "from": "p-608cdb5e",
+      "to": "x-mchtco-limited",
+      "kind": "person_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-olia-2-trust",
+      "to": "x-olia-2-ag",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-santa-erika-ltd",
+      "to": "x-s-br-global-investments-limited",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 55.345,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "x-santa-heloisa-ltd",
+      "to": "x-s-br-global-investments-limited",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 19.927,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "x-santa-paciencia-ltd",
+      "to": "x-s-br-global-investments-limited",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 24.728,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "x-inpar-investment-fund",
+      "to": "x-santa-erika-ltd",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-ccchhs-holdings-ltd",
+      "to": "x-santa-heloisa-ltd",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-mchtco-limited",
+      "to": "x-santa-paciencia-ltd",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-brc-s-a-r-l",
+      "to": "x-stichting-anheuser-busch-inbev",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "x-eps-s-a",
+      "to": "x-stichting-anheuser-busch-inbev",
+      "kind": "company_owns",
+      "source": "FRE Ambev 161030",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
     }
   ]
 }
