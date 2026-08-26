@@ -351,11 +351,12 @@ seeds:
         source: STRING
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - cnpj_basico
-            - ticker
-            - classe
-            - preco_date
+          arguments:
+            combination_of_columns:
+              - cnpj_basico
+              - ticker
+              - classe
+              - preco_date
     columns:
       - name: cnpj_basico
         description: 8-digit CNPJ básico (STRING with leading zeros)
@@ -391,7 +392,8 @@ seeds:
   - name: listed_prices_fixture
     description: |
       Listed stock price fixture (FIXTURE/SEED ONLY, NOT LIVE BOLSA).
-      Covers the 31 listed roots published on /grafo plus WEG and Ambev.
+      Covers the verified listed roots published on /grafo plus WEG and Ambev;
+      Claro is absent because it has no listed Bolsa class.
       Quotes and symbols are deterministic test data; quantity still comes exclusively
       from graph_edges listed hops. WEG and Ambev therefore remain absent until a hop
       supplies a quantity. Energisa has two business dates to test append behavior.
