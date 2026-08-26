@@ -89,7 +89,7 @@ describe('Índice search classify helper (issue #149)', () => {
     const result = classifyIndiceQuery('record', grafo.nodes, minted);
     expect(result.kind).toBe('ficha');
     expect(result.href).toBe(`/empresa/${RECORD_ID}/`);
-    expect(grafo.nodes.some((node) => node.id === RECORD_ID)).toBe(false);
+    expect(grafo.nodes.some((node) => node.id === RECORD_ID)).toBe(true);
   });
 
   it('Ache partner-only / Guilherme Mexias Ache classifies as not in the archive', () => {

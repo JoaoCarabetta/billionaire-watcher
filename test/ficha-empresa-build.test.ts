@@ -133,12 +133,16 @@ describe('Built /empresa/ fichas and sitemap (issue #148)', () => {
   it('does not nest Dexco under Votorantim and does not label a Dexco page as Votorantim', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     expect(fs.existsSync(path.join(distPath, 'empresa', 'votorantim', 'dexco', 'index.html'))).toBe(false);
+    const dexcoPath = empresaDistPath(distPath, '97837181000147');
+    expect(fs.existsSync(dexcoPath), 'Dexco listed seed ficha must exist on its own id').toBe(true);
+    const dexcoHtml = fs.readFileSync(dexcoPath, 'utf-8');
+    expect(dexcoHtml, 'Dexco must not be filed as Votorantim').not.toMatch(/Votorantim/i);
     const empresaRoot = path.join(distPath, 'empresa');
     if (fs.existsSync(empresaRoot)) {
       for (const entry of fs.readdirSync(empresaRoot)) {
         const htmlPath = path.join(empresaRoot, entry, 'index.html');
         if (!fs.existsSync(htmlPath)) continue;
-        if (!/dexco/i.test(entry)) continue;
+        if (!/dexco/i.test(entry) && entry !== '97837181000147') continue;
         const html = fs.readFileSync(htmlPath, 'utf-8');
         expect(html, 'Dexco must not be filed as Votorantim').not.toMatch(/Votorantim/i);
       }

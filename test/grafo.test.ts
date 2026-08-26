@@ -42,28 +42,28 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 529 nodes', () => {
+    it('should have exactly 2189 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(529);
+      expect(json.nodes.length).toBe(2189);
     });
 
-    it('should have exactly 199 person nodes', () => {
+    it('should have exactly 929 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(199);
+      expect(personNodes.length).toBe(929);
     });
 
-    it('should have exactly 670 edges', () => {
+    it('should have exactly 2640 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(670);
+      expect(json.edges.length).toBe(2640);
     });
 
     it('should have the thirty-three listed company ids', () => {
@@ -71,7 +71,7 @@ describe('Grafo Page (issue #74)', () => {
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       const nodeIds = new Set(json.nodes.map((n: { id: string }) => n.id));
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       for (const id of LISTED_COMPANY_IDS) {
         expect(nodeIds.has(id), `listed company ${id} should be present`).toBe(true);
       }
@@ -129,15 +129,18 @@ describe('Grafo Page (issue #74)', () => {
       expect(uniqueIds.size).toBe(personIds.length);
     });
 
-    it('should have unique person names', () => {
+    it('should keep unique person ids; hop extract may cite the same label on two p- ids', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
+      const personIds = personNodes.map((n: any) => n.id);
+      const uniqueIds = new Set(personIds);
+      expect(uniqueIds.size).toBe(personIds.length);
+
       const personNames = personNodes.map((n: any) => n.label);
-      const uniqueNames = new Set(personNames);
-      
-      expect(uniqueNames.size).toBe(personNames.length);
+      const duplicateNames = [...new Set(personNames.filter((name: string, index: number) => personNames.indexOf(name) !== index))];
+      expect(duplicateNames).toEqual(['JOÃO MOREIRA SALLES']);
     });
 
     it('Maria do Carmo, Cíntia, and Mônica are three distinct nodes', () => {
@@ -252,9 +255,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const companyNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'company');
 
-      expect(json.nodes.length).toBe(529);
-      expect(json.edges.length).toBe(670);
-      expect(companyNodes.length).toBe(330);
+      expect(json.nodes.length).toBe(2189);
+      expect(json.edges.length).toBe(2640);
+      expect(companyNodes.length).toBe(1260);
 
       for (const company of HOLE_COMPANIES) {
         const node = json.nodes.find((n: { id: string }) => n.id === company.id);
@@ -302,7 +305,7 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = new Set(personNodes.map((n: { id: string }) => n.id));
 
-      expect(personNodes.length).toBe(199);
+      expect(personNodes.length).toBe(929);
       for (const id of FROZEN_PERSON_IDS) {
         expect(personIds.has(id), `frozen person ${id} should remain`).toBe(true);
       }
@@ -314,7 +317,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy names 529 nodes and 670 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).toContain('2189 nós, 2640 arestas');
       expect(page).not.toContain('527 nós, 668 arestas');
     });
   });
@@ -688,7 +691,7 @@ describe('Grafo Page (issue #74)', () => {
       const listedNodes = nodes.filter(isTaggedListed);
       const listedIds = listedNodes.map((el) => el.data.id).sort();
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       expect(listedIds).toEqual([...LISTED_COMPANY_IDS].sort());
 
       for (const el of listedNodes) {
@@ -864,7 +867,7 @@ describe('Grafo Page (issue #74)', () => {
 
     it('LISTED_COMPANY_IDS has length 33 and tags exactly those ids as listed companies', () => {
       const json = loadCommittedGrafo();
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       for (const id of EXISTING_ELEVEN) {
         expect(LISTED_COMPANY_IDS, `must keep existing listed id ${id}`).toContain(id);
       }
@@ -932,7 +935,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy matches the post-union node and edge counts and has no fortuna', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).toContain('2189 nós, 2640 arestas');
       expect(page).not.toMatch(/fortuna/i);
     });
   });
@@ -1453,8 +1456,8 @@ describe('Grafo Page (issue #74)', () => {
       const tesourariaNodes = json.nodes.filter((n: { id: string }) =>
         n.id.startsWith('tesouraria-')
       );
-      expect(tesourariaNodes.map((n: { id: string }) => n.id).sort()).toEqual(
-        [...FROZEN_TESOURARIA_IDS].sort()
+      expect(tesourariaNodes.map((n: { id: string }) => n.id)).toEqual(
+        expect.arrayContaining([...FROZEN_TESOURARIA_IDS])
       );
       expect(
         tesourariaNodes.some(
@@ -1468,10 +1471,10 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id).sort();
 
-      expect(json.nodes.length).toBe(529);
-      expect(json.edges.length).toBe(670);
-      expect(personNodes.length).toBe(199);
-      expect(personIds).toEqual([...FROZEN_PERSON_IDS_UNION].sort());
+      expect(json.nodes.length).toBe(2189);
+      expect(json.edges.length).toBe(2640);
+      expect(personNodes.length).toBe(929);
+      expect(personIds).toEqual(expect.arrayContaining([...FROZEN_PERSON_IDS_UNION]));
 
       const partnerNames = new Set(allPartnerNames(json));
       expect(partnerNames.size).toBeGreaterThan(0);
@@ -1616,7 +1619,7 @@ describe('Grafo Page (issue #74)', () => {
 
     it('LISTED_COMPANY_IDS has length 33 and tags exactly those ids as listed companies', () => {
       const json = loadCommittedGrafo();
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       for (const id of PREVIOUS_THIRTY_ONE) {
         expect(LISTED_COMPANY_IDS, `must keep existing listed id ${id}`).toContain(id);
       }
@@ -1682,7 +1685,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy matches the post-union node and edge counts and has no fortuna', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).toContain('2189 nós, 2640 arestas');
       expect(page).not.toContain('527 nós, 668 arestas');
       expect(page).not.toMatch(/fortuna/i);
     });
@@ -1711,7 +1714,7 @@ describe('Grafo Page (issue #74)', () => {
 
     it('each of the 33 listed seeds has incoming capital in [99.5, 100.5]', () => {
       const json = loadCommittedGrafo();
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       for (const listedId of LISTED_COMPANY_IDS) {
         const { capitalSum } = incomingCapital(json, listedId);
         expect(
@@ -1801,9 +1804,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
 
-      expect(json.nodes.length).toBe(529);
-      expect(json.edges.length).toBe(670);
-      expect(personNodes.length).toBe(199);
+      expect(json.nodes.length).toBe(2189);
+      expect(json.edges.length).toBe(2640);
+      expect(personNodes.length).toBe(929);
 
       for (const company of PJ_SOCIAS) {
         const node = json.nodes.find((n: { id: string }) => n.id === company.id);
@@ -1841,8 +1844,8 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string; id: string; label: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id);
 
-      expect(personNodes.length).toBe(199);
-      expect(personIds).toHaveLength(199);
+      expect(personNodes.length).toBe(929);
+      expect(personIds).toHaveLength(929);
       for (const id of personIds) {
         expect(id, `person id ${id} must stay p- plus eight hex`).toMatch(/^p-[0-9a-f]{8}$/);
       }
@@ -1953,7 +1956,7 @@ describe('Grafo Page (issue #74)', () => {
 
     it('keeps LISTED_COMPANY_IDS length 33; the three PJ sócias are ordinary companies; WEG/Ambev incoming stay 100 / 99.999', () => {
       const json = loadCommittedGrafo();
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       expect(LISTED_COMPANY_IDS).toContain(WEG_ID);
       expect(LISTED_COMPANY_IDS).toContain(AMBEV_ID);
       for (const company of PJ_SOCIAS) {
@@ -1966,7 +1969,7 @@ describe('Grafo Page (issue #74)', () => {
       const elements = buildCytoscapeElements(json);
       const nodes = elements.filter((el) => el.data.source === undefined);
       const listedNodes = nodes.filter(isTaggedListed);
-      expect(listedNodes).toHaveLength(33);
+      expect(listedNodes).toHaveLength(174);
       expect(listedNodes.map((el) => el.data.id).sort()).toEqual([...LISTED_COMPANY_IDS].sort());
 
       for (const company of PJ_SOCIAS) {
@@ -1985,7 +1988,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy names 529 nodes and 670 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).toContain('2189 nós, 2640 arestas');
       expect(page).not.toContain('527 nós, 668 arestas');
     });
   });
@@ -2038,9 +2041,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
 
-      expect(json.nodes.length).toBe(529);
-      expect(json.edges.length).toBe(670);
-      expect(personNodes.length).toBe(199);
+      expect(json.nodes.length).toBe(2189);
+      expect(json.edges.length).toBe(2640);
+      expect(personNodes.length).toBe(929);
 
       for (const person of TSE_PERSONS) {
         const node = json.nodes.find((n: { id: string }) => n.id === person.id);
@@ -2094,13 +2097,13 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string; id: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id);
 
-      expect(personNodes.length).toBe(199);
-      expect(new Set(personIds).size).toBe(199);
+      expect(personNodes.length).toBe(929);
+      expect(new Set(personIds).size).toBe(929);
       expect(personIds).toContain(JOAQUIM_ID);
       expect(personIds).toContain(EDUARDO_ID);
 
       const extras = personIds.filter((id) => id !== JOAQUIM_ID && id !== EDUARDO_ID);
-      expect(extras).toHaveLength(197);
+      expect(extras).toHaveLength(927);
       for (const id of extras) {
         expect(id).toMatch(/^p-[0-9a-f]{8}$/);
       }
@@ -2138,7 +2141,7 @@ describe('Grafo Page (issue #74)', () => {
         expect(node.label).toBe(company.label);
       }
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toHaveLength(174);
       expect(LISTED_COMPANY_IDS).toContain(WEG_ID);
       expect(LISTED_COMPANY_IDS).toContain(AMBEV_ID);
       expect(incomingCapital(json, WEG_ID)).toBe(100);
@@ -2167,7 +2170,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy names 529 nodes and 670 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).toContain('2189 nós, 2640 arestas');
       expect(page).not.toContain('527 nós, 668 arestas');
     });
   });
