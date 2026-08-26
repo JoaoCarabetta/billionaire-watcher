@@ -36,12 +36,12 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 102 nodes', () => {
+    it('should have exactly 111 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(102);
+      expect(json.nodes.length).toBe(111);
     });
 
     it('should have exactly 33 person nodes', () => {
@@ -52,12 +52,12 @@ describe('Grafo Page (issue #74)', () => {
       expect(personNodes.length).toBe(33);
     });
 
-    it('should have exactly 121 edges', () => {
+    it('should have exactly 130 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(121);
+      expect(json.edges.length).toBe(130);
     });
 
     it('should have the eleven listed company ids', () => {
@@ -168,6 +168,150 @@ describe('Grafo Page (issue #74)', () => {
       const uniquePairs = new Set(edgePairs);
       
       expect(uniquePairs.size).toBe(edgePairs.length);
+    });
+  });
+
+  describe('Test (issue #93): nine vehicle QSA hole edges', () => {
+    const MMS_ID = '08542030000131';
+    const MULTISETOR_ID = '20286787000107';
+    const JSP_ID = '32392209000134';
+    const BAD_MAMS_ID = '61563585000107';
+    const HOLE_COMPANIES = [
+      { id: '61563585000142', label: 'MAMS INVESTMENTS LTDA' },
+      { id: '02049012000136', label: 'AURORA TEXTIL LTDA' },
+      { id: '23349343000161', label: 'MULTIAGRO AGROPECUARIA COMERCIO E INDUSTRIA LTDA' },
+      { id: '07544616000172', label: 'RIBEIRA EMPREENDIMENTOS IMOBILIARIOS LTDA' },
+      { id: '39513958000111', label: 'RIBEIRA VENDAS E INTERMEDIACAO IMOBILIARIA LTDA' },
+      { id: '42601461000160', label: 'GREEN HOLDING LTDA' },
+      { id: '43347650000110', label: 'RBRA 6 SPE EMPREENDIMENTO IMOBILIARIO LTDA' },
+      { id: '45278506000103', label: 'RIBEIRA INCORPORACOES IMOBILIARIAS LTDA.' },
+      { id: '58534632000115', label: 'BSIM PARTICIPACOES E HOLDING LTDA' },
+    ] as const;
+    const HOLE_EDGES = [
+      { from: MMS_ID, to: '61563585000142' },
+      { from: MULTISETOR_ID, to: '02049012000136' },
+      { from: MULTISETOR_ID, to: '23349343000161' },
+      { from: JSP_ID, to: '07544616000172' },
+      { from: JSP_ID, to: '39513958000111' },
+      { from: JSP_ID, to: '42601461000160' },
+      { from: JSP_ID, to: '43347650000110' },
+      { from: JSP_ID, to: '45278506000103' },
+      { from: JSP_ID, to: '58534632000115' },
+    ] as const;
+    const FROZEN_PERSON_IDS = [
+      'p-010e2551',
+      'p-02f52298',
+      'p-1282fcb3',
+      'p-1348ab32',
+      'p-134ca0da',
+      'p-392bfe45',
+      'p-3d9739a9',
+      'p-40894d2d',
+      'p-5438e9c8',
+      'p-5a3a3ade',
+      'p-5c6eb6c7',
+      'p-73a733cc',
+      'p-74cd4e86',
+      'p-7636b07f',
+      'p-7f3fc508',
+      'p-7fc3be74',
+      'p-831e3028',
+      'p-848bf0ce',
+      'p-887e054b',
+      'p-8db5e3f1',
+      'p-8f4b2205',
+      'p-a382ee76',
+      'p-a54160d7',
+      'p-a64df172',
+      'p-a8c1e5f9',
+      'p-b7719454',
+      'p-b9db9330',
+      'p-cdbc8c4e',
+      'p-dbf7401a',
+      'p-ea4eb254',
+      'p-f3c190ea',
+      'p-f8603dda',
+      'p-faf6d605',
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function isNumericPercent(value: unknown): boolean {
+      return typeof value === 'number' && Number.isFinite(value);
+    }
+
+    it('adds nine company nodes with the warehouse matriz ids and labels', () => {
+      const json = loadCommittedGrafo();
+      const companyNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'company');
+
+      expect(json.nodes.length).toBe(111);
+      expect(json.edges.length).toBe(130);
+      expect(companyNodes.length).toBe(78);
+
+      for (const company of HOLE_COMPANIES) {
+        const node = json.nodes.find((n: { id: string }) => n.id === company.id);
+        expect(node, `company ${company.id} should exist`).toBeDefined();
+        expect(node.kind).toBe('company');
+        expect(node.label).toBe(company.label);
+      }
+
+      const nodeIds = json.nodes.map((n: { id: string }) => n.id);
+      expect(nodeIds).not.toContain(BAD_MAMS_ID);
+    });
+
+    it('adds nine company_owns hole edges with no numeric percent', () => {
+      const json = loadCommittedGrafo();
+
+      for (const pair of HOLE_EDGES) {
+        const edge = json.edges.find(
+          (e: { from: string; to: string }) => e.from === pair.from && e.to === pair.to
+        );
+        expect(edge, `hole edge ${pair.from} → ${pair.to} should exist`).toBeDefined();
+        expect(edge.kind).toBe('company_owns');
+        expect(
+          isNumericPercent(edge.pct_capital),
+          `hole edge ${pair.from} → ${pair.to} must not have numeric pct_capital`
+        ).toBe(false);
+        expect(
+          isNumericPercent(edge.pct_votos),
+          `hole edge ${pair.from} → ${pair.to} must not have numeric pct_votos`
+        ).toBe(false);
+      }
+    });
+
+    it('names Receita or Quadro de Sócios on the nine hole edges', () => {
+      const json = loadCommittedGrafo();
+
+      for (const pair of HOLE_EDGES) {
+        const edge = json.edges.find(
+          (e: { from: string; to: string }) => e.from === pair.from && e.to === pair.to
+        );
+        expect(edge, `hole edge ${pair.from} → ${pair.to} should exist`).toBeDefined();
+        expect(String(edge.source)).toMatch(/Receita|Quadro de S[oó]cios/);
+        expect(String(edge.source)).toMatch(/2026-01-11/);
+      }
+    });
+
+    it('keeps the same 33 person nodes, including GUSTAVO KOS BOTELH0', () => {
+      const json = loadCommittedGrafo();
+      const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
+      const personIds = personNodes.map((n: { id: string }) => n.id).sort();
+
+      expect(personNodes.length).toBe(33);
+      expect(personIds).toEqual([...FROZEN_PERSON_IDS].sort());
+      expect(
+        personNodes.some((n: { label: string }) => n.label === 'GUSTAVO KOS BOTELH0')
+      ).toBe(true);
+    });
+
+    it('page copy names 111 nodes and 130 edges', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const page = fs.readFileSync(pagePath, 'utf-8');
+      expect(page).toContain('111 nós, 130 arestas');
+      expect(page).not.toContain('102 nós, 121 arestas');
     });
   });
 
