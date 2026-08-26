@@ -53,7 +53,11 @@ partner_rows as (
         socios.documento,
         socios.qualificacao,
         socios.data_entrada_sociedade,
+        {% if target.type == 'duckdb' %}
         cast(null as double) as percent,
+        {% else %}
+        cast(null as float64) as percent,
+        {% endif %}
         count(*) over (partition by socios.cnpj_basico) as partner_count,
         roots.source_query
     from filtered_socios as socios
@@ -69,7 +73,11 @@ empty_rows as (
         cast(null as string) as documento,
         cast(null as string) as qualificacao,
         cast(null as date) as data_entrada_sociedade,
+        {% if target.type == 'duckdb' %}
         cast(null as double) as percent,
+        {% else %}
+        cast(null as float64) as percent,
+        {% endif %}
         0 as partner_count,
         roots.source_query
     from roots_with_query as roots
