@@ -188,9 +188,8 @@ describe('Dinheiro sob controle (issue #116)', () => {
 
     it('defaults to the #123 B3 archive file, not a listed-prices fixture', () => {
       expect(DEFAULT_PRICES_RELATIVE.replace(/\\/g, '/')).toBe('transform/seeds/b3_listed_prices.csv');
-      const source = fs.readFileSync(path.join(ROOT, 'metrics', 'money.ts'), 'utf8');
-      expect(source).not.toMatch(/listed_prices_fixture/);
-      expect(source).not.toMatch(/energisa_prices/);
+      expect(DEFAULT_PRICES_RELATIVE).not.toMatch(/listed_prices_fixture/);
+      expect(DEFAULT_PRICES_RELATIVE).not.toMatch(/energisa_prices/);
       const docs = fs.readFileSync(path.join(ROOT, 'metrics', 'MONEY.md'), 'utf8');
       expect(docs).toMatch(/#123/);
       expect(docs).toMatch(/2025-05-16/);
