@@ -1340,6 +1340,82 @@ unit_tests:
           cast('2026-08-25' as date),
           'Recorded fixture quote + Vale FRE fixture table 6.1'
 
+  - name: test_graph_listed_prices_weg_ambev_and_claro
+    description: |
+      WEG and Ambev produce price rows only when graph_edges supplies their quantities.
+      Claro has a listed-looking hop but no Bolsa quote, so it produces no price row.
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '12345678' as from_id,
+            '84429695' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            125 as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'WEG FRE fixture' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-25' as date) as source_retrieved_at
+          union all
+          select
+            '87654321',
+            '07526557',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            250,
+            cast(null as integer),
+            'Ambev FRE fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '11111111',
+            '07043628',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            500,
+            cast(null as integer),
+            'Claro fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '84429695' as cnpj_basico, 'WEGE3' as ticker, 'ordinaria' as classe, 42.30 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '07526557', 'ABEV3', 'ordinaria', 13.20, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '84429695' as cnpj_basico,
+          'WEGE3' as ticker,
+          'ordinaria' as classe,
+          42.30 as preco,
+          125 as quantidade,
+          5287.50 as produto,
+          cast('2026-08-25' as date) as preco_date,
+          'Recorded fixture quote + WEG FRE fixture table 6.1' as source
+        union all
+        select
+          '07526557',
+          'ABEV3',
+          'ordinaria',
+          13.20,
+          250,
+          3300.00,
+          cast('2026-08-25' as date),
+          'Recorded fixture quote + Ambev FRE fixture table 6.1'
+
   - name: test_graph_listed_prices_product_computed_correctly
     description: |
       Verify product is quantity × price (issue #66).
