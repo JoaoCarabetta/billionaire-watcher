@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
-import { buildPanelView, LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
+import { buildPanelView, LISTED_COMPANY_IDS, renderPanelHtml } from '../src/lib/grafo-panel';
 
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
@@ -1195,6 +1195,304 @@ describe('Grafo Page (issue #74)', () => {
       expect(cited!.pct_votos, 'must not invent pct_votos on a hole path').toBeUndefined();
       expect(cited!.paths[0].pct_capital).toBeUndefined();
       expect(cited!.paths[0].pct_votos).toBeUndefined();
+    });
+  });
+
+  describe('Test (issue #98): gestora partners on the seven nodes', () => {
+    type Partner = {
+      nome: string;
+      qualificacao: string;
+      qualificacao_label: string;
+    };
+
+    const GESTORA_PARTNERS: Record<string, Partner[]> = {
+      '11752203': [
+        { nome: 'ACACIO ROBOREDO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'ANGELA REGINA RODRIGUES DE PAULA FREITAS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'DANILO BREDDA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'EDUARDO CHRISTOVAM GALDI MESTIERI', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'GUILHERME YUITI MIAZAQUI', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'HENRIQUE BREDDA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'LUIZ ALVES PAES DE BARROS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'MARCOS TATSUO YAMAMOTO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'NEY ALEXANDRE MIYAMOTO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'PAULA AKEMI RIBEIRO HIROSE', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'RODRIGO ABUD', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'THIAGO COSTA JACINTO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'WILLIAM CORDEIRO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'YAN RODRIGO DE CARVALHO VIEIRA', qualificacao: '22', qualificacao_label: 'Sócio' },
+      ],
+      '72116353': [
+        { nome: 'ANDRE DE ALMEIDA ROSA SOARES', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'BERNARDO ABREU DA COSTA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'BRUNO DE ARAUJO LIMA ROCHA', qualificacao: '38', qualificacao_label: 'Sócio Pessoa Física Residente No Exterior' },
+        { nome: 'BRUNO HERMES DA FONSECA RUDGE', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA', qualificacao: '63', qualificacao_label: 'Cotas Em Tesouraria' },
+        { nome: 'EDUARDO DE ALMEIDA SANTOS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'EMERSON ADRIANO FERRATO MELO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'FERNANDO JOSE DE OLIVEIRA PIRES DOS SANTOS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'GABRIEL RAPOZO MAROTTI', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'KASSYANA PAULA ALEXANDRA PINAUD', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'LUIZ FELIPE DE ALMEIDA CAMPOS', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'LUIZ ORENSTEIN', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'PEDRO FURTADO MOREIRA MONTEIRO DE BARROS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'THIAGO DI BLASI TEIXEIRA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'TIAGO MOTA MOLISANI FERREIRA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+      ],
+      '41020034': [
+        { nome: 'ANDRE DE CARVALHO FERREIRA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'FLAVIO AUGUSTO DURAN MANZANO', qualificacao: '5', qualificacao_label: 'Administrador' },
+        { nome: 'JOAO DA SILVA FERREIRA NETO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'JOAQUIM DA SILVA FERREIRA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'JULIO DE MORAIS ERSE', qualificacao: '5', qualificacao_label: 'Administrador' },
+      ],
+      '05395883': [
+        { nome: 'ADRIANA CESARIO CARNAVAL', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'ALEXANDRE MUNIZ LISBOA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'ANA CAROLINA DE OLIVEIRA SILVA MOREIRA LIMA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'BRUNO BEIER PALERMO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'BRUNO FERNANDES WAGA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'CARLOS EDUARDO DIAS GOMES', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'CARLOS PACHECO GONCALVES MAXIMINO PEREIRA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'DANIEL VALENTE DANTAS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'DIOGO ALEXANDRE DE MELO BAHIA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'DORIO FERMAN', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'FERNANDO MAURICIO TAVARES GOUVEIA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'GABRIEL MORETTA CHEBAR', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'ITAMAR BENIGNO FILHO', qualificacao: '5', qualificacao_label: 'Administrador' },
+        { nome: 'JULIANA KLAIOM DA SILVEIRA MACHADO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'MARCELO SEIXAS CAVALCANTI DE ALBUQUERQUE', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'MICHEL DAHIS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'NORBERTO AGUIAR TOMAZ', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'OPPORTUNITY PARTNERS PARTICIPACOES LTDA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'SANTA LUZIA COMERCIAL E PARTICIPACOES LTDA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'THIAGO KLAIOM DA SILVEIRA MACHADO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'VERONICA VALENTE DANTAS', qualificacao: '38', qualificacao_label: 'Sócio Pessoa Física Residente No Exterior' },
+        { nome: 'VINICIUS COUTINHO SALDANHA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'VINICIUS GIERKENS FERREIRA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'VIVIANE D ALMEIDA FERREIRA SILVA', qualificacao: '22', qualificacao_label: 'Sócio' },
+      ],
+      '33857830': [
+        { nome: 'ANDRE STRAUSS VASQUES', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'DIOGO ALEXANDRE DE MELO BAHIA', qualificacao: '5', qualificacao_label: 'Administrador' },
+        { nome: 'DORIO FERMAN', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'FELIPE BARROS MAIA VINAGRE', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'FELIPE SANTOS STUDART', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'GABRIEL PICCOLI ARAUJO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'ITAMAR BENIGNO FILHO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'JOAO ANTONIO DE ALBUQUERQUE MEDEIROS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'JOAO CARLOS FRAGA TONON', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'JOAO MANOEL PINHO DE MELLO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'JOAO VICTOR CARRIELLO CELES', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'LUIZA CAVALLEIRO DE MACEDO WEHLING GASPARIAN', qualificacao: '5', qualificacao_label: 'Administrador' },
+        { nome: 'NORBERTO AGUIAR TOMAZ', qualificacao: '5', qualificacao_label: 'Administrador' },
+        { nome: 'OPPORTUNITY HOLDERS PARTICIPACOES LTDA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'PAULO CESAR DO NASCIMENTO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'PEDRO GUEDES ALVES', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'RODRIGO DOMINGUES VINHA FREITAS', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'THIAGO AUDI CASSEB', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'TIAGO DE ALMEIDA NOEL', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'VERONICA VALENTE DANTAS', qualificacao: '38', qualificacao_label: 'Sócio Pessoa Física Residente No Exterior' },
+        { nome: 'VITOR FREITAS LIMA BURJACK', qualificacao: '22', qualificacao_label: 'Sócio' },
+      ],
+      '09267871': [
+        { nome: 'ANTONIO SILVA CORDOVIL', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'BERNARDO FERNANDES DA VEIGA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'EDUARDO COELHO GOMES FERNANDES BASTO', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'EDUARDO VALENTIM DE ARAUJO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'FELIPE DUTRA CANCADO', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'GUILHERME MEXIAS ACHE', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'JOAO CLAUDIO TELLES VIANNA', qualificacao: '22', qualificacao_label: 'Sócio' },
+        { nome: 'LUIS AUGUSTO OLIVEIRA GAMBOA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'LUIS FELIPE SARAMAGO STERN', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'LUIZ MAURICIO DE MIRANDA E SILVA', qualificacao: '49', qualificacao_label: 'Sócio-Administrador' },
+        { nome: 'MARCELO GONZALEZ PASSOS', qualificacao: '22', qualificacao_label: 'Sócio' },
+      ],
+      '14406534': [],
+    };
+
+    const EXPECTED_COUNTS: Record<string, number> = {
+      '11752203': 14,
+      '72116353': 15,
+      '41020034': 5,
+      '05395883': 24,
+      '33857830': 21,
+      '09267871': 11,
+      '14406534': 0,
+    };
+
+    const FROZEN_PERSON_IDS_UNION = [
+      'p-0054a089', 'p-010e2551', 'p-02f52298', 'p-031cab91', 'p-050ee925',
+      'p-06305882', 'p-0f5c431e', 'p-0fab5b2d', 'p-10813f9e', 'p-11e495ad',
+      'p-1282fcb3', 'p-1305d0ba', 'p-1348ab32', 'p-134ca0da', 'p-1459b3e2',
+      'p-147c3c83', 'p-147f9b49', 'p-166c2e76', 'p-16b64a1a', 'p-1b0a077e',
+      'p-1b38d073', 'p-1b487d80', 'p-1d00cce0', 'p-1d9e434d', 'p-1dfdd2d0',
+      'p-1ecc43b8', 'p-1ffa9e7e', 'p-20fd468b', 'p-2491a4ba', 'p-2504f2c4',
+      'p-25fe52ce', 'p-27a7f3ee', 'p-27f97b5a', 'p-29ad3177', 'p-2ab994b8',
+      'p-2ad67f5f', 'p-2bb82ca0', 'p-2c7d71b2', 'p-2cdc324b', 'p-33ab3cce',
+      'p-35b92c94', 'p-3626b31f', 'p-36ac01c2', 'p-392bfe45', 'p-39dcf5fb',
+      'p-3cebed6c', 'p-3d9739a9', 'p-3e6b7d53', 'p-40894d2d', 'p-40f90cbf',
+      'p-43b383b5', 'p-45485941', 'p-4850ff53', 'p-4906483b', 'p-4f3f270f',
+      'p-5438e9c8', 'p-543bce99', 'p-561b3bc9', 'p-582ebdb4', 'p-5a3a3ade',
+      'p-5aebb94f', 'p-5c6eb6c7', 'p-6094b0a0', 'p-611d831b', 'p-617ea2b3',
+      'p-620c94a1', 'p-62540a56', 'p-65d1af58', 'p-6686dd35', 'p-66e24efd',
+      'p-710dd63a', 'p-71c9adb5', 'p-73a733cc', 'p-74b6bde7', 'p-74cd4e86',
+      'p-7636b07f', 'p-793faab4', 'p-7a7bf0bd', 'p-7b86ae04', 'p-7e21753e',
+      'p-7edeec49', 'p-7f3fc508', 'p-7fc3be74', 'p-7fdafcf3', 'p-831e3028',
+      'p-848bf0ce', 'p-859f7d99', 'p-85c0959b', 'p-887e054b', 'p-8db5e3f1',
+      'p-8dd8d5d2', 'p-8e8923a7', 'p-8f4b2205', 'p-8fb82e01', 'p-9e358fc7',
+      'p-9ee93418', 'p-a382ee76', 'p-a54160d7', 'p-a55190d2', 'p-a64df172',
+      'p-a7b24f91', 'p-a8a4e8c0', 'p-a8c1e5f9', 'p-a941080d', 'p-ab5dac7a',
+      'p-ab969513', 'p-b01f59e4', 'p-b33b7ca8', 'p-b57fc592', 'p-b7719454',
+      'p-b9db9330', 'p-babf54a7', 'p-bb882ad3', 'p-bceb16ac', 'p-bd91e3be',
+      'p-c053ac2c', 'p-c42eece6', 'p-c63f4853', 'p-ca22e731', 'p-ca645ca0',
+      'p-cb00e854', 'p-cd7a4b97', 'p-cdbc8c4e', 'p-cf538a76', 'p-d02e2ddd',
+      'p-d49364c9', 'p-d5231da6', 'p-d584d2cc', 'p-d5b7fd2a', 'p-dbce5574',
+      'p-dbf7401a', 'p-dfe70769', 'p-dfef8e07', 'p-e2ecb2dd', 'p-e31b35c3',
+      'p-ea4eb254', 'p-ee7b22d1', 'p-f25ff412', 'p-f3c190ea', 'p-f42e6571',
+      'p-f511f986', 'p-f53dc520', 'p-f5f008f9', 'p-f8603dda', 'p-faf6d605',
+      'p-fffd4a1c',
+    ] as const;
+
+    const FROZEN_TESOURARIA_IDS = [
+      'tesouraria-00864214', 'tesouraria-03220438', 'tesouraria-06057223',
+      'tesouraria-07415333', 'tesouraria-07689002', 'tesouraria-17155730',
+      'tesouraria-33592510', 'tesouraria-34274233', 'tesouraria-43776517',
+      'tesouraria-00001180', 'tesouraria-02558157', 'tesouraria-03853896',
+      'tesouraria-06047087', 'tesouraria-16404287', 'tesouraria-16670085',
+      'tesouraria-24990777', 'tesouraria-33256439', 'tesouraria-33453598',
+      'tesouraria-33611500', 'tesouraria-47960950', 'tesouraria-50746577',
+      'tesouraria-61585865', 'tesouraria-67620377',
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function companyByBasico(json: { nodes: Array<{ id: string }> }, prefix: string) {
+      const matches = json.nodes.filter((n) => n.id.startsWith(prefix));
+      expect(matches, `prefix ${prefix} must match exactly one existing node`).toHaveLength(1);
+      return matches[0] as {
+        id: string;
+        kind: string;
+        label: string;
+        partners?: Partner[];
+      };
+    }
+
+    function allPartnerNames(json: { nodes: Array<{ partners?: Partner[] }> }): string[] {
+      return json.nodes.flatMap((n) => (n.partners ?? []).map((p) => p.nome));
+    }
+
+    it('Alaska 14, Dynamo 15, Nova Futura 5, Opportunity Asset 24, Opportunity HDF 21, Squadra 11, Lazard 0', () => {
+      const json = loadCommittedGrafo();
+      for (const [prefix, count] of Object.entries(EXPECTED_COUNTS)) {
+        const node = companyByBasico(json, prefix);
+        expect(node.kind).toBe('company');
+        expect(Array.isArray(node.partners), `${prefix} must have a partners array`).toBe(true);
+        expect(node.partners, `${prefix} partner count`).toHaveLength(count);
+        expect(node.partners).toEqual(GESTORA_PARTNERS[prefix]);
+        for (const partner of node.partners!) {
+          expect(Object.keys(partner).sort()).toEqual(['nome', 'qualificacao', 'qualificacao_label']);
+          expect(typeof partner.qualificacao).toBe('string');
+          expect(partner).not.toHaveProperty('documento');
+          expect(partner).not.toHaveProperty('percent');
+          expect(partner).not.toHaveProperty('pct_capital');
+          expect(partner).not.toHaveProperty('pct_votos');
+        }
+      }
+    });
+
+    it('Squadra partners include GUILHERME MEXIAS ACHE as Sócio-Administrador and the panel HTML lists both', () => {
+      const json = loadCommittedGrafo();
+      const squadra = companyByBasico(json, '09267871');
+      const ache = squadra.partners?.find((p) => p.nome === 'GUILHERME MEXIAS ACHE');
+      expect(ache, 'Squadra must list GUILHERME MEXIAS ACHE').toBeDefined();
+      expect(ache!.qualificacao_label).toBe('Sócio-Administrador');
+
+      const view = buildPanelView(json, { nodeId: squadra.id });
+      expect(view, 'Squadra node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      expect(view.partners).toEqual(GESTORA_PARTNERS['09267871']);
+      const html = renderPanelHtml(view);
+      expect(html).toContain('GUILHERME MEXIAS ACHE');
+      expect(html).toContain('Sócio-Administrador');
+    });
+
+    it('Dynamo lists DYNAMO ADMINISTRACAO DE RECURSOS LTDA as Cotas Em Tesouraria without a person or tesouraria node', () => {
+      const json = loadCommittedGrafo();
+      const dynamo = companyByBasico(json, '72116353');
+      const tesourariaRow = dynamo.partners?.find(
+        (p) => p.nome === 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA'
+      );
+      expect(tesourariaRow, 'Dynamo partners must include the tesouraria name').toBeDefined();
+      expect(tesourariaRow!.qualificacao).toBe('63');
+      expect(tesourariaRow!.qualificacao_label).toBe('Cotas Em Tesouraria');
+
+      const personForName = json.nodes.find(
+        (n: { kind: string; label: string }) =>
+          n.kind === 'person' && n.label === 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA'
+      );
+      expect(personForName, 'must not mint a person node for the Dynamo tesouraria name').toBeUndefined();
+
+      const tesourariaNodes = json.nodes.filter((n: { id: string }) =>
+        n.id.startsWith('tesouraria-')
+      );
+      expect(tesourariaNodes.map((n: { id: string }) => n.id).sort()).toEqual(
+        [...FROZEN_TESOURARIA_IDS].sort()
+      );
+      expect(
+        tesourariaNodes.some(
+          (n: { label: string }) => n.label === 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA'
+        )
+      ).toBe(false);
+    });
+
+    it('keeps 403 nodes, 492 edges, 146 person ids, and draws no partner-name edges', () => {
+      const json = loadCommittedGrafo();
+      const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
+      const personIds = personNodes.map((n: { id: string }) => n.id).sort();
+
+      expect(json.nodes.length).toBe(403);
+      expect(json.edges.length).toBe(492);
+      expect(personNodes.length).toBe(146);
+      expect(personIds).toEqual([...FROZEN_PERSON_IDS_UNION].sort());
+
+      const partnerNames = new Set(allPartnerNames(json));
+      expect(partnerNames.size).toBeGreaterThan(0);
+      for (const edge of json.edges) {
+        expect(
+          partnerNames.has(edge.from),
+          `edge.from must not be a partner name: ${edge.from}`
+        ).toBe(false);
+        expect(
+          partnerNames.has(edge.to),
+          `edge.to must not be a partner name: ${edge.to}`
+        ).toBe(false);
+      }
+    });
+
+    it('has zero eleven-digit Cadastro, no fortuna, and other pages still without extra JS', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const jsonText = fs.readFileSync(jsonPath, 'utf-8');
+      expect(jsonText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
+      expect(jsonText).not.toMatch(/fortuna/i);
+
+      const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
+      const helper = fs.readFileSync(helperPath, 'utf-8');
+      expect(helper).not.toMatch(/fortuna/i);
+
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      const homePath = path.join(distPath, 'index.html');
+      const metodologiaPath = path.join(distPath, 'metodologia', 'index.html');
+      const doacoesPath = path.join(distPath, 'doacoes', 'index.html');
+      expect(fs.readFileSync(homePath, 'utf-8')).not.toMatch(/<script/);
+      expect(fs.readFileSync(metodologiaPath, 'utf-8')).not.toMatch(/<script/);
+      expect(fs.readFileSync(doacoesPath, 'utf-8')).not.toMatch(/<script/);
     });
   });
 });

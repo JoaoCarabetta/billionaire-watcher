@@ -1,12 +1,12 @@
 /**
  * Builds the /grafo side-panel view-model from committed JSON.
  *
- * Reads only label, kind, pct_capital, pct_votos, source (plus id / from / to).
+ * Reads only label, kind, partners, pct_capital, pct_votos, source (plus id / from / to).
  * Cited participation is the product of hop percents on complete paths.
  * No invented percents. No money fields.
  */
 
-import type { GrafoData, GrafoEdge, GrafoNode } from './grafo-elements';
+import type { GrafoData, GrafoEdge, GrafoNode, GrafoPartner } from './grafo-elements';
 
 export type PanelHop = {
   other_id: string;
@@ -50,6 +50,7 @@ export type NodePanelView = {
   id: string;
   hops: PanelHop[];
   participations: CitedParticipation[];
+  partners?: GrafoPartner[];
 };
 
 export type EdgePanelView = {
@@ -123,7 +124,7 @@ function buildNodePanel(data: GrafoData, nodeId: string): NodePanelView | null {
     }
   }
 
-  return {
+  const view: NodePanelView = {
     mode: 'node',
     label: node.label,
     kind: node.kind,
@@ -131,6 +132,10 @@ function buildNodePanel(data: GrafoData, nodeId: string): NodePanelView | null {
     hops,
     participations: buildCitedParticipations(data, nodeId),
   };
+  if (node.partners) {
+    view.partners = node.partners;
+  }
+  return view;
 }
 
 function buildEdgePanel(
@@ -406,6 +411,27 @@ function renderParticipations(items: CitedParticipation[]): string {
   );
 }
 
+function renderPartner(partner: GrafoPartner): string {
+  return (
+    '<li>' +
+      '<strong>' + escapeHtml(partner.nome) + '</strong>' +
+      factLine('qualificacao_label', partner.qualificacao_label) +
+    '</li>'
+  );
+}
+
+function renderPartners(partners: GrafoPartner[] | undefined): string {
+  if (!partners) {
+    return '';
+  }
+  return (
+    '<section>' +
+      '<h3>sócios</h3>' +
+      '<ul>' + partners.map(renderPartner).join('') + '</ul>' +
+    '</section>'
+  );
+}
+
 export function renderPanelHtml(view: PanelView): string {
   if (!view) {
     return '';
@@ -419,6 +445,7 @@ export function renderPanelHtml(view: PanelView): string {
         '<h2>' + escapeHtml(view.label) + '</h2>' +
         factLine('kind', view.kind) +
         factLine('id', view.id) +
+        renderPartners(view.partners) +
         renderHopGroup('saida', outgoing) +
         renderHopGroup('entrada', incoming) +
         renderParticipations(view.participations) +
