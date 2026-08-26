@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
+import { withoutJsonLdAndPageTools } from './page-tools-html';
 
 const ENERGISA_ID = '00864214000106';
 const GIPAR_ID = '02260956000158';
@@ -156,7 +157,11 @@ describe('Built /empresa/ fichas and sitemap (issue #148)', () => {
     expect(home).toContain('/pessoa/p1');
     expect(home).not.toContain('/empresa/00864214000106');
     expect(home).not.toContain('/empresa/record');
-    expect(fs.readFileSync(path.join(distPath, 'metodologia', 'index.html'), 'utf-8')).not.toMatch(/<script/);
-    expect(fs.readFileSync(path.join(distPath, 'doacoes', 'index.html'), 'utf-8')).not.toMatch(/<script/);
+    expect(
+      withoutJsonLdAndPageTools(fs.readFileSync(path.join(distPath, 'metodologia', 'index.html'), 'utf-8'))
+    ).not.toMatch(/<script/);
+    expect(
+      withoutJsonLdAndPageTools(fs.readFileSync(path.join(distPath, 'doacoes', 'index.html'), 'utf-8'))
+    ).not.toMatch(/<script/);
   });
 });

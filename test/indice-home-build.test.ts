@@ -47,6 +47,7 @@ describe('Home is the índice search surface (issue #149)', () => {
     expect(page).toContain('não está no arquivo');
     expect(page).toMatch(/href="\/metodologia\/?"/);
     expect(page).toMatch(/href="\/grafo\/?"/);
+    expect(page).toContain("PageTools");
     expect(page).toMatch(/<h2[^>]*>Pessoas<\/h2>/);
     expect(page).not.toMatch(/ficha-card|featured-ficha/i);
     expect(page).not.toContain('money_economic');
@@ -74,6 +75,7 @@ describe('Home is the índice search surface (issue #149)', () => {
     expect(home).toContain('Maria Santos');
     expect(home).toContain('Ana Lima');
     expect(home).toMatch(/<h2[^>]*>Pessoas<\/h2>/);
+    expect(home).toMatch(/register-page-tools/);
   });
 
   it('home HTML has no money_economic, Valor rank, featured-ficha cards, UBO, eleven-digit Cadastro, or o bilionário', () => {
