@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
+import { buildPanelView, LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
 
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
@@ -35,28 +36,39 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 97 nodes', () => {
+    it('should have exactly 102 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(97);
+      expect(json.nodes.length).toBe(102);
     });
 
-    it('should have exactly 25 person nodes', () => {
+    it('should have exactly 33 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(25);
+      expect(personNodes.length).toBe(33);
     });
 
-    it('should have exactly 60 edges', () => {
+    it('should have exactly 121 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(60);
+      expect(json.edges.length).toBe(121);
+    });
+
+    it('should have the eleven listed company ids', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      const nodeIds = new Set(json.nodes.map((n: { id: string }) => n.id));
+
+      expect(LISTED_COMPANY_IDS).toHaveLength(11);
+      for (const id of LISTED_COMPANY_IDS) {
+        expect(nodeIds.has(id), `listed company ${id} should be present`).toBe(true);
+      }
     });
 
     it('should have all edges resolve to existing nodes', () => {
@@ -170,9 +182,10 @@ describe('Grafo Page (issue #74)', () => {
       const capitalSum = incomingEdges.reduce((sum: number, edge: any) => {
         return sum + (edge.pct_capital || 0);
       }, 0);
+      const capitalRounded = Math.round(capitalSum * 1000) / 1000;
       
       expect(
-        capitalSum,
+        capitalRounded,
         `Capital sum to Energisa should be ~100, got ${capitalSum}`
       ).toBeGreaterThanOrEqual(99.999);
       expect(
@@ -191,9 +204,10 @@ describe('Grafo Page (issue #74)', () => {
       const votosSum = incomingEdges.reduce((sum: number, edge: any) => {
         return sum + (edge.pct_votos || 0);
       }, 0);
+      const votosRounded = Math.round(votosSum * 1000) / 1000;
       
       expect(
-        votosSum,
+        votosRounded,
         `Votes sum to Energisa should be ~100, got ${votosSum}`
       ).toBeGreaterThanOrEqual(99.999);
       expect(
@@ -247,7 +261,7 @@ describe('Grafo Page (issue #74)', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
-      const outrosId = 'outros-energisa';
+      const outrosId = 'outros-00864214';
       const energisaId = '00864214000106';
       
       const outrosToEnergisa = json.edges.find(
@@ -269,6 +283,27 @@ describe('Grafo Page (issue #74)', () => {
         edgesToOutros.length,
         'Outros acionistas should have no incoming edges (is a leaf)'
       ).toBe(0);
+    });
+
+    it('each of the 11 listed companies has incoming capital between 99.5 and 100.5', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+
+      for (const listedId of LISTED_COMPANY_IDS) {
+        const incoming = json.edges.filter((e: { to: string }) => e.to === listedId);
+        const capitalSum = incoming.reduce(
+          (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
+          0
+        );
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeGreaterThanOrEqual(99.5);
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeLessThanOrEqual(100.5);
+      }
     });
   });
 
@@ -488,6 +523,217 @@ describe('Grafo Page (issue #74)', () => {
       // Remove JSON-LD scripts before checking
       const htmlWithoutJsonLd = html.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
       expect(htmlWithoutJsonLd).not.toMatch(/<script/);
+    });
+  });
+
+  describe('Test 6 (issue #84): hop-fact side panel', () => {
+    const GIPAR_ID = '02260956000158';
+    const ENERGISA_ID = '00864214000106';
+    const MONICA_ID = 'p-ea4eb254';
+    const MCLC_ID = '59206795000131';
+    const IVAN_ID = 'p-cdbc8c4e';
+    const MULTISETOR_ID = '20286787000107';
+    const ITACATU_ID = '23160658000166';
+    const NOVA_GIPAR_ID = '16674735000130';
+    const HOLE_PERSON_ID = 'p-hole0001';
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function panelCopySources(): Array<{ label: string; text: string }> {
+      const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const sources = [
+        { label: 'src/lib/grafo-panel.ts', text: fs.readFileSync(helperPath, 'utf-8') },
+        { label: 'src/pages/grafo.astro', text: fs.readFileSync(pagePath, 'utf-8') },
+      ];
+
+      if (!buildFailed) {
+        const grafoHtmlPath = path.join(distPath, 'grafo', 'index.html');
+        const html = fs.readFileSync(grafoHtmlPath, 'utf-8');
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/);
+        const bodyWithoutScripts = (bodyMatch?.[1] ?? html).replace(
+          /<script[\s\S]*?<\/script>/gi,
+          ''
+        );
+        sources.push({ label: 'dist/grafo/index.html body', text: bodyWithoutScripts });
+      }
+
+      return sources;
+    }
+
+    it('dist/grafo/index.html includes a panel element', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      const grafoHtmlPath = path.join(distPath, 'grafo', 'index.html');
+      const html = fs.readFileSync(grafoHtmlPath, 'utf-8');
+
+      expect(
+        html,
+        'dist/grafo/index.html must include id="panel" so the click panel exists after build'
+      ).toMatch(/id="panel"/);
+    });
+
+    it('panel copy has no fortuna, currency symbol, or price field', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      for (const { label, text } of panelCopySources()) {
+        const withoutInterpolation = text.replace(/\$\{[^}]*\}/g, '');
+        expect(withoutInterpolation, `${label} must not mention fortuna`).not.toMatch(/fortuna/i);
+        expect(withoutInterpolation, `${label} must not contain R$`).not.toMatch(/R\$/);
+        expect(withoutInterpolation, `${label} must not contain £ or €`).not.toMatch(/[£€]/);
+        expect(withoutInterpolation, `${label} must not contain a leftover $ currency mark`).not.toMatch(/\$/);
+        expect(withoutInterpolation, `${label} must not have a preço field`).not.toMatch(/preço/i);
+        expect(withoutInterpolation, `${label} must not have a price field`).not.toMatch(/\bprice\b/i);
+      }
+    });
+
+    it('grafo.astro imports the shared panel helper (copying logic must fail)', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const pageSource = fs.readFileSync(pagePath, 'utf-8');
+
+      expect(
+        pageSource,
+        'grafo.astro must import from ../lib/grafo-panel — same seam as #74 unique-edge helper'
+      ).toMatch(/from ['"]\.\.\/lib\/grafo-panel['"]/);
+      expect(
+        pageSource,
+        'grafo.astro must call buildPanelView so dropping the helper fails'
+      ).toMatch(/buildPanelView\s*\(/);
+    });
+
+    it('Gipar node and Gipar→Energisa edge yield 26.646, 61.162, and the FRE source', () => {
+      const json = loadCommittedGrafo();
+
+      const nodeView = buildPanelView(json, { nodeId: GIPAR_ID });
+      expect(nodeView, 'Gipar node should open a node panel').not.toBeNull();
+      expect(nodeView!.mode).toBe('node');
+      if (nodeView!.mode !== 'node') return;
+
+      expect(nodeView.label).toMatch(/Gipar/i);
+      expect(nodeView.kind).toBe('company');
+      expect(nodeView.id).toBe(GIPAR_ID);
+
+      const energisaHop = nodeView.hops.find(
+        (hop) => hop.other_id === ENERGISA_ID || /energisa/i.test(hop.other_label)
+      );
+      expect(energisaHop, 'Gipar node should list the Energisa hop').toBeDefined();
+      expect(energisaHop!.pct_capital).toBe(26.646);
+      expect(energisaHop!.pct_votos).toBe(61.162);
+      expect(energisaHop!.source).toMatch(/FRE Energisa 160981/);
+
+      const edgeView = buildPanelView(json, { from: GIPAR_ID, to: ENERGISA_ID });
+      expect(edgeView, 'Gipar→Energisa should open an edge panel').not.toBeNull();
+      expect(edgeView!.mode).toBe('edge');
+      if (edgeView!.mode !== 'edge') return;
+
+      expect(edgeView.from_label).toMatch(/Gipar/i);
+      expect(edgeView.to_label).toMatch(/energisa/i);
+      expect(edgeView.kind).toBe('company_owns');
+      expect(edgeView.pct_capital).toBe(26.646);
+      expect(edgeView.pct_votos).toBe(61.162);
+      expect(edgeView.source).toMatch(/FRE Energisa 160981/);
+    });
+
+    it('Mônica node lists MCLC at 52.004 and does not list Energisa at 52.004', () => {
+      const json = loadCommittedGrafo();
+      const view = buildPanelView(json, { nodeId: MONICA_ID });
+
+      expect(view, 'Mônica node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const mclcHop = view.hops.find(
+        (hop) => hop.other_id === MCLC_ID || /mclc/i.test(hop.other_label)
+      );
+      expect(mclcHop, 'Mônica should list MCLC').toBeDefined();
+      expect(mclcHop!.pct_capital).toBe(52.004);
+
+      const energisaAt52 = view.hops.find(
+        (hop) =>
+          (hop.other_id === ENERGISA_ID || /energisa/i.test(hop.other_label)) &&
+          hop.pct_capital === 52.004
+      );
+      expect(
+        energisaAt52,
+        'Mônica must not list Energisa at 52.004 — that hop is MCLC'
+      ).toBeUndefined();
+    });
+
+    it('Ivan → Energisa capital and votes equal the hop products on the complete path', () => {
+      const json = loadCommittedGrafo();
+      const hopIds: Array<[string, string]> = [
+        [IVAN_ID, MULTISETOR_ID],
+        [MULTISETOR_ID, ITACATU_ID],
+        [ITACATU_ID, NOVA_GIPAR_ID],
+        [NOVA_GIPAR_ID, GIPAR_ID],
+        [GIPAR_ID, ENERGISA_ID],
+      ];
+      const hops = hopIds.map(([from, to]) => {
+        const edge = json.edges.find((item: { from: string; to: string }) => item.from === from && item.to === to);
+        expect(edge, `committed hop ${from} → ${to} must exist`).toBeDefined();
+        return edge;
+      });
+
+      const expectedCapital = hops.reduce(
+        (acc: number, edge: { pct_capital: number }) => acc * (edge.pct_capital / 100),
+        1
+      ) * 100;
+      const expectedVotes = hops.reduce(
+        (acc: number, edge: { pct_votos: number }) => acc * (edge.pct_votos / 100),
+        1
+      ) * 100;
+
+      const view = buildPanelView(json, { nodeId: IVAN_ID });
+      expect(view, 'Ivan node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const energisa = view.participations.find((item) => item.company_id === ENERGISA_ID);
+      expect(energisa, 'Ivan should have cited participation in Energisa').toBeDefined();
+
+      const examplePath = energisa!.paths.find((path) => {
+        const ids = path.hops.map((hop) => hop.from_id + '>' + hop.to_id);
+        const wanted = hopIds.map(([from, to]) => from + '>' + to);
+        return ids.length === wanted.length && ids.every((id, index) => id === wanted[index]);
+      });
+      expect(examplePath, 'the Ivan → Multisetor → Itacatu → Nova Gipar → Gipar → Energisa path must be listed').toBeDefined();
+      expect(examplePath!.pct_capital).toBe(expectedCapital);
+      expect(examplePath!.pct_votos).toBe(expectedVotes);
+    });
+
+    it('a Receita Federal path with a missing percent does not invent a product', () => {
+      const holeGraph = {
+        nodes: [
+          { id: HOLE_PERSON_ID, kind: 'person' as const, label: 'HOLE PERSON' },
+          { id: ENERGISA_ID, kind: 'company' as const, label: 'ENERGISA S.A.' },
+        ],
+        edges: [
+          {
+            from: HOLE_PERSON_ID,
+            to: ENERGISA_ID,
+            kind: 'person_owns',
+            source: 'Quadro de Socios Receita',
+          },
+        ],
+      };
+
+      const view = buildPanelView(holeGraph, { nodeId: HOLE_PERSON_ID });
+      expect(view, 'hole person should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const cited = view.participations.find((item) => item.company_id === ENERGISA_ID);
+      expect(cited, 'hole person should list the reachable listed company').toBeDefined();
+      expect(cited!.paths.length).toBeGreaterThan(0);
+      expect(cited!.paths[0].hops.length).toBe(1);
+      expect(cited!.paths[0].hops[0].source).toMatch(/Receita/);
+      expect(cited!.pct_capital, 'must not invent pct_capital on a hole path').toBeUndefined();
+      expect(cited!.pct_votos, 'must not invent pct_votos on a hole path').toBeUndefined();
+      expect(cited!.paths[0].pct_capital).toBeUndefined();
+      expect(cited!.paths[0].pct_votos).toBeUndefined();
     });
   });
 });

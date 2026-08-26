@@ -43,11 +43,65 @@
         display: block;
       }
       
+      .grafo-stage {
+        position: relative;
+      }
+
       #cy {
         width: 100%;
         height: 80vh;
         border: 1px solid #ddd;
         background: #fafafa;
+      }
+
+      #panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: min(360px, 92vw);
+        height: 80vh;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-left: 1px solid #ccc;
+        padding: 1rem;
+        z-index: 2;
+      }
+
+      #panel[hidden] {
+        display: none;
+      }
+
+      .grafo-panel-body h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .grafo-panel-body h3 {
+        font-size: 0.95rem;
+        margin: 1rem 0 0.4rem;
+      }
+
+      .grafo-panel-body p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+      }
+
+      .grafo-panel-field {
+        color: #666;
+        font-size: 0.8rem;
+        text-transform: none;
+      }
+
+      .grafo-panel-body ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .grafo-panel-body li {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #eee;
       }
 
       .info {
@@ -71,14 +125,29 @@
 
     <main>
       <div class="info">
-        <p>97 nós, 60 arestas | Dados: <a href="/grafo-publico.json">grafo-publico.json</a></p>
+        <p>102 nós, 121 arestas | Dados: <a href="/grafo-publico.json">grafo-publico.json</a></p>
       </div>
-      <div id="cy"></div>
+      <div class="grafo-stage">
+        <div id="cy"></div>
+        <aside id="panel" hidden></aside>
+      </div>
     </main>
 
     <script type="module">
       import cytoscape from 'cytoscape';
       import { buildCytoscapeElements } from '../lib/grafo-elements';
+      import { buildPanelView, renderPanelHtml } from '../lib/grafo-panel';
+
+      const panel = document.getElementById('panel');
+
+      function showPanel(view) {
+        if (!panel) {
+          return;
+        }
+        const html = renderPanelHtml(view);
+        panel.innerHTML = html;
+        panel.hidden = html === '';
+      }
 
       // Fetch the static JSON
       fetch('/grafo-publico.json')
@@ -146,6 +215,23 @@
               initialTemp: 1000,
               coolingFactor: 0.99,
               minTemp: 1.0
+            }
+          });
+
+          cy.on('tap', 'node', function (evt) {
+            showPanel(buildPanelView(data, { nodeId: evt.target.id() }));
+          });
+
+          cy.on('tap', 'edge', function (evt) {
+            showPanel(buildPanelView(data, {
+              from: evt.target.data('source'),
+              to: evt.target.data('target')
+            }));
+          });
+
+          cy.on('tap', function (evt) {
+            if (evt.target === cy) {
+              showPanel(null);
             }
           });
         })
