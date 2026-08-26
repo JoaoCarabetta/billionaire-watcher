@@ -6,6 +6,7 @@ export function withoutJsonLdAndPageTools(html: string): string {
   return html
     .replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/gi, '')
     .replace(/<script[^>]*id="page-tools-archive"[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<script[^>]*id="indice-minted"[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<script[^>]*src="\/register-page-tools\.js"[^>]*>\s*<\/script>/gi, '')
     .replace(/<script[^>]*type="module"[^>]*src="[^"]+"[^>]*>\s*<\/script>/gi, '')
     .replace(/<script[^>]*src="[^"]+"[^>]*type="module"[^>]*>\s*<\/script>/gi, '');

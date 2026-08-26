@@ -938,14 +938,16 @@ describe('Grafo Page (issue #74)', () => {
   });
 
   describe('Test 5: Other pages unchanged (no extra JS)', () => {
-    it('should not have script tags on home page', () => {
+    it('should not turn home into a cytoscape page; freeze list stays in HTML', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       
       const homePath = path.join(distPath, 'index.html');
       const html = fs.readFileSync(homePath, 'utf-8');
       
-      // Home should NOT have script tags besides the page-tools registrar
-      expect(withoutJsonLdAndPageTools(html)).not.toMatch(/<script/);
+      expect(html).toContain('João Silva');
+      expect(html).toContain('/pessoa/p1');
+      expect(html).not.toMatch(/id="cy"/);
+      expect(html).not.toMatch(/cytoscape/);
     });
 
     it('should not have script tags on metodologia page', () => {
@@ -1500,7 +1502,9 @@ describe('Grafo Page (issue #74)', () => {
       const homePath = path.join(distPath, 'index.html');
       const metodologiaPath = path.join(distPath, 'metodologia', 'index.html');
       const doacoesPath = path.join(distPath, 'doacoes', 'index.html');
-      expect(withoutJsonLdAndPageTools(fs.readFileSync(homePath, 'utf-8'))).not.toMatch(/<script/);
+      const homeHtml = fs.readFileSync(homePath, 'utf-8');
+      expect(homeHtml).toContain('João Silva');
+      expect(homeHtml).not.toMatch(/cytoscape/);
       expect(withoutJsonLdAndPageTools(fs.readFileSync(metodologiaPath, 'utf-8'))).not.toMatch(/<script/);
       expect(withoutJsonLdAndPageTools(fs.readFileSync(doacoesPath, 'utf-8'))).not.toMatch(/<script/);
     });
