@@ -2281,9 +2281,11 @@ unit_tests:
     description: |
       Issue #129 public seam: company-level Formulário quantity for priced seeds.
       Energisa 00864214: 609526325 ordinary and 89144004 preferred, cited to
-      Energisa IR 14 Aug 2026 table 6.1 (already on graph_edges).
-      ENGI11 is a unit: no quantity row. Claro 07043628 has no Bolsa quote: no row.
-      WEG hop without quantity is absent, not zero. Vale hop with quantity appears.
+      Energisa IR 14 Aug 2026 table 6.1 (already on graph_edges). Conflicting 17.1
+      fixture quantities (1 / 2) must not overwrite the hop. ENGI11 is a unit: no
+      quantity row. Claro 07043628 has no Bolsa quote: no row.
+      WEG hop without quantity and without 17.1 is absent, not zero. Vale hop with
+      quantity appears.
     model: graph_listed_quantities
     given:
       - input: ref('graph_edges')
@@ -2353,6 +2355,28 @@ unit_tests:
             'Claro fixture',
             'table 6.1',
             cast('2026-08-25' as date)
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '00864214000100' as CNPJ_Companhia,
+            cast('2026-12-31' as date) as Data_Referencia,
+            4 as Versao,
+            160981 as ID_Documento,
+            1 as ID_Capital_Social,
+            'Capital Integralizado' as Tipo_Capital,
+            1 as Quantidade_Acoes_Ordinarias,
+            2 as Quantidade_Acoes_Preferenciais
+          union all
+          select
+            '99999999000191',
+            cast('2026-12-31' as date),
+            1,
+            1,
+            1,
+            'Capital Autorizado',
+            0,
+            0
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
@@ -2430,6 +2454,18 @@ unit_tests:
             'Energisa IR 14 Aug 2026',
             'table 6.1',
             cast('2026-08-14' as date)
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '99999999000191' as CNPJ_Companhia,
+            cast('2026-12-31' as date) as Data_Referencia,
+            1 as Versao,
+            1 as ID_Documento,
+            1 as ID_Capital_Social,
+            'Capital Autorizado' as Tipo_Capital,
+            0 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
@@ -2459,9 +2495,10 @@ unit_tests:
 
   - name: test_graph_listed_quantities_weg_ambev_only_when_hop_has_qty
     description: |
-      WEG (84429695) and Ambev (07526557) appear only when graph_edges already has
-      quantity. Claro stays absent. Fixture quantities here are hop literals, not
-      FRE 17.1 sidecar numbers.
+      Hop yes-path: WEG (84429695) and Ambev (07526557) appear when graph_edges
+      already has quantity. Claro stays absent. Fixture quantities here are hop
+      literals (125 / 250), not FRE 17.1 sidecar numbers. 17.1 parent is mocked
+      empty so this test does not depend on the Formulário fallback.
     model: graph_listed_quantities
     given:
       - input: ref('graph_edges')
@@ -2505,6 +2542,18 @@ unit_tests:
             'Claro fixture',
             'table 6.1',
             cast('2026-08-25' as date)
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '99999999000191' as CNPJ_Companhia,
+            cast('2026-12-31' as date) as Data_Referencia,
+            1 as Versao,
+            1 as ID_Documento,
+            1 as ID_Capital_Social,
+            'Capital Autorizado' as Tipo_Capital,
+            0 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais
       - input: ref('listed_prices_fixture')
         format: sql
         rows: |
@@ -2531,4 +2580,283 @@ unit_tests:
           'Ambev FRE fixture',
           'table 6.1',
           cast('2026-08-25' as date)
+
+  - name: test_graph_listed_quantities_formulario_171_when_hop_null
+    description: |
+      Issue #129: hop-null is not a skip. Vale 33592510 has no graph_edges qty and
+      mocked 17.1 Integralizado 333 ordinary. Expect VALE3 333. Equatorial 03220438
+      is priced with neither hop qty nor 17.1: absent, not zero. Claro 17.1 qty
+      does not emit (no Bolsa class). ENGI11 unit is not emitted. Fixture 333 is
+      not a PR 126 CSV number.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '05466338' as from_id,
+            '33592510' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            6.45 as pct_capital,
+            6.45 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'Vale hop without quantity' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-25' as date) as source_retrieved_at
+          union all
+          select
+            '11111111',
+            '07043628',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            500,
+            cast(null as integer),
+            'Claro fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '33592510000100' as CNPJ_Companhia,
+            cast('2026-12-31' as date) as Data_Referencia,
+            9 as Versao,
+            200 as ID_Documento,
+            10 as ID_Capital_Social,
+            'Capital Integralizado' as Tipo_Capital,
+            333 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais
+          union all
+          select
+            '07043628000100',
+            cast('2026-12-31' as date),
+            1,
+            158569,
+            20,
+            'Capital Integralizado',
+            500,
+            0
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '33592510' as cnpj_basico, 'VALE3' as ticker, 'ordinaria' as classe, 73.10 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '03220438', 'EQTL3', 'ordinaria', 36.40, '2026-08-25', 'Recorded fixture quote'
+          union all
+          select '00864214', 'ENGI11', 'unit', 46.28, '2026-08-20', 'Brasil Bolsa Balcão'
+    expect:
+      format: sql
+      rows: |
+        select
+          '33592510' as cnpj_basico,
+          'VALE3' as ticker,
+          'ordinaria' as classe,
+          333 as quantidade,
+          'CVM FRE item 17.1 Capital Integralizado' as source_doc,
+          'ID_Documento 200; Data_Referencia 2026-12-31; Versao 9' as source_locator,
+          cast('2026-12-31' as date) as source_retrieved_at
+
+  - name: test_graph_listed_quantities_weg_ambev_from_171
+    description: |
+      WEG 84429695 and Ambev 07526557 yes-path from mocked Formulário 17.1 when
+      hops have no quantity. Fixture literals 111 / 222 are not PR 126 CSV numbers.
+      Claro stays absent.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '12345678' as from_id,
+            '84429695' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'WEG hop without quantity' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-25' as date) as source_retrieved_at
+          union all
+          select
+            '87654321',
+            '07526557',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            cast(null as integer),
+            cast(null as integer),
+            'Ambev hop without quantity',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '11111111',
+            '07043628',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            500,
+            cast(null as integer),
+            'Claro fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '84429695000100' as CNPJ_Companhia,
+            cast('2026-12-31' as date) as Data_Referencia,
+            2 as Versao,
+            160163 as ID_Documento,
+            11 as ID_Capital_Social,
+            'Capital Integralizado' as Tipo_Capital,
+            111 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais
+          union all
+          select
+            '07526557000100',
+            cast('2026-12-31' as date),
+            3,
+            161030,
+            12,
+            'Capital Integralizado',
+            222,
+            0
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '84429695' as cnpj_basico, 'WEGE3' as ticker, 'ordinaria' as classe, 42.30 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '07526557', 'ABEV3', 'ordinaria', 13.20, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '84429695' as cnpj_basico,
+          'WEGE3' as ticker,
+          'ordinaria' as classe,
+          111 as quantidade,
+          'CVM FRE item 17.1 Capital Integralizado' as source_doc,
+          'ID_Documento 160163; Data_Referencia 2026-12-31; Versao 2' as source_locator,
+          cast('2026-12-31' as date) as source_retrieved_at
+        union all
+        select
+          '07526557',
+          'ABEV3',
+          'ordinaria',
+          222,
+          'CVM FRE item 17.1 Capital Integralizado',
+          'ID_Documento 161030; Data_Referencia 2026-12-31; Versao 3',
+          cast('2026-12-31' as date)
+
+  - name: test_graph_listed_quantities_171_tipo_not_summed
+    description: |
+      Tipo_Capital is not additive. Latest ID_Documento only. Prefer Capital
+      Integralizado 111 over Emitido 999 and Autorizado 888 on the same latest
+      document. Older document Integralizado 50 is ignored. Marfrig-style seed
+      with only Emitido 444 is emitted from Emitido. Fixture literals are not
+      PR 126 CSV numbers.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '00000000' as from_id,
+            '11111111' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            cast(null as integer) as pct_capital,
+            cast(null as integer) as pct_votos,
+            cast(null as integer) as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'unused hop' as source_doc,
+            'none' as source_locator,
+            cast('2026-08-25' as date) as source_retrieved_at
+      - input: ref('stg_cvm_fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '33592510000100' as CNPJ_Companhia,
+            cast('2025-12-31' as date) as Data_Referencia,
+            1 as Versao,
+            100 as ID_Documento,
+            1 as ID_Capital_Social,
+            'Capital Integralizado' as Tipo_Capital,
+            50 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais
+          union all
+          select
+            '33592510000100',
+            cast('2026-12-31' as date),
+            9,
+            200,
+            2,
+            'Capital Autorizado',
+            888,
+            0
+          union all
+          select
+            '33592510000100',
+            cast('2026-12-31' as date),
+            9,
+            200,
+            3,
+            'Capital Emitido',
+            999,
+            0
+          union all
+          select
+            '33592510000100',
+            cast('2026-12-31' as date),
+            9,
+            200,
+            4,
+            'Capital Integralizado',
+            111,
+            0
+          union all
+          select
+            '03853896000100',
+            cast('2026-12-31' as date),
+            5,
+            159757,
+            5,
+            'Capital Emitido',
+            444,
+            0
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '33592510' as cnpj_basico, 'VALE3' as ticker, 'ordinaria' as classe, 73.10 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '03853896', 'MRFG3', 'ordinaria', 20.40, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '33592510' as cnpj_basico,
+          'VALE3' as ticker,
+          'ordinaria' as classe,
+          111 as quantidade,
+          'CVM FRE item 17.1 Capital Integralizado' as source_doc,
+          'ID_Documento 200; Data_Referencia 2026-12-31; Versao 9' as source_locator,
+          cast('2026-12-31' as date) as source_retrieved_at
+        union all
+        select
+          '03853896',
+          'MRFG3',
+          'ordinaria',
+          444,
+          'CVM FRE item 17.1 Capital Emitido',
+          'ID_Documento 159757; Data_Referencia 2026-12-31; Versao 5',
+          cast('2026-12-31' as date)
 

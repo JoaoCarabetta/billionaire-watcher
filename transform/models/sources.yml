@@ -69,6 +69,19 @@ sources:
             field_delimiter: ";"
             skip_leading_rows: 1
 
+      - name: fre_capital_social_2026
+        description: |
+          CVM FRE item 17.1 capital social 2026 (external table from GCS).
+          Company-level Quantidade_Acoes_Ordinarias / Quantidade_Acoes_Preferenciais.
+          Do not sum Tipo_Capital rows (Autorizado / Emitido / Subscrito / Integralizado
+          are different views of the same capital, not addends).
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_capital_social_2026.csv
+            encoding: ISO-8859-1
+            field_delimiter: ";"
+            skip_leading_rows: 1
+
   - name: br_tse_eleicoes
     description: Base dos Dados - TSE election data (closed cycles)
     database: basedosdados

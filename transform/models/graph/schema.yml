@@ -179,10 +179,14 @@ models:
     description: |
       Formulário share quantity at seed × class grain for priced listed seeds (issue #129).
       Warehouse sidecar the public graph / Coder can read. Not the money-script FRE 17.1 CSV.
-      Quantity comes only from graph_edges listed-hop columns (qty_ordinarias / qty_preferenciais).
+      Prefer graph_edges listed-hop quantity when present (Energisa IR table 6.1).
+      Else company-level outstanding from stg_cvm_fre_capital_social_2026 (item 17.1,
+      latest ID_Documento, Capital Integralizado if that row has qty else Capital Emitido).
+      Do not sum Tipo_Capital. Preferred subclasses (classe_acao) are unused.
       Identical company totals copied onto more than one holder hop collapse to one row.
-      A seed with no hop quantity is omitted, not zero. Unit classes are never emitted.
-      Claro Telecom Participações (07043628) has no Bolsa class, so it never appears.
+      A seed × class with neither hop qty nor 17.1 qty is omitted, not zero.
+      Unit classes are never emitted. Claro Telecom Participações (07043628) has no
+      Bolsa class, so it never appears.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -206,7 +210,7 @@ models:
               arguments:
                 values: ['ordinaria', 'preferencial']
       - name: quantidade
-        description: Company-level outstanding share quantity from the listed hop (IR/FRE table)
+        description: Company-level outstanding share quantity (listed hop, else FRE 17.1)
         tests:
           - not_null
       - name: source_doc
