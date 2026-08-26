@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
 import { buildPanelView, LISTED_COMPANY_IDS, renderPanelHtml } from '../src/lib/grafo-panel';
+import { withoutJsonLdAndPageTools } from './page-tools-html';
 
 /** Issue #130: the panel may deny fortune (`Não é uma fortuna.`). Still fail on fortuna-as-claim. */
 function withoutFortunaDenial(text: string): string {
@@ -943,8 +944,8 @@ describe('Grafo Page (issue #74)', () => {
       const homePath = path.join(distPath, 'index.html');
       const html = fs.readFileSync(homePath, 'utf-8');
       
-      // Home should NOT have script tags
-      expect(html).not.toMatch(/<script/);
+      // Home should NOT have script tags besides the page-tools registrar
+      expect(withoutJsonLdAndPageTools(html)).not.toMatch(/<script/);
     });
 
     it('should not have script tags on metodologia page', () => {
@@ -953,8 +954,8 @@ describe('Grafo Page (issue #74)', () => {
       const metodologiaPath = path.join(distPath, 'metodologia', 'index.html');
       const html = fs.readFileSync(metodologiaPath, 'utf-8');
       
-      // Metodologia should NOT have script tags
-      expect(html).not.toMatch(/<script/);
+      // Metodologia should NOT have script tags besides the page-tools registrar
+      expect(withoutJsonLdAndPageTools(html)).not.toMatch(/<script/);
     });
 
     it('should not have script tags on doacoes page', () => {
@@ -963,8 +964,8 @@ describe('Grafo Page (issue #74)', () => {
       const doacoesPath = path.join(distPath, 'doacoes', 'index.html');
       const html = fs.readFileSync(doacoesPath, 'utf-8');
       
-      // Doacoes should NOT have script tags
-      expect(html).not.toMatch(/<script/);
+      // Doacoes should NOT have script tags besides the page-tools registrar
+      expect(withoutJsonLdAndPageTools(html)).not.toMatch(/<script/);
     });
 
     it('should not have executable script tags on pessoa pages', () => {
@@ -976,7 +977,7 @@ describe('Grafo Page (issue #74)', () => {
       // Pessoa pages should NOT have executable script tags
       // (JSON-LD structured data is OK: <script type="application/ld+json">)
       // Remove JSON-LD scripts before checking
-      const htmlWithoutJsonLd = html.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
+      const htmlWithoutJsonLd = withoutJsonLdAndPageTools(html);
       expect(htmlWithoutJsonLd).not.toMatch(/<script/);
     });
   });
@@ -1499,9 +1500,9 @@ describe('Grafo Page (issue #74)', () => {
       const homePath = path.join(distPath, 'index.html');
       const metodologiaPath = path.join(distPath, 'metodologia', 'index.html');
       const doacoesPath = path.join(distPath, 'doacoes', 'index.html');
-      expect(fs.readFileSync(homePath, 'utf-8')).not.toMatch(/<script/);
-      expect(fs.readFileSync(metodologiaPath, 'utf-8')).not.toMatch(/<script/);
-      expect(fs.readFileSync(doacoesPath, 'utf-8')).not.toMatch(/<script/);
+      expect(withoutJsonLdAndPageTools(fs.readFileSync(homePath, 'utf-8'))).not.toMatch(/<script/);
+      expect(withoutJsonLdAndPageTools(fs.readFileSync(metodologiaPath, 'utf-8'))).not.toMatch(/<script/);
+      expect(withoutJsonLdAndPageTools(fs.readFileSync(doacoesPath, 'utf-8'))).not.toMatch(/<script/);
     });
   });
 

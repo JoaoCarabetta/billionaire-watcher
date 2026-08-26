@@ -25,6 +25,9 @@ import {
   renderFichaHtml,
   type CitedPessoa,
 } from '../../lib/mint-pessoa';
+import { pageToolsMarkup } from '../../lib/archive-tools';
+import { pageToolsArchiveJson } from '../../lib/page-tools-data';
+import PageTools from '../../components/PageTools.astro';
 
 export async function getStaticPaths() {
   const freezePersons = getFreeze();
@@ -52,9 +55,16 @@ interface Props {
 
 const { person, ficha } = Astro.props;
 if (ficha) {
-  return new Response(renderFichaHtml(ficha, fichaMoneyFor(ficha, loadPublicMoney())), {
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
-  });
+  return new Response(
+    renderFichaHtml(
+      ficha,
+      fichaMoneyFor(ficha, loadPublicMoney()),
+      pageToolsMarkup(pageToolsArchiveJson(), '/register-page-tools.js')
+    ),
+    {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    }
+  );
 }
 if (!person) {
   return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
@@ -336,5 +346,6 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
         </p>
       </footer>
     </main>
+    <PageTools />
   </body>
 </html>

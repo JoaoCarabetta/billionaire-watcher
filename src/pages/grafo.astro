@@ -1,4 +1,5 @@
 ---
+import PageTools from '../components/PageTools.astro';
 // No server-side data fetching - the page reads the static JSON client-side
 ---
 
@@ -396,5 +397,6 @@
             '<div style="padding: 2rem; text-align: center; color: #666;">Erro ao carregar o grafo. Verifique o console.</div>';
         });
     </script>
+    <PageTools />
   </body>
 </html>

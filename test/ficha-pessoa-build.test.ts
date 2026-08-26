@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { withoutJsonLdAndPageTools } from './page-tools-html';
 
 const IVAN_ID = 'p-cdbc8c4e';
 const JOAQUIM_ID = 'p-da3e3836';
@@ -53,7 +54,7 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
     expect(containsLiteralOrPtBr(html, 1300458655.36)).toBe(true);
     expect(containsLiteralOrPtBr(html, 2896272224.98)).toBe(true);
     expect(html).toContain('Não é uma fortuna.');
-    const withoutJsonLd = html.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
+    const withoutJsonLd = withoutJsonLdAndPageTools(html);
     expect(withoutJsonLd).not.toMatch(/<script/);
     expect(html).not.toContain(String(LAST_HOP_SLICE));
   });
@@ -128,10 +129,14 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
   it('home stays the freeze-elite list and other pages stay without extra script tags', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     const home = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
-    expect(home).not.toMatch(/<script/);
+    expect(withoutJsonLdAndPageTools(home)).not.toMatch(/<script/);
     expect(home).not.toContain('/pessoa/p-cdbc8c4e');
     expect(home).not.toContain('/pessoa/p-da3e3836');
-    expect(fs.readFileSync(path.join(distPath, 'metodologia', 'index.html'), 'utf-8')).not.toMatch(/<script/);
-    expect(fs.readFileSync(path.join(distPath, 'doacoes', 'index.html'), 'utf-8')).not.toMatch(/<script/);
+    expect(
+      withoutJsonLdAndPageTools(fs.readFileSync(path.join(distPath, 'metodologia', 'index.html'), 'utf-8'))
+    ).not.toMatch(/<script/);
+    expect(
+      withoutJsonLdAndPageTools(fs.readFileSync(path.join(distPath, 'doacoes', 'index.html'), 'utf-8'))
+    ).not.toMatch(/<script/);
   });
 });

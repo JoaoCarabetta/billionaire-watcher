@@ -3,6 +3,7 @@ import FactWithCitation from '../components/FactWithCitation.astro';
 import Citations from '../components/Citations.astro';
 import { getMethodologyFacts } from '../utils/fixtures';
 import type { Source, Fact } from '../types';
+import PageTools from '../components/PageTools.astro';
 
 const allFacts = getMethodologyFacts();
 
@@ -235,5 +236,6 @@ const repetirNoutroPaisFacts = [
 
       <Citations citationMap={citationMap} allSources={allSources} />
     </main>
+    <PageTools />
   </body>
 </html>

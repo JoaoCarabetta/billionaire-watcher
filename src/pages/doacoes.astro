@@ -2,6 +2,7 @@
 import Citations from '../components/Citations.astro';
 import { getDonations, getCandidateByCpf, getFreeze, formatCurrency, redactCPF } from '../utils/fixtures';
 import type { Source } from '../types';
+import PageTools from '../components/PageTools.astro';
 
 const donations = getDonations();
 const freeze = getFreeze();
@@ -202,5 +203,6 @@ const sortedDonations = [...donations].sort((a, b) => b.year - a.year);
 
       <Citations citationMap={citationMap} allSources={allSources} />
     </main>
+    <PageTools />
   </body>
 </html>

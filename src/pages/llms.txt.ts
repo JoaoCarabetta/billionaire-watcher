@@ -19,6 +19,8 @@ Arquivo cívico de poder econômico no Brasil. Dossiês HTML gerados de dados p�
 - /grafo/ — visualização de grafo de controle corporativo (Cytoscape.js)
 - /grafo-publico.json — dados do grafo (${nodeCount} nós, ${edgeCount} arestas) em JSON estático
 
+As páginas HTML registram ferramentas de leitura (search_archive, get_person, get_methodology) quando o navegador expõe document.modelContext. Sem essa interface, a página permanece igual.
+
 Pessoas no índice atual: ${freezePersons.length}
 
 ## Princípios
