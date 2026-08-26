@@ -14,6 +14,8 @@ Arquivo cívico de poder econômico no Brasil. Dossiês HTML gerados de dados p�
 - /metodologia/ — métodos e fontes
 - /doacoes/ — tabela de doações políticas (TSE)
 - /pessoa/{id}/ — dossiê individual com fatos documentados e citações
+- /grafo/ — visualização de grafo de controle corporativo (Cytoscape.js)
+- /grafo-publico.json — dados do grafo (89 nós, 44 arestas) em JSON estático
 
 Pessoas no índice atual: ${freezePersons.length}
 

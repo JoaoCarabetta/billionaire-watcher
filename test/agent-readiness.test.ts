@@ -58,6 +58,22 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       expect(html).toContain('Doações Políticas');
       expect(html).toMatch(/<table/);
     });
+
+    it('should allow /grafo to use JavaScript (exception to no-JS rule)', () => {
+      const grafoPath = path.join(distPath, 'grafo', 'index.html');
+      
+      // /grafo is allowed to exist and use JavaScript
+      if (fs.existsSync(grafoPath)) {
+        const html = fs.readFileSync(grafoPath, 'utf-8');
+        
+        // Should have script tag (JavaScript is allowed here)
+        expect(html).toMatch(/<script/);
+        
+        // Should still have h1 and graph container in initial HTML
+        expect(html).toMatch(/<h1[^>]*>/);
+        expect(html).toMatch(/id="cy"/);
+      }
+    });
   });
 
   describe('Test 2: sitemap.xml lists all routes', () => {
@@ -95,6 +111,20 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       expect(xml).toMatch(/<loc>[^<]*\/pessoa\/p2\/<\/loc>/);
       expect(xml).toMatch(/<loc>[^<]*\/pessoa\/p3\/<\/loc>/);
     });
+
+    it('should list /grafo/ in sitemap.xml', () => {
+      const sitemapPath = path.join(distPath, 'sitemap.xml');
+      const xml = fs.readFileSync(sitemapPath, 'utf-8');
+      
+      expect(xml).toMatch(/<loc>[^<]*\/grafo\/<\/loc>/);
+    });
+
+    it('should list /grafo-publico.json in sitemap.xml', () => {
+      const sitemapPath = path.join(distPath, 'sitemap.xml');
+      const xml = fs.readFileSync(sitemapPath, 'utf-8');
+      
+      expect(xml).toMatch(/<loc>[^<]*\/grafo-publico\.json<\/loc>/);
+    });
   });
 
   describe('Test 3: llms.txt exists and points to key routes', () => {
@@ -124,6 +154,20 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       const content = fs.readFileSync(llmsTxtPath, 'utf-8');
       
       expect(content).toMatch(/\/pessoa\//);
+    });
+
+    it('should mention /grafo/ route in llms.txt', () => {
+      const llmsTxtPath = path.join(distPath, 'llms.txt');
+      const content = fs.readFileSync(llmsTxtPath, 'utf-8');
+      
+      expect(content).toMatch(/\/grafo\//);
+    });
+
+    it('should mention /grafo-publico.json in llms.txt', () => {
+      const llmsTxtPath = path.join(distPath, 'llms.txt');
+      const content = fs.readFileSync(llmsTxtPath, 'utf-8');
+      
+      expect(content).toMatch(/grafo-publico\.json/);
     });
   });
 
