@@ -225,6 +225,33 @@
     }
   },
   {
+    "id": "metod-lacuna-sa-fechada-sem-tabela-nacional",
+    "value": "Não existe tabela nacional pública do acionista atual de sociedade anônima fechada. O livro de registro de ações nominativas fica na companhia.",
+    "source": {
+      "publisher": "Presidência da República",
+      "locator": "https://www.planalto.gov.br/ccivil_03/leis/l6404consol.htm",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-lacuna-junta-livros-autenticados",
+    "value": "Na Junta Comercial, os livros de sociedade anônima são autenticados e não arquivados; o quadro público informa diretores, não acionistas.",
+    "source": {
+      "publisher": "Junta Comercial do Estado de Santa Catarina",
+      "locator": "https://atendimento.jucesc.sc.gov.br/help/pt-br/75-certidoes-como-solicitar-a-certidao-desejada/292-solicitacao-da-certidao-simplificada",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
+    "id": "metod-lacuna-subscritores-foto-constituicao",
+    "value": "A relação de subscritores e o estatuto arquivados na Junta são foto da constituição, não o livro corrente.",
+    "source": {
+      "publisher": "Presidência da República",
+      "locator": "https://www.planalto.gov.br/ccivil_03/leis/l6404consol.htm",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
     "id": "metod-limitacao-nao-ranking-forbes",
     "value": "O grafo não é um ranking de patrimônio e não copia a lista Forbes.",
     "source": {
