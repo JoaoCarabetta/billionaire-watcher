@@ -6,8 +6,9 @@
  *   B) one closed sociedade anônima group (agreed key `record`)
  *
  * Ordinary holdings, tesouraria, outros, União, limitadas and gestoras stay
- * graph nodes. Record and Globo are not in the JSON; this ticket mints Record
- * only. Do not invent a fourteen-digit Cadastro for Record.
+ * graph nodes. Folha, Globo, Havan, and Record may appear as company slugs on
+ * the graph; this helper still mints Record only as a closed S.A. group page.
+ * Do not invent a fourteen-digit Cadastro for Record.
  */
 
 import type { GrafoData, GrafoEdge, GrafoNode } from './grafo-elements';

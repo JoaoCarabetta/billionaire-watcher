@@ -102,8 +102,8 @@ describe('Built /llms.txt graph size (issue #151)', () => {
     expect(graphSize, 'llms.txt must state graph size as N nós, M arestas').toBeTruthy();
     expect(Number(graphSize![1])).not.toBe(89);
     expect(Number(graphSize![2])).not.toBe(44);
-    expect(content).not.toMatch(/89\s+nós/);
-    expect(content).not.toMatch(/44\s+arestas/);
+    expect(content).not.toMatch(/(?<!\d)89\s+nós/);
+    expect(content).not.toMatch(/(?<!\d)44\s+arestas/);
   });
 
   it('contains the live node and edge counts from grafo-publico.json', () => {

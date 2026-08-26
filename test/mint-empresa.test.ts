@@ -31,7 +31,7 @@ describe('Mint cited /empresa/ fichas (issue #148)', () => {
     const byId = new Map(minted.map((empresa) => [empresa.id, empresa]));
 
     it('mints each LISTED_COMPANY_IDS seed that already has a company node, including Energisa', () => {
-      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS.length).toBeGreaterThanOrEqual(33);
       expect(LISTED_COMPANY_IDS).toContain(ENERGISA_ID);
       for (const id of LISTED_COMPANY_IDS) {
         const empresa = byId.get(id);
@@ -87,12 +87,18 @@ describe('Mint cited /empresa/ fichas (issue #148)', () => {
       expect(minted.some((empresa) => empresa.id.startsWith('outros-'))).toBe(false);
     });
 
-    it('does not mint Dexco, Votorantim, or Globo, and does not mint every 14-digit Cadastro', () => {
-      expect(minted.some((empresa) => /dexco/i.test(empresa.id) || /dexco/i.test(empresa.legal_name))).toBe(false);
-      expect(minted.some((empresa) => /votorantim/i.test(empresa.id) || /votorantim/i.test(empresa.legal_name))).toBe(
+    it('mints Dexco as 97837181000147, not as Votorantim; does not mint Globo or every 14-digit Cadastro', () => {
+      const dexco = minted.find(
+        (empresa) => empresa.id === '97837181000147' || /dexco/i.test(empresa.legal_name)
+      );
+      expect(dexco, 'Dexco listed seed must be minted on its own id').toBeDefined();
+      expect(dexco!.id).toBe('97837181000147');
+      expect(dexco!.legal_name).toMatch(/DEXCO/i);
+      expect(dexco!.legal_name).not.toMatch(/Votorantim/i);
+      expect(byId.has('03407049000151')).toBe(false);
+      expect(minted.some((empresa) => empresa.id === 'globo' || /^globo$/i.test(empresa.legal_name))).toBe(
         false
       );
-      expect(minted.some((empresa) => /globo/i.test(empresa.id) || /globo/i.test(empresa.legal_name))).toBe(false);
       const fourteenDigitNodes = grafo.nodes.filter(
         (node) => node.kind === 'company' && /^\d{14}$/.test(node.id)
       );

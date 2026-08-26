@@ -41,8 +41,8 @@ describe('Grafo search (issue #128)', () => {
       });
     });
 
-    it('jose includes a node whose live label has José after accent fold', () => {
-      const hits = searchGrafoNodes(json.nodes, 'jose');
+    it('jose salim includes a node whose live label has José after accent fold', () => {
+      const hits = searchGrafoNodes(json.nodes, 'jose salim');
       expect(hits).toContainEqual({
         id: 'p-d584d2cc',
         label: 'JOSÉ SALIM MATTAR JÚNIOR',
