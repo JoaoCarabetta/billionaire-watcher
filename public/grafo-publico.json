@@ -1,97 +1,127 @@
 {
   "nodes": [
     {
-      "id": "***796***",
+      "id": "p-40894d2d",
       "kind": "person",
       "label": "MARIA CLARA BOTELHO PEREZ"
     },
     {
-      "id": "***768***",
+      "id": "p-74cd4e86",
       "kind": "person",
       "label": "MARIA DO CARMO RIPPER KOS"
     },
     {
-      "id": "***730***",
+      "id": "p-848bf0ce",
       "kind": "person",
       "label": "CAMILA BOTELHO ROCHA JANSEN"
     },
     {
-      "id": "***782***",
+      "id": "p-a382ee76",
       "kind": "person",
       "label": "GUSTAVO KOS BOTELH0"
     },
     {
-      "id": "***703***",
+      "id": "p-73a733cc",
       "kind": "person",
       "label": "BRUNO ALZUGUIR BOTELHO"
     },
     {
-      "id": "***700***",
+      "id": "p-7636b07f",
+      "kind": "person",
+      "label": "CINTIA ALZUGUIR BOTELHO"
+    },
+    {
+      "id": "p-392bfe45",
       "kind": "person",
       "label": "ALICE BOTELHO BASTOS"
     },
     {
-      "id": "***853***",
+      "id": "p-7f3fc508",
       "kind": "person",
       "label": "RUTH MARIA FERREIRA BOTELHO"
     },
     {
-      "id": "***740***",
+      "id": "p-a54160d7",
       "kind": "person",
       "label": "FREDERICO KOS BOTELHO"
     },
     {
-      "id": "***791***",
+      "id": "p-dbf7401a",
       "kind": "person",
       "label": "ADRIANA BOTELHO BASTOS ZAVERUCHA"
     },
     {
-      "id": "***780***",
+      "id": "p-5438e9c8",
+      "kind": "person",
+      "label": "PEDRO AUGUSTO BOTELHO BASTOS"
+    },
+    {
+      "id": "p-a8c1e5f9",
       "kind": "person",
       "label": "ANDRE LUIS BOTELHO BASTOS"
     },
     {
-      "id": "***712***",
+      "id": "p-8db5e3f1",
       "kind": "person",
       "label": "DORA BOTELHO BASTOS"
     },
     {
-      "id": "***798***",
+      "id": "p-8f4b2205",
       "kind": "person",
       "label": "PATRICIA PEREZ BOTELHO"
     },
     {
-      "id": "***715***",
+      "id": "p-1282fcb3",
       "kind": "person",
       "label": "GILBERTO MULLER BOTELHO"
     },
     {
-      "id": "***710***",
+      "id": "p-1348ab32",
       "kind": "person",
       "label": "BEATRIZ ALZUGUIR BOTELHO"
     },
     {
-      "id": "***634***",
+      "id": "p-ea4eb254",
+      "kind": "person",
+      "label": "MONICA PEREZ BOTELHO"
+    },
+    {
+      "id": "p-b9db9330",
       "kind": "person",
       "label": "STELLA PEREZ BOTELHO"
     },
     {
-      "id": "***759***",
+      "id": "p-887e054b",
+      "kind": "person",
+      "label": "MAURICIO PEREZ BOTELHO"
+    },
+    {
+      "id": "p-5c6eb6c7",
       "kind": "person",
       "label": "PAULO CESAR BOTELHO BASTOS"
     },
     {
-      "id": "***704***",
+      "id": "p-010e2551",
+      "kind": "person",
+      "label": "LEONARDO BOTELHO ROCHA"
+    },
+    {
+      "id": "p-3d9739a9",
       "kind": "person",
       "label": "MYRIAN ALTAIR MEIRA"
     },
     {
-      "id": "***615***",
+      "id": "p-831e3028",
+      "kind": "person",
+      "label": "RICARDO PEREZ BOTELHO"
+    },
+    {
+      "id": "p-cdbc8c4e",
       "kind": "person",
       "label": "IVAN MÜLLER BOTELHO"
     },
     {
-      "id": "***877***",
+      "id": "p-7fc3be74",
       "kind": "person",
       "label": "ESPOLIO DE ORMEO JUNQUEIRA BOTELHO NETO"
     },
@@ -448,311 +478,339 @@
   ],
   "edges": [
     {
-      "from": "***768***",
+      "from": "p-7636b07f",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 0.002,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 0.001
     },
     {
-      "from": "***768***",
+      "from": "p-74cd4e86",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 0.012,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 0.006
     },
     {
-      "from": "***700***",
+      "from": "p-392bfe45",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 0.097,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 0.097
     },
     {
-      "from": "***712***",
+      "from": "p-8db5e3f1",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 1.918,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 1.918
     },
     {
-      "from": "***759***",
+      "from": "p-5c6eb6c7",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 1.918,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 1.918
     },
     {
-      "from": "***780***",
+      "from": "p-a8c1e5f9",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 1.918,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 1.918
     },
     {
-      "from": "***700***",
+      "from": "p-5438e9c8",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 1.918,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 1.918
     },
     {
-      "from": "***791***",
+      "from": "p-dbf7401a",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 1.918,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 1.918
     },
     {
-      "from": "***634***",
+      "from": "p-b9db9330",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 2.428,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 2.428
     },
     {
-      "from": "***853***",
+      "from": "p-7f3fc508",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 3.132,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.132
     },
     {
-      "from": "***704***",
+      "from": "p-3d9739a9",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 3.132,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.132
     },
     {
-      "from": "***877***",
+      "from": "p-7fc3be74",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 3.132,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.132
     },
     {
-      "from": "***768***",
+      "from": "p-ea4eb254",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 52.004,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.982
     },
     {
-      "from": "***798***",
+      "from": "p-8f4b2205",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 6.75,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 6.75
     },
     {
-      "from": "***715***",
+      "from": "p-1282fcb3",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 8.765,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 8.765
     },
     {
-      "from": "***791***",
+      "from": "p-831e3028",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 46.444,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 31.143
     },
     {
-      "from": "***700***",
+      "from": "p-887e054b",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 46.444,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 31.143
     },
     {
-      "from": "***796***",
+      "from": "p-40894d2d",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 15.999,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 32.006
     },
     {
-      "from": "***730***",
+      "from": "p-848bf0ce",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 15.999,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 32.006
     },
     {
-      "from": "***780***",
+      "from": "p-010e2551",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 15.999,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 32.006
     },
     {
-      "from": "***703***",
+      "from": "p-73a733cc",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 26.778,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 34.429
     },
     {
-      "from": "***740***",
+      "from": "p-a54160d7",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 26.778,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 34.429
     },
     {
-      "from": "***710***",
+      "from": "p-1348ab32",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 26.778,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 34.429
     },
     {
-      "from": "***782***",
+      "from": "p-a382ee76",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 26.778,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 34.429
     },
     {
-      "from": "***615***",
+      "from": "p-cdbc8c4e",
       "to": "00864214000106",
       "kind": "person_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 70.573,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 70.573
     },
     {
       "from": "00383281000109",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 6.152,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.237
     },
     {
       "from": "33857830000199",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 7.363,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 3.875
     },
     {
       "from": "10643191000163",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 7.781,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 4.095
     },
     {
       "from": "09267871000140",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 8.514,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 4.469
     },
     {
       "from": "53216157000115",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 6.75,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 6.75
     },
     {
       "from": "59206795000131",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 6.75,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 6.75
     },
     {
       "from": "53285084000113",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 6.75,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 6.75
     },
     {
       "from": "02260956000158",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 26.646,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 61.162
     },
     {
       "from": "23160658000166",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 66.095,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 66.095
     },
     {
       "from": "20286787000107",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 72.155,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 72.155
     },
     {
       "from": "16674735000130",
       "to": "00864214000106",
       "kind": "company_owns",
+      "source": "FRE Energisa 160981",
       "pct_capital": 100.0,
-      "source": "FRE Energisa 160981"
+      "pct_votos": 100.0
     },
     {
       "from": "05717225000187",
       "to": "01961898",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "17248371000190",
       "to": "01961898",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "05528233000185",
       "to": "03361252",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "05717887000157",
       "to": "10456016",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "33171026000151",
       "to": "16701716",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "05491982000185",
       "to": "16701716",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "05712135000101",
       "to": "43149806",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     },
     {
       "from": "42179743000110",
       "to": "59104422",
       "kind": "company_owns",
-      "pct_capital": null,
       "source": "Quadro de Socios Receita"
     }
   ]
