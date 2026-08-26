@@ -43,7 +43,7 @@ export interface CytoscapeElement {
 export function buildCytoscapeElements(data: GrafoData): CytoscapeElement[] {
   const elements: CytoscapeElement[] = [];
 
-  // Add nodes. Tag the eleven listed seeds; leave kind as company.
+  // Add nodes. Tag listed seeds from LISTED_COMPANY_IDS; leave kind as company.
   data.nodes.forEach(node => {
     const nodeData: CytoscapeElement['data'] = {
       id: node.id,
