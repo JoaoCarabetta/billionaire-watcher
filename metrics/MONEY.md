@@ -6,7 +6,7 @@ O comando lê `grafo-publico.json` (`nodes` + `edges`) do tamanho que o arquivo 
 
 ## Como rodar
 
-Na raiz do repositório:
+Na raiz do repositório (latest Energisa fixture date, 2026-08-21):
 
 ```sh
 npm run money -- public/grafo-publico.json
@@ -18,24 +18,32 @@ JSON completo:
 npm run money -- public/grafo-publico.json --json
 ```
 
-Uma data (Energisa, 21 August 2026):
+Data explícita:
 
 ```sh
 npm run money -- public/grafo-publico.json --date 2026-08-21
 ```
 
-Preços e quantidades padrão: `transform/seeds/listed_prices_fixture.csv` + `transform/seeds/energisa_edges_fixture.csv`.
-
-Fixture mínima (algoritmo, testes):
+As duas datas da fixture como duas linhas (append-by-day; inclui 2026-08-20):
 
 ```sh
-npx vitest run test/grafo-money.test.ts
+npm run money -- public/grafo-publico.json --all-dates
 ```
+
+## Fonte de preço (fixture de teste)
+
+Não é pull ao vivo da Bolsa. Não é linha confirmada no BigQuery.
+
+- Preços: Energisa *test fixture* (hoje em `transform/seeds/listed_prices_fixture.csv`, ticker **ENGI**). Latest `preco_date` **2026-08-21**: ordinária 45.75, preferencial 43.10.
+- Quantidades: `transform/seeds/energisa_edges_fixture.csv` — 609526325 ordinárias, 89144004 preferenciais (Energisa IR 14 Aug 2026 table 6.1).
+- V = 45.75 × 609526325 + 43.10 × 89144004 = **31727935941.15**.
+
+O comando sem `--date` e sem `--all-dates` usa só essa data latest. 2026-08-20 só entra se `--all-dates` (duas linhas) ou `--date 2026-08-20`.
 
 ## O que cada coluna significa
 
-- **V** — valor listado naquela data: soma dos produtos de classe (quantidade × preço) da cia aberta. Join: primeiros 8 dígitos do CNPJ de 14 dígitos no JSON = `cnpj_basico` do armazém. Energisa `00864214000106` → `00864214`.
-- **slice_capital / slice_votos** — fatia citada em caminhos completos, agrupada pelo último salto (linha FRE de entrada na semente). Caminho com buraco não entra. Outros e tesouraria não entram.
+- **V** — valor listado naquela data: soma dos produtos de classe (quantidade × preço) da cia aberta. Join: primeiros 8 dígitos do CNPJ de 14 dígitos no JSON = `cnpj_basico`. Energisa `00864214000106` → `00864214`.
+- **slice_capital / slice_votos** — fatia citada em caminhos completos, **agrupada pelo último salto** (linha FRE de entrada na semente). Não é a soma de todos os caminhos simples (isso duplicaria Ivan através da Gipar). Caminho com buraco não entra. Outros e tesouraria não entram.
 - **economic** — `V × slice_capital`. Pretensão sobre o valor de equity listado naquela data.
 - **control** — `V × slice_votos`. Os mesmos reais como unidade de poder de voto. Não é caixa. É dinheiro sob controle.
 - **Person total** — soma dos grupos de último salto daquela pessoa naquela semente. O salto direto é **um** grupo, não o total. Produto através de um holding; não se toma o holding a 100%.
@@ -47,8 +55,8 @@ Ivan Müller Botelho através da Gipar é um grupo de último salto. A Gipar tem
 
 ## O que não dá para precificar
 
-- Veículos não listados (Gipar, Nova Gipar, Itacatu, Multisetor, LTD, …): não têm V. Só entra a fatia citada de uma semente listada que tenha cotação de arquivo.
-- Outras cias abertas: **Energisa-only until issue 123** (cotações reais Brasil Bolsa Balcão no armazém). Issue 115 / PR 120 é *recorded fixture quote* (teste). Não é valor de arquivo. Vale, WEG, Ambev e o restante não recebem coluna de dinheiro neste PR.
+- Veículos não listados (Gipar, Nova Gipar, Itacatu, Multisetor, LTD, …): não têm V. Só entra a fatia citada de uma semente listada precificada.
+- Outras cias abertas: **Energisa-only until issue 123**. Issue 115 / PR 120 é *recorded fixture quote* (teste). Não é valor de arquivo. Vale, WEG, Ambev e o restante não recebem coluna de dinheiro neste PR.
 - Buraco no caminho: sem dinheiro naquele caminho.
 - Outros e tesouraria: sem dinheiro.
 - Cotistas de fundo: não estão no arquivo.
@@ -61,6 +69,8 @@ Wealth REFUSED.
 ## Worked example (from `npm run money -- public/grafo-publico.json --date 2026-08-21`)
 
 IVAN MÜLLER BOTELHO `p-cdbc8c4e` → ENERGISA S.A. `00864214000106` on 2026-08-21.
+
+Energisa test fixture, ticker ENGI. Not a live Bolsa pull. Not a confirmed BigQuery row.
 
 V = 31727935941.15 reais (ON 45.75 × 609526325 + PN 43.10 × 89144004).
 

@@ -5,6 +5,7 @@
  *   npm run money -- public/grafo-publico.json
  *   npm run money -- public/grafo-publico.json --json
  *   npm run money -- public/grafo-publico.json --date 2026-08-21
+ *   npm run money -- public/grafo-publico.json --all-dates
  */
 
 import {
@@ -41,6 +42,7 @@ const result = computeMoneyUnderControl(graph, {
   pricesPath: flagValue('--prices'),
   qtyPath: flagValue('--qty'),
   date: flagValue('--date'),
+  allDates: args.includes('--all-dates'),
 });
 const text = jsonMode ? JSON.stringify(result, null, 2) : formatMoneyReport(result);
 assertSafeMoneyOutput(text);

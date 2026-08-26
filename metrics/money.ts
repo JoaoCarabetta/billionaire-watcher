@@ -4,20 +4,22 @@
  * Economic column = V × capital_slice (claim on listed equity that date).
  * Control column = V × votes_slice (same reais as a unit for voting power; not cash).
  *
- * Last-hop grouping into the listed seed. Person total = sum of those groups.
- * Direct hop is one group, not the whole total. Do not take a holding at 100%.
- * Nested rows (person through a holding on the same seed) are not a published sum.
+ * Last-hop grouping into the listed seed lives in this file. Do not call the
+ * metrics helper that sums every simple complete path: that would double-count
+ * diamonds (Ivan through Gipar on Energisa).
  *
  * Missing hop → no money. Outros / tesouraria → no money. No equal-split.
  * Person id is p- plus eight hex. Unlisted vehicles have no V.
  *
- * Archive money is Energisa-only until issue 123 (warehouse real Brasil Bolsa
- * Balcão quotes). Issue 115/PR 120 is a test fixture: Recorded fixture quote
- * rows are not civic-archive value.
+ * Energisa money uses the Energisa *test fixture* (ticker ENGI), not a live
+ * Bolsa pull and not a confirmed BigQuery row. Latest preco_date 2026-08-21.
+ * Other listadas stay without reais until issue 123. Issue 115/PR 120
+ * Recorded fixture quote rows are not civic-archive value.
  */
 
 import { readFileSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
+// File load + node typology only. Money slices are last-hop grouped below.
 import {
   classifyNode,
   loadGraphFile,
@@ -56,6 +58,9 @@ export type ListedValue = {
   cnpj_basico: string;
   date: string;
   listed_value: number;
+  ticker?: string;
+  quote_kind: 'energisa_test_fixture' | 'unit_fixture';
+  price_source_label: string;
   class_produtos: Array<{
     classe: string;
     ticker?: string;
@@ -146,6 +151,8 @@ export type MoneyResult = {
   };
 };
 
+export const ENERGISA_TEST_FIXTURE_LABEL =
+  'Energisa test fixture (ticker ENGI; not a live Bolsa pull; not a confirmed BigQuery row)';
 /** Energisa until issue 123. The #115 fixture does not unlock other listadas. */
 export const ENERGISA_CNPJ_BASICO = '00864214';
 export const ARCHIVE_BOLSA_SOURCE = /brasil\s+bolsa\s+balc[aã]o/i;
@@ -348,13 +355,22 @@ export function listedValuesFromPrices(
     }
     const produto = price.preco * quantidade;
     const key = `${price.cnpj_basico}\t${price.preco_date}`;
+    const isEnergisa = price.cnpj_basico === ENERGISA_CNPJ_BASICO;
     const bucket = buckets.get(key) ?? {
       cnpj_basico: price.cnpj_basico,
       date: price.preco_date,
       listed_value: 0,
+      ticker: price.ticker,
+      quote_kind: isEnergisa ? 'energisa_test_fixture' : 'unit_fixture',
+      price_source_label: isEnergisa
+        ? ENERGISA_TEST_FIXTURE_LABEL
+        : 'unit fixture (algorithm test; not archive value)',
       class_produtos: [],
       sources: [],
     };
+    if (price.ticker && !bucket.ticker) {
+      bucket.ticker = price.ticker;
+    }
     bucket.class_produtos.push({
       classe,
       ticker: price.ticker,
@@ -363,13 +379,18 @@ export function listedValuesFromPrices(
       produto,
     });
     bucket.listed_value += produto;
-    const sources = [price.source, qtyByBasico.get(price.cnpj_basico)?.source].filter(
-      (part): part is string => Boolean(part)
-    );
-    for (const source of sources) {
-      if (!bucket.sources.includes(source)) {
-        bucket.sources.push(source);
+    const qtySource = qtyByBasico.get(price.cnpj_basico)?.source;
+    if (isEnergisa && !bucket.sources.includes(ENERGISA_TEST_FIXTURE_LABEL)) {
+      bucket.sources.push(ENERGISA_TEST_FIXTURE_LABEL);
+    }
+    for (const source of [isEnergisa ? undefined : price.source, qtySource]) {
+      if (!source || bucket.sources.includes(source)) {
+        continue;
       }
+      if (isEnergisa && ARCHIVE_BOLSA_SOURCE.test(source)) {
+        continue;
+      }
+      bucket.sources.push(source);
     }
     buckets.set(key, bucket);
   }
@@ -440,6 +461,8 @@ type SliceCtx = {
 };
 
 function lastHopGroups(fromId: string, targetId: string, ctx: SliceCtx, stack: string[]): SliceGroup[] {
+  // Group by the last hop into `targetId`. Recurse for the prefix N→D.
+  // Do not raw-sum every simple complete path (that double-counts diamonds).
   if (fromId === targetId) {
     return [];
   }
@@ -567,6 +590,7 @@ export function computeMoneyUnderControl(
     pricesPath?: string;
     qtyPath?: string;
     date?: string;
+    allDates?: boolean;
     cwd?: string;
     allowNonArchivePrices?: boolean;
   }
@@ -587,9 +611,17 @@ export function computeMoneyUnderControl(
           options?.qtyPath ?? join(repoRoot, 'transform', 'seeds', 'energisa_edges_fixture.csv'),
           cwd
         ));
-  const values = listedValuesFromPrices(archivePrices, quantities).filter(
-    (row) => !options?.date || row.date === options.date
-  );
+  const allValues = listedValuesFromPrices(archivePrices, quantities);
+  const latestDate = allValues.map((row) => row.date).sort().at(-1);
+  const values = allValues.filter((row) => {
+    if (options?.allDates) {
+      return true;
+    }
+    if (options?.date) {
+      return row.date === options.date;
+    }
+    return row.date === latestDate;
+  });
   const valueByBasicoDate = new Map(values.map((row) => [`${row.cnpj_basico}\t${row.date}`, row]));
   const pricedBasicos = new Set(values.map((row) => row.cnpj_basico));
 
@@ -783,7 +815,7 @@ export function computeMoneyUnderControl(
     node_totals: nodeTotals,
     cannot_measure: [
       'unlisted vehicles: no listed value; only a cited slice of a priced listed seed',
-      'cias abertas other than Energisa: no money until issue 123 lands warehouse Brasil Bolsa Balcão quotes (issue 115 is a recorded fixture quote, not archive value)',
+      'cias abertas other than Energisa: no money until issue 123 (Energisa money is the test fixture, not a live Bolsa pull and not a confirmed BigQuery row; issue 115 recorded fixture quotes are skipped)',
       'hole on a path: that path yields no money',
       'Outros and tesouraria: no money',
       'fund cotistas: not in this file',
@@ -872,7 +904,8 @@ function workedExample(result: MoneyResult): string[] {
   lines.push(
     `${ivan.node_label} ${ivan.node_id} → ${ivan.listed_seed_label} ${ivan.listed_seed_id} on ${ivan.date}.`
   );
-  lines.push(`V (listed value that date) = ${fmtReais(ivan.listed_value)} reais.`);
+  lines.push(`V (Energisa test fixture, ticker ENGI, that date) = ${fmtReais(ivan.listed_value)} reais.`);
+  lines.push('Not a live Bolsa pull. Not a confirmed BigQuery row.');
   lines.push('Direct hop is one group, not the whole total. Product through a holding, not 100% of the holding.');
   lines.push('');
   lines.push(
@@ -930,7 +963,7 @@ export function formatMoneyReport(result: MoneyResult): string {
   lines.push(
     'Person total on a listed seed = sum of last-hop groups. Direct hop is one group. Nested rows are marked; do not add them.'
   );
-  lines.push('Energisa-only until issue 123. Issue 115 is a recorded fixture quote, not archive value.');
+  lines.push('Energisa-only until issue 123. Energisa prices are the test fixture (ticker ENGI), not a live Bolsa pull and not a confirmed BigQuery row.');
   lines.push('');
   lines.push('## Wealth');
   lines.push(`Wealth REFUSED. ${result.wealth_rank.reason}`);
@@ -940,17 +973,19 @@ export function formatMoneyReport(result: MoneyResult): string {
     lines.push(`- ${item}`);
   }
   lines.push('');
-  lines.push('## Priced listed seeds this run (archive: Energisa + Brasil Bolsa Balcão)');
+  lines.push('## Priced listed seeds this run (Energisa test fixture)');
   if (result.graph.priced_listed_seed_ids.length === 0) {
     lines.push('None. Energisa-only until issue 123.');
   } else {
     const valueRows = result.listed_values.map((row) => [
       row.cnpj_basico,
+      row.ticker ?? '',
       row.date,
       fmtReais(row.listed_value),
       row.class_produtos.map((item) => `${item.classe} ${item.quantidade}×${item.preco}`).join('; '),
+      row.price_source_label,
     ]);
-    lines.push(table(['cnpj_basico', 'date', 'V', 'class produtos'], valueRows));
+    lines.push(table(['cnpj_basico', 'ticker', 'date', 'V', 'class produtos', 'price source'], valueRows));
   }
   if (result.skipped_fixture_quotes.length > 0) {
     lines.push('');

@@ -152,6 +152,12 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(graph.edges.length).toBeGreaterThan(0);
     });
 
+    it('does not reuse the metrics helper that sums every simple complete path', () => {
+      const source = fs.readFileSync(path.join(ROOT, 'metrics', 'money.ts'), 'utf8');
+      expect(source).not.toMatch(/walkCitedPaths\(/);
+      expect(source).not.toMatch(/cited_slices/);
+    });
+
     it('does not hardcode graph size in the money source', () => {
       const source = fs.readFileSync(path.join(ROOT, 'metrics', 'money.ts'), 'utf8');
       const runner = fs.readFileSync(path.join(ROOT, 'metrics', 'money-run.ts'), 'utf8');
@@ -162,6 +168,43 @@ describe('Dinheiro sob controle (issue #116)', () => {
         expect(text).not.toMatch(/\b403\b/);
         expect(text).not.toMatch(/\b492\b/);
       }
+    });
+
+    it('labels Energisa quotes as the test fixture on the latest preco_date, ticker ENGI', () => {
+      const latest = computeMoneyUnderControl(graph, {
+        pricesPath: LISTED_PRICES,
+        qtyPath: ENERGISA_QTY,
+        repoRoot: ROOT,
+        cwd: ROOT,
+      });
+      expect(latest.dates).toEqual(['2026-08-21']);
+      expect(latest.listed_values).toHaveLength(1);
+      expect(latest.listed_values[0].ticker).toBe('ENGI');
+      expect(latest.listed_values[0].quote_kind).toBe('energisa_test_fixture');
+      expect(latest.listed_values[0].listed_value).toBeCloseTo(31727935941.15, 2);
+      expect(latest.listed_values[0].class_produtos.map((row) => row.preco).sort()).toEqual([43.1, 45.75]);
+      const report = formatMoneyReport(latest);
+      expect(report).toMatch(/Energisa test fixture/);
+      expect(report).toMatch(/ticker ENGI/);
+      expect(report).toMatch(/not a live Bolsa pull/i);
+      expect(report).toMatch(/not a confirmed BigQuery row/i);
+      expect(report).not.toMatch(/2026-08-20/);
+    });
+
+    it('emits 2026-08-20 only when both fixture dates are requested as two rows', () => {
+      const both = computeMoneyUnderControl(graph, {
+        pricesPath: LISTED_PRICES,
+        qtyPath: ENERGISA_QTY,
+        allDates: true,
+        repoRoot: ROOT,
+        cwd: ROOT,
+      });
+      expect(both.dates).toEqual(['2026-08-20', '2026-08-21']);
+      const v20 = both.listed_values.find((row) => row.date === '2026-08-20');
+      const v21 = both.listed_values.find((row) => row.date === '2026-08-21');
+      expect(v20).toBeDefined();
+      expect(v21?.listed_value).toBeCloseTo(31727935941.15, 2);
+      expect(v20!.listed_value).not.toBeCloseTo(31727935941.15, 2);
     });
 
     it('prints archive money only for Energisa, not recorded fixture quotes', () => {
@@ -302,8 +345,8 @@ describe('Dinheiro sob controle (issue #116)', () => {
   });
 
   describe('CLI', () => {
-    it('runs the documented command and prints Ivan person total on Energisa', () => {
-      const output = execSync('npm run money -- public/grafo-publico.json --date 2026-08-21', {
+    it('runs the documented command on the latest fixture date and prints Ivan person total', () => {
+      const output = execSync('npm run money -- public/grafo-publico.json', {
         cwd: ROOT,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -311,6 +354,10 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(output).toMatch(/Wealth REFUSED/);
       expect(output).toMatch(/p-cdbc8c4e/);
       expect(output).toMatch(/Person total/);
+      expect(output).toMatch(/Energisa test fixture/);
+      expect(output).toMatch(/2026-08-21/);
+      expect(output).toMatch(/ENGI/);
+      expect(output).not.toMatch(/2026-08-20/);
       expect(output).toMatch(/issue 123/);
       expect(output).not.toMatch(/fortuna/i);
       expect(output).not.toMatch(/(?<![\d.])\d{11}(?![\d.])/);
