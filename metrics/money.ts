@@ -11,11 +11,14 @@
  * Missing hop → no money. Outros / tesouraria → no money. No equal-split.
  * Person id is p- plus eight hex. Unlisted vehicles have no V.
  *
- * Energisa money uses the Energisa *test fixture* (ticker ENGI), not a live
- * Bolsa pull and not a confirmed BigQuery row. Latest preco_date 2026-08-21.
- * Other listadas stay without money until issue 115 lands prices. WEG, Ambev,
- * and the rest are not priced here. Issue 115 recorded fixture quotes are not
- * civic-archive value.
+ * Prices: issue #123 transform/seeds/b3_listed_prices.csv (Brasil Bolsa Balcão
+ * PREULT, date 2025-05-16). Default is never listed_prices_fixture.csv.
+ * Recorded fixture quotes are skipped and never printed.
+ * Claro (cnpj_basico 07043628) has no Bolsa class. ENGI11 is a unit: no money
+ * without a unit quantity (do not invent one). Energisa V uses graph_edges
+ * ordinary/preferred quantities × ENGI3/ENGI4. Other listadas use CVM FRE
+ * item 17.1 capital quantities on or before the quote date, only when a B3
+ * class also has a quantity.
  */
 
 import { readFileSync } from 'node:fs';
@@ -52,6 +55,7 @@ export type QtyInputRow = {
   cnpj_basico: string;
   qty_ordinarias?: number;
   qty_preferenciais?: number;
+  qty_unit?: number;
   source?: string;
 };
 
@@ -60,7 +64,7 @@ export type ListedValue = {
   date: string;
   listed_value: number;
   ticker?: string;
-  quote_kind: 'energisa_test_fixture' | 'unit_fixture';
+  quote_kind: 'b3_archive' | 'unit_fixture';
   price_source_label: string;
   class_produtos: Array<{
     classe: string;
@@ -152,12 +156,16 @@ export type MoneyResult = {
   };
 };
 
-export const ENERGISA_TEST_FIXTURE_LABEL =
-  'Energisa test fixture (ticker ENGI; not a live Bolsa pull; not a confirmed BigQuery row)';
-/** Energisa-only until issue 115 lands prices. WEG/Ambev stay unpriced. */
-export const ENERGISA_CNPJ_BASICO = '00864214';
+export const B3_ARCHIVE_LABEL = 'Brasil Bolsa Balcão';
+export const CLARO_CNPJ_BASICO = '07043628';
+export const DEFAULT_MONEY_DATE = '2025-05-16';
 export const ARCHIVE_BOLSA_SOURCE = /brasil\s+bolsa\s+balc[aã]o/i;
 export const RECORDED_FIXTURE_QUOTE = /recorded\s+fixture\s+quote/i;
+export const DEFAULT_PRICES_RELATIVE = join('transform', 'seeds', 'b3_listed_prices.csv');
+export const DEFAULT_QTY_RELATIVE_PATHS = [
+  join('metrics', 'listed_capital_quantities.csv'),
+  join('transform', 'seeds', 'energisa_edges_fixture.csv'),
+];
 
 type SliceGroup = {
   via_last_hop_id: string;
@@ -174,11 +182,26 @@ export function isRecordedFixtureQuote(source?: string): boolean {
   return RECORDED_FIXTURE_QUOTE.test(source ?? '');
 }
 
-export function isArchiveBolsaPrice(row: { cnpj_basico: string; source?: string }): boolean {
+export function isUnitClass(classe: string): boolean {
+  const normalized = classe.trim().toLowerCase();
+  return normalized === 'unit' || normalized === 'units' || normalized === 'unt' || normalized === 'unidade';
+}
+
+export function isOrdinaryClass(classe: string): boolean {
+  const normalized = classe.trim().toLowerCase();
+  return normalized === 'ordinaria' || normalized === 'ordinarias' || normalized === 'on';
+}
+
+export function isPreferredClass(classe: string): boolean {
+  const normalized = classe.trim().toLowerCase();
+  return normalized === 'preferencial' || normalized === 'preferenciais' || normalized === 'pn';
+}
+
+export function isArchiveBolsaPrice(row: { cnpj_basico: string; classe?: string; source?: string }): boolean {
   if (isRecordedFixtureQuote(row.source)) {
     return false;
   }
-  if (row.cnpj_basico !== ENERGISA_CNPJ_BASICO) {
+  if (row.cnpj_basico === CLARO_CNPJ_BASICO) {
     return false;
   }
   return ARCHIVE_BOLSA_SOURCE.test(row.source ?? '');
@@ -277,10 +300,13 @@ export function loadQtyRowsFromEdgesFixture(filePath: string, cwd = process.cwd(
     }
     const ordinarias = parseOptionalNumber(row.qty_ordinarias);
     const preferenciais = parseOptionalNumber(row.qty_preferenciais);
-    if (ordinarias === undefined && preferenciais === undefined) {
+    const unit = parseOptionalNumber(row.qty_unit);
+    if (ordinarias === undefined && preferenciais === undefined && unit === undefined) {
       continue;
     }
-    const sourceParts = [row.source_doc, row.source_locator].filter((part) => part && part.length > 0);
+    const sourceParts = [row.source_doc, row.source_locator, row.source].filter(
+      (part) => part && part.length > 0
+    );
     const existing = grouped.get(basico) ?? { cnpj_basico: basico };
     if (ordinarias !== undefined) {
       existing.qty_ordinarias = ordinarias;
@@ -288,10 +314,24 @@ export function loadQtyRowsFromEdgesFixture(filePath: string, cwd = process.cwd(
     if (preferenciais !== undefined) {
       existing.qty_preferenciais = preferenciais;
     }
+    if (unit !== undefined) {
+      existing.qty_unit = unit;
+    }
     if (sourceParts.length > 0) {
       existing.source = sourceParts.join(' ');
     }
     grouped.set(basico, existing);
+  }
+  return [...grouped.values()];
+}
+
+export function loadQtyRows(filePaths: string | string[], cwd = process.cwd()): QtyInputRow[] {
+  const paths = Array.isArray(filePaths) ? filePaths : [filePaths];
+  const grouped = new Map<string, QtyInputRow>();
+  for (const filePath of paths) {
+    for (const row of loadQtyRowsFromEdgesFixture(filePath, cwd)) {
+      grouped.set(row.cnpj_basico, row);
+    }
   }
   return [...grouped.values()];
 }
@@ -304,25 +344,26 @@ export function partitionPriceRows(
   const skipped: SkippedFixtureQuote[] = [];
   const seenSkip = new Set<string>();
   for (const row of prices) {
-    if (isRecordedFixtureQuote(row.source) || !isArchiveBolsaPrice(row)) {
-      if (options?.allowNonArchivePrices && !isRecordedFixtureQuote(row.source)) {
+    const recorded = isRecordedFixtureQuote(row.source);
+    const claro = row.cnpj_basico === CLARO_CNPJ_BASICO;
+    const archiveOk = !claro && isArchiveBolsaPrice(row);
+    if (!archiveOk) {
+      if (options?.allowNonArchivePrices && !recorded && !claro) {
         archive.push(row);
         continue;
       }
-      if (isRecordedFixtureQuote(row.source) || row.cnpj_basico !== ENERGISA_CNPJ_BASICO) {
-        const key = `${row.cnpj_basico}\t${row.preco_date}\t${row.classe}\t${row.ticker ?? ''}`;
-        if (seenSkip.has(key)) {
-          continue;
-        }
-        seenSkip.add(key);
-        skipped.push({
-          cnpj_basico: row.cnpj_basico,
-          date: row.preco_date,
-          ticker: row.ticker,
-          classe: row.classe,
-          source: row.source || 'Recorded fixture quote',
-        });
+      const key = `${row.cnpj_basico}\t${row.preco_date}\t${row.classe}\t${row.ticker ?? ''}`;
+      if (seenSkip.has(key)) {
+        continue;
       }
+      seenSkip.add(key);
+      skipped.push({
+        cnpj_basico: row.cnpj_basico,
+        date: row.preco_date,
+        ticker: row.ticker,
+        classe: row.classe,
+        source: row.source || 'skipped quote',
+      });
       continue;
     }
     archive.push(row);
@@ -342,34 +383,40 @@ export function listedValuesFromPrices(
       continue;
     }
     const classe = price.classe;
+    if (isUnitClass(classe) && !presentNumber(price.quantidade) && !qtyByBasico.get(price.cnpj_basico)?.qty_unit) {
+      // Unit (ENGI11): no money without a unit quantity. Do not use ON/PN counts.
+      continue;
+    }
     let quantidade = price.quantidade;
     if (!presentNumber(quantidade)) {
       const qty = qtyByBasico.get(price.cnpj_basico);
-      if (classe === 'ordinaria' || classe === 'ordinarias' || classe === 'on') {
+      if (isOrdinaryClass(classe)) {
         quantidade = qty?.qty_ordinarias;
-      } else if (classe === 'preferencial' || classe === 'preferenciais' || classe === 'pn') {
+      } else if (isPreferredClass(classe)) {
         quantidade = qty?.qty_preferenciais;
+      } else if (isUnitClass(classe)) {
+        quantidade = qty?.qty_unit;
       }
     }
-    if (!presentNumber(quantidade)) {
+    if (!presentNumber(quantidade) || quantidade === 0) {
       continue;
     }
     const produto = price.preco * quantidade;
     const key = `${price.cnpj_basico}\t${price.preco_date}`;
-    const isEnergisa = price.cnpj_basico === ENERGISA_CNPJ_BASICO;
+    const archiveQuote = isArchiveBolsaPrice(price);
     const bucket = buckets.get(key) ?? {
       cnpj_basico: price.cnpj_basico,
       date: price.preco_date,
       listed_value: 0,
-      ticker: price.ticker,
-      quote_kind: isEnergisa ? 'energisa_test_fixture' : 'unit_fixture',
-      price_source_label: isEnergisa
-        ? ENERGISA_TEST_FIXTURE_LABEL
+      ticker: isUnitClass(classe) ? undefined : price.ticker,
+      quote_kind: archiveQuote ? 'b3_archive' : 'unit_fixture',
+      price_source_label: archiveQuote
+        ? B3_ARCHIVE_LABEL
         : 'unit fixture (algorithm test; not archive value)',
       class_produtos: [],
       sources: [],
     };
-    if (price.ticker && !bucket.ticker) {
+    if (price.ticker && !bucket.ticker && !isUnitClass(classe)) {
       bucket.ticker = price.ticker;
     }
     bucket.class_produtos.push({
@@ -381,14 +428,8 @@ export function listedValuesFromPrices(
     });
     bucket.listed_value += produto;
     const qtySource = qtyByBasico.get(price.cnpj_basico)?.source;
-    if (isEnergisa && !bucket.sources.includes(ENERGISA_TEST_FIXTURE_LABEL)) {
-      bucket.sources.push(ENERGISA_TEST_FIXTURE_LABEL);
-    }
-    for (const source of [isEnergisa ? undefined : price.source, qtySource]) {
-      if (!source || bucket.sources.includes(source)) {
-        continue;
-      }
-      if (isEnergisa && ARCHIVE_BOLSA_SOURCE.test(source)) {
+    for (const source of [price.source, qtySource]) {
+      if (!source || bucket.sources.includes(source) || isRecordedFixtureQuote(source)) {
         continue;
       }
       bucket.sources.push(source);
@@ -600,18 +641,18 @@ export function computeMoneyUnderControl(
   const repoRoot = options?.repoRoot ?? REPO_ROOT;
   const prices =
     options?.prices ??
-    loadPriceRows(options?.pricesPath ?? join(repoRoot, 'transform', 'seeds', 'listed_prices_fixture.csv'), cwd);
+    loadPriceRows(options?.pricesPath ?? join(repoRoot, DEFAULT_PRICES_RELATIVE), cwd);
   const { archive: archivePrices, skipped: skippedFixtureQuotes } = partitionPriceRows(prices, {
     allowNonArchivePrices: options?.allowNonArchivePrices,
   });
   const quantities =
     options?.quantities ??
-    (archivePrices.some((row) => presentNumber(row.quantidade))
-      ? []
-      : loadQtyRowsFromEdgesFixture(
-          options?.qtyPath ?? join(repoRoot, 'transform', 'seeds', 'energisa_edges_fixture.csv'),
-          cwd
-        ));
+    loadQtyRows(
+      options?.qtyPath
+        ? [options.qtyPath]
+        : DEFAULT_QTY_RELATIVE_PATHS.map((relative) => join(repoRoot, relative)),
+      cwd
+    );
   const allValues = listedValuesFromPrices(archivePrices, quantities);
   const latestDate = allValues.map((row) => row.date).sort().at(-1);
   const values = allValues.filter((row) => {
@@ -620,6 +661,9 @@ export function computeMoneyUnderControl(
     }
     if (options?.date) {
       return row.date === options.date;
+    }
+    if (allValues.some((item) => item.date === DEFAULT_MONEY_DATE)) {
+      return row.date === DEFAULT_MONEY_DATE;
     }
     return row.date === latestDate;
   });
@@ -816,7 +860,9 @@ export function computeMoneyUnderControl(
     node_totals: nodeTotals,
     cannot_measure: [
       'unlisted vehicles: no listed value; only a cited slice of a priced listed seed',
-      'cias abertas other than Energisa: no money until issue 115 lands prices (WEG, Ambev, and the other listadas stay unpriced; recorded fixture quotes are skipped)',
+      'listed seed with a B3 quote but no ordinary/preferred quantity: no money (do not invent shares)',
+      'ENGI11 unit: no money without a unit quantity (do not invent that quantity)',
+      'Claro Telecom Participações (cnpj_basico 07043628): no Brasil Bolsa Balcão class',
       'hole on a path: that path yields no money',
       'Outros and tesouraria: no money',
       'fund cotistas: not in this file',
@@ -838,6 +884,10 @@ function fmtPct(value: number): string {
 
 function fmtReais(value: number): string {
   return value.toFixed(2);
+}
+
+function fmtQty(value: number): string {
+  return Math.round(value).toLocaleString('en-US');
 }
 
 function fmtBillions(value: number): string {
@@ -905,8 +955,7 @@ function workedExample(result: MoneyResult): string[] {
   lines.push(
     `${ivan.node_label} ${ivan.node_id} → ${ivan.listed_seed_label} ${ivan.listed_seed_id} on ${ivan.date}.`
   );
-  lines.push(`V (Energisa test fixture, ticker ENGI, that date) = ${fmtReais(ivan.listed_value)} reais.`);
-  lines.push('Not a live Bolsa pull. Not a confirmed BigQuery row.');
+  lines.push(`V (Brasil Bolsa Balcão ${ivan.date}, ENGI3/ENGI4 × graph_edges quantities) = ${fmtReais(ivan.listed_value)} reais.`);
   lines.push('Direct hop is one group, not the whole total. Product through a holding, not 100% of the holding.');
   lines.push('');
   lines.push(
@@ -965,7 +1014,7 @@ export function formatMoneyReport(result: MoneyResult): string {
     'Person total on a listed seed = sum of last-hop groups. Direct hop is one group. Nested rows are marked; do not add them.'
   );
   lines.push(
-    'Energisa-only until issue 115 lands prices. WEG, Ambev, and the other listadas stay without money. Energisa prices are the test fixture (ticker ENGI), not a live Bolsa pull and not a confirmed BigQuery row.'
+    `Prices: ${B3_ARCHIVE_LABEL} ${DEFAULT_MONEY_DATE} (issue #123). Energisa uses ENGI3/ENGI4 × graph_edges quantities. Unit classes without a unit quantity are skipped. Claro is omitted.`
   );
   lines.push('');
   lines.push('## Wealth');
@@ -976,39 +1025,26 @@ export function formatMoneyReport(result: MoneyResult): string {
     lines.push(`- ${item}`);
   }
   lines.push('');
-  lines.push('## Priced listed seeds this run (Energisa test fixture)');
+  lines.push('## Priced listed seeds this run');
   if (result.graph.priced_listed_seed_ids.length === 0) {
-    lines.push('None. Energisa-only until issue 115 lands prices.');
+    lines.push('None. A listed seed needs a Brasil Bolsa Balcão quote and a quantity.');
   } else {
     const valueRows = result.listed_values.map((row) => [
       row.cnpj_basico,
       row.ticker ?? '',
       row.date,
       fmtReais(row.listed_value),
-      row.class_produtos.map((item) => `${item.classe} ${item.quantidade}×${item.preco}`).join('; '),
+      row.class_produtos
+        .map((item) => `${item.ticker ?? item.classe} ${fmtQty(item.quantidade)}×${item.preco.toFixed(2)}`)
+        .join('; '),
       row.price_source_label,
     ]);
     lines.push(table(['cnpj_basico', 'ticker', 'date', 'V', 'class produtos', 'price source'], valueRows));
   }
-  if (result.skipped_fixture_quotes.length > 0) {
-    lines.push('');
-    lines.push('## Recorded fixture quotes (not archive value; no reais)');
-    lines.push(
-      `Skipped ${result.skipped_fixture_quotes.length} quote row(s) from issue 115. WEG, Ambev, and the other listadas stay without money until issue 115 lands prices.`
-    );
-    const skipRows = result.skipped_fixture_quotes.map((row) => [
-      row.cnpj_basico,
-      row.ticker ?? '',
-      row.date,
-      'Recorded fixture quote',
-      'skipped',
-    ]);
-    lines.push(table(['cnpj_basico', 'ticker', 'date', 'source', 'money'], skipRows));
-  }
   if (result.graph.unpriced_listed_seed_ids.length > 0) {
     lines.push('');
     lines.push(
-      `Listed seeds without archive money this run: ${result.graph.unpriced_listed_seed_ids.length} (Energisa-only until issue 115 lands prices).`
+      `Listed seeds without archive money this run: ${result.graph.unpriced_listed_seed_ids.length} (no B3 quote, no quantity, unit without unit qty, or Claro).`
     );
   }
   lines.push('');
