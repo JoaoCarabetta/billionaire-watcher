@@ -1,0 +1,759 @@
+{
+  "nodes": [
+    {
+      "id": "***796***",
+      "kind": "person",
+      "label": "MARIA CLARA BOTELHO PEREZ"
+    },
+    {
+      "id": "***768***",
+      "kind": "person",
+      "label": "MARIA DO CARMO RIPPER KOS"
+    },
+    {
+      "id": "***730***",
+      "kind": "person",
+      "label": "CAMILA BOTELHO ROCHA JANSEN"
+    },
+    {
+      "id": "***782***",
+      "kind": "person",
+      "label": "GUSTAVO KOS BOTELH0"
+    },
+    {
+      "id": "***703***",
+      "kind": "person",
+      "label": "BRUNO ALZUGUIR BOTELHO"
+    },
+    {
+      "id": "***700***",
+      "kind": "person",
+      "label": "ALICE BOTELHO BASTOS"
+    },
+    {
+      "id": "***853***",
+      "kind": "person",
+      "label": "RUTH MARIA FERREIRA BOTELHO"
+    },
+    {
+      "id": "***740***",
+      "kind": "person",
+      "label": "FREDERICO KOS BOTELHO"
+    },
+    {
+      "id": "***791***",
+      "kind": "person",
+      "label": "ADRIANA BOTELHO BASTOS ZAVERUCHA"
+    },
+    {
+      "id": "***780***",
+      "kind": "person",
+      "label": "ANDRE LUIS BOTELHO BASTOS"
+    },
+    {
+      "id": "***712***",
+      "kind": "person",
+      "label": "DORA BOTELHO BASTOS"
+    },
+    {
+      "id": "***798***",
+      "kind": "person",
+      "label": "PATRICIA PEREZ BOTELHO"
+    },
+    {
+      "id": "***715***",
+      "kind": "person",
+      "label": "GILBERTO MULLER BOTELHO"
+    },
+    {
+      "id": "***710***",
+      "kind": "person",
+      "label": "BEATRIZ ALZUGUIR BOTELHO"
+    },
+    {
+      "id": "***634***",
+      "kind": "person",
+      "label": "STELLA PEREZ BOTELHO"
+    },
+    {
+      "id": "***759***",
+      "kind": "person",
+      "label": "PAULO CESAR BOTELHO BASTOS"
+    },
+    {
+      "id": "***704***",
+      "kind": "person",
+      "label": "MYRIAN ALTAIR MEIRA"
+    },
+    {
+      "id": "***615***",
+      "kind": "person",
+      "label": "IVAN MÜLLER BOTELHO"
+    },
+    {
+      "id": "***877***",
+      "kind": "person",
+      "label": "ESPOLIO DE ORMEO JUNQUEIRA BOTELHO NETO"
+    },
+    {
+      "id": "02558157",
+      "kind": "company",
+      "label": "02558157"
+    },
+    {
+      "id": "02429144",
+      "kind": "company",
+      "label": "02429144"
+    },
+    {
+      "id": "03361252",
+      "kind": "company",
+      "label": "03361252"
+    },
+    {
+      "id": "67620377",
+      "kind": "company",
+      "label": "67620377"
+    },
+    {
+      "id": "17155730",
+      "kind": "company",
+      "label": "17155730"
+    },
+    {
+      "id": "16701716",
+      "kind": "company",
+      "label": "16701716"
+    },
+    {
+      "id": "01961898",
+      "kind": "company",
+      "label": "01961898"
+    },
+    {
+      "id": "47067525",
+      "kind": "company",
+      "label": "47067525"
+    },
+    {
+      "id": "07689002",
+      "kind": "company",
+      "label": "07689002"
+    },
+    {
+      "id": "02916265",
+      "kind": "company",
+      "label": "02916265"
+    },
+    {
+      "id": "84046101",
+      "kind": "company",
+      "label": "84046101"
+    },
+    {
+      "id": "50746577",
+      "kind": "company",
+      "label": "50746577"
+    },
+    {
+      "id": "01832635",
+      "kind": "company",
+      "label": "01832635"
+    },
+    {
+      "id": "33042730",
+      "kind": "company",
+      "label": "33042730"
+    },
+    {
+      "id": "04786144",
+      "kind": "company",
+      "label": "04786144"
+    },
+    {
+      "id": "33000167",
+      "kind": "company",
+      "label": "33000167"
+    },
+    {
+      "id": "16670085",
+      "kind": "company",
+      "label": "16670085"
+    },
+    {
+      "id": "10265949",
+      "kind": "company",
+      "label": "10265949"
+    },
+    {
+      "id": "41777706",
+      "kind": "company",
+      "label": "41777706"
+    },
+    {
+      "id": "00001180",
+      "kind": "company",
+      "label": "00001180"
+    },
+    {
+      "id": "06057223",
+      "kind": "company",
+      "label": "06057223"
+    },
+    {
+      "id": "01083200",
+      "kind": "company",
+      "label": "01083200"
+    },
+    {
+      "id": "34274233",
+      "kind": "company",
+      "label": "34274233"
+    },
+    {
+      "id": "43633296",
+      "kind": "company",
+      "label": "43633296"
+    },
+    {
+      "id": "43776517",
+      "kind": "company",
+      "label": "43776517"
+    },
+    {
+      "id": "03220438",
+      "kind": "company",
+      "label": "03220438"
+    },
+    {
+      "id": "33611500",
+      "kind": "company",
+      "label": "33611500"
+    },
+    {
+      "id": "42150391",
+      "kind": "company",
+      "label": "42150391"
+    },
+    {
+      "id": "10456016",
+      "kind": "company",
+      "label": "10456016"
+    },
+    {
+      "id": "75315333",
+      "kind": "company",
+      "label": "75315333"
+    },
+    {
+      "id": "06315338",
+      "kind": "company",
+      "label": "06315338"
+    },
+    {
+      "id": "17469701",
+      "kind": "company",
+      "label": "17469701"
+    },
+    {
+      "id": "33592510",
+      "kind": "company",
+      "label": "33592510"
+    },
+    {
+      "id": "33256439",
+      "kind": "company",
+      "label": "33256439"
+    },
+    {
+      "id": "33453598",
+      "kind": "company",
+      "label": "33453598"
+    },
+    {
+      "id": "07523555",
+      "kind": "company",
+      "label": "07523555"
+    },
+    {
+      "id": "43149806",
+      "kind": "company",
+      "label": "43149806"
+    },
+    {
+      "id": "07526557",
+      "kind": "company",
+      "label": "07526557"
+    },
+    {
+      "id": "01838723",
+      "kind": "company",
+      "label": "01838723"
+    },
+    {
+      "id": "59104422",
+      "kind": "company",
+      "label": "59104422"
+    },
+    {
+      "id": "07043628",
+      "kind": "company",
+      "label": "07043628"
+    },
+    {
+      "id": "00383281000109",
+      "kind": "company",
+      "label": "BNDES PARTICIPACOES S/A BNDESPAR"
+    },
+    {
+      "id": "17248371000190",
+      "kind": "company",
+      "label": "CARGILL INTERNATIONAL LUXEMBOURG 9 SARL"
+    },
+    {
+      "id": "00864214000106",
+      "kind": "company",
+      "label": "ENERGISA S.A."
+    },
+    {
+      "id": "00864214",
+      "kind": "company",
+      "label": "Energisa"
+    },
+    {
+      "id": "33171026000151",
+      "kind": "company",
+      "label": "FCA FIAT CHRYSLER PARTICIPACOES BRASIL LTDA."
+    },
+    {
+      "id": "02260956000158",
+      "kind": "company",
+      "label": "Gipar S.A."
+    },
+    {
+      "id": "24990777",
+      "kind": "company",
+      "label": "Grupo Mateus"
+    },
+    {
+      "id": "07415333",
+      "kind": "company",
+      "label": "Grupo Simpar"
+    },
+    {
+      "id": "05712135000101",
+      "kind": "company",
+      "label": "HONDA MOTOR CO., LTD."
+    },
+    {
+      "id": "23160658000166",
+      "kind": "company",
+      "label": "Itacatu S/A"
+    },
+    {
+      "id": "59206795000131",
+      "kind": "company",
+      "label": "MCLC PARTICIPAÇÕES LTDA."
+    },
+    {
+      "id": "05528233000185",
+      "kind": "company",
+      "label": "MERCADOLIBRE, INC."
+    },
+    {
+      "id": "53216157000115",
+      "kind": "company",
+      "label": "MNBB PARTICIPAÇÕES LTDA."
+    },
+    {
+      "id": "20286787000107",
+      "kind": "company",
+      "label": "MULTISETOR COM. LND. E PARTICIPAÇÕES S/A"
+    },
+    {
+      "id": "47960950",
+      "kind": "company",
+      "label": "Magazine Luiza"
+    },
+    {
+      "id": "03853896",
+      "kind": "company",
+      "label": "Marfrig"
+    },
+    {
+      "id": "16674735000130",
+      "kind": "company",
+      "label": "Nova Gipar Holding S/A"
+    },
+    {
+      "id": "33857830000199",
+      "kind": "company",
+      "label": "OPPORTUNITY HDF ADMINISTRADORA DE RECURSOS LTDA."
+    },
+    {
+      "id": "05717225000187",
+      "kind": "company",
+      "label": "PROVIMI BV"
+    },
+    {
+      "id": "61585865",
+      "kind": "company",
+      "label": "RD Saúde"
+    },
+    {
+      "id": "53285084000113",
+      "kind": "company",
+      "label": "RFG PARTICIPACOES LTDA."
+    },
+    {
+      "id": "06047087",
+      "kind": "company",
+      "label": "Rede D'Or"
+    },
+    {
+      "id": "05717887000157",
+      "kind": "company",
+      "label": "SHELL BRAZIL HOLDING BV"
+    },
+    {
+      "id": "09267871000140",
+      "kind": "company",
+      "label": "SQUADRA INVESTIMENTOS - GESTÃO DE RECURSOS LTDA."
+    },
+    {
+      "id": "05491982000185",
+      "kind": "company",
+      "label": "STELLANTIS EUROPE S.P.A"
+    },
+    {
+      "id": "10643191000163",
+      "kind": "company",
+      "label": "Samambaia Master Fundo de Investimento em Ações no Exterior - BDR Nível I"
+    },
+    {
+      "id": "16404287",
+      "kind": "company",
+      "label": "Suzano"
+    },
+    {
+      "id": "42179743000110",
+      "kind": "company",
+      "label": "VOLKSWAGEN INTERNATIONAL LUXEMBURG"
+    },
+    {
+      "id": "84429695",
+      "kind": "company",
+      "label": "WEG"
+    }
+  ],
+  "edges": [
+    {
+      "from": "***768***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 0.002,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***768***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 0.012,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***700***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 0.097,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***712***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 1.918,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***759***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 1.918,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***780***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 1.918,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***700***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 1.918,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***791***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 1.918,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***634***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 2.428,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***853***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 3.132,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***704***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 3.132,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***877***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 3.132,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***768***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 52.004,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***798***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 6.75,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***715***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 8.765,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***791***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 46.444,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***700***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 46.444,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***796***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 15.999,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***730***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 15.999,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***780***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 15.999,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***703***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 26.778,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***740***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 26.778,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***710***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 26.778,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***782***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 26.778,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "***615***",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "pct_capital": 70.573,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "00383281000109",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 6.152,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "33857830000199",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 7.363,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "10643191000163",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 7.781,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "09267871000140",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 8.514,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "53216157000115",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 6.75,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "59206795000131",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 6.75,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "53285084000113",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 6.75,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "02260956000158",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 26.646,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "23160658000166",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 66.095,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "20286787000107",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 72.155,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "16674735000130",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "pct_capital": 100.0,
+      "source": "FRE Energisa 160981"
+    },
+    {
+      "from": "05717225000187",
+      "to": "01961898",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "17248371000190",
+      "to": "01961898",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "05528233000185",
+      "to": "03361252",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "05717887000157",
+      "to": "10456016",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "33171026000151",
+      "to": "16701716",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "05491982000185",
+      "to": "16701716",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "05712135000101",
+      "to": "43149806",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    },
+    {
+      "from": "42179743000110",
+      "to": "59104422",
+      "kind": "company_owns",
+      "pct_capital": null,
+      "source": "Quadro de Socios Receita"
+    }
+  ]
+}

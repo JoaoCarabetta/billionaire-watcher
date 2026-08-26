@@ -58,6 +58,22 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       expect(html).toContain('Doações Políticas');
       expect(html).toMatch(/<table/);
     });
+
+    it('should allow /grafo to use JavaScript (exception to no-JS rule)', () => {
+      const grafoPath = path.join(distPath, 'grafo', 'index.html');
+      
+      // /grafo is allowed to exist and use JavaScript
+      if (fs.existsSync(grafoPath)) {
+        const html = fs.readFileSync(grafoPath, 'utf-8');
+        
+        // Should have script tag (JavaScript is allowed here)
+        expect(html).toMatch(/<script/);
+        
+        // Should still have h1 and graph container in initial HTML
+        expect(html).toMatch(/<h1[^>]*>/);
+        expect(html).toMatch(/id="cy"/);
+      }
+    });
   });
 
   describe('Test 2: sitemap.xml lists all routes', () => {
