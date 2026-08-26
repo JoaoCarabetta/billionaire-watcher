@@ -3,7 +3,11 @@
  * 
  * Edge IDs are unique (e0, e1, e2...) to handle multiple edges between same nodes.
  * Source/target are the JSON from/to node IDs.
+ *
+ * Listed seed companies are tagged from LISTED_COMPANY_IDS (no new JSON field).
  */
+
+import { LISTED_COMPANY_IDS } from './grafo-panel';
 
 export interface GrafoNode {
   id: string;
@@ -30,6 +34,7 @@ export interface CytoscapeElement {
     id: string;
     label?: string;
     kind?: string;
+    listed?: boolean;
     source?: string;
     target?: string;
   };
@@ -38,15 +43,17 @@ export interface CytoscapeElement {
 export function buildCytoscapeElements(data: GrafoData): CytoscapeElement[] {
   const elements: CytoscapeElement[] = [];
 
-  // Add nodes
+  // Add nodes. Tag the eleven listed seeds; leave kind as company.
   data.nodes.forEach(node => {
-    elements.push({
-      data: {
-        id: node.id,
-        label: node.label,
-        kind: node.kind
-      }
-    });
+    const nodeData: CytoscapeElement['data'] = {
+      id: node.id,
+      label: node.label,
+      kind: node.kind
+    };
+    if ((LISTED_COMPANY_IDS as readonly string[]).includes(node.id)) {
+      nodeData.listed = true;
+    }
+    elements.push({ data: nodeData });
   });
 
   // Add edges with unique IDs

@@ -621,6 +621,143 @@ describe('Grafo Page (issue #74)', () => {
     });
   });
 
+  describe('Test (issue #100): listed seed companies get a third color', () => {
+    const GIPAR_ID = '02260956000158';
+    const SQUADRA_ID = '09267871000140';
+    const TESOURARIA_ENERGISA_ID = 'tesouraria-00864214';
+    const MAMS_ID = '61563585000142';
+    const HOLE_COMPANY_IDS = [
+      '61563585000142',
+      '02049012000136',
+      '23349343000161',
+      '07544616000172',
+      '39513958000111',
+      '42601461000160',
+      '43347650000110',
+      '45278506000103',
+      '58534632000115',
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function isTaggedListed(el: { data: { listed?: boolean | string; seed?: string } }): boolean {
+      return el.data.listed === true || el.data.listed === 'true' || el.data.seed === 'listed';
+    }
+
+    it('built /grafo has a listed-company style rule', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const pageSource = fs.readFileSync(pagePath, 'utf-8');
+      expect(
+        pageSource,
+        'grafo.astro must include a Cytoscape selector that mentions listed / seed / LISTED'
+      ).toMatch(/selector:\s*(['"`]).{0,80}(listed|seed|LISTED)/);
+
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      const grafoHtmlPath = path.join(distPath, 'grafo', 'index.html');
+      const html = fs.readFileSync(grafoHtmlPath, 'utf-8');
+      const blobs = [html];
+      for (const match of html.matchAll(/(?:src|href)="([^"]+\.js)"/g)) {
+        const rel = match[1].replace(/^\//, '');
+        const scriptPath = path.join(distPath, rel);
+        if (fs.existsSync(scriptPath)) {
+          blobs.push(fs.readFileSync(scriptPath, 'utf-8'));
+        }
+      }
+      expect(
+        blobs.some((text) => /listed|seed|LISTED/.test(text)),
+        'dist/grafo/index.html or its scripts must mention listed / seed / LISTED'
+      ).toBe(true);
+    });
+
+    it('buildCytoscapeElements tags exactly the eleven listed ids', () => {
+      const json = loadCommittedGrafo();
+      const elements = buildCytoscapeElements(json);
+      const nodes = elements.filter((el) => el.data.source === undefined);
+      const listedNodes = nodes.filter(isTaggedListed);
+      const listedIds = listedNodes.map((el) => el.data.id).sort();
+
+      expect(LISTED_COMPANY_IDS).toHaveLength(11);
+      expect(listedIds).toEqual([...LISTED_COMPANY_IDS].sort());
+
+      for (const el of listedNodes) {
+        expect(el.data.kind, `listed node ${el.data.id} must stay kind=company`).toBe('company');
+      }
+
+      const byId = new Map(nodes.map((el) => [el.data.id, el]));
+      expect(isTaggedListed(byId.get(GIPAR_ID)!), 'Gipar must stay ordinary company color').toBe(false);
+      expect(isTaggedListed(byId.get(SQUADRA_ID)!), 'Squadra must stay ordinary company color').toBe(false);
+      expect(
+        isTaggedListed(byId.get(TESOURARIA_ENERGISA_ID)!),
+        'tesouraria-00864214 must stay ordinary company color'
+      ).toBe(false);
+
+      const tesouraria = nodes.filter((el) => el.data.id.startsWith('tesouraria-'));
+      expect(tesouraria.length).toBeGreaterThan(0);
+      for (const el of tesouraria) {
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+
+      const mams = byId.get(MAMS_ID);
+      if (mams) {
+        expect(isTaggedListed(mams), 'MAMS 61563585000142 must stay ordinary company color').toBe(false);
+      }
+      for (const holeId of HOLE_COMPANY_IDS) {
+        const hole = byId.get(holeId);
+        if (!hole) continue;
+        expect(isTaggedListed(hole), `hole company ${holeId} must not be tagged listed`).toBe(false);
+      }
+    });
+
+    it('grafo.astro imports the mapper that uses LISTED_COMPANY_IDS and does not hardcode a second id list', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const mapperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-elements.ts');
+      const pageSource = fs.readFileSync(pagePath, 'utf-8');
+      const mapperSource = fs.readFileSync(mapperPath, 'utf-8');
+
+      expect(
+        mapperSource,
+        'grafo-elements.ts must import LISTED_COMPANY_IDS from grafo-panel — do not copy the list'
+      ).toMatch(/LISTED_COMPANY_IDS/);
+      expect(
+        mapperSource,
+        'grafo-elements.ts must import from ./grafo-panel'
+      ).toMatch(/from ['"]\.\/grafo-panel['"]/);
+
+      const importsMapper =
+        /from ['"]\.\.\/lib\/grafo-elements['"]/.test(pageSource) &&
+        /buildCytoscapeElements/.test(pageSource);
+      const importsListedIds =
+        /LISTED_COMPANY_IDS/.test(pageSource) &&
+        /from ['"]\.\.\/lib\/grafo-panel['"]/.test(pageSource);
+      expect(
+        importsMapper || importsListedIds,
+        'grafo.astro must import LISTED_COMPANY_IDS or the mapper that already uses that list'
+      ).toBe(true);
+
+      for (const id of LISTED_COMPANY_IDS) {
+        expect(
+          pageSource,
+          `grafo.astro must not hardcode listed id ${id}`
+        ).not.toContain(id);
+      }
+    });
+
+    it('new listed-color copy has no fortuna', () => {
+      const files = [
+        path.join(__dirname, '..', 'src', 'lib', 'grafo-elements.ts'),
+        path.join(__dirname, '..', 'src', 'pages', 'grafo.astro'),
+      ];
+      for (const filePath of files) {
+        const text = fs.readFileSync(filePath, 'utf-8');
+        expect(text, `${filePath} must not mention fortuna`).not.toMatch(/fortuna/i);
+      }
+    });
+  });
+
   describe('Test 5: Other pages unchanged (no extra JS)', () => {
     it('should not have script tags on home page', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
