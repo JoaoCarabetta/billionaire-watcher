@@ -218,10 +218,12 @@
         panel.hidden = html === '';
       }
 
-      // Fetch the static JSON
-      fetch('/grafo-publico.json')
-        .then(response => response.json())
-        .then(data => {
+      // Fetch the static JSON (graph + cited person money; no server)
+      Promise.all([
+        fetch('/grafo-publico.json').then(response => response.json()),
+        fetch('/grafo-dinheiro.json').then(response => response.json()),
+      ])
+        .then(([data, money]) => {
           // Transform nodes and edges to Cytoscape format using shared function
           const elements = buildCytoscapeElements(data);
 
@@ -295,7 +297,7 @@
           });
 
           function openNodePanel(nodeId) {
-            showPanel(buildPanelView(data, { nodeId }));
+            showPanel(buildPanelView(data, { nodeId }, money));
           }
 
           function hideSearchList() {
@@ -347,7 +349,7 @@
             showPanel(buildPanelView(data, {
               from: evt.target.data('source'),
               to: evt.target.data('target')
-            }));
+            }, money));
           });
 
           cy.on('tap', function (evt) {

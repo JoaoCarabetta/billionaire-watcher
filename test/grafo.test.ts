@@ -5,6 +5,11 @@ import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
 import { buildPanelView, LISTED_COMPANY_IDS, renderPanelHtml } from '../src/lib/grafo-panel';
 
+/** Issue #130: the panel may deny fortune (`Não é uma fortuna.`). Still fail on fortuna-as-claim. */
+function withoutFortunaDenial(text: string): string {
+  return text.replace(/Não é uma fortuna\./g, '');
+}
+
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
   let buildFailed: boolean = false;
@@ -1031,7 +1036,10 @@ describe('Grafo Page (issue #74)', () => {
 
       for (const { label, text } of panelCopySources()) {
         const withoutInterpolation = text.replace(/\$\{[^}]*\}/g, '');
-        expect(withoutInterpolation, `${label} must not mention fortuna`).not.toMatch(/fortuna/i);
+        expect(
+          withoutFortunaDenial(withoutInterpolation),
+          `${label} must not mention fortuna as a claim`
+        ).not.toMatch(/fortuna/i);
         expect(withoutInterpolation, `${label} must not contain R$`).not.toMatch(/R\$/);
         expect(withoutInterpolation, `${label} must not contain £ or €`).not.toMatch(/[£€]/);
         expect(withoutInterpolation, `${label} must not contain a leftover $ currency mark`).not.toMatch(/\$/);
@@ -1484,7 +1492,7 @@ describe('Grafo Page (issue #74)', () => {
 
       const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
       const helper = fs.readFileSync(helperPath, 'utf-8');
-      expect(helper).not.toMatch(/fortuna/i);
+      expect(withoutFortunaDenial(helper)).not.toMatch(/fortuna/i);
 
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
 
@@ -1934,8 +1942,8 @@ describe('Grafo Page (issue #74)', () => {
 
       const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
-      expect(fs.readFileSync(helperPath, 'utf-8')).not.toMatch(/fortuna/i);
-      expect(fs.readFileSync(pagePath, 'utf-8')).not.toMatch(/fortuna/i);
+      expect(withoutFortunaDenial(fs.readFileSync(helperPath, 'utf-8'))).not.toMatch(/fortuna/i);
+      expect(withoutFortunaDenial(fs.readFileSync(pagePath, 'utf-8'))).not.toMatch(/fortuna/i);
     });
 
     it('keeps LISTED_COMPANY_IDS length 33; the three PJ sócias are ordinary companies; WEG/Ambev incoming stay 100 / 99.999', () => {
@@ -2111,8 +2119,8 @@ describe('Grafo Page (issue #74)', () => {
 
       const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
-      expect(fs.readFileSync(helperPath, 'utf-8')).not.toMatch(/fortuna/i);
-      expect(fs.readFileSync(pagePath, 'utf-8')).not.toMatch(/fortuna/i);
+      expect(withoutFortunaDenial(fs.readFileSync(helperPath, 'utf-8'))).not.toMatch(/fortuna/i);
+      expect(withoutFortunaDenial(fs.readFileSync(pagePath, 'utf-8'))).not.toMatch(/fortuna/i);
     });
 
     it('keeps the three #119 PJ company nodes, LISTED 33, Squadra 11 with Ache, and WEG/Ambev incoming', () => {

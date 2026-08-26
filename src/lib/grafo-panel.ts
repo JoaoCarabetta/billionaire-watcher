@@ -3,10 +3,11 @@
  *
  * Reads only label, kind, partners, pct_capital, pct_votos, source (plus id / from / to).
  * Cited participation is the product of hop percents on complete paths.
- * No invented percents. No money fields.
+ * No invented percents. Person money is looked up from the money JSON; never baked in.
  */
 
 import type { GrafoData, GrafoEdge, GrafoNode, GrafoPartner } from './grafo-elements';
+import { lookupPersonMoney, type GrafoMoneyFile, type PersonMoney } from './grafo-money';
 
 export type PanelHop = {
   other_id: string;
@@ -51,6 +52,7 @@ export type NodePanelView = {
   hops: PanelHop[];
   participations: CitedParticipation[];
   partners?: GrafoPartner[];
+  money?: PersonMoney;
 };
 
 export type EdgePanelView = {
@@ -108,7 +110,11 @@ function hopFromEdge(
   return hop;
 }
 
-function buildNodePanel(data: GrafoData, nodeId: string): NodePanelView | null {
+function buildNodePanel(
+  data: GrafoData,
+  nodeId: string,
+  moneyFile?: GrafoMoneyFile | null
+): NodePanelView | null {
   const node = nodeById(data, nodeId);
   if (!node) {
     return null;
@@ -134,6 +140,12 @@ function buildNodePanel(data: GrafoData, nodeId: string): NodePanelView | null {
   };
   if (node.partners) {
     view.partners = node.partners;
+  }
+  if (node.kind === 'person') {
+    const money = lookupPersonMoney(moneyFile, nodeId);
+    if (money) {
+      view.money = money;
+    }
   }
   return view;
 }
@@ -318,12 +330,16 @@ function buildCitedParticipations(data: GrafoData, startId: string): CitedPartic
   return participations;
 }
 
-export function buildPanelView(data: GrafoData, selection: PanelSelection): PanelView {
+export function buildPanelView(
+  data: GrafoData,
+  selection: PanelSelection,
+  moneyFile?: GrafoMoneyFile | null
+): PanelView {
   if (!selection) {
     return null;
   }
   if ('nodeId' in selection) {
-    return buildNodePanel(data, selection.nodeId);
+    return buildNodePanel(data, selection.nodeId, moneyFile);
   }
   return buildEdgePanel(data, selection.from, selection.to);
 }
@@ -434,6 +450,64 @@ function renderPartners(partners: GrafoPartner[] | undefined): string {
   );
 }
 
+const MONTHS_PT = [
+  'janeiro',
+  'fevereiro',
+  'março',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro',
+];
+
+function formatReais(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatMoneyDate(iso: string): string {
+  const parts = iso.split('-');
+  if (parts.length !== 3) {
+    return iso;
+  }
+  const year = parts[0];
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  if (year.length !== 4 || !Number.isFinite(month) || !Number.isFinite(day)) {
+    return iso;
+  }
+  const monthName = MONTHS_PT[month - 1];
+  if (!monthName) {
+    return iso;
+  }
+  return String(day) + ' de ' + monthName + ' de ' + year + ' (' + iso + ')';
+}
+
+function renderMoney(kind: string, money: PersonMoney | undefined): string {
+  if (kind !== 'person' || !money) {
+    return '';
+  }
+  const sources = money.sources.join('; ');
+  return (
+    '<section>' +
+      factLine('Dinheiro econômico (fatia de capital)', formatReais(money.money_economic)) +
+      factLine('Dinheiro sob controle (fatia de votos)', formatReais(money.money_control)) +
+      factLine('date', formatMoneyDate(money.date)) +
+      factLine('sources', sources) +
+      '<p>Não é uma fortuna.</p>' +
+    '</section>'
+  );
+}
+
 export function renderPanelHtml(view: PanelView): string {
   if (!view) {
     return '';
@@ -447,6 +521,7 @@ export function renderPanelHtml(view: PanelView): string {
         '<h2>' + escapeHtml(view.label) + '</h2>' +
         factLine('kind', view.kind) +
         factLine('id', view.id) +
+        renderMoney(view.kind, view.money) +
         renderPartners(view.partners) +
         renderHopGroup('saida', outgoing) +
         renderHopGroup('entrada', incoming) +
