@@ -22,6 +22,12 @@ models:
       +materialized: table
       +meta:
         location: US
+    vehicles:
+      +schema: billionaire_watcher
+      +materialized: table
+      +enabled: true
+      +meta:
+        location: US
     freeze:
       +schema: billionaire_watcher
       +materialized: table

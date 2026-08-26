@@ -1,0 +1,117 @@
+unit_tests:
+  - name: test_vehicle_qsa_partners_keeps_every_vehicle_and_null_percent
+    description: |
+      Every configured vehicle has either its QSA rows or one explicit zero-count row.
+      Names are fictional and Receita's missing ownership percentage stays null.
+    model: vehicle_qsa_partners
+    given:
+      - input: ref('vehicle_cnpj_basicos')
+        format: sql
+        rows: |
+          select '02260956' as cnpj_basico
+          union all select '23160658'
+          union all select '20286787'
+          union all select '16674735'
+          union all select '59206795'
+          union all select '53216157'
+          union all select '53285084'
+          union all select '32392209'
+          union all select '08542030'
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            '02260956' as cnpj_basico,
+            '2' as tipo,
+            'PESSOA FICTICIA ALFA' as nome,
+            '***123456**' as documento,
+            '49' as qualificacao,
+            cast('2020-02-03' as date) as data_entrada_sociedade
+          union all
+          select
+            cast('2025-12-31' as date) as data,
+            '23160658' as cnpj_basico,
+            '2' as tipo,
+            'PESSOA FICTICIA FORA DA PARTICAO' as nome,
+            '***654321**' as documento,
+            '10' as qualificacao,
+            cast('2019-01-01' as date) as data_entrada_sociedade
+    expect:
+      format: sql
+      rows: |
+        select '02260956' as cnpj_basico, '2' as tipo, 'PESSOA FICTICIA ALFA' as nome, '***123456**' as documento, '49' as qualificacao, cast('2020-02-03' as date) as data_entrada_sociedade, cast(null as double) as percent, 1 as partner_count
+        union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        union all select '08542030', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+
+  - name: test_vehicle_qsa_companies_owned_uses_prefix_not_substring
+    description: |
+      A PJ CNPJ whose first eight digits equal a vehicle matches. A CNPJ that only
+      contains the vehicle key later in the document does not match. Every other
+      vehicle receives an explicit zero-count row and no percentage is invented.
+    model: vehicle_qsa_companies_owned
+    given:
+      - input: ref('vehicle_cnpj_basicos')
+        format: sql
+        rows: |
+          select '02260956' as cnpj_basico
+          union all select '23160658'
+          union all select '20286787'
+          union all select '16674735'
+          union all select '59206795'
+          union all select '53216157'
+          union all select '53285084'
+          union all select '32392209'
+          union all select '08542030'
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            '61563585' as cnpj_basico,
+            '1' as tipo,
+            'VEICULO FICTICIO EXATO' as nome,
+            '08.542.030/0001-07' as documento,
+            '49' as qualificacao
+          union all
+          select
+            cast('2026-01-11' as date) as data,
+            '77777777' as cnpj_basico,
+            '1' as tipo,
+            'VEICULO FICTICIO FALSO POSITIVO' as nome,
+            '10.854.203/0001-07' as documento,
+            '22' as qualificacao
+          union all
+          select
+            cast('2026-01-11' as date) as data,
+            '88888888' as cnpj_basico,
+            '2' as tipo,
+            'PESSOA FICTICIA' as nome,
+            '***542030**' as documento,
+            '10' as qualificacao
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        rows: |
+          select cast('2026-01-11' as date) as data, '61563585' as cnpj_basico, 'EMPRESA FICTICIA EXATA' as razao_social
+          union all
+          select cast('2026-01-11' as date), '77777777', 'EMPRESA FICTICIA SUBSTRING'
+          union all
+          select cast('2026-01-11' as date), '88888888', 'EMPRESA FICTICIA PF'
+    expect:
+      format: sql
+      rows: |
+        select '08542030' as owner_cnpj_basico, '61563585' as owned_cnpj_basico, 'EMPRESA FICTICIA EXATA' as owned_name, '49' as qualificacao, '08.542.030/0001-07' as documento, cast(null as double) as percent, 1 as owned_company_count
+        union all select '02260956', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0

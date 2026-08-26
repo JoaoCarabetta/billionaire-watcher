@@ -20,7 +20,8 @@ The project implements staging (issue #10) and freeze walk (issue #25) layers. M
 
 - **RF CNPJ**: Base dos Dados `basedosdados.br_me_cnpj` (empresas, socios, estabelecimentos)
   - Partition: `DATE '2026-01-11'`
-  - Restricted to 50 freeze-chain CNPJs (top companies from Valor 1000)
+  - Freeze staging is restricted to 50 freeze-chain CNPJs (top companies from Valor 1000)
+  - Issue #88 vehicle QSA models use a separate nine-key warehouse seed; the freeze roots are unchanged
 - **CVM**: GCS `gs://billionairewatcher-landing/raw/cvm/fre/2026/`
   - `fre_cia_aberta_posicao_acionaria_2026.csv` (shareholder positions)
   - `cad_cia_aberta.csv` (registered listed companies)
@@ -36,6 +37,49 @@ The project implements staging (issue #10) and freeze walk (issue #25) layers. M
 | `stg_group_flags` | Top-50 group flags from Valor | cnpj_basico |
 | `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE 6.1 shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
 | `stg_cvm_cad_cia_aberta` | CVM listed company registry | CNPJ_CIA |
+
+### Vehicle QSA Models (Issue #88)
+
+`vehicle_qsa_partners` and `vehicle_qsa_companies_owned` are warehouse-enabled
+tables backed by the separate `vehicle_cnpj_basicos` seed. They do not widen
+`stg_rf_socios` or modify the fifty `freeze_cnpj_basicos` roots. Both queries use
+`{{ var("rf_partition_date") }}` (`2026-01-11`).
+
+Partners of each vehicle:
+
+```sql
+select tipo, nome, documento, qualificacao, data_entrada_sociedade
+from basedosdados.br_me_cnpj.socios
+where data = date '2026-01-11'
+  and lpad(cast(cnpj_basico as string), 8, '0') = '<vehicle_cnpj_basico>'
+```
+
+Companies where each vehicle is a PJ partner:
+
+```sql
+select
+  lpad(cast(s.cnpj_basico as string), 8, '0') as owned_cnpj_basico,
+  e.razao_social,
+  s.qualificacao,
+  s.documento
+from basedosdados.br_me_cnpj.socios as s
+join basedosdados.br_me_cnpj.empresas as e
+  on lpad(cast(e.cnpj_basico as string), 8, '0')
+   = lpad(cast(s.cnpj_basico as string), 8, '0')
+ and e.data = s.data
+where s.data = date '2026-01-11'
+  and cast(s.tipo as string) = '1'
+  and substr(
+    lpad(regexp_replace(cast(s.documento as string), r'[^0-9]', ''), 14, '0'),
+    1,
+    8
+  ) = '<vehicle_cnpj_basico>'
+```
+
+The second query compares the first eight normalized CNPJ digits. It must never
+use substring containment. Each model emits one count-zero row with its concrete
+source query when a configured key has no match. Receita provides no percentage
+column, so `percent` remains null.
 
 ### Freeze Models (Issue #25)
 

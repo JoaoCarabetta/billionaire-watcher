@@ -12,7 +12,27 @@ seeds:
         tests:
           - not_null
           - unique
-          
+
+  - name: vehicle_cnpj_basicos
+    description: |
+      Nine issue #88 control-vehicle CNPJ básicos used for the bounded Receita
+      QSA ingest. This is warehouse input, not a test fixture, and remains
+      separate from the fifty `freeze_cnpj_basicos` roots.
+    config:
+      column_types:
+        cnpj_basico: STRING
+        vehicle_name: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit vehicle CNPJ básico with leading zeros preserved.
+        tests:
+          - not_null
+          - unique
+      - name: vehicle_name
+        description: Human-readable vehicle name supplied by issue #88.
+        tests:
+          - not_null
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:
