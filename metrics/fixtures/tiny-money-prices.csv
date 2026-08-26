@@ -1,0 +1,4 @@
+cnpj_basico,ticker,classe,preco,quantidade,preco_date,source
+12345678,TINY,ordinaria,10,100,2026-08-21,fixture price
+12345678,TINY,preferencial,5,20,2026-08-21,fixture price
+87654321,BETA,ordinaria,99,1000,2026-08-21,Recorded fixture quote
