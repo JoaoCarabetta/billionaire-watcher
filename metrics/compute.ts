@@ -956,5 +956,10 @@ export function formatReport(result: MetricsResult): string {
 }
 
 export function outputContainsCpf(text: string): boolean {
-  return /(?<!\d)\d{11}(?!\d)/.test(text);
+  if (/\d{3}\.\d{3}\.\d{3}-\d{2}/.test(text)) {
+    return true;
+  }
+  // Cadastro is 11 digits standing alone. Do not treat a decimal fraction
+  // (path product) or a 14-digit company number as Cadastro.
+  return /(?<![\d.])\d{11}(?![\d.])/.test(text);
 }

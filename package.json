@@ -12,7 +12,7 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "metrics": "node --experimental-strip-types metrics/run.ts"
+    "metrics": "node --experimental-strip-types --disable-warning=ExperimentalWarning metrics/run.ts"
   },
   "dependencies": {
     "astro": "^7.2.6",

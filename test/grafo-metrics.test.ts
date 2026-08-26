@@ -316,7 +316,7 @@ describe('Grafo relevance metrics (issue #107)', () => {
       expect(output).toMatch(/nodes 12/);
       expect(output).toMatch(/REFUSED/);
       expect(output).toContain('p-bbb22222');
-      expect(output).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
+      expect(output).not.toMatch(/(?<![\d.])\d{11}(?![\d.])/);
     });
 
     it('refuses a wealth-rank flag', () => {

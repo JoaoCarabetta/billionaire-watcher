@@ -59,7 +59,7 @@ Derivados de id/rótulo e da lista de sementes do repositório, sem congelar Ene
 | outros | prefixo `outros-` ou rótulo Outros acionistas |
 | foreign | prefixo `x-` (folha estrangeira do freeze) |
 | state | rótulo União Federal, `Estado de …`, Secretaria da Fazenda do Estado |
-| company | o restante das empresas |
+| company | o restante das empresas, inclusive nome estrangeiro que neste JSON tem CNPJ de 14 dígitos (não é prefixo `x-`) |
 
 Holding/veículo, gestora/fundo e empresa-buraco da Receita **não** são um campo neste JSON: entram como `company`, salvo os prefixos acima. Tesouraria e outros são folhas.
 
