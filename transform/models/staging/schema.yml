@@ -134,6 +134,46 @@ models:
               - Data_Referencia
               - ID_Acionista
 
+  - name: stg_cvm_fre_capital_social_2026
+    description: |
+      CVM FRE item 17.1 capital social 2026.
+      Source: GCS gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_capital_social_2026.csv
+
+      CNPJ_Companhia is 14-digit STRING (full CNPJ of listed issuer), not 8-digit.
+      Tipo_Capital is Autorizado / Emitido / Subscrito / Integralizado. Downstream
+      must pick one view (prefer Integralizado, else Emitido) and must not sum tipos.
+    columns:
+      - name: CNPJ_Companhia
+        description: 14-digit full CNPJ of listed company (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: Data_Referencia
+        description: Reference date for this capital social row
+        tests:
+          - not_null
+      - name: ID_Documento
+        description: CVM FRE document id
+        tests:
+          - not_null
+      - name: ID_Capital_Social
+        description: Capital social record id inside the document
+        tests:
+          - not_null
+      - name: Tipo_Capital
+        description: Capital view (Autorizado, Emitido, Subscrito, Integralizado)
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+          arguments:
+            combination_of_columns:
+              - CNPJ_Companhia
+              - ID_Documento
+              - Tipo_Capital
+              - ID_Capital_Social
+
   - name: stg_cvm_cad_cia_aberta
     description: |
       CVM registered listed companies (cadastro).

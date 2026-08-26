@@ -246,3 +246,44 @@ unit_tests:
     expect:
       format: sql
       fixture: stg_cvm_cad_cnpj_expect
+
+  - name: test_stg_cvm_fre_capital_social_cnpj_14_digit_string
+    description: |
+      Verify CNPJ_Companhia is 14-digit STRING after stripping punctuation.
+      JBS: 02.916.265/0001-60 → '02916265000160'. Quantities stay integer.
+    model: stg_cvm_fre_capital_social_2026
+    given:
+      - input: source('gcs_cvm', 'fre_capital_social_2026')
+        format: sql
+        rows: |
+          select
+            '02.916.265/0001-60' as CNPJ_Companhia,
+            '2026-12-31' as Data_Referencia,
+            2 as Versao,
+            159309 as ID_Documento,
+            'JBS S.A.' as Nome_Companhia,
+            1 as ID_Capital_Social,
+            'Capital Integralizado' as Tipo_Capital,
+            '2020-01-01' as Data_Autorizacao_Aprovacao,
+            1000.00 as Valor_Capital,
+            cast(null as varchar) as Prazo_Integralizacao,
+            111 as Quantidade_Acoes_Ordinarias,
+            0 as Quantidade_Acoes_Preferenciais,
+            111 as Quantidade_Total_Acoes
+    expect:
+      format: sql
+      rows: |
+        select
+          '02916265000160' as CNPJ_Companhia,
+          cast('2026-12-31' as date) as Data_Referencia,
+          2 as Versao,
+          159309 as ID_Documento,
+          'JBS S.A.' as Nome_Companhia,
+          1 as ID_Capital_Social,
+          'Capital Integralizado' as Tipo_Capital,
+          '2020-01-01' as Data_Autorizacao_Aprovacao,
+          1000.00 as Valor_Capital,
+          cast(null as varchar) as Prazo_Integralizacao,
+          111 as Quantidade_Acoes_Ordinarias,
+          0 as Quantidade_Acoes_Preferenciais,
+          111 as Quantidade_Total_Acoes

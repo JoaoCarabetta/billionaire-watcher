@@ -24,6 +24,7 @@ The project implements staging (issue #10) and freeze walk (issue #25) layers. M
   - Issue #88 vehicle QSA models use a separate nine-key warehouse seed; the freeze roots are unchanged
 - **CVM**: GCS `gs://billionairewatcher-landing/raw/cvm/fre/2026/`
   - `fre_cia_aberta_posicao_acionaria_2026.csv` (shareholder positions)
+  - `fre_cia_aberta_capital_social_2026.csv` (item 17.1 capital social)
   - `cad_cia_aberta.csv` (registered listed companies)
   - Encoding: latin-1, delimiter: semicolon
 
@@ -36,6 +37,7 @@ The project implements staging (issue #10) and freeze walk (issue #25) layers. M
 | `stg_rf_estabelecimentos` | RF CNPJ establishments | cnpj (14-digit) |
 | `stg_group_flags` | Top-50 group flags from Valor | cnpj_basico |
 | `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE 6.1 shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
+| `stg_cvm_fre_capital_social_2026` | CVM FRE 17.1 capital social | (CNPJ_Companhia, ID_Documento, Tipo_Capital, ID_Capital_Social) |
 | `stg_cvm_cad_cia_aberta` | CVM listed company registry | CNPJ_CIA |
 
 ### Vehicle QSA Models (Issue #88)
