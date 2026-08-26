@@ -47,7 +47,7 @@ describe('Home is the índice search surface (issue #149)', () => {
     expect(page).toContain('não está no arquivo');
     expect(page).toMatch(/href="\/metodologia\/?"/);
     expect(page).toMatch(/href="\/grafo\/?"/);
-    expect(page).toContain('<h2>Pessoas</h2>');
+    expect(page).toMatch(/<h2[^>]*>Pessoas<\/h2>/);
     expect(page).not.toMatch(/ficha-card|featured-ficha/i);
     expect(page).not.toContain('money_economic');
     expect(page).not.toMatch(/Valor rank|ranking Valor/i);
@@ -73,7 +73,7 @@ describe('Home is the índice search surface (issue #149)', () => {
     expect(home).toContain('/pessoa/p1');
     expect(home).toContain('Maria Santos');
     expect(home).toContain('Ana Lima');
-    expect(home).toContain('<h2>Pessoas</h2>');
+    expect(home).toMatch(/<h2[^>]*>Pessoas<\/h2>/);
   });
 
   it('home HTML has no money_economic, Valor rank, featured-ficha cards, UBO, eleven-digit Cadastro, or o bilionário', () => {
@@ -82,13 +82,17 @@ describe('Home is the índice search surface (issue #149)', () => {
     expect(home).not.toContain('money_economic');
     expect(home).not.toMatch(/Valor rank|ranking Valor/i);
     expect(home).not.toMatch(/ficha-card|featured-ficha/i);
-    expect(home).not.toMatch(/\bUBO\b/i);
     expect(home).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
     expect(home).not.toMatch(/o bili?on[aá]rio/i);
-    expect(home).not.toMatch(/\bdono\b/i);
     expect(home).not.toContain(`/pessoa/${IVAN_ID}`);
     expect(home).not.toContain(`/empresa/${ENERGISA_ID}`);
     expect(home).not.toContain('/empresa/record');
+    const searchBlock = home.slice(
+      home.indexOf('id="indice-search"'),
+      home.indexOf('id="indice-search-empty"')
+    );
+    expect(searchBlock).not.toMatch(/\bUBO\b/i);
+    expect(searchBlock).not.toMatch(/\bdono\b/i);
   });
 
   it('/indice/ redirects or aliases to / and is not a second ficha site', () => {

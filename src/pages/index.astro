@@ -4,11 +4,7 @@ import type { Source } from '../types';
 import PageTools from '../components/PageTools.astro';
 import { mintCitedEmpresas } from '../lib/mint-empresa';
 import { loadPublicGrafo, mintCitedPessoas } from '../lib/mint-pessoa';
-import {
-  INDICE_EMPTY_GRAFO_ONLY,
-  INDICE_EMPTY_NOT_IN_ARCHIVE,
-  type MintedFicha,
-} from '../lib/indice-search';
+import type { MintedFicha } from '../lib/indice-search';
 
 const freezePersons = getFreeze();
 const grafo = loadPublicGrafo();
@@ -249,8 +245,8 @@ const getCitationNumber = (source: Source | undefined) => {
           <label for="indice-search">Buscar pessoa ou empresa</label>
           <input id="indice-search" type="search" autocomplete="off" spellcheck="false">
           <ul id="indice-search-results" hidden></ul>
-          <p id="indice-search-grafo-only" hidden>{INDICE_EMPTY_GRAFO_ONLY}</p>
-          <p id="indice-search-empty" hidden>{INDICE_EMPTY_NOT_IN_ARCHIVE}</p>
+          <p id="indice-search-grafo-only" hidden>no grafo apenas</p>
+          <p id="indice-search-empty" hidden>não está no arquivo</p>
         </div>
         <p class="indice-tools">
           <a href="/metodologia/">Metodologia</a>
