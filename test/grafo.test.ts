@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { buildCytoscapeElements } from '../src/lib/grafo-elements';
 
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
@@ -121,44 +122,21 @@ describe('Grafo Page (issue #74)', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
-      // Build the same element list that the page builds
-      const elements: any[] = [];
-      
-      // Add nodes
-      json.nodes.forEach((node: any) => {
-        elements.push({
-          data: {
-            id: node.id,
-            label: node.label,
-            kind: node.kind
-          }
-        });
-      });
-      
-      // Add edges with unique IDs (same logic as grafo.astro)
-      json.edges.forEach((edge: any, index: number) => {
-        const edgeLabel = edge.pct_capital !== null && edge.pct_capital !== undefined
-          ? `${edge.pct_capital}%`
-          : '';
-        
-        elements.push({
-          data: {
-            id: `e${index}`,
-            source: edge.from,
-            target: edge.to,
-            label: edgeLabel,
-            kind: edge.kind
-          }
-        });
-      });
+      // Use the SAME function that grafo.astro uses
+      const elements = buildCytoscapeElements(json);
       
       // Extract edge elements
       const edges = elements.filter(el => el.data.source !== undefined);
       
-      // Assert count equals 44
+      // Assert edge count equals JSON edge count (44)
       expect(
         edges.length,
-        `Should have exactly 44 edges, got ${edges.length}`
+        `Edge count must equal json.edges.length. Got ${edges.length}, expected ${json.edges.length}`
+      ).toBe(json.edges.length);
+      
+      expect(
+        edges.length,
+        `Should have exactly 44 edges (spec requirement)`
       ).toBe(44);
       
       // Assert all edge IDs are unique
@@ -168,6 +146,20 @@ describe('Grafo Page (issue #74)', () => {
         uniqueEdgeIds.size,
         `Edge IDs must be unique. Got ${edgeIds.length} edges but only ${uniqueEdgeIds.size} unique IDs`
       ).toBe(44);
+      
+      // Assert source/target are the JSON from/to
+      // (so ***768*** → 00864214000106 has every edge, including duplicates)
+      edges.forEach((edge, index) => {
+        const jsonEdge = json.edges[index];
+        expect(
+          edge.data.source,
+          `Edge ${index} source should be ${jsonEdge.from}`
+        ).toBe(jsonEdge.from);
+        expect(
+          edge.data.target,
+          `Edge ${index} target should be ${jsonEdge.to}`
+        ).toBe(jsonEdge.to);
+      });
     });
 
     it('should have dist/grafo/index.html', () => {

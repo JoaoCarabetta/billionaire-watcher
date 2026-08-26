@@ -78,41 +78,14 @@
 
     <script type="module">
       import cytoscape from 'cytoscape';
+      import { buildCytoscapeElements } from '../lib/grafo-elements';
 
       // Fetch the static JSON
       fetch('/grafo-publico.json')
         .then(response => response.json())
         .then(data => {
-          // Transform nodes and edges to Cytoscape format
-          const elements = [];
-
-          // Add nodes
-          data.nodes.forEach(node => {
-            elements.push({
-              data: {
-                id: node.id,
-                label: node.label,
-                kind: node.kind
-              }
-            });
-          });
-
-          // Add edges with unique IDs
-          data.edges.forEach((edge, index) => {
-            const edgeLabel = edge.pct_capital !== null && edge.pct_capital !== undefined
-              ? `${edge.pct_capital}%`
-              : '';
-
-            elements.push({
-              data: {
-                id: `e${index}`,
-                source: edge.from,
-                target: edge.to,
-                label: edgeLabel,
-                kind: edge.kind
-              }
-            });
-          });
+          // Transform nodes and edges to Cytoscape format using shared function
+          const elements = buildCytoscapeElements(data);
 
           // Initialize Cytoscape
           const cy = cytoscape({
