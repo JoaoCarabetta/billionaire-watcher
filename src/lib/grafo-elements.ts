@@ -15,7 +15,8 @@ export interface GrafoEdge {
   from: string;
   to: string;
   kind: string;
-  pct_capital: number | null;
+  pct_capital?: number | null;
+  pct_votos?: number | null;
   source: string;
 }
 
@@ -50,16 +51,25 @@ export function buildCytoscapeElements(data: GrafoData): CytoscapeElement[] {
 
   // Add edges with unique IDs
   data.edges.forEach((edge, index) => {
-    const edgeLabel = edge.pct_capital !== null && edge.pct_capital !== undefined
-      ? `${edge.pct_capital}%`
-      : '';
+    let edgeLabel = '';
+    
+    const hasCapital = edge.pct_capital !== null && edge.pct_capital !== undefined;
+    const hasVotos = edge.pct_votos !== null && edge.pct_votos !== undefined;
+    
+    if (hasCapital && hasVotos) {
+      edgeLabel = `${edge.pct_capital}% capital, ${edge.pct_votos}% votos`;
+    } else if (hasCapital) {
+      edgeLabel = `${edge.pct_capital}%`;
+    } else if (hasVotos) {
+      edgeLabel = `${edge.pct_votos}% votos`;
+    }
 
     elements.push({
       data: {
         id: `e${index}`,
         source: edge.from,
         target: edge.to,
-        label: edgeLabel,
+        label: edgeLabel || undefined,
         kind: edge.kind
       }
     });

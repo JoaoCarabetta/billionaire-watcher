@@ -35,12 +35,20 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 89 nodes', () => {
+    it('should have exactly 95 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(89);
+      expect(json.nodes.length).toBe(95);
+    });
+
+    it('should have exactly 25 person nodes', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
+      expect(personNodes.length).toBe(25);
     });
 
     it('should have exactly 44 edges', () => {
@@ -78,7 +86,7 @@ describe('Grafo Page (issue #74)', () => {
       expect(jsonText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
     });
 
-    it('should have person ids matching ***NNN*** pattern', () => {
+    it('should have person ids matching p-{8 hex} pattern', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
@@ -87,9 +95,69 @@ describe('Grafo Page (issue #74)', () => {
       for (const node of personNodes) {
         expect(
           node.id,
-          `Person id "${node.id}" should match ***NNN*** pattern`
-        ).toMatch(/^\*\*\*\d{3}\*\*\*$/);
+          `Person id "${node.id}" should match p-{8 hex} pattern`
+        ).toMatch(/^p-[0-9a-f]{8}$/);
       }
+    });
+
+    it('should have unique person ids', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
+      const personIds = personNodes.map((n: any) => n.id);
+      const uniqueIds = new Set(personIds);
+      
+      expect(uniqueIds.size).toBe(personIds.length);
+      expect(uniqueIds.size).toBe(25);
+    });
+
+    it('should have unique person names', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
+      const personNames = personNodes.map((n: any) => n.label);
+      const uniqueNames = new Set(personNames);
+      
+      expect(uniqueNames.size).toBe(personNames.length);
+      expect(uniqueNames.size).toBe(25);
+    });
+
+    it('Maria do Carmo, Cíntia, and Mônica are three distinct nodes', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
+      
+      const mariaDoCarmo = personNodes.find((n: any) => n.label.includes('MARIA DO CARMO RIPPER KOS'));
+      const cintia = personNodes.find((n: any) => n.label.includes('CINTIA ALZUGUIR BOTELHO'));
+      const monica = personNodes.find((n: any) => n.label.includes('MONICA PEREZ BOTELHO'));
+      
+      expect(mariaDoCarmo).toBeDefined();
+      expect(cintia).toBeDefined();
+      expect(monica).toBeDefined();
+      
+      expect(mariaDoCarmo.id).not.toBe(cintia.id);
+      expect(mariaDoCarmo.id).not.toBe(monica.id);
+      expect(cintia.id).not.toBe(monica.id);
+    });
+
+    it('should have no ***NNN*** person ids', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const jsonText = fs.readFileSync(jsonPath, 'utf-8');
+      
+      expect(jsonText).not.toContain('***');
+    });
+
+    it('should have no duplicate edge pairs', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      const edgePairs = json.edges.map((e: any) => `${e.from}->${e.to}`);
+      const uniquePairs = new Set(edgePairs);
+      
+      expect(uniquePairs.size).toBe(edgePairs.length);
     });
   });
 
@@ -148,7 +216,6 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(44);
       
       // Assert source/target are the JSON from/to
-      // (so ***768*** → 00864214000106 has every edge, including duplicates)
       edges.forEach((edge, index) => {
         const jsonEdge = json.edges[index];
         expect(
@@ -160,6 +227,33 @@ describe('Grafo Page (issue #74)', () => {
           `Edge ${index} target should be ${jsonEdge.to}`
         ).toBe(jsonEdge.to);
       });
+    });
+
+    it('when edge has both pct_capital and pct_votos, label contains both numbers', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      // Find Monica's Energisa edge in the JSON
+      const monicaEdge = json.edges.find(
+        (e: any) => e.from === 'p-ea4eb254' && e.to === '00864214000106'
+      );
+      
+      expect(monicaEdge).toBeDefined();
+      expect(monicaEdge.pct_capital).toBe(52.004);
+      expect(monicaEdge.pct_votos).toBe(3.982);
+      
+      // Build Cytoscape elements
+      const elements = buildCytoscapeElements(json);
+      const edges = elements.filter(el => el.data.source !== undefined);
+      
+      // Find Monica's edge in Cytoscape elements
+      const monicaCytoscapeEdge = edges.find(
+        (e: any) => e.data.source === 'p-ea4eb254' && e.data.target === '00864214000106'
+      );
+      
+      expect(monicaCytoscapeEdge).toBeDefined();
+      expect(monicaCytoscapeEdge!.data.label).toContain('52.004');
+      expect(monicaCytoscapeEdge!.data.label).toContain('3.982');
     });
 
     it('should have dist/grafo/index.html', () => {
