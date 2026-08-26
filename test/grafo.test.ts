@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
+import { buildPanelView } from '../src/lib/grafo-panel';
 
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
@@ -488,6 +489,138 @@ describe('Grafo Page (issue #74)', () => {
       // Remove JSON-LD scripts before checking
       const htmlWithoutJsonLd = html.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
       expect(htmlWithoutJsonLd).not.toMatch(/<script/);
+    });
+  });
+
+  describe('Test 6 (issue #84): hop-fact side panel', () => {
+    const GIPAR_ID = '02260956000158';
+    const ENERGISA_ID = '00864214000106';
+    const MONICA_ID = 'p-ea4eb254';
+    const MCLC_ID = '59206795000131';
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function panelCopySources(): Array<{ label: string; text: string }> {
+      const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const sources = [
+        { label: 'src/lib/grafo-panel.ts', text: fs.readFileSync(helperPath, 'utf-8') },
+        { label: 'src/pages/grafo.astro', text: fs.readFileSync(pagePath, 'utf-8') },
+      ];
+
+      if (!buildFailed) {
+        const grafoHtmlPath = path.join(distPath, 'grafo', 'index.html');
+        const html = fs.readFileSync(grafoHtmlPath, 'utf-8');
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/);
+        const bodyWithoutScripts = (bodyMatch?.[1] ?? html).replace(
+          /<script[\s\S]*?<\/script>/gi,
+          ''
+        );
+        sources.push({ label: 'dist/grafo/index.html body', text: bodyWithoutScripts });
+      }
+
+      return sources;
+    }
+
+    it('dist/grafo/index.html includes a panel element', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      const grafoHtmlPath = path.join(distPath, 'grafo', 'index.html');
+      const html = fs.readFileSync(grafoHtmlPath, 'utf-8');
+
+      expect(
+        html,
+        'dist/grafo/index.html must include id="panel" so the click panel exists after build'
+      ).toMatch(/id="panel"/);
+    });
+
+    it('panel copy has no fortuna, currency symbol, or price field', () => {
+      if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+
+      for (const { label, text } of panelCopySources()) {
+        const withoutInterpolation = text.replace(/\$\{[^}]*\}/g, '');
+        expect(withoutInterpolation, `${label} must not mention fortuna`).not.toMatch(/fortuna/i);
+        expect(withoutInterpolation, `${label} must not contain R$`).not.toMatch(/R\$/);
+        expect(withoutInterpolation, `${label} must not contain £ or €`).not.toMatch(/[£€]/);
+        expect(withoutInterpolation, `${label} must not contain a leftover $ currency mark`).not.toMatch(/\$/);
+        expect(withoutInterpolation, `${label} must not have a preço field`).not.toMatch(/preço/i);
+        expect(withoutInterpolation, `${label} must not have a price field`).not.toMatch(/\bprice\b/i);
+      }
+    });
+
+    it('grafo.astro imports the shared panel helper (copying logic must fail)', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const pageSource = fs.readFileSync(pagePath, 'utf-8');
+
+      expect(
+        pageSource,
+        'grafo.astro must import from ../lib/grafo-panel — same seam as #74 unique-edge helper'
+      ).toMatch(/from ['"]\.\.\/lib\/grafo-panel['"]/);
+      expect(
+        pageSource,
+        'grafo.astro must call buildPanelView so dropping the helper fails'
+      ).toMatch(/buildPanelView\s*\(/);
+    });
+
+    it('Gipar node and Gipar→Energisa edge yield 26.646, 61.162, and the FRE source', () => {
+      const json = loadCommittedGrafo();
+
+      const nodeView = buildPanelView(json, { nodeId: GIPAR_ID });
+      expect(nodeView, 'Gipar node should open a node panel').not.toBeNull();
+      expect(nodeView!.mode).toBe('node');
+      if (nodeView!.mode !== 'node') return;
+
+      expect(nodeView.label).toMatch(/Gipar/i);
+      expect(nodeView.kind).toBe('company');
+      expect(nodeView.id).toBe(GIPAR_ID);
+
+      const energisaHop = nodeView.hops.find(
+        (hop) => hop.other_id === ENERGISA_ID || /energisa/i.test(hop.other_label)
+      );
+      expect(energisaHop, 'Gipar node should list the Energisa hop').toBeDefined();
+      expect(energisaHop!.pct_capital).toBe(26.646);
+      expect(energisaHop!.pct_votos).toBe(61.162);
+      expect(energisaHop!.source).toMatch(/FRE Energisa 160981/);
+
+      const edgeView = buildPanelView(json, { from: GIPAR_ID, to: ENERGISA_ID });
+      expect(edgeView, 'Gipar→Energisa should open an edge panel').not.toBeNull();
+      expect(edgeView!.mode).toBe('edge');
+      if (edgeView!.mode !== 'edge') return;
+
+      expect(edgeView.from_label).toMatch(/Gipar/i);
+      expect(edgeView.to_label).toMatch(/energisa/i);
+      expect(edgeView.kind).toBe('company_owns');
+      expect(edgeView.pct_capital).toBe(26.646);
+      expect(edgeView.pct_votos).toBe(61.162);
+      expect(edgeView.source).toMatch(/FRE Energisa 160981/);
+    });
+
+    it('Mônica node lists MCLC at 52.004 and does not list Energisa at 52.004', () => {
+      const json = loadCommittedGrafo();
+      const view = buildPanelView(json, { nodeId: MONICA_ID });
+
+      expect(view, 'Mônica node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const mclcHop = view.hops.find(
+        (hop) => hop.other_id === MCLC_ID || /mclc/i.test(hop.other_label)
+      );
+      expect(mclcHop, 'Mônica should list MCLC').toBeDefined();
+      expect(mclcHop!.pct_capital).toBe(52.004);
+
+      const energisaAt52 = view.hops.find(
+        (hop) =>
+          (hop.other_id === ENERGISA_ID || /energisa/i.test(hop.other_label)) &&
+          hop.pct_capital === 52.004
+      );
+      expect(
+        energisaAt52,
+        'Mônica must not list Energisa at 52.004 — that hop is MCLC'
+      ).toBeUndefined();
     });
   });
 });
