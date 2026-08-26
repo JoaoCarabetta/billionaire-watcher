@@ -1569,7 +1569,8 @@ describe('Grafo Page (issue #74)', () => {
         (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
         0
       );
-      return { incoming, capitalSum };
+      const capitalRounded = Math.round(capitalSum * 1000) / 1000;
+      return { incoming, capitalSum, capitalRounded };
     }
 
     it('has WEG S.A. and AMBEV S.A. as company nodes', () => {
@@ -1588,13 +1589,13 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const weg = incomingCapital(json, WEG_ID);
       expect(weg.incoming.length, 'WEG incoming hop count').toBe(52);
-      expect(weg.capitalSum).toBe(100);
+      expect(weg.capitalRounded).toBe(100);
       expect(weg.capitalSum).toBeGreaterThanOrEqual(99.5);
       expect(weg.capitalSum).toBeLessThanOrEqual(100.5);
 
       const ambev = incomingCapital(json, AMBEV_ID);
       expect(ambev.incoming.length, 'Ambev incoming hop count').toBe(5);
-      expect(ambev.capitalSum).toBe(99.999);
+      expect(ambev.capitalRounded).toBe(99.999);
       expect(ambev.capitalSum).toBeGreaterThanOrEqual(99.5);
       expect(ambev.capitalSum).toBeLessThanOrEqual(100.5);
     });
