@@ -497,6 +497,12 @@ describe('Grafo Page (issue #74)', () => {
     const ENERGISA_ID = '00864214000106';
     const MONICA_ID = 'p-ea4eb254';
     const MCLC_ID = '59206795000131';
+    const IVAN_ID = 'p-cdbc8c4e';
+    const MULTISETOR_ID = '20286787000107';
+    const ITACATU_ID = '23160658000166';
+    const NOVA_GIPAR_ID = '16674735000130';
+    const HONDA_ID = '05712135000101';
+    const HONDA_TARGET_ID = '43149806';
 
     function loadCommittedGrafo() {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
@@ -621,6 +627,73 @@ describe('Grafo Page (issue #74)', () => {
         energisaAt52,
         'Mônica must not list Energisa at 52.004 — that hop is MCLC'
       ).toBeUndefined();
+    });
+
+    it('Ivan → Energisa capital and votes equal the hop products on the complete path', () => {
+      const json = loadCommittedGrafo();
+      const hopIds: Array<[string, string]> = [
+        [IVAN_ID, MULTISETOR_ID],
+        [MULTISETOR_ID, ITACATU_ID],
+        [ITACATU_ID, NOVA_GIPAR_ID],
+        [NOVA_GIPAR_ID, GIPAR_ID],
+        [GIPAR_ID, ENERGISA_ID],
+      ];
+      const hops = hopIds.map(([from, to]) => {
+        const edge = json.edges.find((item: { from: string; to: string }) => item.from === from && item.to === to);
+        expect(edge, `committed hop ${from} → ${to} must exist`).toBeDefined();
+        return edge;
+      });
+
+      const expectedCapital = hops.reduce(
+        (acc: number, edge: { pct_capital: number }) => acc * (edge.pct_capital / 100),
+        1
+      ) * 100;
+      const expectedVotes = hops.reduce(
+        (acc: number, edge: { pct_votos: number }) => acc * (edge.pct_votos / 100),
+        1
+      ) * 100;
+
+      const view = buildPanelView(json, { nodeId: IVAN_ID });
+      expect(view, 'Ivan node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const energisa = view.participations.find((item) => item.company_id === ENERGISA_ID);
+      expect(energisa, 'Ivan should have cited participation in Energisa').toBeDefined();
+
+      const examplePath = energisa!.paths.find((path) => {
+        const ids = path.hops.map((hop) => hop.from_id + '>' + hop.to_id);
+        const wanted = hopIds.map(([from, to]) => from + '>' + to);
+        return ids.length === wanted.length && ids.every((id, index) => id === wanted[index]);
+      });
+      expect(examplePath, 'the Ivan → Multisetor → Itacatu → Nova Gipar → Gipar → Energisa path must be listed').toBeDefined();
+      expect(examplePath!.pct_capital).toBe(expectedCapital);
+      expect(examplePath!.pct_votos).toBe(expectedVotes);
+    });
+
+    it('a Receita Federal path with a missing percent does not invent a product', () => {
+      const json = loadCommittedGrafo();
+      const holeEdge = json.edges.find(
+        (edge: { from: string; to: string }) => edge.from === HONDA_ID && edge.to === HONDA_TARGET_ID
+      );
+      expect(holeEdge, 'Honda Receita hop should exist').toBeDefined();
+      expect(holeEdge.pct_capital).toBeUndefined();
+      expect(holeEdge.pct_votos).toBeUndefined();
+
+      const view = buildPanelView(json, { nodeId: HONDA_ID });
+      expect(view, 'Honda node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+
+      const cited = view.participations.find((item) => item.company_id === HONDA_TARGET_ID);
+      expect(cited, 'Honda should list the reachable Receita target').toBeDefined();
+      expect(cited!.paths.length).toBeGreaterThan(0);
+      expect(cited!.paths[0].hops.length).toBe(1);
+      expect(cited!.paths[0].hops[0].source).toMatch(/Receita/);
+      expect(cited!.pct_capital, 'must not invent pct_capital on a hole path').toBeUndefined();
+      expect(cited!.pct_votos, 'must not invent pct_votos on a hole path').toBeUndefined();
+      expect(cited!.paths[0].pct_capital).toBeUndefined();
+      expect(cited!.paths[0].pct_votos).toBeUndefined();
     });
   });
 });

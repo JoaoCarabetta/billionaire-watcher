@@ -2,7 +2,8 @@
  * Builds the /grafo side-panel view-model from committed JSON.
  *
  * Reads only label, kind, pct_capital, pct_votos, source (plus id / from / to).
- * No money, no path product, no invented fields.
+ * Cited participation is the product of hop percents on complete paths.
+ * No invented percents. No money fields.
  */
 
 import type { GrafoData, GrafoEdge, GrafoNode } from './grafo-elements';
@@ -17,12 +18,38 @@ export type PanelHop = {
   source?: string;
 };
 
+export type CitedHop = {
+  from_id: string;
+  from_label: string;
+  to_id: string;
+  to_label: string;
+  kind: string;
+  pct_capital?: number;
+  pct_votos?: number;
+  source?: string;
+};
+
+export type CitedPath = {
+  hops: CitedHop[];
+  pct_capital?: number;
+  pct_votos?: number;
+};
+
+export type CitedParticipation = {
+  company_id: string;
+  company_label: string;
+  pct_capital?: number;
+  pct_votos?: number;
+  paths: CitedPath[];
+};
+
 export type NodePanelView = {
   mode: 'node';
   label: string;
   kind: string;
   id: string;
   hops: PanelHop[];
+  participations: CitedParticipation[];
 };
 
 export type EdgePanelView = {
@@ -102,6 +129,7 @@ function buildNodePanel(data: GrafoData, nodeId: string): NodePanelView | null {
     kind: node.kind,
     id: node.id,
     hops,
+    participations: buildCitedParticipations(data, nodeId),
   };
 }
 
@@ -133,6 +161,126 @@ function buildEdgePanel(
   }
 
   return view;
+}
+
+function isListedCompany(data: GrafoData, id: string): boolean {
+  const node = nodeById(data, id);
+  if (!node || node.kind !== 'company') {
+    return false;
+  }
+  const incoming = data.edges.some((edge) => edge.to === id);
+  const outgoing = data.edges.some((edge) => edge.from === id);
+  return incoming && !outgoing;
+}
+
+function productOfPercents(values: Array<number | null | undefined>): number | undefined {
+  if (values.some((value) => !presentNumber(value))) {
+    return undefined;
+  }
+  let acc = 1;
+  for (const value of values as number[]) {
+    acc = acc * (value / 100);
+  }
+  return acc * 100;
+}
+
+function citedHopFromEdge(data: GrafoData, edge: GrafoEdge): CitedHop {
+  const hop: CitedHop = {
+    from_id: edge.from,
+    from_label: labelOf(data, edge.from),
+    to_id: edge.to,
+    to_label: labelOf(data, edge.to),
+    kind: edge.kind,
+  };
+  if (presentNumber(edge.pct_capital)) {
+    hop.pct_capital = edge.pct_capital;
+  }
+  if (presentNumber(edge.pct_votos)) {
+    hop.pct_votos = edge.pct_votos;
+  }
+  if (edge.source) {
+    hop.source = edge.source;
+  }
+  return hop;
+}
+
+function findPathsTo(
+  data: GrafoData,
+  fromId: string,
+  targetId: string,
+  visited: Set<string>
+): GrafoEdge[][] {
+  const results: GrafoEdge[][] = [];
+  for (const edge of data.edges) {
+    if (edge.from !== fromId) {
+      continue;
+    }
+    if (visited.has(edge.to)) {
+      continue;
+    }
+    if (edge.to === targetId) {
+      results.push([edge]);
+      continue;
+    }
+    const nextVisited = new Set(visited);
+    nextVisited.add(edge.to);
+    for (const rest of findPathsTo(data, edge.to, targetId, nextVisited)) {
+      results.push([edge, ...rest]);
+    }
+  }
+  return results;
+}
+
+function pathView(data: GrafoData, edges: GrafoEdge[]): CitedPath {
+  const hops = edges.map((edge) => citedHopFromEdge(data, edge));
+  const path: CitedPath = { hops };
+  const capital = productOfPercents(edges.map((edge) => edge.pct_capital));
+  const votes = productOfPercents(edges.map((edge) => edge.pct_votos));
+  if (capital !== undefined) {
+    path.pct_capital = capital;
+  }
+  if (votes !== undefined) {
+    path.pct_votos = votes;
+  }
+  return path;
+}
+
+function sumPresent(values: Array<number | undefined>): number | undefined {
+  const present = values.filter((value): value is number => value !== undefined);
+  if (present.length === 0) {
+    return undefined;
+  }
+  return present.reduce((acc, value) => acc + value, 0);
+}
+
+function buildCitedParticipations(data: GrafoData, startId: string): CitedParticipation[] {
+  const listedIds = data.nodes
+    .filter((node) => isListedCompany(data, node.id) && node.id !== startId)
+    .map((node) => node.id);
+
+  const participations: CitedParticipation[] = [];
+  for (const companyId of listedIds) {
+    const rawPaths = findPathsTo(data, startId, companyId, new Set([startId]));
+    if (rawPaths.length === 0) {
+      continue;
+    }
+    const paths = rawPaths.map((edges) => pathView(data, edges));
+    const participation: CitedParticipation = {
+      company_id: companyId,
+      company_label: labelOf(data, companyId),
+      paths,
+    };
+    const capital = sumPresent(paths.map((path) => path.pct_capital));
+    const votes = sumPresent(paths.map((path) => path.pct_votos));
+    if (capital !== undefined) {
+      participation.pct_capital = capital;
+    }
+    if (votes !== undefined) {
+      participation.pct_votos = votes;
+    }
+    participations.push(participation);
+  }
+  return participations;
 }
 
 export function buildPanelView(data: GrafoData, selection: PanelSelection): PanelView {
@@ -185,6 +333,51 @@ function renderHopGroup(title: string, hops: PanelHop[]): string {
   );
 }
 
+function renderCitedHop(hop: CitedHop): string {
+  return (
+    '<li>' +
+      '<strong>' + escapeHtml(hop.from_label) + ' - ' + escapeHtml(hop.to_label) + '</strong>' +
+      factLine('kind', hop.kind) +
+      factLine('pct_capital', hop.pct_capital) +
+      factLine('pct_votos', hop.pct_votos) +
+      factLine('source', hop.source) +
+    '</li>'
+  );
+}
+
+function renderCitedPath(path: CitedPath): string {
+  return (
+    '<li>' +
+      factLine('pct_capital', path.pct_capital) +
+      factLine('pct_votos', path.pct_votos) +
+      '<ul>' + path.hops.map(renderCitedHop).join('') + '</ul>' +
+    '</li>'
+  );
+}
+
+function renderParticipation(item: CitedParticipation): string {
+  return (
+    '<li>' +
+      '<strong>' + escapeHtml(item.company_label) + '</strong>' +
+      factLine('pct_capital', item.pct_capital) +
+      factLine('pct_votos', item.pct_votos) +
+      '<ul>' + item.paths.map(renderCitedPath).join('') + '</ul>' +
+    '</li>'
+  );
+}
+
+function renderParticipations(items: CitedParticipation[]): string {
+  if (items.length === 0) {
+    return '';
+  }
+  return (
+    '<section>' +
+      '<h3>participacao citada</h3>' +
+      '<ul>' + items.map(renderParticipation).join('') + '</ul>' +
+    '</section>'
+  );
+}
+
 export function renderPanelHtml(view: PanelView): string {
   if (!view) {
     return '';
@@ -200,6 +393,7 @@ export function renderPanelHtml(view: PanelView): string {
         factLine('id', view.id) +
         renderHopGroup('saida', outgoing) +
         renderHopGroup('entrada', incoming) +
+        renderParticipations(view.participations) +
       '</div>'
     );
   }
