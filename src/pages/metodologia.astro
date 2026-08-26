@@ -62,6 +62,30 @@ const rejectedMethodsFacts = [
 const dataAccessFacts = [
   getFactById('metod-published-facts-index')
 ].filter(Boolean) as Fact[];
+
+const lacunasFacts = [
+  getFactById('metod-lacuna-valor-bancos-seguradoras'),
+  getFactById('metod-lacuna-pessoa-entrada'),
+  getFactById('metod-lacuna-sa-qsa-nao-acionistas'),
+  getFactById('metod-lacuna-sa-fechada-ausencia'),
+  getFactById('metod-lacuna-hang-macedo-frias-maggi'),
+  getFactById('metod-lacuna-limitada-hop'),
+  getFactById('metod-lacuna-sede-exterior')
+].filter(Boolean) as Fact[];
+
+const limitacoesFacts = [
+  getFactById('metod-limitacao-nao-ranking-forbes'),
+  getFactById('metod-limitacao-fatia-nao-fortuna'),
+  getFactById('metod-limitacao-bloco-sem-percentual'),
+  getFactById('metod-limitacao-ato-oficial-percentual-vazio'),
+  getFactById('metod-limitacao-valor1000-fora-versao')
+].filter(Boolean) as Fact[];
+
+const repetirNoutroPaisFacts = [
+  getFactById('metod-repetir-fre-equivalente'),
+  getFactById('metod-repetir-qsa-equivalente'),
+  getFactById('metod-repetir-revista-revisao')
+].filter(Boolean) as Fact[];
 ---
 
 <!DOCTYPE html>
@@ -183,6 +207,27 @@ const dataAccessFacts = [
         <p style="margin-top: 1rem; color: #666;">
           Arquivos por pessoa: <code>/api/facts/latest/{'{'}slug{'}'}.json</code> e <code>/api/facts/latest/{'{'}slug{'}'}.jsonl</code>
         </p>
+      </section>
+
+      <section class="methodology-content">
+        <h2>Lacunas</h2>
+        {lacunasFacts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Limitações</h2>
+        {limitacoesFacts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
+      </section>
+
+      <section class="methodology-content">
+        <h2>Como repetir noutro país</h2>
+        {repetirNoutroPaisFacts.map((fact) => (
+          <FactWithCitation fact={fact} citationNumber={getCitationNumber(fact.source!)} />
+        ))}
       </section>
 
       <Citations citationMap={citationMap} allSources={allSources} />
