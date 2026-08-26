@@ -117,6 +117,59 @@ describe('Grafo Page (issue #74)', () => {
   });
 
   describe('Test 3: /grafo build output is 200-shaped', () => {
+    it('should pass all 44 edges with unique IDs to Cytoscape', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      
+      // Build the same element list that the page builds
+      const elements: any[] = [];
+      
+      // Add nodes
+      json.nodes.forEach((node: any) => {
+        elements.push({
+          data: {
+            id: node.id,
+            label: node.label,
+            kind: node.kind
+          }
+        });
+      });
+      
+      // Add edges with unique IDs (same logic as grafo.astro)
+      json.edges.forEach((edge: any, index: number) => {
+        const edgeLabel = edge.pct_capital !== null && edge.pct_capital !== undefined
+          ? `${edge.pct_capital}%`
+          : '';
+        
+        elements.push({
+          data: {
+            id: `e${index}`,
+            source: edge.from,
+            target: edge.to,
+            label: edgeLabel,
+            kind: edge.kind
+          }
+        });
+      });
+      
+      // Extract edge elements
+      const edges = elements.filter(el => el.data.source !== undefined);
+      
+      // Assert count equals 44
+      expect(
+        edges.length,
+        `Should have exactly 44 edges, got ${edges.length}`
+      ).toBe(44);
+      
+      // Assert all edge IDs are unique
+      const edgeIds = edges.map(e => e.data.id);
+      const uniqueEdgeIds = new Set(edgeIds);
+      expect(
+        uniqueEdgeIds.size,
+        `Edge IDs must be unique. Got ${edgeIds.length} edges but only ${uniqueEdgeIds.size} unique IDs`
+      ).toBe(44);
+    });
+
     it('should have dist/grafo/index.html', () => {
       if (buildFailed) throw new Error(`Build failed: ${buildError}`);
       

@@ -97,15 +97,15 @@
             });
           });
 
-          // Add edges
-          data.edges.forEach(edge => {
+          // Add edges with unique IDs
+          data.edges.forEach((edge, index) => {
             const edgeLabel = edge.pct_capital !== null && edge.pct_capital !== undefined
               ? `${edge.pct_capital}%`
               : '';
 
             elements.push({
               data: {
-                id: `${edge.from}-${edge.to}`,
+                id: `e${index}`,
                 source: edge.from,
                 target: edge.to,
                 label: edgeLabel,

@@ -8,6 +8,8 @@ export const GET: APIRoute = () => {
     { loc: '/', priority: '1.0' },
     { loc: '/metodologia/', priority: '0.9' },
     { loc: '/doacoes/', priority: '0.8' },
+    { loc: '/grafo/', priority: '0.8' },
+    { loc: '/grafo-publico.json', priority: '0.7' },
     ...freezePersons.map(person => ({
       loc: `/pessoa/${person.person_id}/`,
       priority: '0.7'

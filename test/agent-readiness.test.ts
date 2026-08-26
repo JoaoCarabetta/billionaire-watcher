@@ -111,6 +111,20 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       expect(xml).toMatch(/<loc>[^<]*\/pessoa\/p2\/<\/loc>/);
       expect(xml).toMatch(/<loc>[^<]*\/pessoa\/p3\/<\/loc>/);
     });
+
+    it('should list /grafo/ in sitemap.xml', () => {
+      const sitemapPath = path.join(distPath, 'sitemap.xml');
+      const xml = fs.readFileSync(sitemapPath, 'utf-8');
+      
+      expect(xml).toMatch(/<loc>[^<]*\/grafo\/<\/loc>/);
+    });
+
+    it('should list /grafo-publico.json in sitemap.xml', () => {
+      const sitemapPath = path.join(distPath, 'sitemap.xml');
+      const xml = fs.readFileSync(sitemapPath, 'utf-8');
+      
+      expect(xml).toMatch(/<loc>[^<]*\/grafo-publico\.json<\/loc>/);
+    });
   });
 
   describe('Test 3: llms.txt exists and points to key routes', () => {
@@ -140,6 +154,20 @@ describe('Tracer: Agent Readiness (is-agentic Essential)', () => {
       const content = fs.readFileSync(llmsTxtPath, 'utf-8');
       
       expect(content).toMatch(/\/pessoa\//);
+    });
+
+    it('should mention /grafo/ route in llms.txt', () => {
+      const llmsTxtPath = path.join(distPath, 'llms.txt');
+      const content = fs.readFileSync(llmsTxtPath, 'utf-8');
+      
+      expect(content).toMatch(/\/grafo\//);
+    });
+
+    it('should mention /grafo-publico.json in llms.txt', () => {
+      const llmsTxtPath = path.join(distPath, 'llms.txt');
+      const content = fs.readFileSync(llmsTxtPath, 'utf-8');
+      
+      expect(content).toMatch(/grafo-publico\.json/);
     });
   });
 
