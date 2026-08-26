@@ -4,6 +4,7 @@ import path from 'path';
 import { mintCitedPessoas, renderFichaHtml } from '../src/lib/mint-pessoa';
 import { lookupPersonMoney } from '../src/lib/grafo-money';
 import type { GrafoData } from '../src/lib/grafo-elements';
+import { firstMainBlockText, h1Text } from './ficha-html';
 
 const IVAN_ID = 'p-cdbc8c4e';
 const JOAQUIM_ID = 'p-da3e3836';
@@ -118,6 +119,24 @@ describe('Mint cited /pessoa/ fichas (issue #147)', () => {
       expect(html).toContain('Não é uma fortuna.');
     });
 
+    it('Ivan lead is the nexo template in view-source, with money sentence, not a biography (issue #161)', () => {
+      const html = renderFichaHtml(ivan, lookupPersonMoney(money, IVAN_ID));
+      expect(h1Text(html)).toMatch(/IVAN MÜLLER BOTELHO/);
+      expect(html.indexOf('<h1>')).toBeLessThan(html.indexOf('<main>'));
+      const lead = firstMainBlockText(html);
+      expect(lead).toMatch(/figura como acionista controlador/);
+      expect(lead).toMatch(/ENERGISA/);
+      expect(lead).toMatch(/Formul[aá]rio 6\.1|FRE/);
+      expect(lead).toMatch(/Fatia citada de capital/);
+      expect(containsLiteralOrPtBr(lead, 1300458655.36)).toBe(true);
+      expect(containsLiteralOrPtBr(lead, 2896272224.98)).toBe(true);
+      expect(lead).toMatch(/16 de maio de 2025/);
+      expect(lead).toContain('Não é uma fortuna.');
+      expect(lead).not.toMatch(/é um empresário/i);
+      expect(lead).not.toMatch(/o bili?on[aá]rio/i);
+      expect(html).not.toMatch(/<script(?![^>]*type="application\/ld\+json")/i);
+    });
+
     it('Ivan cite is in the HTML (not JS-only) and does not print the 0.387 hop slice', () => {
       const html = renderFichaHtml(ivan, lookupPersonMoney(money, IVAN_ID));
       expect(html).not.toMatch(/<script(?![^>]*type="application\/ld\+json")/i);
@@ -138,6 +157,17 @@ describe('Mint cited /pessoa/ fichas (issue #147)', () => {
       expect(html).not.toContain('money_economic');
       expect(html).not.toMatch(/>\s*0\s*</);
       expect(html).not.toMatch(/R\$\s*[—–-]/);
+    });
+
+    it('Joaquim lead is sócio-administrador of Nova Futura and has no money sentence (issue #161)', () => {
+      const html = renderFichaHtml(joaquim, lookupPersonMoney(money, JOAQUIM_ID));
+      expect(h1Text(html)).toMatch(/JOAQUIM DA SILVA FERREIRA/);
+      const lead = firstMainBlockText(html);
+      expect(lead).toMatch(/figura como s[oó]cio-administrador/);
+      expect(lead).toMatch(/NOVA FUTURA/);
+      expect(lead).not.toMatch(/Fatia citada/);
+      expect(lead).not.toMatch(/R\$/);
+      expect(lead).not.toContain('Não é uma fortuna.');
     });
 
     it('public ficha HTML has no eleven-digit Cadastro, no UBO, no biography voice', () => {

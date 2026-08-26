@@ -219,22 +219,31 @@ function formatReais(value: number): string {
   }).format(value);
 }
 
-function formatDatePt(iso: string): string {
+function proseDateFromIso(iso: string): string | null {
   const parts = iso.split('-');
   if (parts.length !== 3) {
-    return iso;
+    return null;
   }
   const year = parts[0];
   const month = Number(parts[1]);
   const day = Number(parts[2]);
   if (year.length !== 4 || !Number.isFinite(month) || !Number.isFinite(day)) {
-    return iso;
+    return null;
   }
   const monthName = MONTHS_PT[month - 1];
   if (!monthName) {
-    return iso;
+    return null;
   }
-  return String(day) + ' de ' + monthName + ' de ' + year + ' (' + iso + ')';
+  return String(day) + ' de ' + monthName + ' de ' + year;
+}
+
+function formatDatePt(iso: string): string {
+  const prose = proseDateFromIso(iso);
+  return prose ? prose + ' (' + iso + ')' : iso;
+}
+
+function formatLeadDatePt(iso: string): string {
+  return proseDateFromIso(iso) ?? iso;
 }
 
 function fieldLine(name: string, value: string): string {
@@ -258,6 +267,50 @@ function renderMoneyBlock(money: PersonMoney | null): string {
       '<p>Não é uma fortuna.</p>' +
     '</section>'
   );
+}
+
+function renderResumoSection(sentences: string[]): string {
+  if (sentences.length === 0) {
+    return '';
+  }
+  return (
+    '<section class="resumo">' +
+      sentences.map((sentence) => '<p>' + escapeHtml(sentence) + '</p>').join('') +
+    '</section>'
+  );
+}
+
+/**
+ * Template nexo only. No Wikipedia, no model prose.
+ * First sentence requires a minted role. Money sentence only if a money row exists.
+ */
+export function pessoaResumoSentences(pessoa: CitedPessoa, money: PersonMoney | null): string[] {
+  let first =
+    pessoa.name +
+    ' figura como ' +
+    pessoa.role +
+    ' de ' +
+    pessoa.company_label +
+    ' no ' +
+    pessoa.source;
+  if (pessoa.date) {
+    first += ' em ' + formatLeadDatePt(pessoa.date);
+  }
+  first += '.';
+
+  const sentences = [first];
+  if (money) {
+    sentences.push(
+      'Fatia citada de capital ' +
+        formatReais(money.money_economic) +
+        ' e de votos ' +
+        formatReais(money.money_control) +
+        ' em ' +
+        formatLeadDatePt(money.date) +
+        '. Não é uma fortuna.'
+    );
+  }
+  return sentences;
 }
 
 export function renderFichaHtml(
@@ -284,6 +337,7 @@ export function renderFichaHtml(
           '.back-link{display:inline-block;margin-bottom:1rem;font-size:.9rem}' +
           '.ficha-field{color:#666;font-size:.85rem}' +
           'section{margin:2rem 0}' +
+          '.resumo p{margin:0 0 .75rem}' +
           'footer{margin-top:3rem;padding-top:2rem;border-top:1px solid #ddd}' +
         '</style>' +
       '</head>' +
@@ -291,6 +345,7 @@ export function renderFichaHtml(
         '<a href="/" class="back-link">← Voltar para o índice</a>' +
         '<header><h1>' + escapeHtml(pessoa.name) + '</h1></header>' +
         '<main>' +
+          renderResumoSection(pessoaResumoSentences(pessoa, money)) +
           fieldLine('Papel', pessoa.role) +
           fieldLine('Empresa', pessoa.company_label) +
           fieldLine('Fonte', pessoa.source) +
