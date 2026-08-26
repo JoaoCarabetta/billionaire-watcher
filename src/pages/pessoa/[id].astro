@@ -17,21 +17,48 @@ import {
   shouldUsePublishedFacts
 } from '../../utils/fixtures';
 import type { Person, Source } from '../../types';
+import {
+  fichaMoneyFor,
+  loadPublicGrafo,
+  loadPublicMoney,
+  mintCitedPessoas,
+  renderFichaHtml,
+  type CitedPessoa,
+} from '../../lib/mint-pessoa';
 
 export async function getStaticPaths() {
   const freezePersons = getFreeze();
-  
-  return freezePersons.map(person => ({
+  const freezePaths = freezePersons.map(person => ({
     params: { id: person.person_id },
-    props: { person }
+    props: { person, ficha: undefined as CitedPessoa | undefined }
   }));
+
+  const minted = mintCitedPessoas(loadPublicGrafo());
+  const freezeIds = new Set(freezePersons.map(person => person.person_id));
+  const mintedPaths = minted
+    .filter(ficha => !freezeIds.has(ficha.id))
+    .map(ficha => ({
+      params: { id: ficha.id },
+      props: { person: undefined as Person | undefined, ficha }
+    }));
+
+  return [...freezePaths, ...mintedPaths];
 }
 
 interface Props {
-  person: Person;
+  person?: Person;
+  ficha?: CitedPessoa;
 }
 
-const { person } = Astro.props;
+const { person, ficha } = Astro.props;
+if (ficha) {
+  return new Response(renderFichaHtml(ficha, fichaMoneyFor(ficha, loadPublicMoney())), {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
+}
+if (!person) {
+  return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+}
 const identityFacts = getIdentityFactsByPersonId(person.person_id);
 const rfPartnerEdges = getRFPartnerEdgesByPersonId(person.person_id);
 const cvmFreControls = getCVMFREControlsByPersonId(person.person_id);

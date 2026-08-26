@@ -167,9 +167,13 @@ describe('Tracer: Historical TSE Donations', () => {
         return fs.statSync(fullPath).isDirectory();
       });
       
-      // Should only have p1, p2, p3 from freeze.csv
+      // Freeze CSV still emits p1, p2, p3. Extra dirs are minted graph fichas (#147 p- hex).
       expect(personDirs).toEqual(expect.arrayContaining(['p1', 'p2', 'p3']));
-      expect(personDirs.length).toBe(3);
+      const freezeIds = new Set(['p1', 'p2', 'p3']);
+      for (const id of personDirs) {
+        if (freezeIds.has(id)) continue;
+        expect(id).toMatch(/^p-[0-9a-f]{8}$/);
+      }
     });
 
     it('should not create dossier for Roberto Oliveira (weak name match)', () => {
