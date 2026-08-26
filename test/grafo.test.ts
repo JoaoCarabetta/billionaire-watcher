@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { buildCytoscapeElements } from '../src/lib/grafo-elements';
-import { buildPanelView } from '../src/lib/grafo-panel';
+import { buildPanelView, LISTED_COMPANY_IDS } from '../src/lib/grafo-panel';
 
 describe('Grafo Page (issue #74)', () => {
   let distPath: string;
@@ -36,28 +36,39 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 97 nodes', () => {
+    it('should have exactly 102 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(97);
+      expect(json.nodes.length).toBe(102);
     });
 
-    it('should have exactly 25 person nodes', () => {
+    it('should have exactly 33 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(25);
+      expect(personNodes.length).toBe(33);
     });
 
-    it('should have exactly 60 edges', () => {
+    it('should have exactly 121 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(60);
+      expect(json.edges.length).toBe(121);
+    });
+
+    it('should have the eleven listed company ids', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      const nodeIds = new Set(json.nodes.map((n: { id: string }) => n.id));
+
+      expect(LISTED_COMPANY_IDS).toHaveLength(11);
+      for (const id of LISTED_COMPANY_IDS) {
+        expect(nodeIds.has(id), `listed company ${id} should be present`).toBe(true);
+      }
     });
 
     it('should have all edges resolve to existing nodes', () => {
@@ -171,9 +182,10 @@ describe('Grafo Page (issue #74)', () => {
       const capitalSum = incomingEdges.reduce((sum: number, edge: any) => {
         return sum + (edge.pct_capital || 0);
       }, 0);
+      const capitalRounded = Math.round(capitalSum * 1000) / 1000;
       
       expect(
-        capitalSum,
+        capitalRounded,
         `Capital sum to Energisa should be ~100, got ${capitalSum}`
       ).toBeGreaterThanOrEqual(99.999);
       expect(
@@ -192,9 +204,10 @@ describe('Grafo Page (issue #74)', () => {
       const votosSum = incomingEdges.reduce((sum: number, edge: any) => {
         return sum + (edge.pct_votos || 0);
       }, 0);
+      const votosRounded = Math.round(votosSum * 1000) / 1000;
       
       expect(
-        votosSum,
+        votosRounded,
         `Votes sum to Energisa should be ~100, got ${votosSum}`
       ).toBeGreaterThanOrEqual(99.999);
       expect(
@@ -248,7 +261,7 @@ describe('Grafo Page (issue #74)', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
-      const outrosId = 'outros-energisa';
+      const outrosId = 'outros-00864214';
       const energisaId = '00864214000106';
       
       const outrosToEnergisa = json.edges.find(
@@ -270,6 +283,27 @@ describe('Grafo Page (issue #74)', () => {
         edgesToOutros.length,
         'Outros acionistas should have no incoming edges (is a leaf)'
       ).toBe(0);
+    });
+
+    it('each of the 11 listed companies has incoming capital between 99.5 and 100.5', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+
+      for (const listedId of LISTED_COMPANY_IDS) {
+        const incoming = json.edges.filter((e: { to: string }) => e.to === listedId);
+        const capitalSum = incoming.reduce(
+          (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
+          0
+        );
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeGreaterThanOrEqual(99.5);
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeLessThanOrEqual(100.5);
+      }
     });
   });
 
@@ -501,8 +535,7 @@ describe('Grafo Page (issue #74)', () => {
     const MULTISETOR_ID = '20286787000107';
     const ITACATU_ID = '23160658000166';
     const NOVA_GIPAR_ID = '16674735000130';
-    const HONDA_ID = '05712135000101';
-    const HONDA_TARGET_ID = '43149806';
+    const HOLE_PERSON_ID = 'p-hole0001';
 
     function loadCommittedGrafo() {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
@@ -672,21 +705,28 @@ describe('Grafo Page (issue #74)', () => {
     });
 
     it('a Receita Federal path with a missing percent does not invent a product', () => {
-      const json = loadCommittedGrafo();
-      const holeEdge = json.edges.find(
-        (edge: { from: string; to: string }) => edge.from === HONDA_ID && edge.to === HONDA_TARGET_ID
-      );
-      expect(holeEdge, 'Honda Receita hop should exist').toBeDefined();
-      expect(holeEdge.pct_capital).toBeUndefined();
-      expect(holeEdge.pct_votos).toBeUndefined();
+      const holeGraph = {
+        nodes: [
+          { id: HOLE_PERSON_ID, kind: 'person' as const, label: 'HOLE PERSON' },
+          { id: ENERGISA_ID, kind: 'company' as const, label: 'ENERGISA S.A.' },
+        ],
+        edges: [
+          {
+            from: HOLE_PERSON_ID,
+            to: ENERGISA_ID,
+            kind: 'person_owns',
+            source: 'Quadro de Socios Receita',
+          },
+        ],
+      };
 
-      const view = buildPanelView(json, { nodeId: HONDA_ID });
-      expect(view, 'Honda node should open a node panel').not.toBeNull();
+      const view = buildPanelView(holeGraph, { nodeId: HOLE_PERSON_ID });
+      expect(view, 'hole person should open a node panel').not.toBeNull();
       expect(view!.mode).toBe('node');
       if (view!.mode !== 'node') return;
 
-      const cited = view.participations.find((item) => item.company_id === HONDA_TARGET_ID);
-      expect(cited, 'Honda should list the reachable Receita target').toBeDefined();
+      const cited = view.participations.find((item) => item.company_id === ENERGISA_ID);
+      expect(cited, 'hole person should list the reachable listed company').toBeDefined();
       expect(cited!.paths.length).toBeGreaterThan(0);
       expect(cited!.paths[0].hops.length).toBe(1);
       expect(cited!.paths[0].hops[0].source).toMatch(/Receita/);

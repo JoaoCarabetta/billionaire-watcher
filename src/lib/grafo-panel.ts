@@ -163,14 +163,22 @@ function buildEdgePanel(
   return view;
 }
 
-function isListedCompany(data: GrafoData, id: string): boolean {
-  const node = nodeById(data, id);
-  if (!node || node.kind !== 'company') {
-    return false;
-  }
-  const incoming = data.edges.some((edge) => edge.to === id);
-  const outgoing = data.edges.some((edge) => edge.from === id);
-  return incoming && !outgoing;
+export const LISTED_COMPANY_IDS = [
+  '00864214000106',
+  '07689002000189',
+  '33592510000154',
+  '03220438000173',
+  '34274233000102',
+  '07415333000120',
+  '01838723000127',
+  '17155730000164',
+  '01083200000118',
+  '43776517000180',
+  '06057223000171',
+] as const;
+
+function isListedCompany(id: string): boolean {
+  return (LISTED_COMPANY_IDS as readonly string[]).includes(id);
 }
 
 function productOfPercents(values: Array<number | null | undefined>): number | undefined {
@@ -255,7 +263,7 @@ function sumPresent(values: Array<number | undefined>): number | undefined {
 
 function buildCitedParticipations(data: GrafoData, startId: string): CitedParticipation[] {
   const listedIds = data.nodes
-    .filter((node) => isListedCompany(data, node.id) && node.id !== startId)
+    .filter((node) => isListedCompany(node.id) && node.id !== startId)
     .map((node) => node.id);
 
   const participations: CitedParticipation[] = [];

@@ -6,184 +6,149 @@
       "label": "ENERGISA S.A."
     },
     {
-      "id": "p-a54160d7",
-      "kind": "person",
-      "label": "FREDERICO KOS BOTELHO"
-    },
-    {
-      "id": "p-ea4eb254",
-      "kind": "person",
-      "label": "MONICA PEREZ BOTELHO"
-    },
-    {
-      "id": "p-73a733cc",
-      "kind": "person",
-      "label": "BRUNO ALZUGUIR BOTELHO"
-    },
-    {
-      "id": "p-1348ab32",
-      "kind": "person",
-      "label": "BEATRIZ ALZUGUIR BOTELHO"
-    },
-    {
-      "id": "p-392bfe45",
-      "kind": "person",
-      "label": "ALICE BOTELHO BASTOS"
-    },
-    {
-      "id": "23160658000166",
+      "id": "07689002000189",
       "kind": "company",
-      "label": "Itacatu S/A"
+      "label": "EMBRAER S.A."
     },
     {
-      "id": "p-b9db9330",
-      "kind": "person",
-      "label": "STELLA PEREZ BOTELHO"
-    },
-    {
-      "id": "20286787000107",
+      "id": "33592510000154",
       "kind": "company",
-      "label": "MULTISETOR COM. LND. E PARTICIPAÇÕES S/A"
+      "label": "VALE S.A."
     },
     {
-      "id": "p-7636b07f",
-      "kind": "person",
-      "label": "CINTIA ALZUGUIR BOTELHO"
-    },
-    {
-      "id": "p-848bf0ce",
-      "kind": "person",
-      "label": "CAMILA BOTELHO ROCHA JANSEN"
-    },
-    {
-      "id": "59206795000131",
+      "id": "03220438000173",
       "kind": "company",
-      "label": "MCLC PARTICIPAÇÕES LTDA."
+      "label": "EQUATORIAL S.A."
     },
     {
-      "id": "p-010e2551",
-      "kind": "person",
-      "label": "LEONARDO BOTELHO ROCHA"
-    },
-    {
-      "id": "p-40894d2d",
-      "kind": "person",
-      "label": "MARIA CLARA BOTELHO PEREZ"
-    },
-    {
-      "id": "53216157000115",
+      "id": "34274233000102",
       "kind": "company",
-      "label": "MNBB PARTICIPAÇÕES LTDA."
+      "label": "VIBRA ENERGIA S/A"
     },
     {
-      "id": "p-8f4b2205",
-      "kind": "person",
-      "label": "PATRICIA PEREZ BOTELHO"
-    },
-    {
-      "id": "53285084000113",
+      "id": "07415333000120",
       "kind": "company",
-      "label": "RFG PARTICIPACOES LTDA."
+      "label": "SIMPAR S.A."
     },
     {
-      "id": "p-a382ee76",
-      "kind": "person",
-      "label": "GUSTAVO KOS BOTELH0"
+      "id": "01838723000127",
+      "kind": "company",
+      "label": "BRF S.A."
     },
     {
-      "id": "p-831e3028",
-      "kind": "person",
-      "label": "RICARDO PEREZ BOTELHO"
+      "id": "17155730000164",
+      "kind": "company",
+      "label": "CIA ENERGETICA DE MINAS GERAIS - CEMIG"
     },
     {
-      "id": "p-887e054b",
-      "kind": "person",
-      "label": "MAURICIO PEREZ BOTELHO"
+      "id": "01083200000118",
+      "kind": "company",
+      "label": "NEOENERGIA S.A."
     },
     {
-      "id": "p-7f3fc508",
-      "kind": "person",
-      "label": "RUTH MARIA FERREIRA BOTELHO"
+      "id": "43776517000180",
+      "kind": "company",
+      "label": "CIA SANEAMENTO BASICO EST SAO PAULO"
     },
     {
-      "id": "p-7fc3be74",
-      "kind": "person",
-      "label": "ESPOLIO DE ORMEO JUNQUEIRA BOTELHO NETO"
+      "id": "06057223000171",
+      "kind": "company",
+      "label": "SENDAS DISTRIBUIDORA S.A."
     },
     {
-      "id": "p-8db5e3f1",
-      "kind": "person",
-      "label": "DORA BOTELHO BASTOS"
+      "id": "11752203000150",
+      "kind": "company",
+      "label": "Alaska Investimentos Ltda."
     },
     {
-      "id": "p-dbf7401a",
-      "kind": "person",
-      "label": "ADRIANA BOTELHO BASTOS ZAVERUCHA"
-    },
-    {
-      "id": "p-5c6eb6c7",
-      "kind": "person",
-      "label": "PAULO CESAR BOTELHO BASTOS"
-    },
-    {
-      "id": "p-74cd4e86",
-      "kind": "person",
-      "label": "MARIA DO CARMO RIPPER KOS"
-    },
-    {
-      "id": "p-5438e9c8",
-      "kind": "person",
-      "label": "PEDRO AUGUSTO BOTELHO BASTOS"
-    },
-    {
-      "id": "p-a8c1e5f9",
-      "kind": "person",
-      "label": "ANDRE LUIS BOTELHO BASTOS"
-    },
-    {
-      "id": "p-3d9739a9",
-      "kind": "person",
-      "label": "MYRIAN ALTAIR MEIRA"
-    },
-    {
-      "id": "p-1282fcb3",
-      "kind": "person",
-      "label": "GILBERTO MULLER BOTELHO"
-    },
-    {
-      "id": "p-cdbc8c4e",
-      "kind": "person",
-      "label": "IVAN MÜLLER BOTELHO"
-    },
-    {
-      "id": "tesouraria-energisa",
+      "id": "tesouraria-00864214",
       "kind": "company",
       "label": "Ações em tesouraria"
     },
     {
-      "id": "16674735000130",
+      "id": "tesouraria-03220438",
       "kind": "company",
-      "label": "Nova Gipar Holding S/A"
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-06057223",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-07415333",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-07689002",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-17155730",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-33592510",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-34274233",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-43776517",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "10979208000158",
+      "kind": "company",
+      "label": "BLACKROCK, INC."
     },
     {
       "id": "00383281000109",
       "kind": "company",
-      "label": "BNDES PARTICIPACOES S/A BNDESPAR"
+      "label": "BNDES Participações S.A."
     },
     {
-      "id": "33857830000199",
+      "id": "x-brandes-investment-partners-l-p",
       "kind": "company",
-      "label": "OPPORTUNITY HDF ADMINISTRADORA DE RECURSOS LTDA."
+      "label": "Brandes Investment Partners, L.P."
     },
     {
-      "id": "10643191000163",
+      "id": "17962858000130",
       "kind": "company",
-      "label": "Samambaia Master Fundo de Investimento em Ações no Exterior - BDR Nível I"
+      "label": "Canada Pension Plan Investment Board"
     },
     {
-      "id": "09267871000140",
+      "id": "x-capital-world-investors",
       "kind": "company",
-      "label": "SQUADRA INVESTIMENTOS - GESTÃO DE RECURSOS LTDA."
+      "label": "Capital World Investors"
+    },
+    {
+      "id": "x-conifer-management-llc",
+      "kind": "company",
+      "label": "Conifer Management LLC"
+    },
+    {
+      "id": "72116353000162",
+      "kind": "company",
+      "label": "Dynamo Administração de Recursos Ltda."
+    },
+    {
+      "id": "18715615000160",
+      "kind": "company",
+      "label": "Estado de Minas Gerais (Casa Civil)"
+    },
+    {
+      "id": "08196003000154",
+      "kind": "company",
+      "label": "FIA Dinâmica Energia"
     },
     {
       "id": "02260956000158",
@@ -191,317 +156,457 @@
       "label": "Gipar S.A."
     },
     {
-      "id": "outros-energisa",
+      "id": "64861748000161",
+      "kind": "company",
+      "label": "IBERDROLA NEOENERGIA S.A.U."
+    },
+    {
+      "id": "34148133000121",
+      "kind": "company",
+      "label": "IBERDROLA, S.A."
+    },
+    {
+      "id": "05470823000102",
+      "kind": "company",
+      "label": "Iberdrola Energia S.A."
+    },
+    {
+      "id": "x-iberdrola-s-a-u",
+      "kind": "company",
+      "label": "Iberdrola S.A.U."
+    },
+    {
+      "id": "23160658000166",
+      "kind": "company",
+      "label": "Itacatu S/A"
+    },
+    {
+      "id": "32392209000134",
+      "kind": "company",
+      "label": "JSP Holding"
+    },
+    {
+      "id": "14406534000127",
+      "kind": "company",
+      "label": "LAZARD ASSET MANAGEMENT"
+    },
+    {
+      "id": "44409243000153",
+      "kind": "company",
+      "label": "MAMS FIA"
+    },
+    {
+      "id": "59206795000131",
+      "kind": "company",
+      "label": "MCLC PARTICIPAÇÕES LTDA."
+    },
+    {
+      "id": "05466338000157",
+      "kind": "company",
+      "label": "MITSUI AMP CO., LTD"
+    },
+    {
+      "id": "08542030000131",
+      "kind": "company",
+      "label": "MMS PARTICIPAÇÕES LTDA"
+    },
+    {
+      "id": "53216157000115",
+      "kind": "company",
+      "label": "MNBB PARTICIPAÇÕES LTDA."
+    },
+    {
+      "id": "20286787000107",
+      "kind": "company",
+      "label": "MULTISETOR COM. LND. E PARTICIPAÇÕES S/A"
+    },
+    {
+      "id": "03853896000140",
+      "kind": "company",
+      "label": "Marfrig Global Foods S.A."
+    },
+    {
+      "id": "41020034000125",
+      "kind": "company",
+      "label": "NOVA FUTURA GESTORA DE RECURSOS LTDA"
+    },
+    {
+      "id": "16674735000130",
+      "kind": "company",
+      "label": "Nova Gipar Holding S/A"
+    },
+    {
+      "id": "05395883000108",
+      "kind": "company",
+      "label": "OPPORTUNITY ASSET ADMINISTRADORA DE RECURSOS DE TERCEIROS LTDA."
+    },
+    {
+      "id": "33857830000199",
+      "kind": "company",
+      "label": "OPPORTUNITY HDF ADMINISTRADORA DE RECURSOS LTDA."
+    },
+    {
+      "id": "x-orbis-invest",
+      "kind": "company",
+      "label": "Orbis Invest"
+    },
+    {
+      "id": "outros-00864214",
       "kind": "company",
       "label": "Outros acionistas"
     },
     {
-      "id": "02558157",
+      "id": "outros-03220438",
       "kind": "company",
-      "label": "02558157"
+      "label": "Outros acionistas"
     },
     {
-      "id": "02429144",
+      "id": "outros-06057223",
       "kind": "company",
-      "label": "02429144"
+      "label": "Outros acionistas"
     },
     {
-      "id": "03361252",
+      "id": "outros-07415333",
       "kind": "company",
-      "label": "03361252"
+      "label": "Outros acionistas"
     },
     {
-      "id": "67620377",
+      "id": "outros-07689002",
       "kind": "company",
-      "label": "67620377"
+      "label": "Outros acionistas"
     },
     {
-      "id": "17155730",
+      "id": "outros-17155730",
       "kind": "company",
-      "label": "17155730"
+      "label": "Outros acionistas"
     },
     {
-      "id": "16701716",
+      "id": "outros-33592510",
       "kind": "company",
-      "label": "16701716"
+      "label": "Outros acionistas"
     },
     {
-      "id": "01961898",
+      "id": "outros-34274233",
       "kind": "company",
-      "label": "01961898"
+      "label": "Outros acionistas"
     },
     {
-      "id": "47067525",
+      "id": "outros-43776517",
       "kind": "company",
-      "label": "47067525"
+      "label": "Outros acionistas"
     },
     {
-      "id": "07689002",
+      "id": "33754482000124",
       "kind": "company",
-      "label": "07689002"
+      "label": "PREVI - CAIXA DE PREVIDÊNCIA DOS FUNCIONÁRIOS DO BANCO DO BRASIL"
     },
     {
-      "id": "02916265",
+      "id": "x-pzena-investment-management-llc",
       "kind": "company",
-      "label": "02916265"
+      "label": "Pzena Investment Management, LLC"
     },
     {
-      "id": "84046101",
+      "id": "53285084000113",
       "kind": "company",
-      "label": "84046101"
+      "label": "RFG PARTICIPACOES LTDA."
     },
     {
-      "id": "50746577",
+      "id": "59033590000100",
       "kind": "company",
-      "label": "50746577"
+      "label": "SNAPPER ROCKS STRATEGY FUNDO DE INVESTIMENTO FINANCEIRO EM AÇÕES"
     },
     {
-      "id": "01832635",
+      "id": "09267871000140",
       "kind": "company",
-      "label": "01832635"
+      "label": "SQUADRA INVESTIMENTOS - GESTÃO DE RECURSOS LTDA."
     },
     {
-      "id": "33042730",
+      "id": "10643191000163",
       "kind": "company",
-      "label": "33042730"
+      "label": "Samambaia Master Fundo de Investimento em Ações no Exterior - BDR Nível I"
     },
     {
-      "id": "04786144",
+      "id": "46377222000129",
       "kind": "company",
-      "label": "04786144"
+      "label": "Secretaria da Fazenda do Estado de São Paulo"
     },
     {
-      "id": "33000167",
+      "id": "63429415000103",
       "kind": "company",
-      "label": "33000167"
+      "label": "WHG APACHE FUNDO DE INVESTIMENTO EM AÇÕES"
     },
     {
-      "id": "16670085",
+      "id": "x-wellington-management",
       "kind": "company",
-      "label": "16670085"
+      "label": "Wellington Management"
     },
     {
-      "id": "10265949",
+      "id": "x-wishbone-management-lp",
       "kind": "company",
-      "label": "10265949"
+      "label": "WishBone Management LP"
     },
     {
-      "id": "41777706",
-      "kind": "company",
-      "label": "41777706"
+      "id": "p-dbf7401a",
+      "kind": "person",
+      "label": "ADRIANA BOTELHO BASTOS ZAVERUCHA"
     },
     {
-      "id": "00001180",
-      "kind": "company",
-      "label": "00001180"
+      "id": "p-392bfe45",
+      "kind": "person",
+      "label": "ALICE BOTELHO BASTOS"
     },
     {
-      "id": "06057223",
-      "kind": "company",
-      "label": "06057223"
+      "id": "p-a8c1e5f9",
+      "kind": "person",
+      "label": "ANDRE LUIS BOTELHO BASTOS"
     },
     {
-      "id": "01083200",
-      "kind": "company",
-      "label": "01083200"
+      "id": "p-1348ab32",
+      "kind": "person",
+      "label": "BEATRIZ ALZUGUIR BOTELHO"
     },
     {
-      "id": "34274233",
-      "kind": "company",
-      "label": "34274233"
+      "id": "p-73a733cc",
+      "kind": "person",
+      "label": "BRUNO ALZUGUIR BOTELHO"
     },
     {
-      "id": "43633296",
-      "kind": "company",
-      "label": "43633296"
+      "id": "p-848bf0ce",
+      "kind": "person",
+      "label": "CAMILA BOTELHO ROCHA JANSEN"
     },
     {
-      "id": "43776517",
-      "kind": "company",
-      "label": "43776517"
+      "id": "p-7636b07f",
+      "kind": "person",
+      "label": "CINTIA ALZUGUIR BOTELHO"
     },
     {
-      "id": "03220438",
-      "kind": "company",
-      "label": "03220438"
+      "id": "p-8db5e3f1",
+      "kind": "person",
+      "label": "DORA BOTELHO BASTOS"
     },
     {
-      "id": "33611500",
-      "kind": "company",
-      "label": "33611500"
+      "id": "p-7fc3be74",
+      "kind": "person",
+      "label": "ESPOLIO DE ORMEO JUNQUEIRA BOTELHO NETO"
     },
     {
-      "id": "42150391",
-      "kind": "company",
-      "label": "42150391"
+      "id": "p-faf6d605",
+      "kind": "person",
+      "label": "EVERTON MUFFATO"
     },
     {
-      "id": "10456016",
-      "kind": "company",
-      "label": "10456016"
+      "id": "p-f8603dda",
+      "kind": "person",
+      "label": "FERNANDO ANTONIO SIMÕES"
     },
     {
-      "id": "75315333",
-      "kind": "company",
-      "label": "75315333"
+      "id": "p-a54160d7",
+      "kind": "person",
+      "label": "FREDERICO KOS BOTELHO"
     },
     {
-      "id": "06315338",
-      "kind": "company",
-      "label": "06315338"
+      "id": "p-1282fcb3",
+      "kind": "person",
+      "label": "GILBERTO MULLER BOTELHO"
     },
     {
-      "id": "17469701",
-      "kind": "company",
-      "label": "17469701"
+      "id": "p-a382ee76",
+      "kind": "person",
+      "label": "GUSTAVO KOS BOTELH0"
     },
     {
-      "id": "33592510",
-      "kind": "company",
-      "label": "33592510"
+      "id": "p-cdbc8c4e",
+      "kind": "person",
+      "label": "IVAN MÜLLER BOTELHO"
     },
     {
-      "id": "33256439",
-      "kind": "company",
-      "label": "33256439"
+      "id": "p-02f52298",
+      "kind": "person",
+      "label": "JULIO EDUARDO SIMÕES"
     },
     {
-      "id": "33453598",
-      "kind": "company",
-      "label": "33453598"
+      "id": "p-134ca0da",
+      "kind": "person",
+      "label": "JUSSARA ELAINE SIMÕES"
     },
     {
-      "id": "07523555",
-      "kind": "company",
-      "label": "07523555"
+      "id": "p-010e2551",
+      "kind": "person",
+      "label": "LEONARDO BOTELHO ROCHA"
     },
     {
-      "id": "43149806",
-      "kind": "company",
-      "label": "43149806"
+      "id": "p-f3c190ea",
+      "kind": "person",
+      "label": "MARCIA APARECIDA PASCOAL MARÇAL DOS SANTOS"
     },
     {
-      "id": "07526557",
-      "kind": "company",
-      "label": "07526557"
+      "id": "p-b7719454",
+      "kind": "person",
+      "label": "MARCOS ANTONIO MOLINA DOS SANTOS"
     },
     {
-      "id": "01838723",
-      "kind": "company",
-      "label": "01838723"
+      "id": "p-40894d2d",
+      "kind": "person",
+      "label": "MARIA CLARA BOTELHO PEREZ"
     },
     {
-      "id": "59104422",
-      "kind": "company",
-      "label": "59104422"
+      "id": "p-74cd4e86",
+      "kind": "person",
+      "label": "MARIA DO CARMO RIPPER KOS"
     },
     {
-      "id": "07043628",
-      "kind": "company",
-      "label": "07043628"
+      "id": "p-a64df172",
+      "kind": "person",
+      "label": "MARITA SIMÕES"
     },
     {
-      "id": "17248371000190",
-      "kind": "company",
-      "label": "CARGILL INTERNATIONAL LUXEMBOURG 9 SARL"
+      "id": "p-887e054b",
+      "kind": "person",
+      "label": "MAURICIO PEREZ BOTELHO"
     },
     {
-      "id": "00864214",
-      "kind": "company",
-      "label": "Energisa"
+      "id": "p-ea4eb254",
+      "kind": "person",
+      "label": "MONICA PEREZ BOTELHO"
     },
     {
-      "id": "33171026000151",
-      "kind": "company",
-      "label": "FCA FIAT CHRYSLER PARTICIPACOES BRASIL LTDA."
+      "id": "p-3d9739a9",
+      "kind": "person",
+      "label": "MYRIAN ALTAIR MEIRA"
     },
     {
-      "id": "24990777",
-      "kind": "company",
-      "label": "Grupo Mateus"
+      "id": "p-8f4b2205",
+      "kind": "person",
+      "label": "PATRICIA PEREZ BOTELHO"
     },
     {
-      "id": "07415333",
-      "kind": "company",
-      "label": "Grupo Simpar"
+      "id": "p-5c6eb6c7",
+      "kind": "person",
+      "label": "PAULO CESAR BOTELHO BASTOS"
     },
     {
-      "id": "05712135000101",
-      "kind": "company",
-      "label": "HONDA MOTOR CO., LTD."
+      "id": "p-5438e9c8",
+      "kind": "person",
+      "label": "PEDRO AUGUSTO BOTELHO BASTOS"
     },
     {
-      "id": "05528233000185",
-      "kind": "company",
-      "label": "MERCADOLIBRE, INC."
+      "id": "p-831e3028",
+      "kind": "person",
+      "label": "RICARDO PEREZ BOTELHO"
     },
     {
-      "id": "47960950",
-      "kind": "company",
-      "label": "Magazine Luiza"
+      "id": "p-7f3fc508",
+      "kind": "person",
+      "label": "RUTH MARIA FERREIRA BOTELHO"
     },
     {
-      "id": "03853896",
-      "kind": "company",
-      "label": "Marfrig"
+      "id": "p-5a3a3ade",
+      "kind": "person",
+      "label": "SOLANGE MARIA SIMÕES REIS"
     },
     {
-      "id": "05717225000187",
-      "kind": "company",
-      "label": "PROVIMI BV"
-    },
-    {
-      "id": "61585865",
-      "kind": "company",
-      "label": "RD Saúde"
-    },
-    {
-      "id": "06047087",
-      "kind": "company",
-      "label": "Rede D'Or"
-    },
-    {
-      "id": "05717887000157",
-      "kind": "company",
-      "label": "SHELL BRAZIL HOLDING BV"
-    },
-    {
-      "id": "05491982000185",
-      "kind": "company",
-      "label": "STELLANTIS EUROPE S.P.A"
-    },
-    {
-      "id": "16404287",
-      "kind": "company",
-      "label": "Suzano"
-    },
-    {
-      "id": "42179743000110",
-      "kind": "company",
-      "label": "VOLKSWAGEN INTERNATIONAL LUXEMBURG"
-    },
-    {
-      "id": "84429695",
-      "kind": "company",
-      "label": "WEG"
+      "id": "p-b9db9330",
+      "kind": "person",
+      "label": "STELLA PEREZ BOTELHO"
     }
   ],
   "edges": [
     {
-      "from": "p-392bfe45",
-      "to": "23160658000166",
-      "kind": "person_owns",
+      "from": "00383281000109",
+      "to": "00864214000106",
+      "kind": "company_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.097,
-      "pct_votos": 0.097
+      "pct_capital": 6.152,
+      "pct_votos": 3.237
     },
     {
-      "from": "p-b9db9330",
-      "to": "20286787000107",
+      "from": "02260956000158",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 26.646,
+      "pct_votos": 61.162
+    },
+    {
+      "from": "09267871000140",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 8.514,
+      "pct_votos": 4.469
+    },
+    {
+      "from": "10643191000163",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 7.781,
+      "pct_votos": 4.095
+    },
+    {
+      "from": "20286787000107",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.333,
+      "pct_votos": 0.221
+    },
+    {
+      "from": "23160658000166",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.021,
+      "pct_votos": 0.012
+    },
+    {
+      "from": "33857830000199",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 7.363,
+      "pct_votos": 3.875
+    },
+    {
+      "from": "outros-00864214",
+      "to": "00864214000106",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 42.467,
+      "pct_votos": 22.429
+    },
+    {
+      "from": "p-1282fcb3",
+      "to": "00864214000106",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 2.428,
-      "pct_votos": 2.428
+      "pct_capital": 0.035,
+      "pct_votos": 0.068
+    },
+    {
+      "from": "p-5438e9c8",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.014,
+      "pct_votos": 0.036
+    },
+    {
+      "from": "p-5c6eb6c7",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.009,
+      "pct_votos": 0.005
+    },
+    {
+      "from": "p-74cd4e86",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.012,
+      "pct_votos": 0.006
     },
     {
       "from": "p-7636b07f",
@@ -510,110 +615,6 @@
       "source": "FRE Energisa 160981",
       "pct_capital": 0.002,
       "pct_votos": 0.001
-    },
-    {
-      "from": "p-848bf0ce",
-      "to": "59206795000131",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 15.999,
-      "pct_votos": 32.006
-    },
-    {
-      "from": "p-010e2551",
-      "to": "59206795000131",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 15.999,
-      "pct_votos": 32.006
-    },
-    {
-      "from": "p-40894d2d",
-      "to": "59206795000131",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 15.999,
-      "pct_votos": 32.006
-    },
-    {
-      "from": "59206795000131",
-      "to": "20286787000107",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 6.75,
-      "pct_votos": 6.75
-    },
-    {
-      "from": "53216157000115",
-      "to": "20286787000107",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 6.75,
-      "pct_votos": 6.75
-    },
-    {
-      "from": "p-8f4b2205",
-      "to": "20286787000107",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 6.75,
-      "pct_votos": 6.75
-    },
-    {
-      "from": "53285084000113",
-      "to": "20286787000107",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 6.75,
-      "pct_votos": 6.75
-    },
-    {
-      "from": "p-73a733cc",
-      "to": "53216157000115",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 26.778,
-      "pct_votos": 34.429
-    },
-    {
-      "from": "p-a382ee76",
-      "to": "53285084000113",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 26.778,
-      "pct_votos": 34.429
-    },
-    {
-      "from": "p-a54160d7",
-      "to": "53285084000113",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 26.778,
-      "pct_votos": 34.429
-    },
-    {
-      "from": "p-1348ab32",
-      "to": "53216157000115",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 26.778,
-      "pct_votos": 34.429
-    },
-    {
-      "from": "p-831e3028",
-      "to": "53285084000113",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 46.444,
-      "pct_votos": 31.143
-    },
-    {
-      "from": "p-887e054b",
-      "to": "53216157000115",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 46.444,
-      "pct_votos": 31.143
     },
     {
       "from": "p-7f3fc508",
@@ -632,12 +633,44 @@
       "pct_votos": 0.022
     },
     {
+      "from": "p-831e3028",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.026,
+      "pct_votos": 0.013
+    },
+    {
+      "from": "p-887e054b",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.07,
+      "pct_votos": 0.037
+    },
+    {
       "from": "p-8db5e3f1",
       "to": "00864214000106",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
       "pct_capital": 0.009,
       "pct_votos": 0.005
+    },
+    {
+      "from": "p-b9db9330",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.016,
+      "pct_votos": 0.011
+    },
+    {
+      "from": "p-cdbc8c4e",
+      "to": "00864214000106",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.387,
+      "pct_votos": 0.208
     },
     {
       "from": "p-dbf7401a",
@@ -648,36 +681,628 @@
       "pct_votos": 0.005
     },
     {
-      "from": "p-5c6eb6c7",
+      "from": "tesouraria-00864214",
       "to": "00864214000106",
-      "kind": "person_owns",
+      "kind": "company_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.009,
+      "pct_capital": 0.116,
+      "pct_votos": 0.061
+    },
+    {
+      "from": "00383281000109",
+      "to": "07689002000189",
+      "kind": "company_owns",
+      "source": "FRE Embraer 160985",
+      "pct_capital": 5.37,
+      "pct_votos": 5.37
+    },
+    {
+      "from": "10979208000158",
+      "to": "07689002000189",
+      "kind": "company_owns",
+      "source": "FRE Embraer 160985",
+      "pct_capital": 5.498,
+      "pct_votos": 5.498
+    },
+    {
+      "from": "outros-07689002",
+      "to": "07689002000189",
+      "kind": "company_owns",
+      "source": "FRE Embraer 160985",
+      "pct_capital": 80.264,
+      "pct_votos": 80.264
+    },
+    {
+      "from": "tesouraria-07689002",
+      "to": "07689002000189",
+      "kind": "company_owns",
+      "source": "FRE Embraer 160985",
+      "pct_capital": 3.867,
+      "pct_votos": 3.867
+    },
+    {
+      "from": "x-brandes-investment-partners-l-p",
+      "to": "07689002000189",
+      "kind": "company_owns",
+      "source": "FRE Embraer 160985",
+      "pct_capital": 5.001,
+      "pct_votos": 5.001
+    },
+    {
+      "from": "05466338000157",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 6.45,
+      "pct_votos": 6.45
+    },
+    {
+      "from": "10979208000158",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 6.708,
+      "pct_votos": 6.708
+    },
+    {
+      "from": "33754482000124",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 7.016,
+      "pct_votos": 7.016
+    },
+    {
+      "from": "outros-33592510",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 70.732,
+      "pct_votos": 70.732
+    },
+    {
+      "from": "tesouraria-33592510",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 3.965,
+      "pct_votos": 3.965
+    },
+    {
+      "from": "x-capital-world-investors",
+      "to": "33592510000154",
+      "kind": "company_owns",
+      "source": "FRE Vale 160307",
+      "pct_capital": 5.129,
+      "pct_votos": 5.129
+    },
+    {
+      "from": "05395883000108",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 10.036,
+      "pct_votos": 10.036
+    },
+    {
+      "from": "09267871000140",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 4.578,
+      "pct_votos": 4.578
+    },
+    {
+      "from": "10979208000158",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 9.979,
+      "pct_votos": 9.979
+    },
+    {
+      "from": "17962858000130",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 4.57,
+      "pct_votos": 4.57
+    },
+    {
+      "from": "outros-03220438",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 70.592,
+      "pct_votos": 70.592
+    },
+    {
+      "from": "tesouraria-03220438",
+      "to": "03220438000173",
+      "kind": "company_owns",
+      "source": "FRE Equatorial 160229",
+      "pct_capital": 0.245,
+      "pct_votos": 0.245
+    },
+    {
+      "from": "10979208000158",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 5.22,
+      "pct_votos": 5.22
+    },
+    {
+      "from": "14406534000127",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 5,
+      "pct_votos": 5
+    },
+    {
+      "from": "33754482000124",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 5.241,
+      "pct_votos": 5.241
+    },
+    {
+      "from": "41020034000125",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 12.499,
+      "pct_votos": 12.499
+    },
+    {
+      "from": "outros-34274233",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 71.841,
+      "pct_votos": 71.841
+    },
+    {
+      "from": "tesouraria-34274233",
+      "to": "34274233000102",
+      "kind": "company_owns",
+      "source": "FRE Vibra 159172",
+      "pct_capital": 0.199,
+      "pct_votos": 0.199
+    },
+    {
+      "from": "00383281000109",
+      "to": "07415333000120",
+      "kind": "company_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 10,
+      "pct_votos": 10
+    },
+    {
+      "from": "32392209000134",
+      "to": "07415333000120",
+      "kind": "company_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 48.72,
+      "pct_votos": 48.72
+    },
+    {
+      "from": "outros-07415333",
+      "to": "07415333000120",
+      "kind": "company_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 36.676,
+      "pct_votos": 36.676
+    },
+    {
+      "from": "p-f8603dda",
+      "to": "07415333000120",
+      "kind": "person_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 4.568,
+      "pct_votos": 4.568
+    },
+    {
+      "from": "tesouraria-07415333",
+      "to": "07415333000120",
+      "kind": "company_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 0.035,
+      "pct_votos": 0.035
+    },
+    {
+      "from": "03853896000140",
+      "to": "01838723000127",
+      "kind": "company_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 100,
+      "pct_votos": 100
+    },
+    {
+      "from": "00383281000109",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 3.725,
+      "pct_votos": 11.145
+    },
+    {
+      "from": "08196003000154",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 17.632,
+      "pct_votos": 32.823
+    },
+    {
+      "from": "10979208000158",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 6.661,
+      "pct_votos": 0
+    },
+    {
+      "from": "18715615000160",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 17.037,
+      "pct_votos": 50.966
+    },
+    {
+      "from": "outros-17155730",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 51.578,
+      "pct_votos": 5.066
+    },
+    {
+      "from": "tesouraria-17155730",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 0.038,
+      "pct_votos": 0
+    },
+    {
+      "from": "x-pzena-investment-management-llc",
+      "to": "17155730000164",
+      "kind": "company_owns",
+      "source": "FRE Cemig 159424",
+      "pct_capital": 3.328,
+      "pct_votos": 0
+    },
+    {
+      "from": "05470823000102",
+      "to": "01083200000118",
+      "kind": "company_owns",
+      "source": "FRE Neoenergia 159297",
+      "pct_capital": 82.012,
+      "pct_votos": 82.012
+    },
+    {
+      "from": "34148133000121",
+      "to": "01083200000118",
+      "kind": "company_owns",
+      "source": "FRE Neoenergia 159297",
+      "pct_capital": 3.495,
+      "pct_votos": 3.495
+    },
+    {
+      "from": "64861748000161",
+      "to": "01083200000118",
+      "kind": "company_owns",
+      "source": "FRE Neoenergia 159297",
+      "pct_capital": 14.493,
+      "pct_votos": 14.493
+    },
+    {
+      "from": "03220438000173",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 15,
+      "pct_votos": 15
+    },
+    {
+      "from": "10979208000158",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 5.165,
+      "pct_votos": 5.165
+    },
+    {
+      "from": "46377222000129",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 18.001,
+      "pct_votos": 18.001
+    },
+    {
+      "from": "outros-43776517",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 56.305,
+      "pct_votos": 56.305
+    },
+    {
+      "from": "tesouraria-43776517",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 0.502,
+      "pct_votos": 0.502
+    },
+    {
+      "from": "x-wellington-management",
+      "to": "43776517000180",
+      "kind": "company_owns",
+      "source": "FRE Sabesp 159292",
+      "pct_capital": 5.027,
+      "pct_votos": 5.027
+    },
+    {
+      "from": "10979208000158",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 5.011,
+      "pct_votos": 5.011
+    },
+    {
+      "from": "11752203000150",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 8.428,
+      "pct_votos": 8.428
+    },
+    {
+      "from": "59033590000100",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 10.627,
+      "pct_votos": 10.627
+    },
+    {
+      "from": "63429415000103",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 0.55,
+      "pct_votos": 0.55
+    },
+    {
+      "from": "72116353000162",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 5.012,
+      "pct_votos": 5.012
+    },
+    {
+      "from": "outros-06057223",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 47.631,
+      "pct_votos": 47.631
+    },
+    {
+      "from": "p-faf6d605",
+      "to": "06057223000171",
+      "kind": "person_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 0.005,
       "pct_votos": 0.005
     },
     {
-      "from": "p-ea4eb254",
-      "to": "59206795000131",
-      "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 52.004,
-      "pct_votos": 3.982
+      "from": "tesouraria-06057223",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 1.177,
+      "pct_votos": 1.177
     },
     {
-      "from": "p-74cd4e86",
-      "to": "00864214000106",
+      "from": "x-conifer-management-llc",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 4.999,
+      "pct_votos": 4.999
+    },
+    {
+      "from": "x-orbis-invest",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 11.564,
+      "pct_votos": 11.564
+    },
+    {
+      "from": "x-wishbone-management-lp",
+      "to": "06057223000171",
+      "kind": "company_owns",
+      "source": "FRE Assaí Atacadista 160932",
+      "pct_capital": 4.999,
+      "pct_votos": 4.999
+    },
+    {
+      "from": "16674735000130",
+      "to": "02260956000158",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 100,
+      "pct_votos": 100
+    },
+    {
+      "from": "08542030000131",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 56.362,
+      "pct_votos": 56.362
+    },
+    {
+      "from": "44409243000153",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 2.862,
+      "pct_votos": 2.862
+    },
+    {
+      "from": "p-b7719454",
+      "to": "03853896000140",
+      "kind": "person_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 5.784,
+      "pct_votos": 5.784
+    },
+    {
+      "from": "p-f3c190ea",
+      "to": "03853896000140",
+      "kind": "person_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 7.737,
+      "pct_votos": 7.737
+    },
+    {
+      "from": "x-iberdrola-s-a-u",
+      "to": "05470823000102",
+      "kind": "company_owns",
+      "source": "FRE Neoenergia 159297",
+      "pct_capital": 0.824,
+      "pct_votos": 0.824
+    },
+    {
+      "from": "p-b7719454",
+      "to": "08542030000131",
+      "kind": "person_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 50,
+      "pct_votos": 50
+    },
+    {
+      "from": "p-f3c190ea",
+      "to": "08542030000131",
+      "kind": "person_owns",
+      "source": "FRE BRF 159359",
+      "pct_capital": 50,
+      "pct_votos": 50
+    },
+    {
+      "from": "20286787000107",
+      "to": "16674735000130",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 33.28,
+      "pct_votos": 33.28
+    },
+    {
+      "from": "23160658000166",
+      "to": "16674735000130",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 66.095,
+      "pct_votos": 66.095
+    },
+    {
+      "from": "53216157000115",
+      "to": "20286787000107",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 6.75,
+      "pct_votos": 6.75
+    },
+    {
+      "from": "53285084000113",
+      "to": "20286787000107",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 6.75,
+      "pct_votos": 6.75
+    },
+    {
+      "from": "59206795000131",
+      "to": "20286787000107",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 6.75,
+      "pct_votos": 6.75
+    },
+    {
+      "from": "p-8f4b2205",
+      "to": "20286787000107",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.012,
-      "pct_votos": 0.006
+      "pct_capital": 6.75,
+      "pct_votos": 6.75
+    },
+    {
+      "from": "p-b9db9330",
+      "to": "20286787000107",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 2.428,
+      "pct_votos": 2.428
+    },
+    {
+      "from": "p-cdbc8c4e",
+      "to": "20286787000107",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 70.573,
+      "pct_votos": 70.573
+    },
+    {
+      "from": "20286787000107",
+      "to": "23160658000166",
+      "kind": "company_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 72.155,
+      "pct_votos": 72.155
+    },
+    {
+      "from": "p-1282fcb3",
+      "to": "23160658000166",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 8.765,
+      "pct_votos": 8.765
+    },
+    {
+      "from": "p-392bfe45",
+      "to": "23160658000166",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 0.097,
+      "pct_votos": 0.097
+    },
+    {
+      "from": "p-3d9739a9",
+      "to": "23160658000166",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 3.132,
+      "pct_votos": 3.132
     },
     {
       "from": "p-5438e9c8",
-      "to": "00864214000106",
+      "to": "23160658000166",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.014,
-      "pct_votos": 0.036
+      "pct_capital": 1.918,
+      "pct_votos": 1.918
     },
     {
       "from": "p-5c6eb6c7",
@@ -688,12 +1313,20 @@
       "pct_votos": 1.918
     },
     {
-      "from": "p-5438e9c8",
+      "from": "p-7f3fc508",
       "to": "23160658000166",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 1.918,
-      "pct_votos": 1.918
+      "pct_capital": 3.132,
+      "pct_votos": 3.132
+    },
+    {
+      "from": "p-7fc3be74",
+      "to": "23160658000166",
+      "kind": "person_owns",
+      "source": "FRE Energisa 160981",
+      "pct_capital": 3.132,
+      "pct_votos": 3.132
     },
     {
       "from": "p-8db5e3f1",
@@ -720,236 +1353,132 @@
       "pct_votos": 1.918
     },
     {
-      "from": "p-b9db9330",
-      "to": "00864214000106",
+      "from": "p-02f52298",
+      "to": "32392209000134",
       "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 0.016,
-      "pct_votos": 0.011
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 12,
+      "pct_votos": 12
     },
     {
-      "from": "23160658000166",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 0.021,
-      "pct_votos": 0.012
+      "from": "p-134ca0da",
+      "to": "32392209000134",
+      "kind": "person_owns",
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 12,
+      "pct_votos": 12
     },
     {
-      "from": "p-831e3028",
-      "to": "00864214000106",
+      "from": "p-5a3a3ade",
+      "to": "32392209000134",
       "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 0.026,
-      "pct_votos": 0.013
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 12,
+      "pct_votos": 12
     },
     {
-      "from": "p-3d9739a9",
-      "to": "23160658000166",
+      "from": "p-a64df172",
+      "to": "32392209000134",
       "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 3.132,
-      "pct_votos": 3.132
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 12,
+      "pct_votos": 12
     },
     {
-      "from": "p-7f3fc508",
-      "to": "23160658000166",
+      "from": "p-f8603dda",
+      "to": "32392209000134",
       "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 3.132,
-      "pct_votos": 3.132
+      "source": "FRE Grupo Simpar 159334",
+      "pct_capital": 52,
+      "pct_votos": 52
     },
     {
-      "from": "p-7fc3be74",
-      "to": "23160658000166",
+      "from": "p-b7719454",
+      "to": "44409243000153",
       "kind": "person_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 3.132,
-      "pct_votos": 3.132
+      "source": "FRE BRF 159359",
+      "pct_capital": 100,
+      "pct_votos": 100
     },
     {
-      "from": "p-1282fcb3",
-      "to": "00864214000106",
+      "from": "p-1348ab32",
+      "to": "53216157000115",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.035,
-      "pct_votos": 0.068
+      "pct_capital": 26.778,
+      "pct_votos": 34.429
     },
     {
-      "from": "p-cdbc8c4e",
-      "to": "20286787000107",
+      "from": "p-73a733cc",
+      "to": "53216157000115",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 70.573,
-      "pct_votos": 70.573
+      "pct_capital": 26.778,
+      "pct_votos": 34.429
     },
     {
       "from": "p-887e054b",
-      "to": "00864214000106",
+      "to": "53216157000115",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.07,
-      "pct_votos": 0.037
+      "pct_capital": 46.444,
+      "pct_votos": 31.143
     },
     {
-      "from": "p-1282fcb3",
-      "to": "23160658000166",
+      "from": "p-831e3028",
+      "to": "53285084000113",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 8.765,
-      "pct_votos": 8.765
+      "pct_capital": 46.444,
+      "pct_votos": 31.143
     },
     {
-      "from": "tesouraria-energisa",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 0.116,
-      "pct_votos": 0.061
-    },
-    {
-      "from": "20286787000107",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 0.333,
-      "pct_votos": 0.221
-    },
-    {
-      "from": "p-cdbc8c4e",
-      "to": "00864214000106",
+      "from": "p-a382ee76",
+      "to": "53285084000113",
       "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 0.387,
-      "pct_votos": 0.208
+      "pct_capital": 26.778,
+      "pct_votos": 34.429
     },
     {
-      "from": "20286787000107",
-      "to": "23160658000166",
-      "kind": "company_owns",
+      "from": "p-a54160d7",
+      "to": "53285084000113",
+      "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 72.155,
-      "pct_votos": 72.155
+      "pct_capital": 26.778,
+      "pct_votos": 34.429
     },
     {
-      "from": "20286787000107",
-      "to": "16674735000130",
-      "kind": "company_owns",
+      "from": "p-010e2551",
+      "to": "59206795000131",
+      "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 33.28,
-      "pct_votos": 33.28
+      "pct_capital": 15.999,
+      "pct_votos": 32.006
     },
     {
-      "from": "00383281000109",
-      "to": "00864214000106",
-      "kind": "company_owns",
+      "from": "p-40894d2d",
+      "to": "59206795000131",
+      "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 6.152,
-      "pct_votos": 3.237
+      "pct_capital": 15.999,
+      "pct_votos": 32.006
     },
     {
-      "from": "33857830000199",
-      "to": "00864214000106",
-      "kind": "company_owns",
+      "from": "p-848bf0ce",
+      "to": "59206795000131",
+      "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 7.363,
-      "pct_votos": 3.875
+      "pct_capital": 15.999,
+      "pct_votos": 32.006
     },
     {
-      "from": "10643191000163",
-      "to": "00864214000106",
-      "kind": "company_owns",
+      "from": "p-ea4eb254",
+      "to": "59206795000131",
+      "kind": "person_owns",
       "source": "FRE Energisa 160981",
-      "pct_capital": 7.781,
-      "pct_votos": 4.095
-    },
-    {
-      "from": "23160658000166",
-      "to": "16674735000130",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 66.095,
-      "pct_votos": 66.095
-    },
-    {
-      "from": "09267871000140",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 8.514,
-      "pct_votos": 4.469
-    },
-    {
-      "from": "16674735000130",
-      "to": "02260956000158",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 100.0,
-      "pct_votos": 100.0
-    },
-    {
-      "from": "02260956000158",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 26.646,
-      "pct_votos": 61.162
-    },
-    {
-      "from": "outros-energisa",
-      "to": "00864214000106",
-      "kind": "company_owns",
-      "source": "FRE Energisa 160981",
-      "pct_capital": 42.467,
-      "pct_votos": 22.429
-    },
-    {
-      "from": "05717225000187",
-      "to": "01961898",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "17248371000190",
-      "to": "01961898",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "05528233000185",
-      "to": "03361252",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "05717887000157",
-      "to": "10456016",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "33171026000151",
-      "to": "16701716",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "05491982000185",
-      "to": "16701716",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "05712135000101",
-      "to": "43149806",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
-    },
-    {
-      "from": "42179743000110",
-      "to": "59104422",
-      "kind": "company_owns",
-      "source": "Quadro de Socios Receita"
+      "pct_capital": 52.004,
+      "pct_votos": 3.982
     }
   ]
 }
