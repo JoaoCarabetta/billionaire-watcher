@@ -71,9 +71,9 @@ models:
   - name: valor_universo_fre_hops
     description: |
       Hop-correct Formulário 6.1 extract for ATIVO hop roots. Latest
-      ID_Documento only. Direct holders point at the listed seed (incoming
-      capital about 100). A related name points at the named parent, not at
-      the listed seed. Company from_id is prefix-8 of a 14-digit Cadastro.
+      ID_Documento only. Direct holders (no parent named) point at the
+      listed seed (incoming capital about 100). A holder listed under
+      another name points at that parent, not at the listed seed. Company from_id is prefix-8 of a 14-digit Cadastro.
       Eleven-digit documents are person name keys, never a padded /0001.
       edge_role is null on FRE hops (never dono or UBO). Closed rows have
       no FRE book. No public HTML or /grafo.
