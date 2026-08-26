@@ -306,8 +306,8 @@ describe('Metodologia Page', () => {
     });
 
     it('should publish livro de ações facts under Lacunas', () => {
-      const lacunasStart = builtHtml.search(/<h2[^>]*>.*?Lacunas.*?<\/h2>/);
-      const limitacoesStart = builtHtml.search(/<h2[^>]*>.*?Limitações.*?<\/h2>/);
+      const lacunasStart = builtHtml.search(/<h2[^>]*>\s*Lacunas\s*<\/h2>/);
+      const limitacoesStart = builtHtml.search(/<h2[^>]*>\s*Limitações\s*<\/h2>/);
       expect(lacunasStart).toBeGreaterThan(-1);
       expect(limitacoesStart).toBeGreaterThan(lacunasStart);
       const lacunasHtml = builtHtml.slice(lacunasStart, limitacoesStart);
