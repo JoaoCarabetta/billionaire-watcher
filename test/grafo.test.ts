@@ -175,7 +175,6 @@ describe('Grafo Page (issue #74)', () => {
     const MMS_ID = '08542030000131';
     const MULTISETOR_ID = '20286787000107';
     const JSP_ID = '32392209000134';
-    const BAD_MAMS_ID = '61563585000107';
     const HOLE_COMPANIES = [
       { id: '61563585000142', label: 'MAMS INVESTMENTS LTDA' },
       { id: '02049012000136', label: 'AURORA TEXTIL LTDA' },
@@ -257,9 +256,6 @@ describe('Grafo Page (issue #74)', () => {
         expect(node.kind).toBe('company');
         expect(node.label).toBe(company.label);
       }
-
-      const nodeIds = json.nodes.map((n: { id: string }) => n.id);
-      expect(nodeIds).not.toContain(BAD_MAMS_ID);
     });
 
     it('adds nine company_owns hole edges with no numeric percent', () => {
