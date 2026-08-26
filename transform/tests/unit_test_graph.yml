@@ -1128,7 +1128,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1178,7 +1178,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1228,7 +1228,7 @@ unit_tests:
             'Gipar control chain' as source_doc,
             'FAQ' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '02260956' as cnpj_basico, 'FAKE' as ticker, 'ordinaria' as classe, 100.00 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1245,6 +1245,100 @@ unit_tests:
           cast(null as date) as preco_date,
           cast(null as string) as source
         where false
+
+  - name: test_graph_listed_prices_additional_listed_and_pending_roots
+    description: |
+      Verify the generic listed-price fixture prices a second public graph seed (issue #115).
+      Energisa and Vale have listed-hop quantities and produce rows.
+      WEG and Ambev have quotes but no hop quantity, so they produce no rows.
+    model: graph_listed_prices
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+          union all
+          select
+            '05466338',
+            '33592510',
+            'participacao',
+            cast(null as string),
+            6.45,
+            6.45,
+            1000,
+            cast(null as integer),
+            'Vale FRE fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '12345678',
+            '84429695',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            cast(null as integer),
+            cast(null as integer),
+            'WEG FRE fixture without quantity',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '87654321',
+            '07526557',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            cast(null as integer),
+            cast(null as integer),
+            'Ambev FRE fixture without quantity',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '33592510', 'VALE3', 'ordinaria', 73.10, '2026-08-25', 'Recorded fixture quote'
+          union all
+          select '84429695', 'WEGE3', 'ordinaria', 42.30, '2026-08-25', 'Recorded fixture quote'
+          union all
+          select '07526557', 'ABEV3', 'ordinaria', 13.20, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI' as ticker,
+          'ordinaria' as classe,
+          45.20 as preco,
+          609526325 as quantidade,
+          45.20 * 609526325 as produto,
+          cast('2026-08-25' as date) as preco_date,
+          'Recorded fixture quote + Energisa IR 14 Aug 2026 table 6.1' as source
+        union all
+        select
+          '33592510',
+          'VALE3',
+          'ordinaria',
+          73.10,
+          1000,
+          73100.0,
+          cast('2026-08-25' as date),
+          'Recorded fixture quote + Vale FRE fixture table 6.1'
 
   - name: test_graph_listed_prices_product_computed_correctly
     description: |
@@ -1267,7 +1361,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source

@@ -24,7 +24,7 @@ prices as (
         preco,
         cast(preco_date as date) as preco_date,
         source as price_source
-    from {{ ref('energisa_prices_fixture') }}
+    from {{ ref('listed_prices_fixture') }}
 ),
 
 -- Ordinary shares with prices
