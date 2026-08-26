@@ -2277,3 +2277,258 @@ unit_tests:
           'QSA fixture' as source_locator,
           cast('2026-08-20' as date) as source_retrieved_at
 
+  - name: test_graph_listed_quantities_energisa_cited_no_unit_no_claro
+    description: |
+      Issue #129 public seam: company-level Formulário quantity for priced seeds.
+      Energisa 00864214: 609526325 ordinary and 89144004 preferred, cited to
+      Energisa IR 14 Aug 2026 table 6.1 (already on graph_edges).
+      ENGI11 is a unit: no quantity row. Claro 07043628 has no Bolsa quote: no row.
+      WEG hop without quantity is absent, not zero. Vale hop with quantity appears.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+          union all
+          select
+            '44556677',
+            '00864214',
+            'participacao',
+            cast(null as string),
+            5.0,
+            3.2,
+            cast(null as integer),
+            cast(null as integer),
+            'Energisa minority',
+            'table 6.1',
+            cast('2026-08-14' as date)
+          union all
+          select
+            '05466338',
+            '33592510',
+            'participacao',
+            cast(null as string),
+            6.45,
+            6.45,
+            1000,
+            cast(null as integer),
+            'Vale FRE fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '12345678',
+            '84429695',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            cast(null as integer),
+            cast(null as integer),
+            'WEG FRE fixture without quantity',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '11111111',
+            '07043628',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            500,
+            cast(null as integer),
+            'Claro fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          union all
+          select '00864214', 'ENGI4', 'preferencial', 42.80, '2026-08-20', 'Brasil Bolsa Balcão'
+          union all
+          select '00864214', 'ENGI11', 'unit', 46.28, '2026-08-20', 'Brasil Bolsa Balcão'
+          union all
+          select '33592510', 'VALE3', 'ordinaria', 73.10, '2026-08-25', 'Recorded fixture quote'
+          union all
+          select '84429695', 'WEGE3', 'ordinaria', 42.30, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI3' as ticker,
+          'ordinaria' as classe,
+          609526325 as quantidade,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '00864214',
+          'ENGI4',
+          'preferencial',
+          89144004,
+          'Energisa IR 14 Aug 2026',
+          'table 6.1',
+          cast('2026-08-14' as date)
+        union all
+        select
+          '33592510',
+          'VALE3',
+          'ordinaria',
+          1000,
+          'Vale FRE fixture',
+          'table 6.1',
+          cast('2026-08-25' as date)
+
+  - name: test_graph_listed_quantities_one_row_per_seed_per_class
+    description: |
+      Issue #129 grain: quantity is once per seed per class, not multiplied by holders.
+      Two hops into Energisa carry the same company totals. Expect two rows (ordinaria
+      and preferencial), not four.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '02260956' as from_id,
+            '00864214' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            27.74 as pct_capital,
+            62.45 as pct_votos,
+            609526325 as qty_ordinarias,
+            89144004 as qty_preferenciais,
+            'Energisa IR 14 Aug 2026' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-14' as date) as source_retrieved_at
+          union all
+          select
+            '44556677',
+            '00864214',
+            'participacao',
+            cast(null as string),
+            5.0,
+            3.2,
+            609526325,
+            89144004,
+            'Energisa IR 14 Aug 2026',
+            'table 6.1',
+            cast('2026-08-14' as date)
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '00864214' as cnpj_basico, 'ENGI3' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
+          union all
+          select '00864214', 'ENGI4', 'preferencial', 42.80, '2026-08-20', 'Brasil Bolsa Balcão'
+    expect:
+      format: sql
+      rows: |
+        select
+          '00864214' as cnpj_basico,
+          'ENGI3' as ticker,
+          'ordinaria' as classe,
+          609526325 as quantidade,
+          'Energisa IR 14 Aug 2026' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-14' as date) as source_retrieved_at
+        union all
+        select
+          '00864214',
+          'ENGI4',
+          'preferencial',
+          89144004,
+          'Energisa IR 14 Aug 2026',
+          'table 6.1',
+          cast('2026-08-14' as date)
+
+  - name: test_graph_listed_quantities_weg_ambev_only_when_hop_has_qty
+    description: |
+      WEG (84429695) and Ambev (07526557) appear only when graph_edges already has
+      quantity. Claro stays absent. Fixture quantities here are hop literals, not
+      FRE 17.1 sidecar numbers.
+    model: graph_listed_quantities
+    given:
+      - input: ref('graph_edges')
+        format: sql
+        rows: |
+          select
+            '12345678' as from_id,
+            '84429695' as to_id,
+            'participacao' as edge_kind,
+            cast(null as string) as edge_role,
+            50.0 as pct_capital,
+            50.0 as pct_votos,
+            125 as qty_ordinarias,
+            cast(null as integer) as qty_preferenciais,
+            'WEG FRE fixture' as source_doc,
+            'table 6.1' as source_locator,
+            cast('2026-08-25' as date) as source_retrieved_at
+          union all
+          select
+            '87654321',
+            '07526557',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            250,
+            cast(null as integer),
+            'Ambev FRE fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+          union all
+          select
+            '11111111',
+            '07043628',
+            'participacao',
+            cast(null as string),
+            50.0,
+            50.0,
+            500,
+            cast(null as integer),
+            'Claro fixture',
+            'table 6.1',
+            cast('2026-08-25' as date)
+      - input: ref('listed_prices_fixture')
+        format: sql
+        rows: |
+          select '84429695' as cnpj_basico, 'WEGE3' as ticker, 'ordinaria' as classe, 42.30 as preco, '2026-08-25' as preco_date, 'Recorded fixture quote' as source
+          union all
+          select '07526557', 'ABEV3', 'ordinaria', 13.20, '2026-08-25', 'Recorded fixture quote'
+    expect:
+      format: sql
+      rows: |
+        select
+          '84429695' as cnpj_basico,
+          'WEGE3' as ticker,
+          'ordinaria' as classe,
+          125 as quantidade,
+          'WEG FRE fixture' as source_doc,
+          'table 6.1' as source_locator,
+          cast('2026-08-25' as date) as source_retrieved_at
+        union all
+        select
+          '07526557',
+          'ABEV3',
+          'ordinaria',
+          250,
+          'Ambev FRE fixture',
+          'table 6.1',
+          cast('2026-08-25' as date)
+

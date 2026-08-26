@@ -174,3 +174,46 @@ models:
         description: Combined source (Brasil Bolsa Balcão + IR/FRE table that gave quantity)
         tests:
           - not_null
+
+  - name: graph_listed_quantities
+    description: |
+      Formulário share quantity at seed × class grain for priced listed seeds (issue #129).
+      Warehouse sidecar the public graph / Coder can read. Not the money-script FRE 17.1 CSV.
+      Quantity comes only from graph_edges listed-hop columns (qty_ordinarias / qty_preferenciais).
+      Identical company totals copied onto more than one holder hop collapse to one row.
+      A seed with no hop quantity is omitted, not zero. Unit classes are never emitted.
+      Claro Telecom Participações (07043628) has no Bolsa class, so it never appears.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - cnpj_basico
+              - classe
+    columns:
+      - name: cnpj_basico
+        description: 8-digit CNPJ básico (STRING with leading zeros)
+        tests:
+          - not_null
+      - name: ticker
+        description: Priced Bolsa ticker for this seed × class (ENGI3 / ENGI4, never ENGI11)
+        tests:
+          - not_null
+      - name: classe
+        description: Share class (ordinaria or preferencial). Unit is never emitted.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ordinaria', 'preferencial']
+      - name: quantidade
+        description: Company-level outstanding share quantity from the listed hop (IR/FRE table)
+        tests:
+          - not_null
+      - name: source_doc
+        description: Formulário / IR document that cited the quantity
+        tests:
+          - not_null
+      - name: source_locator
+        description: Locator inside that document (for example table 6.1)
+      - name: source_retrieved_at
+        description: Source retrieval date from the listed hop
