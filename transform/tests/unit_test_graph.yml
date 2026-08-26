@@ -1128,7 +1128,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1178,7 +1178,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1228,7 +1228,7 @@ unit_tests:
             'Gipar control chain' as source_doc,
             'FAQ' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '02260956' as cnpj_basico, 'FAKE' as ticker, 'ordinaria' as classe, 100.00 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source
@@ -1361,7 +1361,7 @@ unit_tests:
             'Energisa IR 14 Aug 2026' as source_doc,
             'table 6.1' as source_locator,
             cast('2026-08-14' as date) as source_retrieved_at
-      - input: ref('energisa_prices_fixture')
+      - input: ref('listed_prices_fixture')
         format: sql
         rows: |
           select '00864214' as cnpj_basico, 'ENGI' as ticker, 'ordinaria' as classe, 45.20 as preco, '2026-08-20' as preco_date, 'Brasil Bolsa Balcão' as source

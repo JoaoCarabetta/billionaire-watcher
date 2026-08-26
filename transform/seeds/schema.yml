@@ -324,11 +324,13 @@ seeds:
       - name: source_retrieved_at
         description: Source retrieval date
 
-  - name: energisa_prices_fixture
+  - name: listed_prices_fixture
     description: |
-      Energisa stock prices fixture (FIXTURE/SEED ONLY, NOT LIVE BOLSA).
-      Test data for dated listed price facts. Fake tickers and prices for unit tests.
-      Business-day append: multiple dates for same ticker/class test daily accumulation.
+      Listed stock price fixture (FIXTURE/SEED ONLY, NOT LIVE BOLSA).
+      Covers the 31 listed roots published on /grafo plus WEG and Ambev.
+      Quotes and symbols are deterministic test data; quantity still comes exclusively
+      from graph_edges listed hops. WEG and Ambev therefore remain absent until a hop
+      supplies a quantity. Energisa has two business dates to test append behavior.
       
       PRODUCTION EXCLUSION: This seed is disabled on the warehouse target (dev) and prod.
       Only test/ci targets may seed this fixture. Do NOT seed into billionairewatcher warehouse.
@@ -338,7 +340,7 @@ seeds:
         cnpj_basico: STRING
         ticker: STRING
         classe: STRING
-        preco: FLOAT64
+        preco: "{{ 'DOUBLE' if target.type == 'duckdb' else 'FLOAT64' }}"
         preco_date: STRING
         source: STRING
     columns:
@@ -363,7 +365,7 @@ seeds:
         tests:
           - not_null
       - name: source
-        description: Price source (Brasil Bolsa Balcão)
+        description: Recorded or deterministic fixture quote source
         tests:
           - not_null
 
