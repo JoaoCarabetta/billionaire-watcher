@@ -9,10 +9,17 @@
 
 import { LISTED_COMPANY_IDS } from './grafo-panel';
 
+export interface GrafoPartner {
+  nome: string;
+  qualificacao: string;
+  qualificacao_label: string;
+}
+
 export interface GrafoNode {
   id: string;
   kind: 'person' | 'company';
   label: string;
+  partners?: GrafoPartner[];
 }
 
 export interface GrafoEdge {

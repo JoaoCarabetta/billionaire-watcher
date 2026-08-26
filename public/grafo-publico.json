@@ -58,7 +58,79 @@
     {
       "id": "11752203000150",
       "kind": "company",
-      "label": "Alaska Investimentos Ltda."
+      "label": "Alaska Investimentos Ltda.",
+      "partners": [
+        {
+          "nome": "ACACIO ROBOREDO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "ANGELA REGINA RODRIGUES DE PAULA FREITAS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "DANILO BREDDA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "EDUARDO CHRISTOVAM GALDI MESTIERI",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "GUILHERME YUITI MIAZAQUI",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "HENRIQUE BREDDA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "LUIZ ALVES PAES DE BARROS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "MARCOS TATSUO YAMAMOTO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "NEY ALEXANDRE MIYAMOTO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "PAULA AKEMI RIBEIRO HIROSE",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "RODRIGO ABUD",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "THIAGO COSTA JACINTO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "WILLIAM CORDEIRO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "YAN RODRIGO DE CARVALHO VIEIRA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        }
+      ]
     },
     {
       "id": "tesouraria-00864214",
@@ -138,7 +210,84 @@
     {
       "id": "72116353000162",
       "kind": "company",
-      "label": "Dynamo Administração de Recursos Ltda."
+      "label": "Dynamo Administração de Recursos Ltda.",
+      "partners": [
+        {
+          "nome": "ANDRE DE ALMEIDA ROSA SOARES",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "BERNARDO ABREU DA COSTA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "BRUNO DE ARAUJO LIMA ROCHA",
+          "qualificacao": "38",
+          "qualificacao_label": "Sócio Pessoa Física Residente No Exterior"
+        },
+        {
+          "nome": "BRUNO HERMES DA FONSECA RUDGE",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "DYNAMO ADMINISTRACAO DE RECURSOS LTDA",
+          "qualificacao": "63",
+          "qualificacao_label": "Cotas Em Tesouraria"
+        },
+        {
+          "nome": "EDUARDO DE ALMEIDA SANTOS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "EMERSON ADRIANO FERRATO MELO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "FERNANDO JOSE DE OLIVEIRA PIRES DOS SANTOS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "GABRIEL RAPOZO MAROTTI",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "KASSYANA PAULA ALEXANDRA PINAUD",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "LUIZ FELIPE DE ALMEIDA CAMPOS",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "LUIZ ORENSTEIN",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "PEDRO FURTADO MOREIRA MONTEIRO DE BARROS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "THIAGO DI BLASI TEIXEIRA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "TIAGO MOTA MOLISANI FERREIRA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        }
+      ]
     },
     {
       "id": "18715615000160",
@@ -188,7 +337,8 @@
     {
       "id": "14406534000127",
       "kind": "company",
-      "label": "LAZARD ASSET MANAGEMENT"
+      "label": "LAZARD ASSET MANAGEMENT",
+      "partners": []
     },
     {
       "id": "44409243000153",
@@ -228,7 +378,34 @@
     {
       "id": "41020034000125",
       "kind": "company",
-      "label": "NOVA FUTURA GESTORA DE RECURSOS LTDA"
+      "label": "NOVA FUTURA GESTORA DE RECURSOS LTDA",
+      "partners": [
+        {
+          "nome": "ANDRE DE CARVALHO FERREIRA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "FLAVIO AUGUSTO DURAN MANZANO",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        },
+        {
+          "nome": "JOAO DA SILVA FERREIRA NETO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "JOAQUIM DA SILVA FERREIRA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "JULIO DE MORAIS ERSE",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        }
+      ]
     },
     {
       "id": "16674735000130",
@@ -238,12 +415,241 @@
     {
       "id": "05395883000108",
       "kind": "company",
-      "label": "OPPORTUNITY ASSET ADMINISTRADORA DE RECURSOS DE TERCEIROS LTDA."
+      "label": "OPPORTUNITY ASSET ADMINISTRADORA DE RECURSOS DE TERCEIROS LTDA.",
+      "partners": [
+        {
+          "nome": "ADRIANA CESARIO CARNAVAL",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "ALEXANDRE MUNIZ LISBOA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "ANA CAROLINA DE OLIVEIRA SILVA MOREIRA LIMA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "BRUNO BEIER PALERMO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "BRUNO FERNANDES WAGA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "CARLOS EDUARDO DIAS GOMES",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "CARLOS PACHECO GONCALVES MAXIMINO PEREIRA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "DANIEL VALENTE DANTAS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "DIOGO ALEXANDRE DE MELO BAHIA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "DORIO FERMAN",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "FERNANDO MAURICIO TAVARES GOUVEIA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "GABRIEL MORETTA CHEBAR",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "ITAMAR BENIGNO FILHO",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        },
+        {
+          "nome": "JULIANA KLAIOM DA SILVEIRA MACHADO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "MARCELO SEIXAS CAVALCANTI DE ALBUQUERQUE",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "MICHEL DAHIS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "NORBERTO AGUIAR TOMAZ",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "OPPORTUNITY PARTNERS PARTICIPACOES LTDA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "SANTA LUZIA COMERCIAL E PARTICIPACOES LTDA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "THIAGO KLAIOM DA SILVEIRA MACHADO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "VERONICA VALENTE DANTAS",
+          "qualificacao": "38",
+          "qualificacao_label": "Sócio Pessoa Física Residente No Exterior"
+        },
+        {
+          "nome": "VINICIUS COUTINHO SALDANHA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "VINICIUS GIERKENS FERREIRA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "VIVIANE D ALMEIDA FERREIRA SILVA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        }
+      ]
     },
     {
       "id": "33857830000199",
       "kind": "company",
-      "label": "OPPORTUNITY HDF ADMINISTRADORA DE RECURSOS LTDA."
+      "label": "OPPORTUNITY HDF ADMINISTRADORA DE RECURSOS LTDA.",
+      "partners": [
+        {
+          "nome": "ANDRE STRAUSS VASQUES",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "DIOGO ALEXANDRE DE MELO BAHIA",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        },
+        {
+          "nome": "DORIO FERMAN",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "FELIPE BARROS MAIA VINAGRE",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "FELIPE SANTOS STUDART",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "GABRIEL PICCOLI ARAUJO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "ITAMAR BENIGNO FILHO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "JOAO ANTONIO DE ALBUQUERQUE MEDEIROS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "JOAO CARLOS FRAGA TONON",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "JOAO MANOEL PINHO DE MELLO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "JOAO VICTOR CARRIELLO CELES",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "LUIZA CAVALLEIRO DE MACEDO WEHLING GASPARIAN",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        },
+        {
+          "nome": "NORBERTO AGUIAR TOMAZ",
+          "qualificacao": "5",
+          "qualificacao_label": "Administrador"
+        },
+        {
+          "nome": "OPPORTUNITY HOLDERS PARTICIPACOES LTDA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "PAULO CESAR DO NASCIMENTO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "PEDRO GUEDES ALVES",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "RODRIGO DOMINGUES VINHA FREITAS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "THIAGO AUDI CASSEB",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "TIAGO DE ALMEIDA NOEL",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "VERONICA VALENTE DANTAS",
+          "qualificacao": "38",
+          "qualificacao_label": "Sócio Pessoa Física Residente No Exterior"
+        },
+        {
+          "nome": "VITOR FREITAS LIMA BURJACK",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        }
+      ]
     },
     {
       "id": "x-orbis-invest",
@@ -318,7 +724,64 @@
     {
       "id": "09267871000140",
       "kind": "company",
-      "label": "SQUADRA INVESTIMENTOS - GESTÃO DE RECURSOS LTDA."
+      "label": "SQUADRA INVESTIMENTOS - GESTÃO DE RECURSOS LTDA.",
+      "partners": [
+        {
+          "nome": "ANTONIO SILVA CORDOVIL",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "BERNARDO FERNANDES DA VEIGA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "EDUARDO COELHO GOMES FERNANDES BASTO",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "EDUARDO VALENTIM DE ARAUJO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "FELIPE DUTRA CANCADO",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "GUILHERME MEXIAS ACHE",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "JOAO CLAUDIO TELLES VIANNA",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        },
+        {
+          "nome": "LUIS AUGUSTO OLIVEIRA GAMBOA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "LUIS FELIPE SARAMAGO STERN",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "LUIZ MAURICIO DE MIRANDA E SILVA",
+          "qualificacao": "49",
+          "qualificacao_label": "Sócio-Administrador"
+        },
+        {
+          "nome": "MARCELO GONZALEZ PASSOS",
+          "qualificacao": "22",
+          "qualificacao_label": "Sócio"
+        }
+      ]
     },
     {
       "id": "10643191000163",
