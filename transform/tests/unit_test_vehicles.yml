@@ -40,15 +40,28 @@ unit_tests:
     expect:
       format: sql
       rows: |
-        select '02260956' as cnpj_basico, '2' as tipo, 'PESSOA FICTICIA ALFA' as nome, '***123456**' as documento, '49' as qualificacao, cast('2020-02-03' as date) as data_entrada_sociedade, cast(null as double) as percent, 1 as partner_count
-        union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
-        union all select '08542030', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        with expected_without_query as (
+          select '02260956' as cnpj_basico, '2' as tipo, 'PESSOA FICTICIA ALFA' as nome, '***123456**' as documento, '49' as qualificacao, cast('2020-02-03' as date) as data_entrada_sociedade, cast(null as double) as percent, 1 as partner_count
+          union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+          union all select '08542030', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as date), cast(null as double), 0
+        )
+        select
+          expected_without_query.*,
+          concat(
+            'SELECT tipo, nome, documento, qualificacao, data_entrada_sociedade ',
+            'FROM basedosdados.br_me_cnpj.socios WHERE data = DATE ',
+            chr(39), '2026-01-11', chr(39),
+            ' AND LPAD(CAST(cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39), ') = ',
+            chr(39), cnpj_basico, chr(39)
+          ) as source_query
+        from expected_without_query
 
   - name: test_vehicle_qsa_companies_owned_uses_prefix_not_substring
     description: |
@@ -106,12 +119,34 @@ unit_tests:
     expect:
       format: sql
       rows: |
-        select '08542030' as owner_cnpj_basico, '61563585' as owned_cnpj_basico, 'EMPRESA FICTICIA EXATA' as owned_name, '49' as qualificacao, '08.542.030/0001-07' as documento, cast(null as double) as percent, 1 as owned_company_count
-        union all select '02260956', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
-        union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        with expected_without_query as (
+          select '08542030' as owner_cnpj_basico, '61563585' as owned_cnpj_basico, 'EMPRESA FICTICIA EXATA' as owned_name, '49' as qualificacao, '08.542.030/0001-07' as documento, cast(null as double) as percent, 1 as owned_company_count
+          union all select '02260956', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '23160658', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '20286787', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '16674735', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '59206795', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '53216157', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '53285084', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+          union all select '32392209', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0
+        )
+        select
+          expected_without_query.*,
+          concat(
+            'SELECT s.cnpj_basico, e.razao_social, s.qualificacao, s.documento ',
+            'FROM basedosdados.br_me_cnpj.socios AS s ',
+            'JOIN basedosdados.br_me_cnpj.empresas AS e ',
+            'ON LPAD(CAST(e.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') = LPAD(CAST(s.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') AND e.data = s.data WHERE s.data = DATE ',
+            chr(39), '2026-01-11', chr(39),
+            ' AND CAST(s.tipo AS STRING) = ',
+            chr(39), '1', chr(39),
+            ' AND SUBSTR(LPAD(REGEXP_REPLACE(CAST(s.documento AS STRING), r',
+            chr(39), '[^0-9]', chr(39), ', ', chr(39), chr(39),
+            '), 14, ', chr(39), '0', chr(39), '), 1, 8) = ',
+            chr(39), owner_cnpj_basico, chr(39)
+          ) as source_query
+        from expected_without_query
