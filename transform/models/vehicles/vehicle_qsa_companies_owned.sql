@@ -83,7 +83,11 @@ owned_company_rows as (
         empresas.razao_social as owned_name,
         socios.qualificacao,
         socios.documento,
+        {% if target.type == 'duckdb' %}
         cast(null as double) as percent,
+        {% else %}
+        cast(null as float64) as percent,
+        {% endif %}
         roots.source_query
     from normalized_pj_socios as socios
     inner join roots_with_query as roots
@@ -113,7 +117,11 @@ empty_rows as (
         cast(null as string) as owned_name,
         cast(null as string) as qualificacao,
         cast(null as string) as documento,
+        {% if target.type == 'duckdb' %}
         cast(null as double) as percent,
+        {% else %}
+        cast(null as float64) as percent,
+        {% endif %}
         0 as owned_company_count,
         roots.source_query
     from roots_with_query as roots
