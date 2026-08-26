@@ -1,0 +1,279 @@
+unit_tests:
+  - name: test_holding_qsa_companies_owned_prefix_eight_and_explicit_empty
+    description: |
+      Prefix-8 of a normalized 14-digit PJ documento matches. A document that
+      only contains the key later does not. PF rows and off-partition rows do
+      not. Family holdings keep named companies. Onofre and Gestora emit one
+      explicit zero-count row. Percent stays null. Banco BTG with no edges is
+      an empty row and is not a size warning.
+    model: holding_qsa_companies_owned
+    given:
+      - input: ref('holding_invert_cnpj_basicos')
+        format: sql
+        rows: |
+          select '00835086' as cnpj_basico, false as bank_book
+          union all select '66117474', false
+          union all select '01878512', false
+          union all select '28446667', false
+          union all select '30306294', true
+          union all select '09631542', false
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            '71000001' as cnpj_basico,
+            '1' as tipo,
+            'SOCIA FICTICIA LUIZA' as nome,
+            '00.835.086/0001-01' as documento,
+            '22' as qualificacao
+          union all
+          select
+            cast('2026-01-11' as date),
+            '71000002',
+            '1',
+            'SOCIA FICTICIA LTD',
+            '66.117.474/0001-02',
+            '22'
+          union all
+          select
+            cast('2026-01-11' as date),
+            '71000003',
+            '1',
+            'SOCIA FICTICIA WAGNER',
+            '01.878.512/0001-03',
+            '49'
+          union all
+          select
+            cast('2026-01-11' as date),
+            '71000004',
+            '1',
+            'SOCIA FICTICIA FALSO POSITIVO',
+            '99.008.350/8600-01',
+            '22'
+          union all
+          select
+            cast('2026-01-11' as date),
+            '71000005',
+            '2',
+            'PESSOA FICTICIA',
+            '***835086**',
+            '10'
+          union all
+          select
+            cast('2025-12-31' as date),
+            '71000006',
+            '1',
+            'SOCIA FICTICIA FORA DA PARTICAO',
+            '00.835.086/0001-01',
+            '22'
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        rows: |
+          select cast('2026-01-11' as date) as data, '71000001' as cnpj_basico, 'EMPRESA FICTICIA LUIZA' as razao_social
+          union all
+          select cast('2026-01-11' as date), '71000002', 'EMPRESA FICTICIA LTD'
+          union all
+          select cast('2026-01-11' as date), '71000003', 'EMPRESA FICTICIA WAGNER'
+          union all
+          select cast('2026-01-11' as date), '71000004', 'EMPRESA FICTICIA FALSO POSITIVO'
+          union all
+          select cast('2026-01-11' as date), '71000005', 'EMPRESA FICTICIA PF'
+          union all
+          select cast('2026-01-11' as date), '71000006', 'EMPRESA FICTICIA FORA DA PARTICAO'
+    expect:
+      format: sql
+      rows: |
+        with expected_without_query as (
+          select '00835086' as owner_cnpj_basico, '71000001' as owned_cnpj_basico, 'EMPRESA FICTICIA LUIZA' as owned_name, '22' as qualificacao, '00.835.086/0001-01' as documento, cast(null as double) as percent, 1 as owned_company_count, cast(false as boolean) as size_warning
+          union all select '66117474', '71000002', 'EMPRESA FICTICIA LTD', '22', '66.117.474/0001-02', cast(null as double), 1, cast(false as boolean)
+          union all select '01878512', '71000003', 'EMPRESA FICTICIA WAGNER', '49', '01.878.512/0001-03', cast(null as double), 1, cast(false as boolean)
+          union all select '28446667', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '30306294', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '09631542', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+        )
+        select
+          expected_without_query.*,
+          concat(
+            'SELECT s.cnpj_basico, e.razao_social, s.qualificacao, s.documento ',
+            'FROM basedosdados.br_me_cnpj.socios AS s ',
+            'JOIN basedosdados.br_me_cnpj.empresas AS e ',
+            'ON LPAD(CAST(e.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') = LPAD(CAST(s.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') AND e.data = s.data WHERE s.data = DATE ',
+            chr(39), '2026-01-11', chr(39),
+            ' AND CAST(s.tipo AS STRING) = ',
+            chr(39), '1', chr(39),
+            ' AND LEFT(LPAD(REGEXP_REPLACE(CAST(s.documento AS STRING), r',
+            chr(39), '[^0-9]', chr(39), ', ', chr(39), chr(39),
+            '), 14, ', chr(39), '0', chr(39), '), 8) = ',
+            chr(39), owner_cnpj_basico, chr(39)
+          ) as source_query
+        from expected_without_query
+
+  - name: test_holding_qsa_companies_owned_keeps_bank_sized_book
+    description: |
+      A mocked Banco BTG-sized book of 26 named companies stays in the warehouse
+      table with size_warning true. A substring false positive does not inflate
+      the count. Onofre and Gestora remain explicit empties. The model is SQL
+      only and does not write public HTML paths.
+    model: holding_qsa_companies_owned
+    given:
+      - input: ref('holding_invert_cnpj_basicos')
+        format: sql
+        rows: |
+          select '00835086' as cnpj_basico, false as bank_book
+          union all select '66117474', false
+          union all select '01878512', false
+          union all select '28446667', false
+          union all select '30306294', true
+          union all select '09631542', false
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            lpad(cast(81000000 + n as varchar), 8, '0') as cnpj_basico,
+            '1' as tipo,
+            'SOCIA FICTICIA BANCO' as nome,
+            '30.306.294/0001-22' as documento,
+            '22' as qualificacao
+          from (select unnest(range(1, 27)) as n)
+          union all
+          select
+            cast('2026-01-11' as date),
+            '81000099',
+            '1',
+            'SOCIA FICTICIA FALSO POSITIVO BANCO',
+            '99.303.062/9400-01',
+            '22'
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            lpad(cast(81000000 + n as varchar), 8, '0') as cnpj_basico,
+            concat('EMPRESA FICTICIA BANCO ', lpad(cast(n as varchar), 2, '0')) as razao_social
+          from (select unnest(range(1, 27)) as n)
+          union all
+          select
+            cast('2026-01-11' as date),
+            '81000099',
+            'EMPRESA FICTICIA FALSO POSITIVO BANCO'
+    expect:
+      format: sql
+      rows: |
+        with expected_without_query as (
+          select
+            '30306294' as owner_cnpj_basico,
+            lpad(cast(81000000 + n as varchar), 8, '0') as owned_cnpj_basico,
+            concat('EMPRESA FICTICIA BANCO ', lpad(cast(n as varchar), 2, '0')) as owned_name,
+            '22' as qualificacao,
+            '30.306.294/0001-22' as documento,
+            cast(null as double) as percent,
+            26 as owned_company_count,
+            cast(true as boolean) as size_warning
+          from (select unnest(range(1, 27)) as n)
+          union all select '00835086', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '66117474', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '01878512', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '28446667', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '09631542', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+        )
+        select
+          expected_without_query.*,
+          concat(
+            'SELECT s.cnpj_basico, e.razao_social, s.qualificacao, s.documento ',
+            'FROM basedosdados.br_me_cnpj.socios AS s ',
+            'JOIN basedosdados.br_me_cnpj.empresas AS e ',
+            'ON LPAD(CAST(e.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') = LPAD(CAST(s.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') AND e.data = s.data WHERE s.data = DATE ',
+            chr(39), '2026-01-11', chr(39),
+            ' AND CAST(s.tipo AS STRING) = ',
+            chr(39), '1', chr(39),
+            ' AND LEFT(LPAD(REGEXP_REPLACE(CAST(s.documento AS STRING), r',
+            chr(39), '[^0-9]', chr(39), ', ', chr(39), chr(39),
+            '), 14, ', chr(39), '0', chr(39), '), 8) = ',
+            chr(39), owner_cnpj_basico, chr(39)
+          ) as source_query
+        from expected_without_query
+
+  - name: test_holding_qsa_companies_owned_size_warning_from_count
+    description: |
+      A non-bank owner whose mocked book meets the size-warning threshold gets
+      size_warning true. This is independent of the Banco BTG bank_book flag.
+    model: holding_qsa_companies_owned
+    overrides:
+      vars:
+        holding_owned_size_warning_threshold: 2
+    given:
+      - input: ref('holding_invert_cnpj_basicos')
+        format: sql
+        rows: |
+          select '00835086' as cnpj_basico, false as bank_book
+          union all select '66117474', false
+          union all select '01878512', false
+          union all select '28446667', false
+          union all select '30306294', true
+          union all select '09631542', false
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        rows: |
+          select
+            cast('2026-01-11' as date) as data,
+            '72000001' as cnpj_basico,
+            '1' as tipo,
+            'SOCIA FICTICIA LUIZA UM' as nome,
+            '00.835.086/0001-01' as documento,
+            '22' as qualificacao
+          union all
+          select
+            cast('2026-01-11' as date),
+            '72000002',
+            '1',
+            'SOCIA FICTICIA LUIZA DOIS',
+            '00.835.086/0001-01',
+            '22'
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        rows: |
+          select cast('2026-01-11' as date) as data, '72000001' as cnpj_basico, 'EMPRESA FICTICIA LUIZA UM' as razao_social
+          union all
+          select cast('2026-01-11' as date), '72000002', 'EMPRESA FICTICIA LUIZA DOIS'
+    expect:
+      format: sql
+      rows: |
+        with expected_without_query as (
+          select '00835086' as owner_cnpj_basico, '72000001' as owned_cnpj_basico, 'EMPRESA FICTICIA LUIZA UM' as owned_name, '22' as qualificacao, '00.835.086/0001-01' as documento, cast(null as double) as percent, 2 as owned_company_count, cast(true as boolean) as size_warning
+          union all select '00835086', '72000002', 'EMPRESA FICTICIA LUIZA DOIS', '22', '00.835.086/0001-01', cast(null as double), 2, cast(true as boolean)
+          union all select '66117474', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '01878512', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '28446667', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '30306294', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+          union all select '09631542', cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as varchar), cast(null as double), 0, cast(false as boolean)
+        )
+        select
+          expected_without_query.*,
+          concat(
+            'SELECT s.cnpj_basico, e.razao_social, s.qualificacao, s.documento ',
+            'FROM basedosdados.br_me_cnpj.socios AS s ',
+            'JOIN basedosdados.br_me_cnpj.empresas AS e ',
+            'ON LPAD(CAST(e.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') = LPAD(CAST(s.cnpj_basico AS STRING), 8, ',
+            chr(39), '0', chr(39),
+            ') AND e.data = s.data WHERE s.data = DATE ',
+            chr(39), '2026-01-11', chr(39),
+            ' AND CAST(s.tipo AS STRING) = ',
+            chr(39), '1', chr(39),
+            ' AND LEFT(LPAD(REGEXP_REPLACE(CAST(s.documento AS STRING), r',
+            chr(39), '[^0-9]', chr(39), ', ', chr(39), chr(39),
+            '), 14, ', chr(39), '0', chr(39), '), 8) = ',
+            chr(39), owner_cnpj_basico, chr(39)
+          ) as source_query
+        from expected_without_query

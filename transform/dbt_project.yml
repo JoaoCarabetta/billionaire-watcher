@@ -40,6 +40,12 @@ models:
       +enabled: true
       +meta:
         location: US
+    holdings:
+      +schema: billionaire_watcher
+      +materialized: table
+      +enabled: true
+      +meta:
+        location: US
     freeze:
       +schema: billionaire_watcher
       +materialized: table
@@ -65,3 +71,4 @@ seeds:
 
 vars:
   rf_partition_date: '2026-01-11'
+  holding_owned_size_warning_threshold: 40

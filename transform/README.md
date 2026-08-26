@@ -83,6 +83,44 @@ use substring containment. Each model emits one count-zero row with its concrete
 source query when a configured key has no match. Receita provides no percentage
 column, so `percent` remains null.
 
+### Holding QSA invert (Issue #110)
+
+`holding_qsa_companies_owned` is a warehouse-enabled invert of Receita Quadro de
+Sócios for six graph holdings, backed by the separate `holding_invert_cnpj_basicos`
+seed. It does not reuse `vehicle_cnpj_basicos` (those nine are the Gipar/Itacatu
+set). It does not write public HTML or `/grafo`.
+
+Grain: one PJ sócio row per (owner, owned company), or one explicit empty row
+when a configured key has no match (`owned_company_count=0`). Match is prefix-8
+of a normalized 14-digit PJ `documento` (`tipo='1'`) at `rf_partition_date`
+(`2026-01-11`). Never `regexp_contains`. Never invent a branch suffix.
+`percent` is always null. Owned-company identity is the 8-digit `owned_cnpj_basico`,
+`owned_name`, and `qualificacao`.
+
+`size_warning` is true when `bank_book` is set on the seed and the owner has at
+least one owned company, or when `owned_company_count` meets
+`holding_owned_size_warning_threshold` (40). Banco BTG stays in the warehouse
+table and off `/grafo`.
+
+```sql
+select
+  lpad(cast(s.cnpj_basico as string), 8, '0') as owned_cnpj_basico,
+  e.razao_social,
+  s.qualificacao,
+  s.documento
+from basedosdados.br_me_cnpj.socios as s
+join basedosdados.br_me_cnpj.empresas as e
+  on lpad(cast(e.cnpj_basico as string), 8, '0')
+   = lpad(cast(s.cnpj_basico as string), 8, '0')
+ and e.data = s.data
+where s.data = date '2026-01-11'
+  and cast(s.tipo as string) = '1'
+  and left(
+    lpad(regexp_replace(cast(s.documento as string), r'[^0-9]', ''), 14, '0'),
+    8
+  ) = '<owner_cnpj_basico>'
+```
+
 ### Freeze Models (Issue #25)
 
 Freeze walk models implementing grupo × pessoa natural × papel per issue #22 spec:

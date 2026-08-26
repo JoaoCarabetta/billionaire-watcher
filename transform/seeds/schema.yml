@@ -75,6 +75,37 @@ seeds:
         tests:
           - not_null
 
+  - name: holding_invert_cnpj_basicos
+    description: |
+      Six issue #110 graph-holding CNPJ básicos used for the bounded Receita
+      QSA invert (companies where these keys appear as PJ sócio). This warehouse
+      input is separate from the nine issue #88 Gipar/Itacatu vehicles, the nine
+      issue #92 unlisted keys, and the seven issue #97 gestoras. `bank_book`
+      marks Banco BTG so a modest subsidiary book still carries a size warning
+      and stays off public HTML.
+    config:
+      enabled: true
+      column_types:
+        cnpj_basico: STRING
+        holding_name: STRING
+        bank_book: BOOLEAN
+    columns:
+      - name: cnpj_basico
+        description: 8-digit holding CNPJ básico with leading zeros preserved.
+        tests:
+          - not_null
+          - unique
+      - name: holding_name
+        description: Human-readable holding name supplied by issue #110.
+        tests:
+          - not_null
+      - name: bank_book
+        description: |
+          True for Banco BTG. Owned rows stay in the warehouse invert; do not
+          emit that book to `/grafo`.
+        tests:
+          - not_null
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:
