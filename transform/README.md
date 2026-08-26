@@ -150,8 +150,9 @@ sócio slice, never a Formulário book and never dono. No public HTML, no
 | `valor_universo_closed_qsa` | Sócio row per closed/group company, or one explicit empty row |
 | `valor_universo_hop_counts` | One summary row |
 
-Hop-correct: direct holders point at the listed seed (incoming capital about
-100); a related name points at the named parent. Company keys are prefix-8.
+Hop-correct: direct holders (no parent named) point at the listed seed
+(incoming capital about 100); a holder listed under another name points at
+that parent. Company keys are prefix-8.
 Eleven-digit documents are person name keys, never a padded `/0001`.
 Already-on-graph roots still extract hops and set `skip_redraw`. Globo,
 Record, Havan, and Folha stay groups.

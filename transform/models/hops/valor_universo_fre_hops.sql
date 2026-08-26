@@ -1,8 +1,8 @@
 -- Hop-correct Formulário extract for issue #141 ATIVO hop roots.
--- Latest ID_Documento only. Direct holders point at the listed seed
--- (incoming capital about 100). A related name points at the named
--- parent, not at the listed seed. Prefix-8 company keys. Eleven-digit
--- documents are persons (name key), never a padded /0001 Cadastro.
+-- Latest ID_Documento only. Direct holders (no parent named) point at the
+-- listed seed (incoming capital about 100). A holder listed under another
+-- name points at that parent, not at the listed seed. Prefix-8 company keys.
+-- Eleven-digit documents are persons (name key), never a padded /0001 Cadastro.
 -- Closed groups have no FRE book. Already-on-graph roots still extract
 -- hops but skip_redraw stays true. No public HTML. No /grafo.
 
@@ -86,11 +86,14 @@ listed_ranked as (
         latest.*,
         row_number() over (
             partition by latest.seed_cnpj_basico, latest.ID_Acionista
-            order by
-                case when latest.ID_Acionista_Relacionado is null then 0 else 1 end,
-                latest.ID_Acionista_Relacionado
+            order by latest.ID_Acionista
         ) as rn
     from latest as latest
+    where latest.ID_Acionista_Relacionado is null
+      and (
+            latest.Acionista_Relacionado is null
+            or {{ normalize_company_name('latest.Acionista_Relacionado') }} = ''
+          )
 ),
 
 listed_hops as (
@@ -131,12 +134,12 @@ nested_hops as (
     select
         latest.seed_name,
         latest.seed_cnpj_basico,
-        {{ hop_holder_id('latest.Acionista_Relacionado', 'latest.CPF_CNPJ_Acionista_Relacionado', 'latest.seed_cnpj_basico', 'latest.ID_Acionista_Relacionado') }} as from_id,
-        {{ hop_holder_id('latest.Acionista', 'latest.CPF_CNPJ_Acionista', 'latest.seed_cnpj_basico', 'latest.ID_Acionista') }} as to_id,
-        {{ hop_holder_kind('latest.Acionista_Relacionado', 'latest.CPF_CNPJ_Acionista_Relacionado') }} as from_kind,
-        latest.Acionista_Relacionado as from_name,
-        {{ hop_holder_kind('latest.Acionista', 'latest.CPF_CNPJ_Acionista') }} as to_kind,
-        latest.Acionista as to_name,
+        {{ hop_holder_id('latest.Acionista', 'latest.CPF_CNPJ_Acionista', 'latest.seed_cnpj_basico', 'latest.ID_Acionista') }} as from_id,
+        {{ hop_holder_id('latest.Acionista_Relacionado', 'latest.CPF_CNPJ_Acionista_Relacionado', 'latest.seed_cnpj_basico', 'latest.ID_Acionista_Relacionado') }} as to_id,
+        {{ hop_holder_kind('latest.Acionista', 'latest.CPF_CNPJ_Acionista') }} as from_kind,
+        latest.Acionista as from_name,
+        {{ hop_holder_kind('latest.Acionista_Relacionado', 'latest.CPF_CNPJ_Acionista_Relacionado') }} as to_kind,
+        latest.Acionista_Relacionado as to_name,
         'participacao' as edge_kind,
         cast(null as string) as edge_role,
         latest.Percentual_Total_Acoes_Circulacao as pct_capital,

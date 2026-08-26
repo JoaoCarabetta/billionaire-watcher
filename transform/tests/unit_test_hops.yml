@@ -139,9 +139,10 @@ unit_tests:
   - name: test_valor_universo_fre_hops_hop_correct_dexco_not_votorantim
     description: |
       Latest ID_Documento only. Direct Dexco holders sum to 100. The related
-      person points at the vehicle, not at Dexco, and is a name key rather
-      than an 11-digit Cadastro. An older document is ignored. Votorantim is
-      a different seed and receives no Dexco hop. Closed Natura FRE for a
+      person is their own Formulário row listed under the vehicle, so they
+      point at the vehicle, not at Dexco, and are a name key rather than an
+      11-digit Cadastro. An older document is ignored. Votorantim is a
+      different seed and receives no Dexco hop. Closed Natura FRE for a
       Cosméticos key is not in the root set so it does not land.
     model: valor_universo_fre_hops
     given:
@@ -190,9 +191,9 @@ unit_tests:
             cast(null as integer), cast(null as varchar), cast(null as varchar),
             cast(null as varchar), 400, 40.0, 0, 0.0, 400, 40.0
           union all select
-            '97837181000100', 200, cast('2025-12-31' as date), 1,
-            'Veiculo Ficticio Dexco', 'PJ', '20000000000100',
-            11, 'Pessoa Ficticia Dexco', 'PF', '12345678901',
+            '97837181000100', 200, cast('2025-12-31' as date), 11,
+            'Pessoa Ficticia Dexco', 'PF', '12345678901',
+            1, 'Veiculo Ficticio Dexco', 'PJ', '20000000000100',
             400, 40.0, 0, 0.0, 400, 40.0
           union all select
             '97837181000100', 200, cast('2025-12-31' as date), 2,
@@ -250,9 +251,9 @@ unit_tests:
           'Pessoa Ficticia Dexco', 'company', 'Veiculo Ficticio Dexco',
           'participacao', cast(null as varchar), 40.0, 40.0,
           cast(null as integer), cast(null as integer), cast(false as boolean),
-          200, 1, 11,
+          200, 11, 1,
           'CVM FRE 2026 item 6.1 ID_Documento 200',
-          'ID_Acionista 1 relacionado 11',
+          'ID_Acionista 11 relacionado 1',
           cast('2025-12-31' as date), cast(false as boolean),
           cast(false as boolean), cast(false as boolean)
         union all select
