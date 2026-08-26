@@ -1,9 +1,11 @@
 import type { APIRoute } from 'astro';
 import { getFreeze } from '../utils/fixtures';
+import { getPublishedGraphCounts } from '../utils/published-graph-counts';
 
 export const GET: APIRoute = () => {
   const freezePersons = getFreeze();
-  
+  const { nodeCount, edgeCount } = getPublishedGraphCounts();
+
   const text = `# Billionaire Watcher
 
 Arquivo cívico de poder econômico no Brasil. Dossiês HTML gerados de dados públicos.
@@ -15,7 +17,7 @@ Arquivo cívico de poder econômico no Brasil. Dossiês HTML gerados de dados p�
 - /doacoes/ — tabela de doações políticas (TSE)
 - /pessoa/{id}/ — dossiê individual com fatos documentados e citações
 - /grafo/ — visualização de grafo de controle corporativo (Cytoscape.js)
-- /grafo-publico.json — dados do grafo (89 nós, 44 arestas) em JSON estático
+- /grafo-publico.json — dados do grafo (${nodeCount} nós, ${edgeCount} arestas) em JSON estático
 
 Pessoas no índice atual: ${freezePersons.length}
 
