@@ -34,6 +34,12 @@ models:
       +enabled: true
       +meta:
         location: US
+    gestoras:
+      +schema: billionaire_watcher
+      +materialized: table
+      +enabled: true
+      +meta:
+        location: US
     freeze:
       +schema: billionaire_watcher
       +materialized: table
