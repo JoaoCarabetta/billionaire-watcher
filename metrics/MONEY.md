@@ -24,6 +24,8 @@ Data explícita:
 npm run money -- public/grafo-publico.json --date 2025-05-16
 ```
 
+O painel da pessoa em `/grafo` lê `public/grafo-dinheiro.json` (um registro por pessoa com total de último salto nas sementes listadas precificadas).
+
 ## Fonte de preço (issue #123, Brasil Bolsa Balcão 2025-05-16)
 
 Prices are **#123** (merged PR 125): `transform/seeds/b3_listed_prices.csv` only. Unadjusted PREULT from B3 COTAHIST_A2025.ZIP. Source label **Brasil Bolsa Balcão**. Date on every money row: **2025-05-16**. Default is not `listed_prices_fixture.csv`. Recorded fixture quotes are skipped and never printed.
