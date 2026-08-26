@@ -554,6 +554,1466 @@
       "id": "p-b9db9330",
       "kind": "person",
       "label": "STELLA PEREZ BOTELHO"
+    },
+    {
+      "id": "02916265000160",
+      "kind": "company",
+      "label": "JBS S.A."
+    },
+    {
+      "id": "33453598000123",
+      "kind": "company",
+      "label": "RAÍZEN S.A."
+    },
+    {
+      "id": "07043628000113",
+      "kind": "company",
+      "label": "CLARO TELECOM PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "33611500000119",
+      "kind": "company",
+      "label": "GERDAU S.A."
+    },
+    {
+      "id": "50746577000115",
+      "kind": "company",
+      "label": "COSAN S.A."
+    },
+    {
+      "id": "06047087000139",
+      "kind": "company",
+      "label": "REDE D'OR SÃO LUIZ S.A."
+    },
+    {
+      "id": "02558157000162",
+      "kind": "company",
+      "label": "TELEFÔNICA BRASIL S.A"
+    },
+    {
+      "id": "61585865000151",
+      "kind": "company",
+      "label": "RAIA DROGASIL S.A."
+    },
+    {
+      "id": "42150391000170",
+      "kind": "company",
+      "label": "BRASKEM S.A."
+    },
+    {
+      "id": "47960950000121",
+      "kind": "company",
+      "label": "MAGAZINE LUIZA S.A."
+    },
+    {
+      "id": "33042730000104",
+      "kind": "company",
+      "label": "CIA SIDERURGICA NACIONAL"
+    },
+    {
+      "id": "33256439000139",
+      "kind": "company",
+      "label": "ULTRAPAR PARTICIPACOES S.A."
+    },
+    {
+      "id": "67620377000114",
+      "kind": "company",
+      "label": "MINERVA S.A."
+    },
+    {
+      "id": "16404287000155",
+      "kind": "company",
+      "label": "SUZANO S.A."
+    },
+    {
+      "id": "02429144000193",
+      "kind": "company",
+      "label": "CPFL ENERGIA S.A."
+    },
+    {
+      "id": "00001180000126",
+      "kind": "company",
+      "label": "AXIA ENERGIA S.A."
+    },
+    {
+      "id": "16670085000155",
+      "kind": "company",
+      "label": "LOCALIZA RENT A CAR S.A."
+    },
+    {
+      "id": "33000167000101",
+      "kind": "company",
+      "label": "PETROLEO BRASILEIRO S.A. PETROBRAS"
+    },
+    {
+      "id": "24990777000109",
+      "kind": "company",
+      "label": "GRUPO MATEUS S.A."
+    },
+    {
+      "id": "05523773000176",
+      "kind": "company",
+      "label": "ADR's"
+    },
+    {
+      "id": "64862192000128",
+      "kind": "company",
+      "label": "AFFINITY INVESTMENTS HOLDINGS LTD"
+    },
+    {
+      "id": "34699877000134",
+      "kind": "company",
+      "label": "ASG Participações S.A."
+    },
+    {
+      "id": "34700238000141",
+      "kind": "company",
+      "label": "ASI Participações S.A."
+    },
+    {
+      "id": "61123219000172",
+      "kind": "company",
+      "label": "AVELINA PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "34699984000162",
+      "kind": "company",
+      "label": "Aguassanta Investimentos S.A."
+    },
+    {
+      "id": "35233631000135",
+      "kind": "company",
+      "label": "Aguassanta Negócios S.A."
+    },
+    {
+      "id": "07198897000159",
+      "kind": "company",
+      "label": "Aguassanta Participações S.A."
+    },
+    {
+      "id": "04679647000142",
+      "kind": "company",
+      "label": "Alden Fundo de Investimento em Ações"
+    },
+    {
+      "id": "07127500000138",
+      "kind": "company",
+      "label": "Amov IV, S.A. de C.V."
+    },
+    {
+      "id": "13055584000144",
+      "kind": "company",
+      "label": "América Móvil, S.A.B de C.V."
+    },
+    {
+      "id": "02290525000134",
+      "kind": "company",
+      "label": "AÇOTER PARTICIPAÇÕES LTDA."
+    },
+    {
+      "id": "tesouraria-00001180",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-02558157",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-03853896",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-06047087",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-16404287",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-16670085",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-24990777",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-33256439",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-33453598",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-33611500",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-47960950",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-50746577",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-61585865",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "tesouraria-67620377",
+      "kind": "company",
+      "label": "Ações em tesouraria"
+    },
+    {
+      "id": "33657248000189",
+      "kind": "company",
+      "label": "BANCO NACIONAL DE DESENVOLVIMENTO ECONÔMICO E SOCIAL - BNDES"
+    },
+    {
+      "id": "30822936000240",
+      "kind": "company",
+      "label": "BB ASSET"
+    },
+    {
+      "id": "x-bg-energy-holdings-ltd",
+      "kind": "company",
+      "label": "BG Energy Holdings Ltd."
+    },
+    {
+      "id": "x-bg-group-limited",
+      "kind": "company",
+      "label": "BG Group Limited"
+    },
+    {
+      "id": "52839420000160",
+      "kind": "company",
+      "label": "BONSUCEX HOLDING S.A."
+    },
+    {
+      "id": "53034321000173",
+      "kind": "company",
+      "label": "BORDEAUX V 2 FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CRÉDITO PRIVADO - RESP"
+    },
+    {
+      "id": "63864884000142",
+      "kind": "company",
+      "label": "BORDEAUX V 3 FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO RESPONSABILIDADE LIMITADA"
+    },
+    {
+      "id": "09631542000137",
+      "kind": "company",
+      "label": "BTG Pactual Gestora de Recursos Ltda."
+    },
+    {
+      "id": "30306294000145",
+      "kind": "company",
+      "label": "Banco BTG Pactual S.A."
+    },
+    {
+      "id": "x-banco-bilbao-viscaya-argentaria-s-a",
+      "kind": "company",
+      "label": "Banco Bilbao Viscaya Argentaria, S.A."
+    },
+    {
+      "id": "33479023000180",
+      "kind": "company",
+      "label": "Banco Citibank"
+    },
+    {
+      "id": "07237373000120",
+      "kind": "company",
+      "label": "Banco do Nordeste"
+    },
+    {
+      "id": "42040639000140",
+      "kind": "company",
+      "label": "CAIXA ASSET"
+    },
+    {
+      "id": "x-capital-research-global-investors",
+      "kind": "company",
+      "label": "CAPITAL RESEARCH GLOBAL lNVESTORS"
+    },
+    {
+      "id": "49384963000125",
+      "kind": "company",
+      "label": "CFL Ana Participações S.A."
+    },
+    {
+      "id": "21681273000119",
+      "kind": "company",
+      "label": "CHARDONNAY FUNDO DE INVESTIMENTO EM AÇÕES INVESTIMENTO NO EXTERIOR"
+    },
+    {
+      "id": "13883056000183",
+      "kind": "company",
+      "label": "CLASSE ÚNICA FUNDO DE INVESTIMENTO EM PARTICIPACOES BPAC3 -MULTIESTRATEGIA RESPONSABILIDADE LIMITADA"
+    },
+    {
+      "id": "33335236000138",
+      "kind": "company",
+      "label": "COLORADO INVESTMENT HOLDINGS LLC"
+    },
+    {
+      "id": "33363896000122",
+      "kind": "company",
+      "label": "Christy Participações Ltda."
+    },
+    {
+      "id": "x-colorado-company-ltd",
+      "kind": "company",
+      "label": "Colorado Company Ltd"
+    },
+    {
+      "id": "47646941000160",
+      "kind": "company",
+      "label": "Cosan Nove Participações S.A."
+    },
+    {
+      "id": "x-criteria-caixa-s-a-u",
+      "kind": "company",
+      "label": "Criteria Caixa, S.A.U"
+    },
+    {
+      "id": "12952687000144",
+      "kind": "company",
+      "label": "DELTA FM&B FUNDO DE INVESTIMENTO EM AÇÕES"
+    },
+    {
+      "id": "08767024000182",
+      "kind": "company",
+      "label": "EAGLE PLUS FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO DE AÇÕES INVESTIMENTO NO EXT"
+    },
+    {
+      "id": "45858366000134",
+      "kind": "company",
+      "label": "EQMG VDQ HOLDINGS LTDA"
+    },
+    {
+      "id": "15146011000151",
+      "kind": "company",
+      "label": "ESC Energia S.A."
+    },
+    {
+      "id": "11261547000167",
+      "kind": "company",
+      "label": "FMR LLC"
+    },
+    {
+      "id": "33571943000123",
+      "kind": "company",
+      "label": "FREPAR PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "10326747000198",
+      "kind": "company",
+      "label": "FUNDO DE INVEST DE ACOES ARAUCARIA SEGUNDO"
+    },
+    {
+      "id": "x-fundacion-bancaria-caixa-d-estalvis-i-pensions-de-barcelona-la-caixa",
+      "kind": "company",
+      "label": "Fundación Bancaria Caixa d'Estalvis i Pensions de Barcelona, \"la Caixa\""
+    },
+    {
+      "id": "10384372000112",
+      "kind": "company",
+      "label": "Fundo de Investimento Caixa FGHab Multimercado"
+    },
+    {
+      "id": "26845679000103",
+      "kind": "company",
+      "label": "Fundo de Investimento em Participações Multiestrategia Formosa"
+    },
+    {
+      "id": "33639148000120",
+      "kind": "company",
+      "label": "GEPAR PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "x-gqg-partners-llc",
+      "kind": "company",
+      "label": "GQG Partners LLC"
+    },
+    {
+      "id": "07078144000100",
+      "kind": "company",
+      "label": "GUEPARDO INVESTIMENTOS LTDA"
+    },
+    {
+      "id": "05318060000170",
+      "kind": "company",
+      "label": "Gl Investimentos e Participacoes Ltda"
+    },
+    {
+      "id": "87153730000100",
+      "kind": "company",
+      "label": "Grupo Gerdau Empreendimentos Ltda"
+    },
+    {
+      "id": "00164270000138",
+      "kind": "company",
+      "label": "Heitor de Moraes - Empreendimentos e Participações Ltda."
+    },
+    {
+      "id": "92690817000157",
+      "kind": "company",
+      "label": "INDAC - INVESTIMENTOS E PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "30673279000135",
+      "kind": "company",
+      "label": "IZVQ Holdings Ltda"
+    },
+    {
+      "id": "34622819000102",
+      "kind": "company",
+      "label": "IgelPar Participações S.A."
+    },
+    {
+      "id": "11823391000160",
+      "kind": "company",
+      "label": "International Grid Holdings Limited"
+    },
+    {
+      "id": "60701190000104",
+      "kind": "company",
+      "label": "Itaú Unibanco S.A."
+    },
+    {
+      "id": "53137639000180",
+      "kind": "company",
+      "label": "J&F INVESTMENTS LUXEMBOURG S.À R.L"
+    },
+    {
+      "id": "00350763000162",
+      "kind": "company",
+      "label": "J&F S.A."
+    },
+    {
+      "id": "49115815000105",
+      "kind": "company",
+      "label": "JBS N.V."
+    },
+    {
+      "id": "46855586000177",
+      "kind": "company",
+      "label": "JBS PARTICIPAÇÕES SOCIETÁRIAS S.A."
+    },
+    {
+      "id": "07704144000178",
+      "kind": "company",
+      "label": "JJMB Participações Ltda."
+    },
+    {
+      "id": "10947525000192",
+      "kind": "company",
+      "label": "JMF Fundo de Investimento em Cotas de Fundos de Investimento em Participações"
+    },
+    {
+      "id": "33571764000196",
+      "kind": "company",
+      "label": "JOPAR PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "33172537000198",
+      "kind": "company",
+      "label": "JPMORGAN CHASE & CO"
+    },
+    {
+      "id": "33571773000187",
+      "kind": "company",
+      "label": "KLAPAR PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "67227574000178",
+      "kind": "company",
+      "label": "LFPA FUNDO DE INVESTIMENTO EM ACOES"
+    },
+    {
+      "id": "66117474000126",
+      "kind": "company",
+      "label": "LTD Administração e Participações S.A."
+    },
+    {
+      "id": "00835086000172",
+      "kind": "company",
+      "label": "Luiza Participações S.A."
+    },
+    {
+      "id": "92690783000109",
+      "kind": "company",
+      "label": "Metalúrgica Gerdau S.A."
+    },
+    {
+      "id": "x-morgan-stanley",
+      "kind": "company",
+      "label": "Morgan Stanley"
+    },
+    {
+      "id": "05839607000183",
+      "kind": "company",
+      "label": "NORGES BANK"
+    },
+    {
+      "id": "22606673000122",
+      "kind": "company",
+      "label": "NSP Investimentos S.A. - Em Recuperação Judicial"
+    },
+    {
+      "id": "28446667000131",
+      "kind": "company",
+      "label": "Onofre P. Trajano Participações Ltda."
+    },
+    {
+      "id": "outros-00001180",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-02429144",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-02558157",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-03853896",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-06047087",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-16404287",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-16670085",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-24990777",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-33000167",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-33042730",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-33256439",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-33453598",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-33611500",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-42150391",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-47960950",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-50746577",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-61585865",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "outros-67620377",
+      "kind": "company",
+      "label": "Outros acionistas"
+    },
+    {
+      "id": "x-pacific-mezz-pte-limited",
+      "kind": "company",
+      "label": "PACIFIC MEZZ PTE LIMITED"
+    },
+    {
+      "id": "62812660000124",
+      "kind": "company",
+      "label": "PERFIN RALLY FUNDO DE INVESTIMENTO EM PARTICIPAÇÕES MULTIESTRATÉGIA RESPONSABILIDADE LIMITADA"
+    },
+    {
+      "id": "60919973000150",
+      "kind": "company",
+      "label": "PIEMONTE 2 FUNDO DE INVESTIMENTO FINANCEIRO EM AÇÕES"
+    },
+    {
+      "id": "20992266000175",
+      "kind": "company",
+      "label": "Parth Do Brasil Participações Ltda"
+    },
+    {
+      "id": "34081202000127",
+      "kind": "company",
+      "label": "Petros"
+    },
+    {
+      "id": "11369979000196",
+      "kind": "company",
+      "label": "Pinheiros Fundo de Investimento em Participações Multiestrategia"
+    },
+    {
+      "id": "x-public-investment-fund",
+      "kind": "company",
+      "label": "Public Investment Fund"
+    },
+    {
+      "id": "29447049000179",
+      "kind": "company",
+      "label": "PÁTRIA PRIVATE EQUITY VI FIP MULTIESTRATÉGIA"
+    },
+    {
+      "id": "15157585000125",
+      "kind": "company",
+      "label": "QUELUZ HOLDINGS LIMITED"
+    },
+    {
+      "id": "50341611000171",
+      "kind": "company",
+      "label": "RADIX HOLDING LTDA"
+    },
+    {
+      "id": "x-rbc-global-asset-management-inc",
+      "kind": "company",
+      "label": "RBC GLOBAL ASSET MANAGEMENT INC. (GESTOR/ADMINISTRADOR - VIDE ITEM 6.6 A SEGUIR)"
+    },
+    {
+      "id": "10971936000113",
+      "kind": "company",
+      "label": "RICCI PARTICIPACOES SOCIAIS LTDA"
+    },
+    {
+      "id": "23340044000166",
+      "kind": "company",
+      "label": "RIO DAS PEDRAS AÇÕES FIA"
+    },
+    {
+      "id": "06990482000150",
+      "kind": "company",
+      "label": "RIO IACO PARTICIPAÇÕES S.A."
+    },
+    {
+      "id": "x-radiomovil-dipsa-s-a",
+      "kind": "company",
+      "label": "Radiomóvil Dipsa, S.A."
+    },
+    {
+      "id": "x-radiomovil-dipsa-s-a-de-c-v",
+      "kind": "company",
+      "label": "Radiomóvil Dipsa, S.A. de C.V."
+    },
+    {
+      "id": "60078060000159",
+      "kind": "company",
+      "label": "Rio Purus Participações S.A."
+    },
+    {
+      "id": "46879386000154",
+      "kind": "company",
+      "label": "SALIC INTERNATIONAL INVESTMENT COMPANY"
+    },
+    {
+      "id": "63986512000199",
+      "kind": "company",
+      "label": "SHINE EQUITY LP"
+    },
+    {
+      "id": "63428842000169",
+      "kind": "company",
+      "label": "SHINE FUNDO DE INVESTIMENTO EM PARTICIPAÇÕES RESPONSABILIDADE LIMITADA"
+    },
+    {
+      "id": "12330774000160",
+      "kind": "company",
+      "label": "SPX Gestão de Recursos Ltda."
+    },
+    {
+      "id": "x-state-grid-corporation-of-china",
+      "kind": "company",
+      "label": "STATE GRID CORPORATION OF CHINA"
+    },
+    {
+      "id": "18022960000118",
+      "kind": "company",
+      "label": "STATE GRID INTERNATIONAL DEVELOPMENT LIMITED CO, LTD"
+    },
+    {
+      "id": "x-state-grid-overseas-investment-europe-limited",
+      "kind": "company",
+      "label": "STATE GRID OVERSEAS INVESTMENT (EUROPE) LIMITED"
+    },
+    {
+      "id": "x-state-grid-overseas-investment-ltd",
+      "kind": "company",
+      "label": "STATE GRID OVERSEAS INVESTMENT, LTD"
+    },
+    {
+      "id": "48977530000110",
+      "kind": "company",
+      "label": "SULEMISA LUX S.A.R.L"
+    },
+    {
+      "id": "48977529000196",
+      "kind": "company",
+      "label": "SULTASO LUX S.A.R.L"
+    },
+    {
+      "id": "05718941000189",
+      "kind": "company",
+      "label": "Sercotel S.A. de C.V."
+    },
+    {
+      "id": "05717887000157",
+      "kind": "company",
+      "label": "Shell Brazil Holding BV"
+    },
+    {
+      "id": "x-shell-group-holding-ltd",
+      "kind": "company",
+      "label": "Shell Group Holding Ltd."
+    },
+    {
+      "id": "x-shell-plc",
+      "kind": "company",
+      "label": "Shell PLC"
+    },
+    {
+      "id": "05710547000102",
+      "kind": "company",
+      "label": "Shell Petroleum NV"
+    },
+    {
+      "id": "x-sociedad-estatal-de-participaciones-industriales",
+      "kind": "company",
+      "label": "Sociedad Estatal de Participaciones Industriales"
+    },
+    {
+      "id": "26002119000197",
+      "kind": "company",
+      "label": "State Grid Brazil Power Participações S.A."
+    },
+    {
+      "id": "12906328000150",
+      "kind": "company",
+      "label": "State Grid International Development Limited"
+    },
+    {
+      "id": "03759567000134",
+      "kind": "company",
+      "label": "Sulasapar Participações S.A."
+    },
+    {
+      "id": "60651809000105",
+      "kind": "company",
+      "label": "Suzano Holding S.A."
+    },
+    {
+      "id": "x-t-rowe-price-associates-inc",
+      "kind": "company",
+      "label": "T. Rowe Price Associates, Inc."
+    },
+    {
+      "id": "x-telefonica-latinoamerica-holding-s-l",
+      "kind": "company",
+      "label": "Telefónica Latinoamérica Holding, S.L."
+    },
+    {
+      "id": "05721582000119",
+      "kind": "company",
+      "label": "Telefónica S.A."
+    },
+    {
+      "id": "x-the-shell-petroleum-company-limited",
+      "kind": "company",
+      "label": "The Shell Petroleum Company Limited"
+    },
+    {
+      "id": "x-the-shell-transport-and-tading-company-limited",
+      "kind": "company",
+      "label": "The Shell Transport and Tading Company Limited"
+    },
+    {
+      "id": "54041439000191",
+      "kind": "company",
+      "label": "Ultra S.A. Participações"
+    },
+    {
+      "id": "00394460000141",
+      "kind": "company",
+      "label": "União Federal"
+    },
+    {
+      "id": "00394460040950",
+      "kind": "company",
+      "label": "União Federal"
+    },
+    {
+      "id": "08803085000158",
+      "kind": "company",
+      "label": "VDQ HOLDING S.A."
+    },
+    {
+      "id": "62330590000178",
+      "kind": "company",
+      "label": "VERTIZ HOLDINGS S.A."
+    },
+    {
+      "id": "04213131000108",
+      "kind": "company",
+      "label": "VICUNHA AÇOS S.A."
+    },
+    {
+      "id": "04169992000136",
+      "kind": "company",
+      "label": "VICUNHA STEEL S.A."
+    },
+    {
+      "id": "46246448000190",
+      "kind": "company",
+      "label": "VIDEIRAS FUNDO DE INVESTIMENTO EM AÇÕES"
+    },
+    {
+      "id": "x-venus-quartz-llc",
+      "kind": "company",
+      "label": "Venus Quartz LLC"
+    },
+    {
+      "id": "30054526000115",
+      "kind": "company",
+      "label": "WELLS HOLDING LIMITED"
+    },
+    {
+      "id": "32107155000118",
+      "kind": "company",
+      "label": "WELLS HOLDING LIMITED"
+    },
+    {
+      "id": "07704137000176",
+      "kind": "company",
+      "label": "WWMB Participações Ltda."
+    },
+    {
+      "id": "01878512000118",
+      "kind": "company",
+      "label": "Wagner Garcia Participações S.A."
+    },
+    {
+      "id": "08706916000173",
+      "kind": "company",
+      "label": "ZMF Participações"
+    },
+    {
+      "id": "p-f42e6571",
+      "kind": "person",
+      "label": "ADRIANA GALLETTI DE QUEIROZ MELCHER"
+    },
+    {
+      "id": "p-543bce99",
+      "kind": "person",
+      "label": "ALBERTO WRIGHT PIPPONZI"
+    },
+    {
+      "id": "p-45485941",
+      "kind": "person",
+      "label": "ALEXANDRE DE ZAGOTTIS"
+    },
+    {
+      "id": "p-031cab91",
+      "kind": "person",
+      "label": "ALEXANDRE VICENTINI DE QUEIROZ"
+    },
+    {
+      "id": "p-9ee93418",
+      "kind": "person",
+      "label": "ALICE JUNQUEIRA MOLL"
+    },
+    {
+      "id": "p-166c2e76",
+      "kind": "person",
+      "label": "ANA MARIA LEVY VILLELA IGEL"
+    },
+    {
+      "id": "p-2cdc324b",
+      "kind": "person",
+      "label": "ANDRE ALMEIDA PIPPONZI"
+    },
+    {
+      "id": "p-1305d0ba",
+      "kind": "person",
+      "label": "ANDRÉ BIER GERDAU JOHANNPETER"
+    },
+    {
+      "id": "p-7fdafcf3",
+      "kind": "person",
+      "label": "ANDRÉ FRANCISCO JUNQUEIRA MOLL"
+    },
+    {
+      "id": "p-620c94a1",
+      "kind": "person",
+      "label": "ANTONELLA MARTINS DE QUEIROZ"
+    },
+    {
+      "id": "p-2491a4ba",
+      "kind": "person",
+      "label": "ANTONIO CARLOS PIPPONZI"
+    },
+    {
+      "id": "p-1b38d073",
+      "kind": "person",
+      "label": "ANTÔNIO CLÁUDIO BRANDÃO RESENDE"
+    },
+    {
+      "id": "p-2ab994b8",
+      "kind": "person",
+      "label": "ARTHUR CHAGAS GERDAU JOHANNPETER"
+    },
+    {
+      "id": "p-d49364c9",
+      "kind": "person",
+      "label": "BEATRIZ BIER JOHANNPETER"
+    },
+    {
+      "id": "p-bd91e3be",
+      "kind": "person",
+      "label": "BEATRIZ DE QUEIROZ LEMANN"
+    },
+    {
+      "id": "p-d5b7fd2a",
+      "kind": "person",
+      "label": "BENJAMIN STEINBRUCH"
+    },
+    {
+      "id": "p-611d831b",
+      "kind": "person",
+      "label": "BETINA CHAGAS GERDAU JOHANNPETER (ATRAVÉS DOS VEÍCULOS BET5PAR LLC E F5BETPAR TRUST)"
+    },
+    {
+      "id": "p-36ac01c2",
+      "kind": "person",
+      "label": "BETTINA IGEL HOFFENBERG"
+    },
+    {
+      "id": "p-c63f4853",
+      "kind": "person",
+      "label": "BETTY V. FEFFER"
+    },
+    {
+      "id": "p-7edeec49",
+      "kind": "person",
+      "label": "BIANCA TERPINS GARCIA"
+    },
+    {
+      "id": "p-b01f59e4",
+      "kind": "person",
+      "label": "BRUNO WRIGHT PIPPONZI"
+    },
+    {
+      "id": "p-babf54a7",
+      "kind": "person",
+      "label": "CARLOS PIRES OLIVEIRA DIAS"
+    },
+    {
+      "id": "p-147c3c83",
+      "kind": "person",
+      "label": "CLAUDIO JOHANNPETER"
+    },
+    {
+      "id": "p-f5f008f9",
+      "kind": "person",
+      "label": "CRISTIANA ALMEIDA PIPPONZI"
+    },
+    {
+      "id": "p-1ffa9e7e",
+      "kind": "person",
+      "label": "CRISTIANA COUTINHO BELTRÃO"
+    },
+    {
+      "id": "p-050ee925",
+      "kind": "person",
+      "label": "CRISTIANO CAMPOZANA DE QUEIROZ"
+    },
+    {
+      "id": "p-4850ff53",
+      "kind": "person",
+      "label": "CRISTIANO JOHANNPETER"
+    },
+    {
+      "id": "p-16b64a1a",
+      "kind": "person",
+      "label": "CRISTINA GERDAU JOHANNPETER (ATRAVÉS DOS VEÍCULOS CRIS5PAR LLC E K5CRISPAR TRUST)"
+    },
+    {
+      "id": "p-27a7f3ee",
+      "kind": "person",
+      "label": "DANIEL FEFFER"
+    },
+    {
+      "id": "p-d5231da6",
+      "kind": "person",
+      "label": "DANIELA CARVALHO RESENDE ARGES"
+    },
+    {
+      "id": "p-859f7d99",
+      "kind": "person",
+      "label": "DAVID FEFFER"
+    },
+    {
+      "id": "p-85c0959b",
+      "kind": "person",
+      "label": "DENÍLSON PINHEIRO RODRIGUES"
+    },
+    {
+      "id": "p-8dd8d5d2",
+      "kind": "person",
+      "label": "DEVANILDA GINELZA EWIG"
+    },
+    {
+      "id": "p-fffd4a1c",
+      "kind": "person",
+      "label": "DIEGO GUPER GERSGORIN"
+    },
+    {
+      "id": "p-f25ff412",
+      "kind": "person",
+      "label": "DIRLEY PINGNATTI RICCI"
+    },
+    {
+      "id": "p-1dfdd2d0",
+      "kind": "person",
+      "label": "EDIVAR VILELA DE QUEIROZ FILHO"
+    },
+    {
+      "id": "p-ab5dac7a",
+      "kind": "person",
+      "label": "EDUARDO SCANNAVINO DE QUEIROZ"
+    },
+    {
+      "id": "p-29ad3177",
+      "kind": "person",
+      "label": "ELISABETH STEINBRUCH SCHWARZ"
+    },
+    {
+      "id": "p-ca22e731",
+      "kind": "person",
+      "label": "ENEIDA CAMPOZANA DE QUEIROZ"
+    },
+    {
+      "id": "p-7a7bf0bd",
+      "kind": "person",
+      "label": "ESPÓLIO DE DOROTHÉA STEINBRUCH"
+    },
+    {
+      "id": "p-10813f9e",
+      "kind": "person",
+      "label": "ESPÓLIO DE GRAZIELA LAFER GALVÃO"
+    },
+    {
+      "id": "p-6686dd35",
+      "kind": "person",
+      "label": "EUGENIO DE ZAGOTTIS"
+    },
+    {
+      "id": "p-20fd468b",
+      "kind": "person",
+      "label": "EUGÊNIO PACELLI MATTAR"
+    },
+    {
+      "id": "p-71c9adb5",
+      "kind": "person",
+      "label": "FABIO IGEL"
+    },
+    {
+      "id": "p-35b92c94",
+      "kind": "person",
+      "label": "FABRÍCIO BITTAR GARCIA"
+    },
+    {
+      "id": "p-cd7a4b97",
+      "kind": "person",
+      "label": "FELIPE JOHANNPETER (ATRAVÉS DOS VEÍCULOS FEL5PAR LLC E K5FELPAR TRUST)"
+    },
+    {
+      "id": "p-8e8923a7",
+      "kind": "person",
+      "label": "FERNANDA JOHANNPETER (ATRAVÉS DOS VEÍCULOS FER5PAR LLC E G5FERPAR TRUST)"
+    },
+    {
+      "id": "p-ca645ca0",
+      "kind": "person",
+      "label": "FERNANDO GALLETTI DE QUEIROZ"
+    },
+    {
+      "id": "p-0fab5b2d",
+      "kind": "person",
+      "label": "FERNANDO HENRIQUE BORGES TRAJANO"
+    },
+    {
+      "id": "p-3cebed6c",
+      "kind": "person",
+      "label": "FERNANDO LUIZ ALTÉRIO"
+    },
+    {
+      "id": "p-27f97b5a",
+      "kind": "person",
+      "label": "FLÁVIA BITTAR GARCIA FALEIROS"
+    },
+    {
+      "id": "p-2c7d71b2",
+      "kind": "person",
+      "label": "FLÁVIO BRANDÃO RESENDE"
+    },
+    {
+      "id": "p-561b3bc9",
+      "kind": "person",
+      "label": "FRANCO BITTAR GARCIA"
+    },
+    {
+      "id": "p-4f3f270f",
+      "kind": "person",
+      "label": "FREDERICO ALCÂNTARA DE QUEIROZ"
+    },
+    {
+      "id": "p-1d00cce0",
+      "kind": "person",
+      "label": "GABRIEL PROVENZALE GUPER"
+    },
+    {
+      "id": "p-f511f986",
+      "kind": "person",
+      "label": "GERMANA JOHANNPETER STEIMAN"
+    },
+    {
+      "id": "p-e2ecb2dd",
+      "kind": "person",
+      "label": "GISELE TRAJANO"
+    },
+    {
+      "id": "p-7e21753e",
+      "kind": "person",
+      "label": "GUILHERME CHAGAS GERDAU JOHANNPETER"
+    },
+    {
+      "id": "p-66e24efd",
+      "kind": "person",
+      "label": "HÉLIO MARCOS COUTINHO BELTRÃO"
+    },
+    {
+      "id": "p-39dcf5fb",
+      "kind": "person",
+      "label": "IAN BARUCH HORNETT GUPER"
+    },
+    {
+      "id": "p-f53dc520",
+      "kind": "person",
+      "label": "IBAR VILELA DE QUEIROZ"
+    },
+    {
+      "id": "p-11e495ad",
+      "kind": "person",
+      "label": "ILSON MATEUS RODRIGUES"
+    },
+    {
+      "id": "p-ee7b22d1",
+      "kind": "person",
+      "label": "ILSON MATEUS RODRIGUES JUNIOR"
+    },
+    {
+      "id": "p-0f5c431e",
+      "kind": "person",
+      "label": "ISABEL CRISTINA DE ALCÂNTARA QUEIROZ"
+    },
+    {
+      "id": "p-74b6bde7",
+      "kind": "person",
+      "label": "ISMAEL BORGES TRAJANO"
+    },
+    {
+      "id": "p-2504f2c4",
+      "kind": "person",
+      "label": "IZABELA FEFFER"
+    },
+    {
+      "id": "p-a941080d",
+      "kind": "person",
+      "label": "JANET GUPER"
+    },
+    {
+      "id": "p-06305882",
+      "kind": "person",
+      "label": "JENNINGS LUIS IGEL HOFFENBERG"
+    },
+    {
+      "id": "p-40f90cbf",
+      "kind": "person",
+      "label": "JOESLEY MENDONÇA BATISTA"
+    },
+    {
+      "id": "p-a7b24f91",
+      "kind": "person",
+      "label": "JORGE FEFFER"
+    },
+    {
+      "id": "p-dfef8e07",
+      "kind": "person",
+      "label": "JORGE NEVAL MOLL FILHO"
+    },
+    {
+      "id": "p-8fb82e01",
+      "kind": "person",
+      "label": "JORGE NEVAL MOLL NETO"
+    },
+    {
+      "id": "p-d584d2cc",
+      "kind": "person",
+      "label": "JOSÉ SALIM MATTAR JÚNIOR"
+    },
+    {
+      "id": "p-3e6b7d53",
+      "kind": "person",
+      "label": "JOYCE IGEL DE CASTRO ANDRADE"
+    },
+    {
+      "id": "p-dbce5574",
+      "kind": "person",
+      "label": "JOÃO AUGUSTO FERREIRA RESENDE"
+    },
+    {
+      "id": "p-0054a089",
+      "kind": "person",
+      "label": "JULIA GUPER SANDER"
+    },
+    {
+      "id": "p-1459b3e2",
+      "kind": "person",
+      "label": "JULIANA JOHANNPETER FRIEDRICH"
+    },
+    {
+      "id": "p-5aebb94f",
+      "kind": "person",
+      "label": "KARINA HARBICH JOHANNPETER"
+    },
+    {
+      "id": "p-7b86ae04",
+      "kind": "person",
+      "label": "LARISSA SCANNAVINO DE QUEIROZ"
+    },
+    {
+      "id": "p-1b0a077e",
+      "kind": "person",
+      "label": "LILIANE SCANNAVINO DE QUEIROZ"
+    },
+    {
+      "id": "p-cf538a76",
+      "kind": "person",
+      "label": "LISABETH S. SANDER"
+    },
+    {
+      "id": "p-e31b35c3",
+      "kind": "person",
+      "label": "LUIS FERNANDO MEMORIA PORTO"
+    },
+    {
+      "id": "p-617ea2b3",
+      "kind": "person",
+      "label": "LUIZA HELENA TRAJANO INÁCIO RODRIGUES"
+    },
+    {
+      "id": "p-1ecc43b8",
+      "kind": "person",
+      "label": "MARCELLO DE ZAGOTTIS"
+    },
+    {
+      "id": "p-25fe52ce",
+      "kind": "person",
+      "label": "MARCELO ALCANTARA DE QUEIROZ"
+    },
+    {
+      "id": "p-1d9e434d",
+      "kind": "person",
+      "label": "MARCOS MARINHO LUTZ"
+    },
+    {
+      "id": "p-cb00e854",
+      "kind": "person",
+      "label": "MARIA COUTINHO BELTRÃO"
+    },
+    {
+      "id": "p-4906483b",
+      "kind": "person",
+      "label": "MARIA DA CONCEIÇÃO COUTINHO BELTRÃO"
+    },
+    {
+      "id": "p-6094b0a0",
+      "kind": "person",
+      "label": "MARIA EUGENIA LAFER GALVÃO"
+    },
+    {
+      "id": "p-62540a56",
+      "kind": "person",
+      "label": "MARILISA QUEIROZ GIANGRANDE"
+    },
+    {
+      "id": "p-b33b7ca8",
+      "kind": "person",
+      "label": "MARTA ALMEIDA PIPPONZI"
+    },
+    {
+      "id": "p-2bb82ca0",
+      "kind": "person",
+      "label": "MARTA BIER JOHANNPETER"
+    },
+    {
+      "id": "p-2ad67f5f",
+      "kind": "person",
+      "label": "MIKHAEL FEFFER"
+    },
+    {
+      "id": "p-ab969513",
+      "kind": "person",
+      "label": "MÁRCIA IGEL JOPPERT"
+    },
+    {
+      "id": "p-65d1af58",
+      "kind": "person",
+      "label": "NINA GUPER SANDER"
+    },
+    {
+      "id": "p-3626b31f",
+      "kind": "person",
+      "label": "PAULO JUNQUEIRA MOLL"
+    },
+    {
+      "id": "p-a8a4e8c0",
+      "kind": "person",
+      "label": "PAULO S. COUTINHO GALVÃO FILHO"
+    },
+    {
+      "id": "p-a55190d2",
+      "kind": "person",
+      "label": "PEDRO IGEL DE BARROS SALLES"
+    },
+    {
+      "id": "p-9e358fc7",
+      "kind": "person",
+      "label": "PEDRO JUNQUEIRA MOLL"
+    },
+    {
+      "id": "p-d02e2ddd",
+      "kind": "person",
+      "label": "PEDRO NOAH HORNETT GUPER"
+    },
+    {
+      "id": "p-dfe70769",
+      "kind": "person",
+      "label": "RAFAEL PROVENZALE GUPER"
+    },
+    {
+      "id": "p-710dd63a",
+      "kind": "person",
+      "label": "RAFAEL VICENTINI DE QUEIROZ"
+    },
+    {
+      "id": "p-147f9b49",
+      "kind": "person",
+      "label": "REGINA CELIA SCANNAVINO DE QUEIROZ"
+    },
+    {
+      "id": "p-1b487d80",
+      "kind": "person",
+      "label": "RENATA JUNQUEIRA MOLL BERNARDES"
+    },
+    {
+      "id": "p-582ebdb4",
+      "kind": "person",
+      "label": "RICARDO STEINBRUCH"
+    },
+    {
+      "id": "p-c42eece6",
+      "kind": "person",
+      "label": "RICHARD CHAGAS GERDAU JOHANNPETER"
+    },
+    {
+      "id": "p-43b383b5",
+      "kind": "person",
+      "label": "RODRIGO WRIGHT PIPPONZI"
+    },
+    {
+      "id": "p-c053ac2c",
+      "kind": "person",
+      "label": "ROSALIA PIPPONZI RAIA DE ALMEIDA PRADO"
+    },
+    {
+      "id": "p-bb882ad3",
+      "kind": "person",
+      "label": "RUBEN FEFFER"
+    },
+    {
+      "id": "p-793faab4",
+      "kind": "person",
+      "label": "RUBENS OMETTO SILVEIRA MELLO"
+    },
+    {
+      "id": "p-33ab3cce",
+      "kind": "person",
+      "label": "SERGIO AUGUSTO GUERRA DE RESENDE"
+    },
+    {
+      "id": "p-bceb16ac",
+      "kind": "person",
+      "label": "VICTOR ADLER"
+    },
+    {
+      "id": "p-b57fc592",
+      "kind": "person",
+      "label": "WESLEY MENDONÇA BATISTA"
     }
   ],
   "edges": [
@@ -1193,33 +2653,33 @@
       "from": "08542030000131",
       "to": "03853896000140",
       "kind": "company_owns",
-      "source": "FRE BRF 159359",
-      "pct_capital": 56.362,
-      "pct_votos": 56.362
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 35.899,
+      "pct_votos": 35.899
     },
     {
       "from": "44409243000153",
       "to": "03853896000140",
       "kind": "company_owns",
-      "source": "FRE BRF 159359",
-      "pct_capital": 2.862,
-      "pct_votos": 2.862
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 1.823,
+      "pct_votos": 1.823
     },
     {
       "from": "p-b7719454",
       "to": "03853896000140",
       "kind": "person_owns",
-      "source": "FRE BRF 159359",
-      "pct_capital": 5.784,
-      "pct_votos": 5.784
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 3.684,
+      "pct_votos": 3.684
     },
     {
       "from": "p-f3c190ea",
       "to": "03853896000140",
       "kind": "person_owns",
-      "source": "FRE BRF 159359",
-      "pct_capital": 7.737,
-      "pct_votos": 7.737
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 4.928,
+      "pct_votos": 4.928
     },
     {
       "from": "x-iberdrola-s-a-u",
@@ -1578,6 +3038,2902 @@
       "to": "58534632000115",
       "kind": "company_owns",
       "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "46855586000177",
+      "to": "02916265000160",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "05717887000157",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 44.024,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "10979208000158",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 0.666,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "47646941000160",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 39.024,
+      "pct_votos": 44.921
+    },
+    {
+      "from": "50746577000115",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 5.0,
+      "pct_votos": 5.079
+    },
+    {
+      "from": "outros-33453598",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 11.195,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "tesouraria-33453598",
+      "to": "33453598000123",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 0.091,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "05718941000189",
+      "to": "07043628000113",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10979208000158",
+      "to": "33611500000119",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 6.428,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "92690783000109",
+      "to": "33611500000119",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 35.538,
+      "pct_votos": 98.044
+    },
+    {
+      "from": "outros-33611500",
+      "to": "33611500000119",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 53.923,
+      "pct_votos": 1.956
+    },
+    {
+      "from": "tesouraria-33611500",
+      "to": "33611500000119",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 0.803,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "x-t-rowe-price-associates-inc",
+      "to": "33611500000119",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 3.307,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "07198897000159",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 14.186,
+      "pct_votos": 14.186
+    },
+    {
+      "from": "13883056000183",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 8.358,
+      "pct_votos": 8.358
+    },
+    {
+      "from": "15157585000125",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 2.761,
+      "pct_votos": 2.761
+    },
+    {
+      "from": "35233631000135",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "62330590000178",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 24.194,
+      "pct_votos": 24.194
+    },
+    {
+      "from": "outros-50746577",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 49.941,
+      "pct_votos": 49.941
+    },
+    {
+      "from": "tesouraria-50746577",
+      "to": "50746577000115",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 0.56,
+      "pct_votos": 0.56
+    },
+    {
+      "from": "03759567000134",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.358,
+      "pct_votos": 0.358
+    },
+    {
+      "from": "12952687000144",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 16.35,
+      "pct_votos": 16.35
+    },
+    {
+      "from": "46246448000190",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.209,
+      "pct_votos": 0.209
+    },
+    {
+      "from": "48977529000196",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.427,
+      "pct_votos": 0.427
+    },
+    {
+      "from": "48977530000110",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.472,
+      "pct_votos": 0.472
+    },
+    {
+      "from": "60919973000150",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.031,
+      "pct_votos": 0.031
+    },
+    {
+      "from": "63864884000142",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 0.045,
+      "pct_votos": 0.045
+    },
+    {
+      "from": "outros-06047087",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 32.825,
+      "pct_votos": 32.825
+    },
+    {
+      "from": "p-1b487d80",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.793,
+      "pct_votos": 2.793
+    },
+    {
+      "from": "p-3626b31f",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.819,
+      "pct_votos": 2.819
+    },
+    {
+      "from": "p-7fdafcf3",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.793,
+      "pct_votos": 2.793
+    },
+    {
+      "from": "p-8fb82e01",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.793,
+      "pct_votos": 2.793
+    },
+    {
+      "from": "p-9e358fc7",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.793,
+      "pct_votos": 2.793
+    },
+    {
+      "from": "p-9ee93418",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.793,
+      "pct_votos": 2.793
+    },
+    {
+      "from": "p-dfef8e07",
+      "to": "06047087000139",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 16.758,
+      "pct_votos": 16.758
+    },
+    {
+      "from": "tesouraria-06047087",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 2.713,
+      "pct_votos": 2.713
+    },
+    {
+      "from": "x-pacific-mezz-pte-limited",
+      "to": "06047087000139",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 13.028,
+      "pct_votos": 13.028
+    },
+    {
+      "from": "05721582000119",
+      "to": "02558157000162",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 39.324,
+      "pct_votos": 39.324
+    },
+    {
+      "from": "outros-02558157",
+      "to": "02558157000162",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 21.916,
+      "pct_votos": 21.916
+    },
+    {
+      "from": "tesouraria-02558157",
+      "to": "02558157000162",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 0.959,
+      "pct_votos": 0.959
+    },
+    {
+      "from": "x-telefonica-latinoamerica-holding-s-l",
+      "to": "02558157000162",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 37.801,
+      "pct_votos": 37.801
+    },
+    {
+      "from": "05318060000170",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 5.65,
+      "pct_votos": 5.65
+    },
+    {
+      "from": "10326747000198",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.091,
+      "pct_votos": 0.091
+    },
+    {
+      "from": "10979208000158",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 5.063,
+      "pct_votos": 5.063
+    },
+    {
+      "from": "32107155000118",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 10.775,
+      "pct_votos": 10.775
+    },
+    {
+      "from": "64862192000128",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.119,
+      "pct_votos": 0.119
+    },
+    {
+      "from": "outros-61585865",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 59.343,
+      "pct_votos": 59.343
+    },
+    {
+      "from": "p-1ecc43b8",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.739,
+      "pct_votos": 0.739
+    },
+    {
+      "from": "p-2491a4ba",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 1.001,
+      "pct_votos": 1.001
+    },
+    {
+      "from": "p-2cdc324b",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.686,
+      "pct_votos": 0.686
+    },
+    {
+      "from": "p-43b383b5",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.4,
+      "pct_votos": 0.4
+    },
+    {
+      "from": "p-45485941",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.512,
+      "pct_votos": 0.512
+    },
+    {
+      "from": "p-543bce99",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.292,
+      "pct_votos": 0.292
+    },
+    {
+      "from": "p-6094b0a0",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.402,
+      "pct_votos": 0.402
+    },
+    {
+      "from": "p-6686dd35",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.718,
+      "pct_votos": 0.718
+    },
+    {
+      "from": "p-a8a4e8c0",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.8,
+      "pct_votos": 0.8
+    },
+    {
+      "from": "p-b01f59e4",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.412,
+      "pct_votos": 0.412
+    },
+    {
+      "from": "p-b33b7ca8",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.75,
+      "pct_votos": 0.75
+    },
+    {
+      "from": "p-c053ac2c",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.526,
+      "pct_votos": 0.526
+    },
+    {
+      "from": "p-f5f008f9",
+      "to": "61585865000151",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.905,
+      "pct_votos": 0.905
+    },
+    {
+      "from": "tesouraria-61585865",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.219,
+      "pct_votos": 0.219
+    },
+    {
+      "from": "x-capital-research-global-investors",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 5.523,
+      "pct_votos": 5.523
+    },
+    {
+      "from": "x-rbc-global-asset-management-inc",
+      "to": "61585865000151",
+      "kind": "company_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 5.073,
+      "pct_votos": 5.073
+    },
+    {
+      "from": "05523773000176",
+      "to": "42150391000170",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 12.667,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "22606673000122",
+      "to": "42150391000170",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 4.0,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "33000167000101",
+      "to": "42150391000170",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 36.15,
+      "pct_votos": 47.032
+    },
+    {
+      "from": "63428842000169",
+      "to": "42150391000170",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 34.323,
+      "pct_votos": 50.111
+    },
+    {
+      "from": "outros-42150391",
+      "to": "42150391000170",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 12.844,
+      "pct_votos": 2.836
+    },
+    {
+      "from": "p-bceb16ac",
+      "to": "42150391000170",
+      "kind": "person_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 0.016,
+      "pct_votos": 0.022
+    },
+    {
+      "from": "01878512000118",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 2.706,
+      "pct_votos": 2.706
+    },
+    {
+      "from": "11752203000150",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 8.048,
+      "pct_votos": 8.048
+    },
+    {
+      "from": "30306294000145",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 5.034,
+      "pct_votos": 5.034
+    },
+    {
+      "from": "66117474000126",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 45.045,
+      "pct_votos": 45.045
+    },
+    {
+      "from": "outros-47960950",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 37.525,
+      "pct_votos": 37.525
+    },
+    {
+      "from": "p-0fab5b2d",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.183,
+      "pct_votos": 0.183
+    },
+    {
+      "from": "p-27f97b5a",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.062,
+      "pct_votos": 0.062
+    },
+    {
+      "from": "p-35b92c94",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.15,
+      "pct_votos": 0.15
+    },
+    {
+      "from": "p-561b3bc9",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.051,
+      "pct_votos": 0.051
+    },
+    {
+      "from": "p-617ea2b3",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.87,
+      "pct_votos": 0.87
+    },
+    {
+      "from": "p-74b6bde7",
+      "to": "47960950000121",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.222,
+      "pct_votos": 0.222
+    },
+    {
+      "from": "tesouraria-47960950",
+      "to": "47960950000121",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 0.104,
+      "pct_votos": 0.104
+    },
+    {
+      "from": "04213131000108",
+      "to": "33042730000104",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 41.657,
+      "pct_votos": 41.657
+    },
+    {
+      "from": "06990482000150",
+      "to": "33042730000104",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 3.447,
+      "pct_votos": 3.447
+    },
+    {
+      "from": "49384963000125",
+      "to": "33042730000104",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 4.57,
+      "pct_votos": 4.57
+    },
+    {
+      "from": "61123219000172",
+      "to": "33042730000104",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 3.176,
+      "pct_votos": 3.176
+    },
+    {
+      "from": "outros-33042730",
+      "to": "33042730000104",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 47.15,
+      "pct_votos": 47.15
+    },
+    {
+      "from": "10979208000158",
+      "to": "33256439000139",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 5.002,
+      "pct_votos": 5.002
+    },
+    {
+      "from": "20992266000175",
+      "to": "33256439000139",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 7.677,
+      "pct_votos": 7.677
+    },
+    {
+      "from": "54041439000191",
+      "to": "33256439000139",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 25.057,
+      "pct_votos": 25.057
+    },
+    {
+      "from": "outros-33256439",
+      "to": "33256439000139",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 58.045,
+      "pct_votos": 58.045
+    },
+    {
+      "from": "tesouraria-33256439",
+      "to": "33256439000139",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 4.219,
+      "pct_votos": 4.219
+    },
+    {
+      "from": "08803085000158",
+      "to": "67620377000114",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 28.891,
+      "pct_votos": 28.891
+    },
+    {
+      "from": "46879386000154",
+      "to": "67620377000114",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 24.343,
+      "pct_votos": 24.343
+    },
+    {
+      "from": "outros-67620377",
+      "to": "67620377000114",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 45.826,
+      "pct_votos": 45.826
+    },
+    {
+      "from": "tesouraria-67620377",
+      "to": "67620377000114",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 0.939,
+      "pct_votos": 0.939
+    },
+    {
+      "from": "04679647000142",
+      "to": "16404287000155",
+      "kind": "company_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 2.148,
+      "pct_votos": 2.148
+    },
+    {
+      "from": "60651809000105",
+      "to": "16404287000155",
+      "kind": "company_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 28.387,
+      "pct_votos": 28.387
+    },
+    {
+      "from": "outros-16404287",
+      "to": "16404287000155",
+      "kind": "company_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 49.348,
+      "pct_votos": 49.348
+    },
+    {
+      "from": "p-0054a089",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.009,
+      "pct_votos": 0.009
+    },
+    {
+      "from": "p-1d00cce0",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.211,
+      "pct_votos": 0.211
+    },
+    {
+      "from": "p-27a7f3ee",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 3.836,
+      "pct_votos": 3.836
+    },
+    {
+      "from": "p-39dcf5fb",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.287,
+      "pct_votos": 0.287
+    },
+    {
+      "from": "p-65d1af58",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.01,
+      "pct_votos": 0.01
+    },
+    {
+      "from": "p-7edeec49",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.097,
+      "pct_votos": 0.097
+    },
+    {
+      "from": "p-859f7d99",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 4.278,
+      "pct_votos": 4.278
+    },
+    {
+      "from": "p-a7b24f91",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 3.772,
+      "pct_votos": 3.772
+    },
+    {
+      "from": "p-a941080d",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.355,
+      "pct_votos": 0.355
+    },
+    {
+      "from": "p-bb882ad3",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 3.707,
+      "pct_votos": 3.707
+    },
+    {
+      "from": "p-cf538a76",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.461,
+      "pct_votos": 0.461
+    },
+    {
+      "from": "p-d02e2ddd",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.287,
+      "pct_votos": 0.287
+    },
+    {
+      "from": "p-dfe70769",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.211,
+      "pct_votos": 0.211
+    },
+    {
+      "from": "p-fffd4a1c",
+      "to": "16404287000155",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 0.023,
+      "pct_votos": 0.023
+    },
+    {
+      "from": "tesouraria-16404287",
+      "to": "16404287000155",
+      "kind": "company_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 2.575,
+      "pct_votos": 2.575
+    },
+    {
+      "from": "15146011000151",
+      "to": "02429144000193",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 20.315,
+      "pct_votos": 20.315
+    },
+    {
+      "from": "26002119000197",
+      "to": "02429144000193",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 63.392,
+      "pct_votos": 63.392
+    },
+    {
+      "from": "outros-02429144",
+      "to": "02429144000193",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 16.293,
+      "pct_votos": 16.293
+    },
+    {
+      "from": "00383281000109",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 3.688,
+      "pct_votos": 3.63
+    },
+    {
+      "from": "00394460000141",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 29.902,
+      "pct_votos": 29.804
+    },
+    {
+      "from": "07237373000120",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 0.018,
+      "pct_votos": 0.018
+    },
+    {
+      "from": "10384372000112",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 0.043,
+      "pct_votos": 0.043
+    },
+    {
+      "from": "30822936000240",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 0.732,
+      "pct_votos": 0.772
+    },
+    {
+      "from": "33657248000189",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 4.081,
+      "pct_votos": 4.096
+    },
+    {
+      "from": "33754482000124",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 0.108,
+      "pct_votos": 0.134
+    },
+    {
+      "from": "34081202000127",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 0.174,
+      "pct_votos": 0.155
+    },
+    {
+      "from": "42040639000140",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 1.271,
+      "pct_votos": 1.578
+    },
+    {
+      "from": "outros-00001180",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 57.382,
+      "pct_votos": 57.17
+    },
+    {
+      "from": "tesouraria-00001180",
+      "to": "00001180000126",
+      "kind": "company_owns",
+      "source": "FRE Eletrobras 161003",
+      "pct_capital": 2.601,
+      "pct_votos": 2.6
+    },
+    {
+      "from": "05839607000183",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 4.857,
+      "pct_votos": 5.044
+    },
+    {
+      "from": "10971936000113",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 0.392,
+      "pct_votos": 0.392
+    },
+    {
+      "from": "67227574000178",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 0.165,
+      "pct_votos": 0.102
+    },
+    {
+      "from": "72116353000162",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 3.619,
+      "pct_votos": 2.797
+    },
+    {
+      "from": "outros-16670085",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 61.505,
+      "pct_votos": 62.12
+    },
+    {
+      "from": "p-1b38d073",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 2.989,
+      "pct_votos": 2.989
+    },
+    {
+      "from": "p-20fd468b",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 4.183,
+      "pct_votos": 4.183
+    },
+    {
+      "from": "p-2c7d71b2",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 2.219,
+      "pct_votos": 2.202
+    },
+    {
+      "from": "p-33ab3cce",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 1.867,
+      "pct_votos": 1.86
+    },
+    {
+      "from": "p-d5231da6",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 0.747,
+      "pct_votos": 0.747
+    },
+    {
+      "from": "p-d584d2cc",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 3.544,
+      "pct_votos": 3.544
+    },
+    {
+      "from": "p-dbce5574",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 0.445,
+      "pct_votos": 0.462
+    },
+    {
+      "from": "p-e31b35c3",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 1.268,
+      "pct_votos": 1.224
+    },
+    {
+      "from": "p-f25ff412",
+      "to": "16670085000155",
+      "kind": "person_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 1.323,
+      "pct_votos": 1.323
+    },
+    {
+      "from": "tesouraria-16670085",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 1.745,
+      "pct_votos": 1.717
+    },
+    {
+      "from": "x-capital-research-global-investors",
+      "to": "16670085000155",
+      "kind": "company_owns",
+      "source": "FRE Localiza 160114",
+      "pct_capital": 9.132,
+      "pct_votos": 9.296
+    },
+    {
+      "from": "00383281000109",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 6.984,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "00394460000141",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 29.021,
+      "pct_votos": 50.26
+    },
+    {
+      "from": "10979208000158",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 5.317,
+      "pct_votos": 3.942
+    },
+    {
+      "from": "33657248000189",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 1.049,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "outros-33000167",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 52.046,
+      "pct_votos": 40.803
+    },
+    {
+      "from": "x-gqg-partners-llc",
+      "to": "33000167000101",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 5.581,
+      "pct_votos": 4.995
+    },
+    {
+      "from": "33172537000198",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 5.586,
+      "pct_votos": 5.586
+    },
+    {
+      "from": "33479023000180",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 15.022,
+      "pct_votos": 15.022
+    },
+    {
+      "from": "outros-03853896",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 32.786,
+      "pct_votos": 32.786
+    },
+    {
+      "from": "tesouraria-03853896",
+      "to": "03853896000140",
+      "kind": "company_owns",
+      "source": "FRE Marfrig 159757",
+      "pct_capital": 0.272,
+      "pct_votos": 0.272
+    },
+    {
+      "from": "07078144000100",
+      "to": "24990777000109",
+      "kind": "company_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 5.01,
+      "pct_votos": 5.01
+    },
+    {
+      "from": "50341611000171",
+      "to": "24990777000109",
+      "kind": "company_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 1.082,
+      "pct_votos": 1.082
+    },
+    {
+      "from": "outros-24990777",
+      "to": "24990777000109",
+      "kind": "company_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 15.265,
+      "pct_votos": 15.265
+    },
+    {
+      "from": "p-11e495ad",
+      "to": "24990777000109",
+      "kind": "person_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 41.986,
+      "pct_votos": 41.986
+    },
+    {
+      "from": "p-85c0959b",
+      "to": "24990777000109",
+      "kind": "person_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 18.841,
+      "pct_votos": 18.841
+    },
+    {
+      "from": "p-ee7b22d1",
+      "to": "24990777000109",
+      "kind": "person_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 17.658,
+      "pct_votos": 17.658
+    },
+    {
+      "from": "tesouraria-24990777",
+      "to": "24990777000109",
+      "kind": "company_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 0.158,
+      "pct_votos": 0.158
+    },
+    {
+      "from": "p-29ad3177",
+      "to": "00164270000138",
+      "kind": "person_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 62.085,
+      "pct_votos": 62.085
+    },
+    {
+      "from": "07704137000176",
+      "to": "00350763000162",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 28.573,
+      "pct_votos": 28.573
+    },
+    {
+      "from": "07704144000178",
+      "to": "00350763000162",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 28.573,
+      "pct_votos": 28.573
+    },
+    {
+      "from": "08706916000173",
+      "to": "00350763000162",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 15.636,
+      "pct_votos": 15.636
+    },
+    {
+      "from": "11369979000196",
+      "to": "00350763000162",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 27.217,
+      "pct_votos": 27.217
+    },
+    {
+      "from": "00394460040950",
+      "to": "00383281000109",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "33657248000189",
+      "to": "00383281000109",
+      "kind": "company_owns",
+      "source": "FRE Petrobras 160125",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "28446667000131",
+      "to": "00835086000172",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 50.0,
+      "pct_votos": 47.288
+    },
+    {
+      "from": "p-617ea2b3",
+      "to": "00835086000172",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 50.0,
+      "pct_votos": 52.712
+    },
+    {
+      "from": "p-27f97b5a",
+      "to": "01878512000118",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-35b92c94",
+      "to": "01878512000118",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-561b3bc9",
+      "to": "01878512000118",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "92690817000157",
+      "to": "02290525000134",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "60078060000159",
+      "to": "04169992000136",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "04169992000136",
+      "to": "04213131000108",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-27a7f3ee",
+      "to": "04679647000142",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 14.617,
+      "pct_votos": 14.617
+    },
+    {
+      "from": "p-859f7d99",
+      "to": "04679647000142",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 12.487,
+      "pct_votos": 12.487
+    },
+    {
+      "from": "p-a7b24f91",
+      "to": "04679647000142",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 13.043,
+      "pct_votos": 13.043
+    },
+    {
+      "from": "p-bb882ad3",
+      "to": "04679647000142",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 13.286,
+      "pct_votos": 13.286
+    },
+    {
+      "from": "p-c63f4853",
+      "to": "04679647000142",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 46.567,
+      "pct_votos": 46.567
+    },
+    {
+      "from": "p-6094b0a0",
+      "to": "05318060000170",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-a8a4e8c0",
+      "to": "05318060000170",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "x-bg-energy-holdings-ltd",
+      "to": "05717887000157",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "13055584000144",
+      "to": "05718941000189",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10979208000158",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 5.077,
+      "pct_votos": 5.077
+    },
+    {
+      "from": "x-banco-bilbao-viscaya-argentaria-s-a",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 5.007,
+      "pct_votos": 5.007
+    },
+    {
+      "from": "x-criteria-caixa-s-a-u",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 5.007,
+      "pct_votos": 5.007
+    },
+    {
+      "from": "x-fundacion-bancaria-caixa-d-estalvis-i-pensions-de-barcelona-la-caixa",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 5.007,
+      "pct_votos": 5.007
+    },
+    {
+      "from": "x-morgan-stanley",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 0.066,
+      "pct_votos": 0.066
+    },
+    {
+      "from": "x-public-investment-fund",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 9.969,
+      "pct_votos": 9.969
+    },
+    {
+      "from": "x-sociedad-estatal-de-participaciones-industriales",
+      "to": "05721582000119",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 10.0,
+      "pct_votos": 10.0
+    },
+    {
+      "from": "60078060000159",
+      "to": "06990482000150",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 99.994,
+      "pct_votos": 99.994
+    },
+    {
+      "from": "p-7a7bf0bd",
+      "to": "06990482000150",
+      "kind": "person_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 0.006,
+      "pct_votos": 0.006
+    },
+    {
+      "from": "05718941000189",
+      "to": "07127500000138",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 100.0,
+      "pct_votos": 99.998
+    },
+    {
+      "from": "x-radiomovil-dipsa-s-a",
+      "to": "07127500000138",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 0.0,
+      "pct_votos": 0.002
+    },
+    {
+      "from": "x-radiomovil-dipsa-s-a-de-c-v",
+      "to": "07127500000138",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 0.0,
+      "pct_votos": 0.002
+    },
+    {
+      "from": "34699877000134",
+      "to": "07198897000159",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 40.543,
+      "pct_votos": 40.543
+    },
+    {
+      "from": "34700238000141",
+      "to": "07198897000159",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 40.543,
+      "pct_votos": 40.543
+    },
+    {
+      "from": "p-3cebed6c",
+      "to": "07198897000159",
+      "kind": "person_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 5.082,
+      "pct_votos": 5.082
+    },
+    {
+      "from": "p-793faab4",
+      "to": "07198897000159",
+      "kind": "person_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 5.342,
+      "pct_votos": 5.342
+    },
+    {
+      "from": "p-40f90cbf",
+      "to": "07704137000176",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-b57fc592",
+      "to": "07704137000176",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 99.999,
+      "pct_votos": 99.999
+    },
+    {
+      "from": "p-40f90cbf",
+      "to": "07704144000178",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 99.999,
+      "pct_votos": 99.999
+    },
+    {
+      "from": "p-b57fc592",
+      "to": "07704144000178",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 0.001,
+      "pct_votos": 0.001
+    },
+    {
+      "from": "p-40f90cbf",
+      "to": "08706916000173",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-b57fc592",
+      "to": "08706916000173",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "30673279000135",
+      "to": "08803085000158",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 5.0,
+      "pct_votos": 5.0
+    },
+    {
+      "from": "45858366000134",
+      "to": "08803085000158",
+      "kind": "company_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 44.0,
+      "pct_votos": 44.0
+    },
+    {
+      "from": "p-031cab91",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 2.5,
+      "pct_votos": 2.5
+    },
+    {
+      "from": "p-050ee925",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 1.254,
+      "pct_votos": 1.254
+    },
+    {
+      "from": "p-0f5c431e",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 13.757,
+      "pct_votos": 13.757
+    },
+    {
+      "from": "p-25fe52ce",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 1.539,
+      "pct_votos": 1.539
+    },
+    {
+      "from": "p-4f3f270f",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 1.539,
+      "pct_votos": 1.539
+    },
+    {
+      "from": "p-620c94a1",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 2.625,
+      "pct_votos": 2.625
+    },
+    {
+      "from": "p-710dd63a",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 2.5,
+      "pct_votos": 2.5
+    },
+    {
+      "from": "p-8dd8d5d2",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 1.249,
+      "pct_votos": 1.249
+    },
+    {
+      "from": "p-bd91e3be",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 1.539,
+      "pct_votos": 1.539
+    },
+    {
+      "from": "p-ca22e731",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 2.498,
+      "pct_votos": 2.498
+    },
+    {
+      "from": "p-ca645ca0",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 5.0,
+      "pct_votos": 5.0
+    },
+    {
+      "from": "p-f53dc520",
+      "to": "08803085000158",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 15.0,
+      "pct_votos": 15.0
+    },
+    {
+      "from": "p-6094b0a0",
+      "to": "10326747000198",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 48.67,
+      "pct_votos": 48.67
+    },
+    {
+      "from": "p-a8a4e8c0",
+      "to": "10326747000198",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 51.33,
+      "pct_votos": 51.33
+    },
+    {
+      "from": "00350763000162",
+      "to": "10947525000192",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "07704137000176",
+      "to": "11369979000196",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 7.285,
+      "pct_votos": 7.285
+    },
+    {
+      "from": "07704144000178",
+      "to": "11369979000196",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 7.285,
+      "pct_votos": 7.285
+    },
+    {
+      "from": "33335236000138",
+      "to": "11369979000196",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 85.429,
+      "pct_votos": 85.429
+    },
+    {
+      "from": "12906328000150",
+      "to": "11823391000160",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "18022960000118",
+      "to": "12906328000150",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 15.06,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-state-grid-overseas-investment-europe-limited",
+      "to": "12906328000150",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 29.254,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "x-state-grid-overseas-investment-ltd",
+      "to": "12906328000150",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 55.686,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "21681273000119",
+      "to": "12952687000144",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "26002119000197",
+      "to": "15146011000151",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "07198897000159",
+      "to": "15157585000125",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "34699984000162",
+      "to": "15157585000125",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-state-grid-corporation-of-china",
+      "to": "18022960000118",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-06305882",
+      "to": "20992266000175",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 35.758,
+      "pct_votos": 35.758
+    },
+    {
+      "from": "p-36ac01c2",
+      "to": "20992266000175",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 24.461,
+      "pct_votos": 24.461
+    },
+    {
+      "from": "p-a55190d2",
+      "to": "20992266000175",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 34.228,
+      "pct_votos": 34.228
+    },
+    {
+      "from": "x-venus-quartz-llc",
+      "to": "20992266000175",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 5.553,
+      "pct_votos": 5.553
+    },
+    {
+      "from": "p-1b487d80",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-3626b31f",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-7fdafcf3",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-8fb82e01",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-9e358fc7",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-9ee93418",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 8.333,
+      "pct_votos": 8.333
+    },
+    {
+      "from": "p-dfef8e07",
+      "to": "21681273000119",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "07198897000159",
+      "to": "23340044000166",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 9.937,
+      "pct_votos": 9.937
+    },
+    {
+      "from": "08767024000182",
+      "to": "23340044000166",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 11.671,
+      "pct_votos": 11.671
+    },
+    {
+      "from": "35233631000135",
+      "to": "23340044000166",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 75.728,
+      "pct_votos": 75.728
+    },
+    {
+      "from": "11823391000160",
+      "to": "26002119000197",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "10947525000192",
+      "to": "26845679000103",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-0fab5b2d",
+      "to": "28446667000131",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-74b6bde7",
+      "to": "28446667000131",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-e2ecb2dd",
+      "to": "28446667000131",
+      "kind": "person_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 33.333,
+      "pct_votos": 33.333
+    },
+    {
+      "from": "p-babf54a7",
+      "to": "30054526000115",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-147f9b49",
+      "to": "30673279000135",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-1b0a077e",
+      "to": "30673279000135",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 16.667,
+      "pct_votos": 16.667
+    },
+    {
+      "from": "p-7b86ae04",
+      "to": "30673279000135",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 16.667,
+      "pct_votos": 16.667
+    },
+    {
+      "from": "p-ab5dac7a",
+      "to": "30673279000135",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 16.667,
+      "pct_votos": 16.667
+    },
+    {
+      "from": "p-babf54a7",
+      "to": "32107155000118",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-colorado-company-ltd",
+      "to": "33335236000138",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-1ffa9e7e",
+      "to": "33363896000122",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 21.699,
+      "pct_votos": 21.699
+    },
+    {
+      "from": "p-4906483b",
+      "to": "33363896000122",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 34.904,
+      "pct_votos": 34.904
+    },
+    {
+      "from": "p-66e24efd",
+      "to": "33363896000122",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 21.699,
+      "pct_votos": 21.699
+    },
+    {
+      "from": "p-cb00e854",
+      "to": "33363896000122",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 21.699,
+      "pct_votos": 21.699
+    },
+    {
+      "from": "p-1305d0ba",
+      "to": "33571764000196",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-2bb82ca0",
+      "to": "33571764000196",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-5aebb94f",
+      "to": "33571764000196",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-d49364c9",
+      "to": "33571764000196",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-1459b3e2",
+      "to": "33571773000187",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "p-147c3c83",
+      "to": "33571773000187",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "p-16b64a1a",
+      "to": "33571773000187",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "p-4850ff53",
+      "to": "33571773000187",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "p-cd7a4b97",
+      "to": "33571773000187",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 20.0,
+      "pct_votos": 20.0
+    },
+    {
+      "from": "p-2ab994b8",
+      "to": "33571943000123",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-611d831b",
+      "to": "33571943000123",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-7e21753e",
+      "to": "33571943000123",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-c42eece6",
+      "to": "33571943000123",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-8e8923a7",
+      "to": "33639148000120",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 33.33,
+      "pct_votos": 33.33
+    },
+    {
+      "from": "p-f511f986",
+      "to": "33639148000120",
+      "kind": "person_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 66.67,
+      "pct_votos": 66.67
+    },
+    {
+      "from": "00394460040950",
+      "to": "33657248000189",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-1d9e434d",
+      "to": "34622819000102",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 49.9,
+      "pct_votos": 49.9
+    },
+    {
+      "from": "p-71c9adb5",
+      "to": "34622819000102",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 50.1,
+      "pct_votos": 50.1
+    },
+    {
+      "from": "34699877000134",
+      "to": "34699877000134",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 0.11,
+      "pct_votos": 0.147
+    },
+    {
+      "from": "34700238000141",
+      "to": "34699877000134",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 0.11,
+      "pct_votos": 0.147
+    },
+    {
+      "from": "p-793faab4",
+      "to": "34699877000134",
+      "kind": "person_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 99.743,
+      "pct_votos": 99.658
+    },
+    {
+      "from": "07198897000159",
+      "to": "34699984000162",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-793faab4",
+      "to": "34700238000141",
+      "kind": "person_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "34699877000134",
+      "to": "35233631000135",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 40.71,
+      "pct_votos": 40.71
+    },
+    {
+      "from": "34700238000141",
+      "to": "35233631000135",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 40.71,
+      "pct_votos": 40.71
+    },
+    {
+      "from": "p-3cebed6c",
+      "to": "35233631000135",
+      "kind": "person_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 5.103,
+      "pct_votos": 5.103
+    },
+    {
+      "from": "p-793faab4",
+      "to": "35233631000135",
+      "kind": "person_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 8.08,
+      "pct_votos": 8.08
+    },
+    {
+      "from": "p-1dfdd2d0",
+      "to": "45858366000134",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-62540a56",
+      "to": "45858366000134",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-ca645ca0",
+      "to": "45858366000134",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-f42e6571",
+      "to": "45858366000134",
+      "kind": "person_owns",
+      "source": "FRE Minerva 159844",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "p-dfef8e07",
+      "to": "46246448000190",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "49115815000105",
+      "to": "46855586000177",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "50746577000115",
+      "to": "47646941000160",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 87.273,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "60701190000104",
+      "to": "47646941000160",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 12.727,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "00383281000109",
+      "to": "49115815000105",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 17.137,
+      "pct_votos": 17.137
+    },
+    {
+      "from": "53137639000180",
+      "to": "49115815000105",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 46.221,
+      "pct_votos": 46.221
+    },
+    {
+      "from": "p-ee7b22d1",
+      "to": "50341611000171",
+      "kind": "person_owns",
+      "source": "FRE Mateus 158148",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-3626b31f",
+      "to": "53034321000173",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "00350763000162",
+      "to": "53137639000180",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 77.93,
+      "pct_votos": 77.93
+    },
+    {
+      "from": "26845679000103",
+      "to": "53137639000180",
+      "kind": "company_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 22.07,
+      "pct_votos": 22.07
+    },
+    {
+      "from": "29447049000179",
+      "to": "54041439000191",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 20.058,
+      "pct_votos": 20.058
+    },
+    {
+      "from": "33363896000122",
+      "to": "54041439000191",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 7.229,
+      "pct_votos": 9.894
+    },
+    {
+      "from": "34622819000102",
+      "to": "54041439000191",
+      "kind": "company_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 3.671,
+      "pct_votos": 5.024
+    },
+    {
+      "from": "p-166c2e76",
+      "to": "54041439000191",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 15.42,
+      "pct_votos": 12.471
+    },
+    {
+      "from": "p-3e6b7d53",
+      "to": "54041439000191",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 6.225,
+      "pct_votos": 6.117
+    },
+    {
+      "from": "p-71c9adb5",
+      "to": "54041439000191",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 15.12,
+      "pct_votos": 16.64
+    },
+    {
+      "from": "p-ab969513",
+      "to": "54041439000191",
+      "kind": "person_owns",
+      "source": "FRE Ultrapar 158948",
+      "pct_capital": 5.724,
+      "pct_votos": 5.433
+    },
+    {
+      "from": "00164270000138",
+      "to": "60078060000159",
+      "kind": "company_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 0.17,
+      "pct_votos": 0.17
+    },
+    {
+      "from": "p-582ebdb4",
+      "to": "60078060000159",
+      "kind": "person_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 0.17,
+      "pct_votos": 0.17
+    },
+    {
+      "from": "p-7a7bf0bd",
+      "to": "60078060000159",
+      "kind": "person_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 49.75,
+      "pct_votos": 49.75
+    },
+    {
+      "from": "p-d5b7fd2a",
+      "to": "60078060000159",
+      "kind": "person_owns",
+      "source": "FRE CSN 161000",
+      "pct_capital": 0.17,
+      "pct_votos": 0.17
+    },
+    {
+      "from": "p-2504f2c4",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 9.153,
+      "pct_votos": 9.153
+    },
+    {
+      "from": "p-27a7f3ee",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 18.306,
+      "pct_votos": 18.306
+    },
+    {
+      "from": "p-2ad67f5f",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 9.153,
+      "pct_votos": 9.153
+    },
+    {
+      "from": "p-859f7d99",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 18.306,
+      "pct_votos": 18.306
+    },
+    {
+      "from": "p-a941080d",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 6.827,
+      "pct_votos": 6.827
+    },
+    {
+      "from": "p-bb882ad3",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 18.306,
+      "pct_votos": 18.306
+    },
+    {
+      "from": "p-cf538a76",
+      "to": "60651809000105",
+      "kind": "person_owns",
+      "source": "FRE Suzano 161031",
+      "pct_capital": 5.89,
+      "pct_votos": 5.89
+    },
+    {
+      "from": "p-3626b31f",
+      "to": "60919973000150",
+      "kind": "person_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "07198897000159",
+      "to": "62330590000178",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 61.621,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "09631542000137",
+      "to": "62330590000178",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 4.719,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "13883056000183",
+      "to": "62330590000178",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 18.139,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "62812660000124",
+      "to": "62330590000178",
+      "kind": "company_owns",
+      "source": "FRE Cosan 159294",
+      "pct_capital": 15.52,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "63986512000199",
+      "to": "63428842000169",
+      "kind": "company_owns",
+      "source": "FRE Braskem 160987",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "53034321000173",
+      "to": "63864884000142",
+      "kind": "company_owns",
+      "source": "FRE Rede D'Or 159594",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-10813f9e",
+      "to": "64862192000128",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 99.94,
+      "pct_votos": 99.94
+    },
+    {
+      "from": "p-6094b0a0",
+      "to": "64862192000128",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.03,
+      "pct_votos": 0.03
+    },
+    {
+      "from": "p-a8a4e8c0",
+      "to": "64862192000128",
+      "kind": "person_owns",
+      "source": "FRE RD Saúde 159738",
+      "pct_capital": 0.03,
+      "pct_votos": 0.03
+    },
+    {
+      "from": "00835086000172",
+      "to": "66117474000126",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 60.616,
+      "pct_votos": 60.616
+    },
+    {
+      "from": "01878512000118",
+      "to": "66117474000126",
+      "kind": "company_owns",
+      "source": "FRE Magalu 159326",
+      "pct_capital": 39.384,
+      "pct_votos": 39.384
+    },
+    {
+      "from": "02290525000134",
+      "to": "87153730000100",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 43.0,
+      "pct_votos": 43.0
+    },
+    {
+      "from": "92690817000157",
+      "to": "87153730000100",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 57.0,
+      "pct_votos": 57.0
+    },
+    {
+      "from": "11261547000167",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 6.335,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "12330774000160",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 3.209,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "52839420000160",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 5.688,
+      "pct_votos": 12.454
+    },
+    {
+      "from": "72116353000162",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 6.425,
+      "pct_votos": 0.0
+    },
+    {
+      "from": "87153730000100",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 11.704,
+      "pct_votos": 31.802
+    },
+    {
+      "from": "92690817000157",
+      "to": "92690783000109",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 15.931,
+      "pct_votos": 43.287
+    },
+    {
+      "from": "33571764000196",
+      "to": "92690817000157",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "33571773000187",
+      "to": "92690817000157",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "33571943000123",
+      "to": "92690817000157",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "33639148000120",
+      "to": "92690817000157",
+      "kind": "company_owns",
+      "source": "FRE Gerdau 160475",
+      "pct_capital": 25.0,
+      "pct_votos": 25.0
+    },
+    {
+      "from": "x-bg-group-limited",
+      "to": "x-bg-energy-holdings-ltd",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-the-shell-petroleum-company-limited",
+      "to": "x-bg-group-limited",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "p-40f90cbf",
+      "to": "x-colorado-company-ltd",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "p-b57fc592",
+      "to": "x-colorado-company-ltd",
+      "kind": "person_owns",
+      "source": "FRE JBS 159309",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "05718941000189",
+      "to": "x-radiomovil-dipsa-s-a",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 100.0,
+      "pct_votos": 99.5
+    },
+    {
+      "from": "07127500000138",
+      "to": "x-radiomovil-dipsa-s-a",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 0.0,
+      "pct_votos": 0.5
+    },
+    {
+      "from": "05718941000189",
+      "to": "x-radiomovil-dipsa-s-a-de-c-v",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 100.0,
+      "pct_votos": 99.5
+    },
+    {
+      "from": "07127500000138",
+      "to": "x-radiomovil-dipsa-s-a-de-c-v",
+      "kind": "company_owns",
+      "source": "FRE Claro 158569",
+      "pct_capital": 0.0,
+      "pct_votos": 0.5
+    },
+    {
+      "from": "05710547000102",
+      "to": "x-shell-plc",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "x-the-shell-transport-and-tading-company-limited",
+      "to": "x-shell-plc",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 50.0,
+      "pct_votos": 50.0
+    },
+    {
+      "from": "x-state-grid-corporation-of-china",
+      "to": "x-state-grid-overseas-investment-ltd",
+      "kind": "company_owns",
+      "source": "FRE CPFL 158929",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "05721582000119",
+      "to": "x-telefonica-latinoamerica-holding-s-l",
+      "kind": "company_owns",
+      "source": "FRE Telefônica 160414",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "x-shell-group-holding-ltd",
+      "to": "x-the-shell-petroleum-company-limited",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
+    },
+    {
+      "from": "05710547000102",
+      "to": "x-the-shell-transport-and-tading-company-limited",
+      "kind": "company_owns",
+      "source": "FRE Raízen 160866",
+      "pct_capital": 100.0,
+      "pct_votos": 100.0
     }
   ]
 }

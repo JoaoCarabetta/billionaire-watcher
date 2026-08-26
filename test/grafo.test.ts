@@ -36,36 +36,36 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 111 nodes', () => {
+    it('should have exactly 403 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(111);
+      expect(json.nodes.length).toBe(403);
     });
 
-    it('should have exactly 33 person nodes', () => {
+    it('should have exactly 146 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(33);
+      expect(personNodes.length).toBe(146);
     });
 
-    it('should have exactly 130 edges', () => {
+    it('should have exactly 492 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(130);
+      expect(json.edges.length).toBe(492);
     });
 
-    it('should have the eleven listed company ids', () => {
+    it('should have the thirty-one listed company ids', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       const nodeIds = new Set(json.nodes.map((n: { id: string }) => n.id));
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(11);
+      expect(LISTED_COMPANY_IDS).toHaveLength(31);
       for (const id of LISTED_COMPANY_IDS) {
         expect(nodeIds.has(id), `listed company ${id} should be present`).toBe(true);
       }
@@ -246,9 +246,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const companyNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'company');
 
-      expect(json.nodes.length).toBe(111);
-      expect(json.edges.length).toBe(130);
-      expect(companyNodes.length).toBe(78);
+      expect(json.nodes.length).toBe(403);
+      expect(json.edges.length).toBe(492);
+      expect(companyNodes.length).toBe(257);
 
       for (const company of HOLE_COMPANIES) {
         const node = json.nodes.find((n: { id: string }) => n.id === company.id);
@@ -291,23 +291,25 @@ describe('Grafo Page (issue #74)', () => {
       }
     });
 
-    it('keeps the same 33 person nodes, including GUSTAVO KOS BOTELH0', () => {
+    it('keeps the original 33 person nodes, including GUSTAVO KOS BOTELH0', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
-      const personIds = personNodes.map((n: { id: string }) => n.id).sort();
+      const personIds = new Set(personNodes.map((n: { id: string }) => n.id));
 
-      expect(personNodes.length).toBe(33);
-      expect(personIds).toEqual([...FROZEN_PERSON_IDS].sort());
+      expect(personNodes.length).toBe(146);
+      for (const id of FROZEN_PERSON_IDS) {
+        expect(personIds.has(id), `frozen person ${id} should remain`).toBe(true);
+      }
       expect(
         personNodes.some((n: { label: string }) => n.label === 'GUSTAVO KOS BOTELH0')
       ).toBe(true);
     });
 
-    it('page copy names 111 nodes and 130 edges', () => {
+    it('page copy names 403 nodes and 492 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('111 nós, 130 arestas');
-      expect(page).not.toContain('102 nós, 121 arestas');
+      expect(page).toContain('403 nós, 492 arestas');
+      expect(page).not.toContain('111 nós, 130 arestas');
     });
   });
 
@@ -425,7 +427,7 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(0);
     });
 
-    it('each of the 11 listed companies has incoming capital between 99.5 and 100.5', () => {
+    it('each listed company has incoming capital between 99.5 and 100.5', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 
@@ -673,14 +675,14 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(true);
     });
 
-    it('buildCytoscapeElements tags exactly the eleven listed ids', () => {
+    it('buildCytoscapeElements tags exactly the thirty-one listed ids', () => {
       const json = loadCommittedGrafo();
       const elements = buildCytoscapeElements(json);
       const nodes = elements.filter((el) => el.data.source === undefined);
       const listedNodes = nodes.filter(isTaggedListed);
       const listedIds = listedNodes.map((el) => el.data.id).sort();
 
-      expect(LISTED_COMPANY_IDS).toHaveLength(11);
+      expect(LISTED_COMPANY_IDS).toHaveLength(31);
       expect(listedIds).toEqual([...LISTED_COMPANY_IDS].sort());
 
       for (const el of listedNodes) {
@@ -755,6 +757,188 @@ describe('Grafo Page (issue #74)', () => {
         const text = fs.readFileSync(filePath, 'utf-8');
         expect(text, `${filePath} must not mention fortuna`).not.toMatch(/fortuna/i);
       }
+    });
+  });
+
+  describe('Test (issue #105): twenty Valor 50 listed trees', () => {
+    const EXISTING_ELEVEN = [
+      '00864214000106',
+      '07689002000189',
+      '33592510000154',
+      '03220438000173',
+      '34274233000102',
+      '07415333000120',
+      '01838723000127',
+      '17155730000164',
+      '01083200000118',
+      '43776517000180',
+      '06057223000171',
+    ] as const;
+    const TWENTY_NEW_LISTED = [
+      '02916265000160',
+      '33453598000123',
+      '07043628000113',
+      '33611500000119',
+      '50746577000115',
+      '06047087000139',
+      '02558157000162',
+      '61585865000151',
+      '42150391000170',
+      '47960950000121',
+      '33042730000104',
+      '33256439000139',
+      '67620377000114',
+      '16404287000155',
+      '02429144000193',
+      '00001180000126',
+      '16670085000155',
+      '33000167000101',
+      '03853896000140',
+      '24990777000109',
+    ] as const;
+    const HELD_OUT_PREFIXES = ['07526557', '84429695'] as const;
+    const GIPAR_ID = '02260956000158';
+    const MAMS_ID = '61563585000142';
+    const UNIAO_IDS = ['00394460000141', '00394460040950'] as const;
+    const HOLE_COMPANY_IDS = [
+      '61563585000142',
+      '02049012000136',
+      '23349343000161',
+      '07544616000172',
+      '39513958000111',
+      '42601461000160',
+      '43347650000110',
+      '45278506000103',
+      '58534632000115',
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function isTaggedListed(el: { data: { listed?: boolean | string; seed?: string } }): boolean {
+      return el.data.listed === true || el.data.listed === 'true' || el.data.seed === 'listed';
+    }
+
+    it('has all twenty listed ids as company nodes', () => {
+      const json = loadCommittedGrafo();
+      for (const id of TWENTY_NEW_LISTED) {
+        const node = json.nodes.find((n: { id: string }) => n.id === id);
+        expect(node, `listed company ${id} should exist`).toBeDefined();
+        expect(node.kind, `${id} must be kind=company`).toBe('company');
+      }
+    });
+
+    it('has JBS and has no Ambev or WEG node or hop', () => {
+      const json = loadCommittedGrafo();
+      const jbs = json.nodes.find((n: { id: string }) => n.id === '02916265000160');
+      expect(jbs, 'JBS node 02916265000160 must exist').toBeDefined();
+      expect(jbs.kind).toBe('company');
+
+      const ids = [
+        ...json.nodes.map((n: { id: string }) => n.id),
+        ...json.edges.map((e: { from: string }) => e.from),
+        ...json.edges.map((e: { to: string }) => e.to),
+      ];
+      for (const prefix of HELD_OUT_PREFIXES) {
+        const hit = ids.find((id: string) => id.startsWith(prefix));
+        expect(hit, `no node/edge id may start with ${prefix}`).toBeUndefined();
+      }
+    });
+
+    it('each of the thirty-one listed seeds has incoming capital in [99.5, 100.5]', () => {
+      const json = loadCommittedGrafo();
+      const listed = [...EXISTING_ELEVEN, ...TWENTY_NEW_LISTED];
+      for (const listedId of listed) {
+        const incoming = json.edges.filter((e: { to: string }) => e.to === listedId);
+        const capitalSum = incoming.reduce(
+          (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
+          0
+        );
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeGreaterThanOrEqual(99.5);
+        expect(
+          capitalSum,
+          `incoming capital to ${listedId} should be in 99.5..100.5, got ${capitalSum}`
+        ).toBeLessThanOrEqual(100.5);
+      }
+    });
+
+    it('LISTED_COMPANY_IDS has length 31 and tags exactly those ids as listed companies', () => {
+      const json = loadCommittedGrafo();
+      expect(LISTED_COMPANY_IDS).toHaveLength(31);
+      for (const id of EXISTING_ELEVEN) {
+        expect(LISTED_COMPANY_IDS, `must keep existing listed id ${id}`).toContain(id);
+      }
+      for (const id of TWENTY_NEW_LISTED) {
+        expect(LISTED_COMPANY_IDS, `must include new listed id ${id}`).toContain(id);
+      }
+
+      const elements = buildCytoscapeElements(json);
+      const nodes = elements.filter((el) => el.data.source === undefined);
+      const listedNodes = nodes.filter(isTaggedListed);
+      expect(listedNodes.map((el) => el.data.id).sort()).toEqual([...LISTED_COMPANY_IDS].sort());
+      for (const el of listedNodes) {
+        expect(el.data.kind, `listed node ${el.data.id} must stay kind=company`).toBe('company');
+      }
+    });
+
+    it('Gipar, tesouraria, hole companies, and x- slugs are not tagged listed', () => {
+      const json = loadCommittedGrafo();
+      const elements = buildCytoscapeElements(json);
+      const nodes = elements.filter((el) => el.data.source === undefined);
+      const byId = new Map(nodes.map((el) => [el.data.id, el]));
+
+      expect(isTaggedListed(byId.get(GIPAR_ID)!), 'Gipar must stay ordinary company color').toBe(false);
+
+      const tesouraria = nodes.filter((el) => el.data.id.startsWith('tesouraria-'));
+      expect(tesouraria.length).toBeGreaterThan(0);
+      for (const el of tesouraria) {
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+
+      const mams = byId.get(MAMS_ID);
+      expect(mams, 'MAMS 61563585000142 should be present').toBeDefined();
+      expect(isTaggedListed(mams!), 'MAMS must stay ordinary company color').toBe(false);
+      for (const holeId of HOLE_COMPANY_IDS) {
+        const hole = byId.get(holeId);
+        expect(hole, `hole company ${holeId} should exist`).toBeDefined();
+        expect(isTaggedListed(hole!), `hole company ${holeId} must not be tagged listed`).toBe(false);
+      }
+
+      const xSlugs = nodes.filter((el) => el.data.id.startsWith('x-'));
+      expect(xSlugs.length, 'foreign x- slugs should be on the page').toBeGreaterThan(0);
+      for (const el of xSlugs) {
+        expect(el.data.kind, `${el.data.id} stays kind=company`).toBe('company');
+        expect(isTaggedListed(el), `${el.data.id} must not be tagged listed`).toBe(false);
+      }
+    });
+
+    it('União Federal nodes are companies, not persons', () => {
+      const json = loadCommittedGrafo();
+      const present = UNIAO_IDS.map((id) => json.nodes.find((n: { id: string }) => n.id === id)).filter(Boolean);
+      expect(present.length, 'at least one União Federal node should be present').toBeGreaterThan(0);
+      for (const node of present) {
+        expect(node.kind, `${node.id} must be kind=company`).toBe('company');
+        expect(node.kind).not.toBe('person');
+      }
+    });
+
+    it('committed JSON has zero eleven-digit Cadastro', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const jsonText = fs.readFileSync(jsonPath, 'utf-8');
+      expect(jsonText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
+      expect(jsonText).not.toContain('***');
+    });
+
+    it('page copy matches the post-union node and edge counts and has no fortuna', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const page = fs.readFileSync(pagePath, 'utf-8');
+      expect(page).toContain('403 nós, 492 arestas');
+      expect(page).not.toMatch(/fortuna/i);
     });
   });
 
