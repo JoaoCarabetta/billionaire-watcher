@@ -70,3 +70,11 @@ Direção da aresta (verificada no arquivo): `from` = dono, `to` = detido. `pct_
 ```sh
 npx vitest run test/grafo-metrics.test.ts
 ```
+
+## Dinheiro sob controle
+
+Sibling command (issue 116). Energisa-only until issue 123. See `metrics/MONEY.md`.
+
+```sh
+npm run money -- public/grafo-publico.json
+```

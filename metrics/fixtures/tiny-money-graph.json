@@ -1,0 +1,85 @@
+{
+  "nodes": [
+    { "id": "12345678000100", "kind": "company", "label": "ALPHA LISTED S.A.", "listed": true },
+    { "id": "87654321000100", "kind": "company", "label": "BETA UNPRICED S.A.", "listed": true },
+    { "id": "p-aaa11111", "kind": "person", "label": "ANA ALPHA" },
+    { "id": "p-bbb22222", "kind": "person", "label": "BRUNO BOTH" },
+    { "id": "p-ccc33333", "kind": "person", "label": "CARLA HOLE" },
+    { "id": "hold-1", "kind": "company", "label": "HOLD ONE" },
+    { "id": "hole-co", "kind": "company", "label": "HOLE CO" },
+    { "id": "tesouraria-alpha", "kind": "company", "label": "Ações em tesouraria" },
+    { "id": "outros-alpha", "kind": "company", "label": "Outros acionistas" }
+  ],
+  "edges": [
+    {
+      "from": "p-aaa11111",
+      "to": "hold-1",
+      "kind": "person_owns",
+      "pct_capital": 40,
+      "pct_votos": 50,
+      "source": "fixture cited"
+    },
+    {
+      "from": "hold-1",
+      "to": "12345678000100",
+      "kind": "company_owns",
+      "pct_capital": 50,
+      "pct_votos": 25,
+      "source": "fixture cited"
+    },
+    {
+      "from": "p-bbb22222",
+      "to": "12345678000100",
+      "kind": "person_owns",
+      "pct_capital": 10,
+      "pct_votos": 10,
+      "source": "fixture cited"
+    },
+    {
+      "from": "p-bbb22222",
+      "to": "hold-1",
+      "kind": "person_owns",
+      "pct_capital": 50,
+      "pct_votos": 50,
+      "source": "fixture cited"
+    },
+    {
+      "from": "p-bbb22222",
+      "to": "87654321000100",
+      "kind": "person_owns",
+      "pct_capital": 5,
+      "pct_votos": 5,
+      "source": "fixture cited"
+    },
+    {
+      "from": "tesouraria-alpha",
+      "to": "12345678000100",
+      "kind": "company_owns",
+      "pct_capital": 5,
+      "pct_votos": 5,
+      "source": "fixture cited"
+    },
+    {
+      "from": "outros-alpha",
+      "to": "12345678000100",
+      "kind": "company_owns",
+      "pct_capital": 20,
+      "pct_votos": 20,
+      "source": "fixture cited"
+    },
+    {
+      "from": "p-ccc33333",
+      "to": "hole-co",
+      "kind": "person_owns",
+      "source": "Receita hole"
+    },
+    {
+      "from": "hole-co",
+      "to": "12345678000100",
+      "kind": "company_owns",
+      "pct_capital": 10,
+      "pct_votos": 10,
+      "source": "fixture cited"
+    }
+  ]
+}
