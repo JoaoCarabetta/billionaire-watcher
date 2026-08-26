@@ -190,7 +190,6 @@ describe('Grafo person money panel (issue #130)', () => {
     it('other pages stay without extra JS', () => {
       const pagesDir = path.join(__dirname, '..', 'src', 'pages');
       const otherPages = [
-        'index.astro',
         'doacoes.astro',
         'metodologia.astro',
         '404.astro',

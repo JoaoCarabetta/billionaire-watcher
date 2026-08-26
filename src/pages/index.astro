@@ -2,8 +2,37 @@
 import { getFreeze, getIdentityFactsByPersonId, getRFPartnerEdgesByPersonId } from '../utils/fixtures';
 import type { Source } from '../types';
 import PageTools from '../components/PageTools.astro';
+import { mintCitedEmpresas } from '../lib/mint-empresa';
+import { loadPublicGrafo, mintCitedPessoas } from '../lib/mint-pessoa';
+import {
+  INDICE_EMPTY_GRAFO_ONLY,
+  INDICE_EMPTY_NOT_IN_ARCHIVE,
+  type MintedFicha,
+} from '../lib/indice-search';
 
 const freezePersons = getFreeze();
+const grafo = loadPublicGrafo();
+const mintedFichas: MintedFicha[] = [];
+const mintedIds = new Set<string>();
+for (const pessoa of mintCitedPessoas(grafo)) {
+  mintedFichas.push({ id: pessoa.id, label: pessoa.name, kind: 'person' });
+  mintedIds.add(pessoa.id);
+}
+for (const empresa of mintCitedEmpresas(grafo)) {
+  mintedFichas.push({ id: empresa.id, label: empresa.legal_name, kind: 'company' });
+  mintedIds.add(empresa.id);
+}
+for (const person of freezePersons) {
+  if (mintedIds.has(person.person_id)) {
+    continue;
+  }
+  mintedFichas.push({
+    id: person.person_id,
+    label: person.person_name,
+    kind: 'person',
+  });
+}
+const mintedJson = JSON.stringify(mintedFichas);
 
 // Build citation map for facts shown on home
 const citationMap = new Map<string, number>();
@@ -150,6 +179,59 @@ const getCitationNumber = (source: Source | undefined) => {
         font-weight: bold;
         margin-left: 0.1em;
       }
+
+      .indice-search {
+        position: relative;
+        margin: 0 0 1rem;
+      }
+
+      .indice-search label {
+        display: block;
+        font-size: 0.9rem;
+        color: #333;
+        margin-bottom: 0.35rem;
+      }
+
+      .indice-search input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      #indice-search-results {
+        list-style: none;
+        margin-top: 0.25rem;
+        padding: 0;
+        border: 1px solid #ddd;
+        background: #fff;
+      }
+
+      #indice-search-results[hidden],
+      #indice-search-grafo-only[hidden],
+      #indice-search-empty[hidden] {
+        display: none;
+      }
+
+      #indice-search-results a,
+      #indice-search-results span {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+      }
+
+      #indice-search-grafo-only,
+      #indice-search-empty {
+        margin-top: 0.35rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .indice-tools {
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+      }
     </style>
   </head>
   <body>
@@ -160,6 +242,21 @@ const getCitationNumber = (source: Source | undefined) => {
     <main>
       <section>
         <p>Arquivo cívico. Fatos citados de fontes públicas.</p>
+      </section>
+
+      <section>
+        <div class="indice-search">
+          <label for="indice-search">Buscar pessoa ou empresa</label>
+          <input id="indice-search" type="search" autocomplete="off" spellcheck="false">
+          <ul id="indice-search-results" hidden></ul>
+          <p id="indice-search-grafo-only" hidden>{INDICE_EMPTY_GRAFO_ONLY}</p>
+          <p id="indice-search-empty" hidden>{INDICE_EMPTY_NOT_IN_ARCHIVE}</p>
+        </div>
+        <p class="indice-tools">
+          <a href="/metodologia/">Metodologia</a>
+          {' · '}
+          <a href="/grafo/">Grafo</a>
+        </p>
       </section>
       
       <section>
@@ -229,6 +326,84 @@ const getCitationNumber = (source: Source | undefined) => {
         </p>
       </footer>
     </main>
+    <script type="application/json" id="indice-minted" set:html={mintedJson} />
+    <script>
+      import { classifyIndiceQuery } from '../lib/indice-search';
+
+      const searchInput = document.getElementById('indice-search');
+      const searchResults = document.getElementById('indice-search-results');
+      const grafoOnlyEmpty = document.getElementById('indice-search-grafo-only');
+      const archiveEmpty = document.getElementById('indice-search-empty');
+      const mintedEl = document.getElementById('indice-minted');
+      const minted = mintedEl ? JSON.parse(mintedEl.textContent || '[]') : [];
+
+      function hideSearch() {
+        if (searchResults) {
+          searchResults.hidden = true;
+          searchResults.replaceChildren();
+        }
+        if (grafoOnlyEmpty) grafoOnlyEmpty.hidden = true;
+        if (archiveEmpty) archiveEmpty.hidden = true;
+      }
+
+      function renderResult(result) {
+        if (!searchResults || !grafoOnlyEmpty || !archiveEmpty) {
+          return;
+        }
+        if (result.kind === 'empty') {
+          hideSearch();
+          return;
+        }
+        if (result.kind === 'not_in_archive') {
+          searchResults.hidden = true;
+          searchResults.replaceChildren();
+          grafoOnlyEmpty.hidden = true;
+          archiveEmpty.hidden = false;
+          return;
+        }
+        archiveEmpty.hidden = true;
+        grafoOnlyEmpty.hidden = result.kind !== 'grafo_only';
+        searchResults.replaceChildren();
+        for (const hit of result.hits) {
+          const item = document.createElement('li');
+          if (hit.href) {
+            const link = document.createElement('a');
+            link.href = hit.href;
+            link.textContent = hit.label;
+            item.appendChild(link);
+          } else {
+            const span = document.createElement('span');
+            span.textContent = hit.label;
+            item.appendChild(span);
+          }
+          searchResults.appendChild(item);
+        }
+        searchResults.hidden = result.hits.length === 0;
+      }
+
+      fetch('/grafo-publico.json')
+        .then((response) => response.json())
+        .then((data) => {
+          if (!searchInput) {
+            return;
+          }
+          searchInput.addEventListener('input', function () {
+            renderResult(classifyIndiceQuery(searchInput.value, data.nodes, minted));
+          });
+          searchInput.addEventListener('keydown', function (evt) {
+            if (evt.key !== 'Enter') {
+              return;
+            }
+            evt.preventDefault();
+            const result = classifyIndiceQuery(searchInput.value, data.nodes, minted);
+            if (result.kind === 'ficha' && result.href) {
+              window.location.assign(result.href);
+            } else {
+              renderResult(result);
+            }
+          });
+        });
+    </script>
     <PageTools />
   </body>
 </html>

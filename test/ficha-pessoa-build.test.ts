@@ -129,7 +129,7 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
   it('home stays the freeze-elite list and other pages stay without extra script tags', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     const home = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
-    expect(withoutJsonLdAndPageTools(home)).not.toMatch(/<script/);
+    expect(home).toContain('/pessoa/p1');
     expect(home).not.toContain('/pessoa/p-cdbc8c4e');
     expect(home).not.toContain('/pessoa/p-da3e3836');
     expect(

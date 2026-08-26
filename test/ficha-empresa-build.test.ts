@@ -153,7 +153,7 @@ describe('Built /empresa/ fichas and sitemap (issue #148)', () => {
   it('home stays the freeze-elite list and other pages stay without extra script tags', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     const home = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
-    expect(home).not.toMatch(/<script/);
+    expect(home).toContain('/pessoa/p1');
     expect(home).not.toContain('/empresa/00864214000106');
     expect(home).not.toContain('/empresa/record');
     expect(fs.readFileSync(path.join(distPath, 'metodologia', 'index.html'), 'utf-8')).not.toMatch(/<script/);
