@@ -2,7 +2,7 @@
 
 Arquivo cívico de poder econômico. Não é ranking Forbes. Não é terminal de investimento.
 
-Os scripts leem `grafo-publico.json` (`nodes` + `edges`) do tamanho que o arquivo tiver. Não há constante de 11, 31, 403 ou 492 nós. Sementes listadas vêm de `LISTED_COMPANY_IDS` em `src/lib/grafo-panel.ts` e de qualquer nó que o JSON marque (`listed: true` ou `kind: listed`).
+Os scripts leem `grafo-publico.json` (`nodes` + `edges`) do tamanho que o arquivo tiver. Não há constante de 11, 31, 33, 403, 492, 524 ou 665 nós. Sementes listadas vêm de `LISTED_COMPANY_IDS` em `src/lib/grafo-panel.ts` e de qualquer nó que o JSON marque (`listed: true` ou `kind: listed`).
 
 ## Como rodar
 
@@ -73,7 +73,7 @@ npx vitest run test/grafo-metrics.test.ts
 
 ## Dinheiro sob controle
 
-Sibling command (issue 116). Energisa test fixture. Other listadas stay without money. Do not wait for issue 115. See `metrics/MONEY.md`.
+Sibling command (issue 116). Energisa-only until issue 115 lands prices. WEG, Ambev, and the other listadas stay without money. See `metrics/MONEY.md`.
 
 ```sh
 npm run money -- public/grafo-publico.json

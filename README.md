@@ -7,7 +7,7 @@ Arquivo cívico de poder econômico no Brasil — dossiês HTML gerados de dados
 npm test        # Run tests
 npm run build   # Build static site to ./dist/
 npm run metrics -- public/grafo-publico.json  # Relevance tables from the public graph
-npm run money -- public/grafo-publico.json    # Dinheiro sob controle (Energisa test fixture; other listadas stay without money)
+npm run money -- public/grafo-publico.json    # Dinheiro sob controle (Energisa-only until #115)
 ```
 
 ## Agent Readiness

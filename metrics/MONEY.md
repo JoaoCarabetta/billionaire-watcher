@@ -56,7 +56,7 @@ Ivan Müller Botelho através da Gipar é um grupo de último salto. A Gipar tem
 ## O que não dá para precificar
 
 - Veículos não listados (Gipar, Nova Gipar, Itacatu, Multisetor, LTD, …): não têm V. Só entra a fatia citada de uma semente listada precificada.
-- Outras cias abertas: **ficam sem dinheiro**. Não esperar a issue 115. Data Engineer é dono da 115. Issue 115 / PR 120 é *recorded fixture quote* (teste). Não é valor de arquivo. Vale, WEG, Ambev e o restante não recebem coluna de dinheiro neste PR.
+- Outras cias abertas: **Energisa-only until issue 115 lands prices**. WEG, Ambev e o restante não recebem coluna de dinheiro neste PR. Issue 115 / PR 120 é *recorded fixture quote* (teste). Não é valor de arquivo.
 - Buraco no caminho: sem dinheiro naquele caminho.
 - Outros e tesouraria: sem dinheiro.
 - Cotistas de fundo: não estão no arquivo.

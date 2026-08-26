@@ -13,8 +13,9 @@
  *
  * Energisa money uses the Energisa *test fixture* (ticker ENGI), not a live
  * Bolsa pull and not a confirmed BigQuery row. Latest preco_date 2026-08-21.
- * Other listadas stay without money. Do not wait for issue 115. Data Engineer
- * owns 115. Issue 115 recorded fixture quotes are not civic-archive value.
+ * Other listadas stay without money until issue 115 lands prices. WEG, Ambev,
+ * and the rest are not priced here. Issue 115 recorded fixture quotes are not
+ * civic-archive value.
  */
 
 import { readFileSync } from 'node:fs';
@@ -153,7 +154,7 @@ export type MoneyResult = {
 
 export const ENERGISA_TEST_FIXTURE_LABEL =
   'Energisa test fixture (ticker ENGI; not a live Bolsa pull; not a confirmed BigQuery row)';
-/** Other listadas stay without money. Data Engineer owns issue 115. */
+/** Energisa-only until issue 115 lands prices. WEG/Ambev stay unpriced. */
 export const ENERGISA_CNPJ_BASICO = '00864214';
 export const ARCHIVE_BOLSA_SOURCE = /brasil\s+bolsa\s+balc[aã]o/i;
 export const RECORDED_FIXTURE_QUOTE = /recorded\s+fixture\s+quote/i;
@@ -815,7 +816,7 @@ export function computeMoneyUnderControl(
     node_totals: nodeTotals,
     cannot_measure: [
       'unlisted vehicles: no listed value; only a cited slice of a priced listed seed',
-      'cias abertas other than Energisa: stay without money (do not wait for issue 115; Data Engineer owns 115; recorded fixture quotes are skipped)',
+      'cias abertas other than Energisa: no money until issue 115 lands prices (WEG, Ambev, and the other listadas stay unpriced; recorded fixture quotes are skipped)',
       'hole on a path: that path yields no money',
       'Outros and tesouraria: no money',
       'fund cotistas: not in this file',
@@ -964,7 +965,7 @@ export function formatMoneyReport(result: MoneyResult): string {
     'Person total on a listed seed = sum of last-hop groups. Direct hop is one group. Nested rows are marked; do not add them.'
   );
   lines.push(
-    'Other listadas stay without money. Do not wait for issue 115. Data Engineer owns 115. Energisa prices are the test fixture (ticker ENGI), not a live Bolsa pull and not a confirmed BigQuery row.'
+    'Energisa-only until issue 115 lands prices. WEG, Ambev, and the other listadas stay without money. Energisa prices are the test fixture (ticker ENGI), not a live Bolsa pull and not a confirmed BigQuery row.'
   );
   lines.push('');
   lines.push('## Wealth');
@@ -977,7 +978,7 @@ export function formatMoneyReport(result: MoneyResult): string {
   lines.push('');
   lines.push('## Priced listed seeds this run (Energisa test fixture)');
   if (result.graph.priced_listed_seed_ids.length === 0) {
-    lines.push('None. Other listadas stay without money.');
+    lines.push('None. Energisa-only until issue 115 lands prices.');
   } else {
     const valueRows = result.listed_values.map((row) => [
       row.cnpj_basico,
@@ -993,7 +994,7 @@ export function formatMoneyReport(result: MoneyResult): string {
     lines.push('');
     lines.push('## Recorded fixture quotes (not archive value; no reais)');
     lines.push(
-      `Skipped ${result.skipped_fixture_quotes.length} quote row(s) from issue 115. Other listadas stay without money. Data Engineer owns 115.`
+      `Skipped ${result.skipped_fixture_quotes.length} quote row(s) from issue 115. WEG, Ambev, and the other listadas stay without money until issue 115 lands prices.`
     );
     const skipRows = result.skipped_fixture_quotes.map((row) => [
       row.cnpj_basico,
@@ -1007,7 +1008,7 @@ export function formatMoneyReport(result: MoneyResult): string {
   if (result.graph.unpriced_listed_seed_ids.length > 0) {
     lines.push('');
     lines.push(
-      `Listed seeds without archive money this run: ${result.graph.unpriced_listed_seed_ids.length} (other listadas stay without money; do not wait for issue 115).`
+      `Listed seeds without archive money this run: ${result.graph.unpriced_listed_seed_ids.length} (Energisa-only until issue 115 lands prices).`
     );
   }
   lines.push('');

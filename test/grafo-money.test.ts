@@ -130,9 +130,9 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(report).not.toMatch(/richest/i);
       expect(report).toMatch(/Wealth REFUSED/);
       expect(outputContainsCpf(report)).toBe(false);
-      expect(report).toMatch(/Do not wait for issue 115/);
-      expect(report).toMatch(/Other listadas stay without money/);
-      expect(report).not.toMatch(/until issue 115/);
+      expect(report).toMatch(/until issue 115/);
+      expect(report).toMatch(/WEG, Ambev, and the other listadas stay without money/);
+      expect(report).not.toMatch(/Do not wait for issue 115/);
     });
   });
 
@@ -168,6 +168,9 @@ describe('Dinheiro sob controle (issue #116)', () => {
         expect(text).not.toMatch(/\b130\b/);
         expect(text).not.toMatch(/\b403\b/);
         expect(text).not.toMatch(/\b492\b/);
+        expect(text).not.toMatch(/\b524\b/);
+        expect(text).not.toMatch(/\b665\b/);
+        expect(text).not.toMatch(/\b33\b/);
       }
     });
 
@@ -214,13 +217,14 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(result.last_hop_rows.every((row) => row.listed_seed_id === ENERGISA)).toBe(true);
 
       const vale = graph.nodes.find((node) => /^VALE/i.test(node.label));
-      const weg = graph.nodes.find((node) => /WEG/i.test(node.label) && node.kind === 'company');
-      const ambev = graph.nodes.find((node) => /AMBEV/i.test(node.label));
+      const weg = graph.nodes.find((node) => node.id === '84429695000111');
+      const ambev = graph.nodes.find((node) => node.id === '07526557000100');
+      expect(vale).toBeDefined();
+      expect(weg).toBeDefined();
+      expect(ambev).toBeDefined();
       for (const node of [vale, weg, ambev]) {
-        if (!node) {
-          continue;
-        }
-        expect(result.node_totals.some((row) => row.listed_seed_id === node.id)).toBe(false);
+        expect(result.graph.priced_listed_seed_ids).not.toContain(node!.id);
+        expect(result.node_totals.some((row) => row.listed_seed_id === node!.id)).toBe(false);
       }
       expect(result.skipped_fixture_quotes.length).toBeGreaterThan(0);
       expect(result.skipped_fixture_quotes.every((row) => /recorded fixture quote/i.test(row.source))).toBe(
@@ -359,7 +363,10 @@ describe('Dinheiro sob controle (issue #116)', () => {
       expect(output).toMatch(/2026-08-21/);
       expect(output).toMatch(/ENGI/);
       expect(output).not.toMatch(/2026-08-20/);
-      expect(output).toMatch(/Do not wait for issue 115/);
+      expect(output).toMatch(/until issue 115/);
+      expect(output).not.toMatch(/Do not wait for issue 115/);
+      expect(output).not.toMatch(/WEGE3[^\n]*[0-9]+\.[0-9]{2} reais/);
+      expect(output).not.toMatch(/ABEV3[^\n]*[0-9]+\.[0-9]{2} reais/);
       expect(output).not.toMatch(/fortuna/i);
       expect(output).not.toMatch(/(?<![\d.])\d{11}(?![\d.])/);
     });
