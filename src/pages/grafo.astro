@@ -114,6 +114,65 @@
       .info a {
         font-weight: 500;
       }
+
+      .grafo-search {
+        position: relative;
+        max-width: 28rem;
+        margin: 0 auto 1rem;
+        z-index: 3;
+      }
+
+      .grafo-search label {
+        display: block;
+        font-size: 0.9rem;
+        color: #333;
+        margin-bottom: 0.35rem;
+      }
+
+      .grafo-search input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      #grafo-search-results {
+        list-style: none;
+        margin-top: 0.25rem;
+        padding: 0;
+        border: 1px solid #ddd;
+        background: #fff;
+        max-height: 16rem;
+        overflow: auto;
+      }
+
+      #grafo-search-results[hidden],
+      #grafo-search-empty[hidden] {
+        display: none;
+      }
+
+      #grafo-search-results button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      #grafo-search-results button:hover,
+      #grafo-search-results button:focus {
+        background: #f0f4f8;
+      }
+
+      #grafo-search-empty {
+        margin-top: 0.35rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
     </style>
   </head>
   <body>
@@ -127,6 +186,12 @@
       <div class="info">
         <p>529 nós, 670 arestas | Dados: <a href="/grafo-publico.json">grafo-publico.json</a></p>
       </div>
+      <div class="grafo-search">
+        <label for="grafo-search">Buscar pessoa ou empresa</label>
+        <input id="grafo-search" type="search" autocomplete="off" spellcheck="false">
+        <ul id="grafo-search-results" hidden></ul>
+        <p id="grafo-search-empty" hidden>Nenhuma pessoa ou empresa neste grafo.</p>
+      </div>
       <div class="grafo-stage">
         <div id="cy"></div>
         <aside id="panel" hidden></aside>
@@ -137,8 +202,12 @@
       import cytoscape from 'cytoscape';
       import { buildCytoscapeElements } from '../lib/grafo-elements';
       import { buildPanelView, renderPanelHtml } from '../lib/grafo-panel';
+      import { searchGrafoNodes } from '../lib/grafo-search';
 
       const panel = document.getElementById('panel');
+      const searchInput = document.getElementById('grafo-search');
+      const searchResults = document.getElementById('grafo-search-results');
+      const searchEmpty = document.getElementById('grafo-search-empty');
 
       function showPanel(view) {
         if (!panel) {
@@ -225,8 +294,53 @@
             }
           });
 
+          function openNodePanel(nodeId) {
+            showPanel(buildPanelView(data, { nodeId }));
+          }
+
+          function hideSearchList() {
+            if (searchResults) {
+              searchResults.hidden = true;
+              searchResults.replaceChildren();
+            }
+            if (searchEmpty) {
+              searchEmpty.hidden = true;
+            }
+          }
+
+          function renderSearchHits(hits) {
+            if (!searchResults || !searchEmpty) {
+              return;
+            }
+            searchResults.replaceChildren();
+            if (hits.length === 0) {
+              searchResults.hidden = true;
+              searchEmpty.hidden = false;
+              return;
+            }
+            searchEmpty.hidden = true;
+            for (const hit of hits) {
+              const item = document.createElement('li');
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.dataset.nodeId = hit.id;
+              button.textContent = hit.label;
+              item.appendChild(button);
+              searchResults.appendChild(item);
+            }
+            searchResults.hidden = false;
+          }
+
+          function selectSearchHit(nodeId) {
+            openNodePanel(nodeId);
+            const ele = cy.getElementById(nodeId);
+            if (ele.nonempty()) {
+              cy.fit(ele, 80);
+            }
+          }
+
           cy.on('tap', 'node', function (evt) {
-            showPanel(buildPanelView(data, { nodeId: evt.target.id() }));
+            openNodePanel(evt.target.id());
           });
 
           cy.on('tap', 'edge', function (evt) {
@@ -241,6 +355,38 @@
               showPanel(null);
             }
           });
+
+          if (searchInput) {
+            searchInput.addEventListener('input', function () {
+              const query = searchInput.value;
+              if (!query.trim()) {
+                hideSearchList();
+                return;
+              }
+              renderSearchHits(searchGrafoNodes(data.nodes, query));
+            });
+
+            searchInput.addEventListener('keydown', function (evt) {
+              if (evt.key !== 'Enter') {
+                return;
+              }
+              evt.preventDefault();
+              const hits = searchGrafoNodes(data.nodes, searchInput.value);
+              if (hits[0]) {
+                selectSearchHit(hits[0].id);
+              }
+            });
+          }
+
+          if (searchResults) {
+            searchResults.addEventListener('click', function (evt) {
+              const button = evt.target.closest('button[data-node-id]');
+              if (!button) {
+                return;
+              }
+              selectSearchHit(button.dataset.nodeId);
+            });
+          }
         })
         .catch(error => {
           console.error('Erro ao carregar o grafo:', error);
