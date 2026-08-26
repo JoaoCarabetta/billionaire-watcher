@@ -346,6 +346,51 @@
       "label": "WishBone Management LP"
     },
     {
+      "id": "02049012000136",
+      "kind": "company",
+      "label": "AURORA TEXTIL LTDA"
+    },
+    {
+      "id": "58534632000115",
+      "kind": "company",
+      "label": "BSIM PARTICIPACOES E HOLDING LTDA"
+    },
+    {
+      "id": "42601461000160",
+      "kind": "company",
+      "label": "GREEN HOLDING LTDA"
+    },
+    {
+      "id": "61563585000142",
+      "kind": "company",
+      "label": "MAMS INVESTMENTS LTDA"
+    },
+    {
+      "id": "23349343000161",
+      "kind": "company",
+      "label": "MULTIAGRO AGROPECUARIA COMERCIO E INDUSTRIA LTDA"
+    },
+    {
+      "id": "43347650000110",
+      "kind": "company",
+      "label": "RBRA 6 SPE EMPREENDIMENTO IMOBILIARIO LTDA"
+    },
+    {
+      "id": "07544616000172",
+      "kind": "company",
+      "label": "RIBEIRA EMPREENDIMENTOS IMOBILIARIOS LTDA"
+    },
+    {
+      "id": "45278506000103",
+      "kind": "company",
+      "label": "RIBEIRA INCORPORACOES IMOBILIARIAS LTDA."
+    },
+    {
+      "id": "39513958000111",
+      "kind": "company",
+      "label": "RIBEIRA VENDAS E INTERMEDIACAO IMOBILIARIA LTDA"
+    },
+    {
       "id": "p-dbf7401a",
       "kind": "person",
       "label": "ADRIANA BOTELHO BASTOS ZAVERUCHA"
@@ -1479,6 +1524,60 @@
       "source": "FRE Energisa 160981",
       "pct_capital": 52.004,
       "pct_votos": 3.982
+    },
+    {
+      "from": "08542030000131",
+      "to": "61563585000142",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "20286787000107",
+      "to": "02049012000136",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "20286787000107",
+      "to": "23349343000161",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "07544616000172",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "39513958000111",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "42601461000160",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "43347650000110",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "45278506000103",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
+    },
+    {
+      "from": "32392209000134",
+      "to": "58534632000115",
+      "kind": "company_owns",
+      "source": "Receita / Quadro de Sócios 2026-01-11"
     }
   ]
 }
