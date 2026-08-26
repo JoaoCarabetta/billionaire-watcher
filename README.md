@@ -6,6 +6,7 @@ Arquivo cívico de poder econômico no Brasil — dossiês HTML gerados de dados
 ```sh
 npm test        # Run tests
 npm run build   # Build static site to ./dist/
+npm run metrics -- public/grafo-publico.json  # Relevance tables from the public graph
 ```
 
 ## Agent Readiness
