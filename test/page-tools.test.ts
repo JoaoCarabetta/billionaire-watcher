@@ -194,7 +194,7 @@ describe('Page tools (issue #157) — tool-function seam', () => {
     }
   });
 
-  it('public/register-page-tools.js no-ops without modelContext and registers from the archive payload', () => {
+  it('public/register-page-tools.js no-ops without modelContext and registers from the archive payload', async () => {
     const src = fs.readFileSync(
       path.join(__dirname, '..', 'public', 'register-page-tools.js'),
       'utf-8'
@@ -237,11 +237,16 @@ describe('Page tools (issue #157) — tool-function seam', () => {
     expect(byName.search_archive.annotations.readOnlyHint).toBe(true);
     expect(byName.get_person.annotations.readOnlyHint).toBe(true);
     expect(byName.get_methodology.annotations.readOnlyHint).toBe(true);
-    expect(byName.search_archive.execute({ query: 'Ivan' }).url).toBe('/pessoa/p-cdbc8c4e/');
-    expect(byName.search_archive.execute({ query: 'Muffato' }).status).toBe('grafo_only');
-    expect(byName.get_person.execute({ id: IVAN_ID }).source).toMatch(/Formul[aá]rio 6\.1/);
-    expect(byName.get_person.execute({ id: MUFFATO_ID })).toEqual({ status: 'grafo_only' });
-    expect(byName.get_methodology.execute({}).url).toBe('/metodologia/');
+    expect(await byName.search_archive.execute({ query: 'Ivan' })).toMatchObject({
+      status: 'ficha',
+      url: '/pessoa/p-cdbc8c4e/',
+    });
+    expect(await byName.search_archive.execute({ query: 'Muffato' })).toMatchObject({
+      status: 'grafo_only',
+    });
+    expect((await byName.get_person.execute({ id: IVAN_ID })).source).toMatch(/Formul[aá]rio 6\.1/);
+    expect(await byName.get_person.execute({ id: MUFFATO_ID })).toEqual({ status: 'grafo_only' });
+    expect((await byName.get_methodology.execute({})).url).toBe('/metodologia/');
 
     log.mockRestore();
     warn.mockRestore();
@@ -283,14 +288,14 @@ describe('Built pages include the registrar (issue #157)', () => {
     '404.html',
   ];
 
-  it('includes the registrar script and archive payload on published pages', () => {
+  it('includes the registrar script on published pages without inlining the archive', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     for (const rel of publishedPages) {
       const htmlPath = path.join(distPath, rel);
       expect(fs.existsSync(htmlPath), htmlPath).toBe(true);
       const html = fs.readFileSync(htmlPath, 'utf-8');
-      expect(html, rel).toContain(`id="${PAGE_TOOLS_ARCHIVE_ELEMENT_ID}"`);
       expect(html, rel).toContain('/register-page-tools.js');
+      expect(html, rel).not.toContain(`id="${PAGE_TOOLS_ARCHIVE_ELEMENT_ID}"`);
       const srcs = pageToolsScriptSrcs(html);
       expect(srcs.length, `${rel} should load register-page-tools.js`).toBeGreaterThan(0);
     }
@@ -309,18 +314,20 @@ describe('Built pages include the registrar (issue #157)', () => {
     expect(bundled).toMatch(/if\s*\(\s*!document\.modelContext\s*\)/);
   });
 
-  it('built tools output path has no eleven-digit Cadastro, no UBO, no raw 0.387', () => {
+  it('built tools archive JSON has Ivan money, no eleven-digit Cadastro, no UBO, no raw 0.387', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
-    const html = fs.readFileSync(path.join(distPath, 'pessoa', IVAN_ID, 'index.html'), 'utf-8');
-    const archiveMatch = html.match(
-      new RegExp(`<script[^>]*id="${PAGE_TOOLS_ARCHIVE_ELEMENT_ID}"[^>]*>([\\s\\S]*?)</script>`)
-    );
-    expect(archiveMatch, 'Ivan page must embed the tools archive').toBeTruthy();
-    const archiveText = archiveMatch![1];
+    const archivePath = path.join(distPath, 'page-tools-archive.json');
+    expect(fs.existsSync(archivePath)).toBe(true);
+    const archiveText = fs.readFileSync(archivePath, 'utf-8');
+    expect(archiveText).toContain(IVAN_ID);
+    expect(archiveText).toMatch(/Formul[aá]rio 6\.1/);
     expect(archiveText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
     expect(archiveText).not.toMatch(/\bUBO\b/i);
     expect(archiveText).not.toContain(String(LAST_HOP_SLICE));
-    expect(html).not.toContain('/empresa/');
+    expect(archiveText).not.toMatch(/\/empresa\//);
+    const ivanHtml = fs.readFileSync(path.join(distPath, 'pessoa', IVAN_ID, 'index.html'), 'utf-8');
+    expect(ivanHtml).toContain('/register-page-tools.js');
+    expect(ivanHtml).not.toContain('/empresa/');
   });
 
   it('does not add graph hash/query or /empresa/ routes', () => {

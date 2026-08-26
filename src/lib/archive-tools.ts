@@ -302,16 +302,6 @@ export function bootPageTools(doc: PageToolsHost): void {
   }
 }
 
-export function pageToolsMarkup(archiveJson: string, scriptSrc: string): string {
-  const safeJson = archiveJson.replace(/</g, '\\u003c');
-  return (
-    '<script id="' +
-    PAGE_TOOLS_ARCHIVE_ELEMENT_ID +
-    '" type="application/json">' +
-    safeJson +
-    '</script>' +
-    '<script src="' +
-    scriptSrc +
-    '"></script>'
-  );
+export function pageToolsMarkup(_archiveJson: string, scriptSrc: string): string {
+  return '<script src="' + scriptSrc + '"></script>';
 }

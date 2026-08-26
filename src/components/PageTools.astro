@@ -1,8 +1,3 @@
 ---
-import { PAGE_TOOLS_ARCHIVE_ELEMENT_ID } from '../lib/archive-tools';
-import { pageToolsArchiveJson } from '../lib/page-tools-data';
-
-const archiveJson = pageToolsArchiveJson().replace(/</g, '\\u003c');
 ---
-<script is:inline id={PAGE_TOOLS_ARCHIVE_ELEMENT_ID} type="application/json" set:html={archiveJson}></script>
 <script is:inline src="/register-page-tools.js"></script>

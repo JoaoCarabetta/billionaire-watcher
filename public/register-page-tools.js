@@ -13,19 +13,38 @@
   }
 
   function parseArchive(raw) {
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      return {
+        fichas: Array.isArray(raw.fichas) ? raw.fichas : [],
+        graph_people: Array.isArray(raw.graph_people) ? raw.graph_people : [],
+        methodology: Array.isArray(raw.methodology) ? raw.methodology : []
+      };
+    }
     if (typeof raw !== 'string' || raw.trim() === '') {
       return emptyArchive();
     }
     try {
-      var parsed = JSON.parse(raw);
-      return {
-        fichas: Array.isArray(parsed.fichas) ? parsed.fichas : [],
-        graph_people: Array.isArray(parsed.graph_people) ? parsed.graph_people : [],
-        methodology: Array.isArray(parsed.methodology) ? parsed.methodology : []
-      };
+      return parseArchive(JSON.parse(raw));
     } catch (err) {
       return emptyArchive();
     }
+  }
+
+  function loadArchive() {
+    var el = document.getElementById('page-tools-archive');
+    if (el && el.textContent) {
+      return Promise.resolve(parseArchive(el.textContent));
+    }
+    return fetch('/page-tools-archive.json')
+      .then(function (response) {
+        if (!response.ok) {
+          return emptyArchive();
+        }
+        return response.json().then(parseArchive);
+      })
+      .catch(function () {
+        return emptyArchive();
+      });
   }
 
   function fold(value) {
@@ -80,7 +99,7 @@
     for (i = 0; i < archive.fichas.length; i += 1) {
       if (archive.fichas[i].id === wanted) {
         var ficha = archive.fichas[i];
-        return {
+        var out = {
           status: 'ficha',
           id: ficha.id,
           name: ficha.name,
@@ -88,11 +107,18 @@
           company_label: ficha.company_label,
           source: ficha.source,
           date: ficha.date,
-          url: ficha.url,
-          money_economic: ficha.money_economic,
-          money_control: ficha.money_control,
-          note: ficha.note
+          url: ficha.url
         };
+        if (ficha.money_economic) {
+          out.money_economic = ficha.money_economic;
+        }
+        if (ficha.money_control) {
+          out.money_control = ficha.money_control;
+        }
+        if (ficha.note) {
+          out.note = ficha.note;
+        }
+        return out;
       }
     }
     for (i = 0; i < archive.graph_people.length; i += 1) {
@@ -107,8 +133,7 @@
     return { url: '/metodologia/', facts: archive.methodology };
   }
 
-  var el = document.getElementById('page-tools-archive');
-  var archive = parseArchive(el && el.textContent);
+  var archivePromise = loadArchive();
   var ctx = document.modelContext;
 
   function ignore() {}
@@ -134,7 +159,9 @@
     },
     annotations: { readOnlyHint: true },
     execute: function (input) {
-      return searchArchive(archive, input && typeof input.query === 'string' ? input.query : '');
+      return archivePromise.then(function (archive) {
+        return searchArchive(archive, input && typeof input.query === 'string' ? input.query : '');
+      });
     }
   });
 
@@ -150,7 +177,9 @@
     },
     annotations: { readOnlyHint: true },
     execute: function (input) {
-      return getPerson(archive, input && typeof input.id === 'string' ? input.id : '');
+      return archivePromise.then(function (archive) {
+        return getPerson(archive, input && typeof input.id === 'string' ? input.id : '');
+      });
     }
   });
 
@@ -161,7 +190,7 @@
     inputSchema: { type: 'object', properties: {} },
     annotations: { readOnlyHint: true },
     execute: function () {
-      return getMethodology(archive);
+      return archivePromise.then(getMethodology);
     }
   });
 })();

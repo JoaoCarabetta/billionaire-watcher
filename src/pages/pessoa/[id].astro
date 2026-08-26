@@ -25,8 +25,6 @@ import {
   renderFichaHtml,
   type CitedPessoa,
 } from '../../lib/mint-pessoa';
-import { pageToolsMarkup } from '../../lib/archive-tools';
-import { pageToolsArchiveJson } from '../../lib/page-tools-data';
 import PageTools from '../../components/PageTools.astro';
 
 export async function getStaticPaths() {
@@ -59,7 +57,7 @@ if (ficha) {
     renderFichaHtml(
       ficha,
       fichaMoneyFor(ficha, loadPublicMoney()),
-      pageToolsMarkup(pageToolsArchiveJson(), '/register-page-tools.js')
+      '<script src="/register-page-tools.js"></script>'
     ),
     {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
