@@ -255,7 +255,7 @@ describe('Dinheiro sob controle (issue #116)', () => {
 
       expect(ivan!.slice_votos).not.toBeCloseTo(giparEnergisa.pct_votos as number, 3);
       expect(ivanOfGiparVot).toBeLessThan(100);
-      expect(ivan!.slice_votos / (giparEnergisa.pct_votos as number)).toBeCloseTo(
+      expect(viaG!.slice_votos / (giparEnergisa.pct_votos as number)).toBeCloseTo(
         ivanOfGiparVot / 100,
         5
       );

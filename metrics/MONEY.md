@@ -58,6 +58,23 @@ Ivan Müller Botelho através da Gipar é um grupo de último salto. A Gipar tem
 
 Wealth REFUSED.
 
+## Worked example (from `npm run money -- public/grafo-publico.json --date 2026-08-21`)
+
+IVAN MÜLLER BOTELHO `p-cdbc8c4e` → ENERGISA S.A. `00864214000106` on 2026-08-21.
+
+V = 31727935941.15 reais (ON 45.75 × 609526325 + PN 43.10 × 89144004).
+
+Last-hop groups:
+
+- self (direct FRE): 0.387% capital / 0.208% votes → economic 122787112.09 / control 65994106.76
+- Multisetor: 0.235% / 0.156% → 74563216.25 / 49484897.27
+- Itacatu: 0.011% / 0.006% → 3392861.45 / 1938777.97
+- Gipar: 15.226% / 34.950% → 4831045263.12 / 11088958582.26 (product; he does not take Gipar at 100%)
+
+Person total (sum of groups): 15.859% capital / 35.320% votes → economic 5031788452.91 reais (5.03 billion reais); control 11206376364.26 reais (11.21 billion reais).
+
+Do not add Gipar 8.45 billion economic / 19.41 billion control on top of Ivan 5.03 / 11.21. Those Gipar reais already contain Ivan-through-Gipar.
+
 ## Testes
 
 ```sh
