@@ -51,23 +51,28 @@ interface Props {
 }
 
 const { person, ficha } = Astro.props;
-const fichaHtml = ficha
-  ? renderFichaHtml(ficha, fichaMoneyFor(ficha, loadPublicMoney()))
-  : null;
-const identityFacts = person ? getIdentityFactsByPersonId(person.person_id) : [];
-const rfPartnerEdges = person ? getRFPartnerEdgesByPersonId(person.person_id) : [];
-const cvmFreControls = person ? getCVMFREControlsByPersonId(person.person_id) : [];
-const donations = person ? getDonationsByPersonId(person.person_id) : [];
-const associations = person ? getDerivedAssociationsByPersonId(person.person_id) : [];
+if (ficha) {
+  return new Response(renderFichaHtml(ficha, fichaMoneyFor(ficha, loadPublicMoney())), {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
+}
+if (!person) {
+  return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+}
+const identityFacts = getIdentityFactsByPersonId(person.person_id);
+const rfPartnerEdges = getRFPartnerEdgesByPersonId(person.person_id);
+const cvmFreControls = getCVMFREControlsByPersonId(person.person_id);
+const donations = getDonationsByPersonId(person.person_id);
+const associations = getDerivedAssociationsByPersonId(person.person_id);
 
 // Find name fact for title, or fallback to freeze CSV name as index chrome
 const nameFact = identityFacts.find(f => f.field === 'nome');
-const pageTitle = nameFact ? nameFact.value : (person?.person_name ?? '');
+const pageTitle = nameFact ? nameFact.value : person.person_name;
 
 // Get CPF for JSON-LD (masked format)
 // Both identity facts and freeze CSV cpf need redaction for old fixtures
 const cpfFromFacts = identityFacts.find(f => f.cpf)?.cpf;
-const cpfForJsonLd = cpfFromFacts ? redactCPF(cpfFromFacts) : (person?.cpf ? redactCPF(person.cpf) : null);
+const cpfForJsonLd = cpfFromFacts ? redactCPF(cpfFromFacts) : (person.cpf ? redactCPF(person.cpf) : null);
 
 // Build citation map: unique sources by first appearance, numbered sequentially
 const citationMap = new Map<string, number>();
@@ -92,8 +97,6 @@ for (const source of allSources) {
 // Helper to get citation number for a source
 const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
 ---
-
-{fichaHtml ? <Fragment set:html={fichaHtml} /> : person && (
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -335,5 +338,3 @@ const getCitationNumber = (source: Source) => citationMap.get(source.locator)!;
     </main>
   </body>
 </html>
-
-)}
