@@ -269,6 +269,7 @@ describe('Metodologia Page', () => {
       'O grafo não é um ranking de patrimônio e não copia a lista Forbes.',
       'A fatia citada de capital ou de votos vezes o valor de bolsa datado de uma companhia aberta não é fortuna.',
       'Não se reparte igualmente um bloco sem percentual citado, nem se inventa quantidade de ações.',
+      'Ato oficial que nomeia sócio ou acionista entra no arquivo mesmo sem percentual citado. O percentual fica vazio. Não se reparte o bloco. Não se rotula dono.',
       'Percorrer as mil linhas do ranking industrial Valor 1000 e desenhá-las no grafo está fora desta versão; o mapa tabular dessas empresas não é o passeio.',
       'Repetir o método noutro país começa pela tabela oficial de controlador da companhia aberta daquele foro, equivalente ao Formulário de Referência seção 6.1.',
       'Para sociedade fechada, usa-se a tabela oficial de sócios e administradores daquele foro, equivalente ao Quadro de Sócios da Receita Federal.',
@@ -295,6 +296,7 @@ describe('Metodologia Page', () => {
       expect(builtHtml).toContain('Feldmann');
       expect(builtHtml).toContain('não é fortuna');
       expect(builtHtml).toContain('noutro país');
+      expect(builtHtml).toContain('sem percentual citado');
     });
 
     it('should publish every new sentence verbatim with a matching citation marker and footer', () => {
@@ -333,6 +335,14 @@ describe('Metodologia Page', () => {
     it('should never label a Receita partner as dono', () => {
       expect(builtHtml).not.toMatch(/rotulad[ao]s?\s+como\s+dono|é\s+dono|são\s+donos/i);
       expect(builtHtml).toMatch(/nunca\s+como\s+dono/i);
+      expect(builtHtml).toContain('Não se rotula dono');
+    });
+
+    it('should keep unnamed percent empty and never equal-split the block', () => {
+      expect(builtHtml).toContain('O percentual fica vazio');
+      expect(builtHtml).toContain('Não se reparte o bloco');
+      expect(builtHtml).toContain('Não se reparte igualmente um bloco sem percentual citado');
+      expect(builtHtml).not.toMatch(/reparte-se igualmente|repartir igualmente o bloco|divide-se o bloco em partes iguais/i);
     });
 
     it('should keep home and dossier links to /metodologia', () => {

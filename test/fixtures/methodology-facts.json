@@ -252,6 +252,15 @@
     }
   },
   {
+    "id": "metod-limitacao-ato-oficial-percentual-vazio",
+    "value": "Ato oficial que nomeia sócio ou acionista entra no arquivo mesmo sem percentual citado. O percentual fica vazio. Não se reparte o bloco. Não se rotula dono.",
+    "source": {
+      "publisher": "Billionaire Watcher",
+      "locator": "https://github.com/JoaoCarabetta/billionaire-watcher/issues/136",
+      "retrieved_at": "2026-08-26"
+    }
+  },
+  {
     "id": "metod-limitacao-valor1000-fora-versao",
     "value": "Percorrer as mil linhas do ranking industrial Valor 1000 e desenhá-las no grafo está fora desta versão; o mapa tabular dessas empresas não é o passeio.",
     "source": {
