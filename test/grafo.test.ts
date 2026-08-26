@@ -36,28 +36,28 @@ describe('Grafo Page (issue #74)', () => {
       expect(fs.existsSync(jsonPath), 'grafo-publico.json should exist in public/').toBe(true);
     });
 
-    it('should have exactly 527 nodes', () => {
+    it('should have exactly 529 nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.nodes).toBeDefined();
-      expect(json.nodes.length).toBe(527);
+      expect(json.nodes.length).toBe(529);
     });
 
-    it('should have exactly 197 person nodes', () => {
+    it('should have exactly 199 person nodes', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       const personNodes = json.nodes.filter((n: any) => n.kind === 'person');
-      expect(personNodes.length).toBe(197);
+      expect(personNodes.length).toBe(199);
     });
 
-    it('should have exactly 668 edges', () => {
+    it('should have exactly 670 edges', () => {
       const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
       const json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
       
       expect(json.edges).toBeDefined();
-      expect(json.edges.length).toBe(668);
+      expect(json.edges.length).toBe(670);
     });
 
     it('should have the thirty-three listed company ids', () => {
@@ -246,8 +246,8 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const companyNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'company');
 
-      expect(json.nodes.length).toBe(527);
-      expect(json.edges.length).toBe(668);
+      expect(json.nodes.length).toBe(529);
+      expect(json.edges.length).toBe(670);
       expect(companyNodes.length).toBe(330);
 
       for (const company of HOLE_COMPANIES) {
@@ -296,7 +296,7 @@ describe('Grafo Page (issue #74)', () => {
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = new Set(personNodes.map((n: { id: string }) => n.id));
 
-      expect(personNodes.length).toBe(197);
+      expect(personNodes.length).toBe(199);
       for (const id of FROZEN_PERSON_IDS) {
         expect(personIds.has(id), `frozen person ${id} should remain`).toBe(true);
       }
@@ -305,11 +305,11 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(true);
     });
 
-    it('page copy names 527 nodes and 668 edges', () => {
+    it('page copy names 529 nodes and 670 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('527 nós, 668 arestas');
-      expect(page).not.toContain('524 nós, 665 arestas');
+      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).not.toContain('527 nós, 668 arestas');
     });
   });
 
@@ -926,7 +926,7 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy matches the post-union node and edge counts and has no fortuna', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('527 nós, 668 arestas');
+      expect(page).toContain('529 nós, 670 arestas');
       expect(page).not.toMatch(/fortuna/i);
     });
   });
@@ -1344,9 +1344,10 @@ describe('Grafo Page (issue #74)', () => {
       'p-c63f4853', 'p-ca22e731', 'p-ca645ca0', 'p-cb00e854', 'p-cbb7fdd7',
       'p-cd7a4b97', 'p-cdbc8c4e', 'p-cf17dea2', 'p-cf538a76', 'p-d02bceb2',
       'p-d02e2ddd', 'p-d09d0ee6', 'p-d3cc9ed4', 'p-d49364c9', 'p-d5231da6',
-      'p-d584d2cc', 'p-d5b7fd2a', 'p-d91896df', 'p-d96d26db', 'p-dbce5574',
-      'p-dbf7401a', 'p-dd3cf03b', 'p-dfe70769', 'p-dfef8e07', 'p-e2ecb2dd',
-      'p-e31b35c3', 'p-e685cd09', 'p-e8022ca0', 'p-ea4eb254', 'p-eb101ae8',
+      'p-d584d2cc', 'p-d5b7fd2a', 'p-d91896df', 'p-d96d26db', 'p-da3e3836',
+      'p-dbce5574', 'p-dbf7401a', 'p-dd3cf03b', 'p-dfe70769', 'p-dfef8e07',
+      'p-e1365405', 'p-e2ecb2dd', 'p-e31b35c3', 'p-e685cd09', 'p-e8022ca0',
+      'p-ea4eb254', 'p-eb101ae8',
       'p-ed3f85fd', 'p-edaa3573', 'p-ee7b22d1', 'p-f25ff412', 'p-f3bdf8a1',
       'p-f3c190ea', 'p-f42e6571', 'p-f48ec877', 'p-f511f986', 'p-f53dc520',
       'p-f5bde2d4', 'p-f5f008f9', 'p-f8603dda', 'p-fad7000a', 'p-faf6d605',
@@ -1451,14 +1452,14 @@ describe('Grafo Page (issue #74)', () => {
       ).toBe(false);
     });
 
-    it('keeps 527 nodes, 668 edges, 197 person ids, and draws no partner-name edges', () => {
+    it('keeps 529 nodes, 670 edges, 199 person ids, and draws no partner-name edges', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id).sort();
 
-      expect(json.nodes.length).toBe(527);
-      expect(json.edges.length).toBe(668);
-      expect(personNodes.length).toBe(197);
+      expect(json.nodes.length).toBe(529);
+      expect(json.edges.length).toBe(670);
+      expect(personNodes.length).toBe(199);
       expect(personIds).toEqual([...FROZEN_PERSON_IDS_UNION].sort());
 
       const partnerNames = new Set(allPartnerNames(json));
@@ -1668,8 +1669,8 @@ describe('Grafo Page (issue #74)', () => {
     it('page copy matches the post-union node and edge counts and has no fortuna', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('527 nós, 668 arestas');
-      expect(page).not.toContain('524 nós, 665 arestas');
+      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).not.toContain('527 nós, 668 arestas');
       expect(page).not.toMatch(/fortuna/i);
     });
 
@@ -1754,6 +1755,10 @@ describe('Grafo Page (issue #74)', () => {
       'SANTA LUZIA COMERCIAL E PARTICIPACOES LTDA',
       'OPPORTUNITY HOLDERS PARTICIPACOES LTDA',
     ]);
+    const TSE_PERSON_NAMES = new Set([
+      'JOAQUIM DA SILVA FERREIRA',
+      'EDUARDO DE ALMEIDA SANTOS',
+    ]);
     const DYNAMO_TESOURARIA_NAME = 'DYNAMO ADMINISTRACAO DE RECURSOS LTDA';
 
     function loadCommittedGrafo() {
@@ -1783,9 +1788,9 @@ describe('Grafo Page (issue #74)', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
 
-      expect(json.nodes.length).toBe(527);
-      expect(json.edges.length).toBe(668);
-      expect(personNodes.length).toBe(197);
+      expect(json.nodes.length).toBe(529);
+      expect(json.edges.length).toBe(670);
+      expect(personNodes.length).toBe(199);
 
       for (const company of PJ_SOCIAS) {
         const node = json.nodes.find((n: { id: string }) => n.id === company.id);
@@ -1818,13 +1823,13 @@ describe('Grafo Page (issue #74)', () => {
       }
     });
 
-    it('keeps 197 person nodes and mints no new p- ids, including none for Ache', () => {
+    it('keeps 199 person nodes and mints no p- node for Ache', () => {
       const json = loadCommittedGrafo();
       const personNodes = json.nodes.filter((n: { kind: string; id: string; label: string }) => n.kind === 'person');
       const personIds = personNodes.map((n: { id: string }) => n.id);
 
-      expect(personNodes.length).toBe(197);
-      expect(personIds).toHaveLength(197);
+      expect(personNodes.length).toBe(199);
+      expect(personIds).toHaveLength(199);
       for (const id of personIds) {
         expect(id, `person id ${id} must stay p- plus eight hex`).toMatch(/^p-[0-9a-f]{8}$/);
       }
@@ -1854,7 +1859,7 @@ describe('Grafo Page (issue #74)', () => {
       expect(html).toContain('Sócio-Administrador');
     });
 
-    it('does not mint nodes for the 86 masked PF names; Dynamo tesouraria stays a name; Lazard stays empty', () => {
+    it('does not mint nodes for the remaining 84 masked PF names; Dynamo tesouraria stays a name; Lazard stays empty', () => {
       const json = loadCommittedGrafo();
       const nodeLabels = new Set(
         json.nodes.map((n: { label: string }) => n.label)
@@ -1868,10 +1873,11 @@ describe('Grafo Page (issue #74)', () => {
         for (const partner of node.partners ?? []) {
           if (PJ_PARTNER_NAMES.has(partner.nome)) continue;
           if (partner.nome === DYNAMO_TESOURARIA_NAME) continue;
+          if (TSE_PERSON_NAMES.has(partner.nome)) continue;
           maskedNames.push(partner.nome);
         }
       }
-      expect(maskedNames).toHaveLength(86);
+      expect(maskedNames).toHaveLength(84);
       for (const nome of maskedNames) {
         expect(
           json.nodes.some(
@@ -1963,11 +1969,193 @@ describe('Grafo Page (issue #74)', () => {
       expect(ambev.capitalRounded).toBe(99.999);
     });
 
-    it('page copy names 527 nodes and 668 edges', () => {
+    it('page copy names 529 nodes and 670 edges', () => {
       const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
       const page = fs.readFileSync(pagePath, 'utf-8');
-      expect(page).toContain('527 nós, 668 arestas');
-      expect(page).not.toContain('524 nós, 665 arestas');
+      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).not.toContain('527 nós, 668 arestas');
+    });
+  });
+
+  describe('Test (issue #122): two TSE-keyed gestora sócios as person nodes', () => {
+    const JOAQUIM_ID = 'p-da3e3836';
+    const EDUARDO_ID = 'p-e1365405';
+    const NOVA_FUTURA_ID = '41020034000125';
+    const DYNAMO_ID = '72116353000162';
+    const SQUADRA_ID = '09267871000140';
+    const WEG_ID = '84429695000111';
+    const AMBEV_ID = '07526557000100';
+    const PJ_SOCIAS = [
+      { id: '10630748000121', label: 'Opportunity Partners Participações Ltda.' },
+      { id: '36163277000182', label: 'Santa Luzia Comercial e Participações Ltda.' },
+      { id: '00806334000157', label: 'Opportunity Holders Participações Ltda.' },
+    ] as const;
+    const TSE_PERSONS = [
+      {
+        id: JOAQUIM_ID,
+        label: 'JOAQUIM DA SILVA FERREIRA',
+        to: NOVA_FUTURA_ID,
+      },
+      {
+        id: EDUARDO_ID,
+        label: 'EDUARDO DE ALMEIDA SANTOS',
+        to: DYNAMO_ID,
+      },
+    ] as const;
+
+    function loadCommittedGrafo() {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    }
+
+    function isNumericPercent(value: unknown): boolean {
+      return typeof value === 'number' && Number.isFinite(value);
+    }
+
+    function incomingCapital(json: { edges: Array<{ to: string; pct_capital?: number }> }, id: string) {
+      const incoming = json.edges.filter((e) => e.to === id);
+      const capitalSum = incoming.reduce(
+        (sum: number, edge: { pct_capital?: number }) => sum + (edge.pct_capital || 0),
+        0
+      );
+      return Math.round(capitalSum * 1000) / 1000;
+    }
+
+    it('adds Joaquim and Eduardo as person nodes with the public ids already computed', () => {
+      const json = loadCommittedGrafo();
+      const personNodes = json.nodes.filter((n: { kind: string }) => n.kind === 'person');
+
+      expect(json.nodes.length).toBe(529);
+      expect(json.edges.length).toBe(670);
+      expect(personNodes.length).toBe(199);
+
+      for (const person of TSE_PERSONS) {
+        const node = json.nodes.find((n: { id: string }) => n.id === person.id);
+        expect(node, `person ${person.id} should exist`).toBeDefined();
+        expect(node.kind).toBe('person');
+        expect(node.label).toBe(person.label);
+      }
+    });
+
+    it('adds two person_owns hole edges with no numeric percent and a Tribunal or Receita / Quadro de Sócios source', () => {
+      const json = loadCommittedGrafo();
+
+      for (const pair of TSE_PERSONS) {
+        const edge = json.edges.find(
+          (e: { from: string; to: string }) => e.from === pair.id && e.to === pair.to
+        );
+        expect(edge, `hole edge ${pair.id} → ${pair.to} should exist`).toBeDefined();
+        expect(edge.kind).toBe('person_owns');
+        expect(
+          isNumericPercent(edge.pct_capital),
+          `hole edge ${pair.id} → ${pair.to} must not have numeric pct_capital`
+        ).toBe(false);
+        expect(
+          isNumericPercent(edge.pct_votos),
+          `hole edge ${pair.id} → ${pair.to} must not have numeric pct_votos`
+        ).toBe(false);
+        expect(edge).not.toHaveProperty('pct_capital');
+        expect(edge).not.toHaveProperty('pct_votos');
+        expect(String(edge.source)).toMatch(/Tribunal|Receita|Quadro de S[oó]cios/);
+      }
+    });
+
+    it('does not mint a node for Paulo Cesar / PAULO CESAR DO NASCIMENTO', () => {
+      const json = loadCommittedGrafo();
+      const pauloNodes = json.nodes.filter(
+        (n: { label: string }) =>
+          n.label === 'PAULO CESAR DO NASCIMENTO' ||
+          n.label === 'PAULO CESAR' ||
+          n.label === 'Paulo Cesar'
+      );
+      expect(pauloNodes, 'Paulo Cesar do Nascimento stays a panel name').toHaveLength(0);
+
+      const hdf = json.nodes.find((n: { id: string }) => n.id === '33857830000199');
+      expect(
+        hdf.partners.some((p: { nome: string }) => p.nome === 'PAULO CESAR DO NASCIMENTO')
+      ).toBe(true);
+    });
+
+    it('person count is 199 and the only new p- ids vs #119 are p-da3e3836 and p-e1365405', () => {
+      const json = loadCommittedGrafo();
+      const personNodes = json.nodes.filter((n: { kind: string; id: string }) => n.kind === 'person');
+      const personIds = personNodes.map((n: { id: string }) => n.id);
+
+      expect(personNodes.length).toBe(199);
+      expect(new Set(personIds).size).toBe(199);
+      expect(personIds).toContain(JOAQUIM_ID);
+      expect(personIds).toContain(EDUARDO_ID);
+
+      const extras = personIds.filter((id) => id !== JOAQUIM_ID && id !== EDUARDO_ID);
+      expect(extras).toHaveLength(197);
+      for (const id of extras) {
+        expect(id).toMatch(/^p-[0-9a-f]{8}$/);
+      }
+      expect(extras).not.toContain(JOAQUIM_ID);
+      expect(extras).not.toContain(EDUARDO_ID);
+    });
+
+    it('has zero eleven-digit Cadastro, no documento, no ***, and no fortuna', () => {
+      const jsonPath = path.join(__dirname, '..', 'public', 'grafo-publico.json');
+      const jsonText = fs.readFileSync(jsonPath, 'utf-8');
+      expect(jsonText).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
+      expect(jsonText).not.toContain('***');
+      expect(jsonText).not.toMatch(/fortuna/i);
+
+      const joaquim = JSON.parse(jsonText).nodes.find((n: { id: string }) => n.id === JOAQUIM_ID);
+      const eduardo = JSON.parse(jsonText).nodes.find((n: { id: string }) => n.id === EDUARDO_ID);
+      expect(joaquim, 'Joaquim node should exist').toBeDefined();
+      expect(eduardo, 'Eduardo node should exist').toBeDefined();
+      expect(joaquim).not.toHaveProperty('documento');
+      expect(eduardo).not.toHaveProperty('documento');
+
+      const helperPath = path.join(__dirname, '..', 'src', 'lib', 'grafo-panel.ts');
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      expect(fs.readFileSync(helperPath, 'utf-8')).not.toMatch(/fortuna/i);
+      expect(fs.readFileSync(pagePath, 'utf-8')).not.toMatch(/fortuna/i);
+    });
+
+    it('keeps the three #119 PJ company nodes, LISTED 33, Squadra 11 with Ache, and WEG/Ambev incoming', () => {
+      const json = loadCommittedGrafo();
+
+      for (const company of PJ_SOCIAS) {
+        const node = json.nodes.find((n: { id: string }) => n.id === company.id);
+        expect(node, `PJ ${company.id} from #119 should remain`).toBeDefined();
+        expect(node.kind).toBe('company');
+        expect(node.label).toBe(company.label);
+      }
+
+      expect(LISTED_COMPANY_IDS).toHaveLength(33);
+      expect(LISTED_COMPANY_IDS).toContain(WEG_ID);
+      expect(LISTED_COMPANY_IDS).toContain(AMBEV_ID);
+      expect(incomingCapital(json, WEG_ID)).toBe(100);
+      expect(incomingCapital(json, AMBEV_ID)).toBe(99.999);
+
+      const squadra = json.nodes.find((n: { id: string }) => n.id === SQUADRA_ID);
+      expect(squadra.partners).toHaveLength(11);
+      expect(
+        squadra.partners.some((p: { nome: string }) => p.nome === 'GUILHERME MEXIAS ACHE')
+      ).toBe(true);
+      expect(
+        json.nodes.some(
+          (n: { kind: string; label: string }) =>
+            n.kind === 'person' && /GUILHERME MEXIAS ACHE/i.test(n.label)
+        )
+      ).toBe(false);
+
+      const view = buildPanelView(json, { nodeId: SQUADRA_ID });
+      expect(view, 'Squadra node should open a node panel').not.toBeNull();
+      expect(view!.mode).toBe('node');
+      if (view!.mode !== 'node') return;
+      const html = renderPanelHtml(view);
+      expect(html).toContain('GUILHERME MEXIAS ACHE');
+    });
+
+    it('page copy names 529 nodes and 670 edges', () => {
+      const pagePath = path.join(__dirname, '..', 'src', 'pages', 'grafo.astro');
+      const page = fs.readFileSync(pagePath, 'utf-8');
+      expect(page).toContain('529 nós, 670 arestas');
+      expect(page).not.toContain('527 nós, 668 arestas');
     });
   });
 });
