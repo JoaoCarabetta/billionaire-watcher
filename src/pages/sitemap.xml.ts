@@ -1,10 +1,13 @@
 import type { APIRoute } from 'astro';
 import { getFreeze } from '../utils/fixtures';
+import { mintCitedEmpresas } from '../lib/mint-empresa';
 import { loadPublicGrafo, mintCitedPessoas } from '../lib/mint-pessoa';
 
 export const GET: APIRoute = () => {
   const freezePersons = getFreeze();
-  const minted = mintCitedPessoas(loadPublicGrafo());
+  const grafo = loadPublicGrafo();
+  const minted = mintCitedPessoas(grafo);
+  const mintedEmpresas = mintCitedEmpresas(grafo);
   const freezeIds = new Set(freezePersons.map(person => person.person_id));
   
   const urls = [
@@ -22,7 +25,11 @@ export const GET: APIRoute = () => {
       .map(pessoa => ({
         loc: `/pessoa/${pessoa.id}/`,
         priority: '0.7'
-      }))
+      })),
+    ...mintedEmpresas.map(empresa => ({
+      loc: `/empresa/${empresa.id}/`,
+      priority: '0.7'
+    }))
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

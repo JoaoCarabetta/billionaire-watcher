@@ -125,7 +125,7 @@ describe('Built /llms.txt graph size (issue #151)', () => {
     expect(content).toMatch(/\/grafo\//);
   });
 
-  it('keeps existing listed paths and does not invent wiki routes', () => {
+  it('keeps existing listed paths; /empresa/ fichas come from #148, not llms.txt', () => {
     if (buildFailed) {
       throw new Error(`Build failed: ${buildError}`);
     }
@@ -134,7 +134,8 @@ describe('Built /llms.txt graph size (issue #151)', () => {
     expect(content).toMatch(/\/pessoa\//);
     expect(content).toMatch(/grafo-publico\.json/);
     expect(content).not.toMatch(/\/empresa\//);
-    expect(fs.existsSync(path.join(distPath, 'empresa'))).toBe(false);
+    expect(fs.existsSync(path.join(distPath, 'empresa', '00864214000106', 'index.html'))).toBe(true);
+    expect(fs.existsSync(path.join(distPath, 'empresa', 'record', 'index.html'))).toBe(true);
   });
 
   it('has no freeze jargon, UBO, o bilionário, or eleven-digit Cadastro', () => {
