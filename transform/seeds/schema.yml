@@ -106,6 +106,129 @@ seeds:
         tests:
           - not_null
 
+  - name: valor_rankings_2025
+    description: |
+      Slim Valor 1000 2025 universe for issue #140: industrial ranks 1–500,
+      union banks 2025, union insurers 2025 (ramos gerais). Ranks come from
+      data/valor1000-2025/{ranking,bancos,seguradoras}.csv. No invented ranks.
+      Industrial 501–1000 are out of this seed.
+    config:
+      enabled: true
+      column_types:
+        ranking_family: STRING
+        valor_rank: INT64
+        empresa: STRING
+        razao_social: STRING
+    columns:
+      - name: ranking_family
+        description: industrial, banks, or insurers
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['industrial', 'banks', 'insurers']
+      - name: valor_rank
+        description: Rank inside that ranking family
+        tests:
+          - not_null
+      - name: empresa
+        description: Valor brand name
+        tests:
+          - not_null
+      - name: razao_social
+        description: Valor legal name
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ranking_family
+              - valor_rank
+
+  - name: valor_launch_add_list
+    description: |
+      Named launch add-list from issue #139/#140. Exact empresa/razão match
+      keys taken from the Valor 2025 files. XP Investimentos and Dexco are
+      absent. Itaúsa is named even though it is not a Valor ranking row.
+      is_votorantim_seed is true only for Votorantim Cimentos.
+    config:
+      enabled: true
+      column_types:
+        spec_name: STRING
+        match_empresa: STRING
+        match_razao: STRING
+        is_votorantim_seed: BOOLEAN
+    columns:
+      - name: spec_name
+        description: Spec name from the launch add-list
+        tests:
+          - not_null
+          - unique
+      - name: match_empresa
+        description: Exact Valor empresa string to match
+        tests:
+          - not_null
+      - name: match_razao
+        description: Exact Valor razão social string to match
+        tests:
+          - not_null
+      - name: is_votorantim_seed
+        description: True only for Votorantim Cimentos. Dexco is not in this seed.
+        tests:
+          - not_null
+
+  - name: valor_known_closed
+    description: |
+      Spec-closed Valor rows from issue #140 that are not ATIVO cias abertas
+      in cadastro. Globo 81 and Record 354 stay visible closed holes. Cadastro
+      ATIVO still wins if it ever appears. Do not mint a person dono from a
+      Quadro de Sócios officer list.
+    config:
+      enabled: true
+      column_types:
+        ranking_family: STRING
+        valor_rank: INT64
+        empresa: STRING
+        notes: STRING
+    columns:
+      - name: ranking_family
+        description: Ranking family of the closed Valor row
+        tests:
+          - not_null
+      - name: valor_rank
+        description: Valor rank of the closed row
+        tests:
+          - not_null
+      - name: empresa
+        description: Valor brand name (documentation)
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ranking_family
+              - valor_rank
+
+  - name: live_graph_company_cnpj_basicos
+    description: |
+      Read-only prefix-8 extract of live graph company nodes from
+      public/grafo-publico.json plus the 33 listed seeds in
+      LISTED_COMPANY_IDS. 14-digit company ids contribute left-8. 8-digit
+      company ids are kept. 11-digit person keys are not in this seed.
+      Do not edit public/grafo-publico.json from issue #140.
+    config:
+      enabled: true
+      column_types:
+        cnpj_basico: STRING
+    columns:
+      - name: cnpj_basico
+        description: 8-digit company key already on the live graph
+        tests:
+          - not_null
+          - unique
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:

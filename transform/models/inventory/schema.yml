@@ -1,0 +1,147 @@
+version: 2
+
+models:
+  - name: valor_cadastro_inventory
+    description: |
+      Valor 1000 2025 industrial ranks 1–500 union Valor banks 2025 union
+      Valor insurers 2025, joined to the cadastro of companhias abertas.
+      One row per Valor company in those three rankings. Company key is the
+      eight-digit Cadastro Nacional prefix when known (top-50 flags prefix-8,
+      else normalized razão social = DENOM_SOCIAL / DENOM_COMERC). Never
+      invents a /0001 branch suffix. Cadastro situation is ATIVO or closed
+      (CANCELADA). Formulário hop is yes only when ATIVO. already_on_graph is
+      prefix-8 of live /grafo company nodes. Launch add-list is an exact
+      empresa/razão match against the named seed; Dexco is not a Votorantim
+      seed and XP Investimentos is not on that list. percent is always null.
+      This model does not write public HTML or /grafo.
+    columns:
+      - name: company_name
+        description: Valor brand name (empresa) from the ranking row.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: cnpj_basico
+        description: |
+          8-digit company key (STRING lpad 8) when a cadastro or top-50 flags
+          key is known. Null when unmatched. Never 11-digit. Never a 14-digit
+          full CNPJ.
+      - name: ranking_family
+        description: industrial, banks, or insurers.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+          - accepted_values:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+              arguments:
+                values: ['industrial', 'banks', 'insurers']
+      - name: valor_rank
+        description: Rank inside that ranking family (industrial 1–500, banks 1–100, insurers 1–50).
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: cadastro_situation
+        description: ATIVO, closed (cadastro CANCELADA), or null when unmatched.
+      - name: already_on_graph
+        description: True when the company key is a live graph company node (prefix-8).
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: formulario_hop
+        description: True iff cadastro SIT is ATIVO. Closed and unmatched are false.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: on_launch_add_list
+        description: True when the Valor row exactly matches the named launch add-list seed.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: is_votorantim_seed
+        description: True only for the Votorantim Cimentos launch row. Dexco stays false.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: percent
+        description: Always null. Quadro de Sócios names do not mint a percent here.
+      - name: razao_social
+        description: Valor legal name from the ranking row.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            combination_of_columns:
+              - ranking_family
+              - valor_rank
+      - dbt_utils.expression_is_true:
+          name: valor_cadastro_inventory_key_is_eight_digits
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+      - dbt_utils.expression_is_true:
+          name: valor_cadastro_inventory_never_invents_percent
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "percent is null"
+      - dbt_utils.expression_is_true:
+          name: valor_cadastro_inventory_dexco_is_not_votorantim_seed
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "company_name != 'Dexco' or is_votorantim_seed = false"
+      - dbt_utils.expression_is_true:
+          name: valor_cadastro_inventory_xp_not_on_launch_add_list
+          config:
+            severity: error
+            enabled: "{{ target.name not in ['test', 'ci'] }}"
+          arguments:
+            expression: "company_name != 'Banco XP' or on_launch_add_list = false"
+
+  - name: valor_cadastro_inventory_counts
+    description: |
+      One-row leftover-planning counts for the Valor × cadastro inventory.
+      ativo_in_universe, already_on_graph, launch_add_list_size (named seed,
+      14), leftover_after_launch (ATIVO, not on graph, not on the add-list).
+    columns:
+      - name: ativo_in_universe
+        description: Valor-universe rows whose cadastro situation is ATIVO.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: already_on_graph
+        description: Valor-universe rows whose company key is already a live graph company node.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: launch_add_list_size
+        description: Named launch add-list size (seed row count, including Itaúsa).
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
+      - name: leftover_after_launch
+        description: ATIVO in universe, not already on the graph, not on the named add-list.
+        tests:
+          - not_null:
+              config:
+                enabled: "{{ target.name not in ['test', 'ci'] }}"
