@@ -6,8 +6,10 @@ dbt-bigquery project skeleton for the Billionaire Watcher civic archive.
 
 The old warehouse layer (freeze walk, hops, valor-universo graph, person-money,
 facts, TSE matches and their seeds) was removed. The design of the replacement
-pipeline — the three tables `empresas`, `pessoas`, and `pessoas_empresas` with
-the `e_oligarca` flag — lives in [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
+pipeline — the node tables `empresas` and `pessoas`, the written edge table
+`vinculos`, and the compatibility view `pessoas_empresas` with the
+`e_oligarca` flag — lives in
+[docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
 Issues #178, #179, and #181 implement the company door and ownership walk:
 
 - **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
@@ -15,9 +17,11 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
   holdings cited during the upward walk with `motivo_entrada = subida` and
   companies found by the one-hop invert with `motivo_entrada = hop`. It
   left-joins optional size floors without dropping uncovered companies.
-- **`pessoas_empresas`** (`models/pessoas_empresas.sql`): every cited natural
-  person relationship reached from a walkable seed. FRE rows are
-  `acionista_controlador` or `acionista`; Receita rows are always `socio`.
+- **`vinculos`** (`models/vinculos.sql`): every cited person-company edge plus
+  each company-company edge traversed by the upward walk. The destination is
+  always the owned company.
+- **`pessoas_empresas`** (`models/pessoas_empresas.sql`): compatibility view
+  over person-origin rows in `vinculos`, with the original columns.
 - **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
   provisional identity, with `e_oligarca` derived only from qualifying FRE
   relationships on seed companies. Hop citations never change the flag.
@@ -187,9 +191,9 @@ Qualifying FRE companies (controller `S` or at least 10% ON) and every Receita
 company where the oligarch is a partner enter as `motivo_entrada = hop`.
 Receita company CNPJs come from the partitioned `estabelecimentos` source, so
 the pipeline does not invent a `/0001` suffix. Every directly cited natural
-person on a hop company enters `pessoas` and `pessoas_empresas`; those new
-partners do not start another descent and do not become oligarchs because of a
-hop tie.
+person on a hop company enters `pessoas` and `vinculos` and remains visible
+through `pessoas_empresas`; those new partners do not start another descent and
+do not become oligarchs because of a hop tie.
 
 ## Setup
 

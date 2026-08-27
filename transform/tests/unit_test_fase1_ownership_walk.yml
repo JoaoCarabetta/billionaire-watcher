@@ -38,12 +38,13 @@ unit_tests:
       format: sql
       fixture: fase1_e2e_empresas_expect
 
-  - name: test_fase1_ownership_walk_emits_pessoas_empresas
+  - name: test_fase1_ownership_walk_emits_vinculos
     description: |
-      End-to-end fase 1 seam, relationship output: all cited natural people
-      enter, QSA rows stay socio, tipo 3 foreign partners do not stop, old FRE
-      documents and administrators do not enter.
-    model: pessoas_empresas
+      End-to-end fase 1 seam, edge output: all cited natural people enter and
+      company owners traversed by the existing walk point to the companies they
+      own. QSA rows stay socio, tipo 3 foreign partners do not stop, and old
+      FRE documents and administrators do not enter.
+    model: vinculos
     given:
       - input: ref('int_walk_roots')
         format: sql
@@ -60,6 +61,19 @@ unit_tests:
       - input: source('br_me_cnpj', 'estabelecimentos')
         format: sql
         fixture: fase1_e2e_qsa_estabelecimentos_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_vinculos_expect
+
+  - name: test_fase1_ownership_walk_emits_pessoas_empresas
+    description: |
+      The compatibility view keeps every existing fase 1 person-company row
+      and excludes company-origin rows from vinculos.
+    model: pessoas_empresas
+    given:
+      - input: ref('vinculos')
+        format: sql
+        fixture: fase1_e2e_vinculos_expect
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_empresas_expect
