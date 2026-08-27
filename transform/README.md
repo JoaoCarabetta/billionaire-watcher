@@ -8,11 +8,15 @@ The old warehouse layer (freeze walk, hops, valor-universo graph, person-money,
 facts, TSE matches and their seeds) was removed. The design of the replacement
 pipeline — the three tables `empresas`, `pessoas`, and `pessoas_empresas` with
 the `e_oligarca` flag — lives in [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
-Implementation is future work; this project intentionally contains only:
+Issue #178 implements the first slice of that replacement:
 
+- **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
+  from seed A union the CVM, BCB, and SUSEP seed-B registries. It does not walk
+  ownership or calculate a size floor.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
   `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
-  `person_id_from_cpf`. No hop or freeze grain.
+  `person_id_from_cpf`, plus a cross-adapter empty string-array helper.
+
 - **CVM staging readers** (`models/staging/`): pure type-cast/normalize readers,
   reusable by the fase 1 pipeline:
 
@@ -36,6 +40,44 @@ Implementation is future work; this project intentionally contains only:
   (`fre_cia_aberta_posicao_acionaria_2026.csv`,
   `fre_cia_aberta_capital_social_2026.csv`, `cad_cia_aberta.csv`;
   latin-1, semicolon)
+- **Fase 1 landing**: GCS `gs://billionairewatcher-landing/raw/fase1/`
+  (`controle-empresas-walk.csv`, `bcb_entidades_supervisionadas.csv`,
+  `susep_dados_cadastrais.csv`). The corresponding BigQuery external tables
+  are declared under the `fase1_landing` source.
+
+### Land the company-door inputs
+
+The downloader uses only Python's standard library. It copies seed A from the
+repository, fetches CVM using latin-1/semicolon as published, calls BCB with
+`dataBase=@dataBase` inside `EntidadesSupervisionadas(...)`, and fetches the
+full SUSEP dump without `$top`:
+
+```bash
+cd transform
+python scripts/download_fase1_company_sources.py \
+  --bcb-date 08-01-2026 \
+  --output-dir landing/fase1
+```
+
+The BCB extraction fails unless the named `SedesBancoComMultCE` check is 154
+for the reference date. Its raw bank-seat check includes BCB type 11; the dbt
+seed filter then explicitly excludes type 11 together with types 3 and 9.
+`manifest.json` records source URLs, row counts, checksums, and the check.
+
+Upload the generated files to the objects used by `models/sources.yml`:
+
+```bash
+gcloud storage cp landing/fase1/cad_cia_aberta.csv \
+  gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
+gcloud storage cp \
+  landing/fase1/controle-empresas-walk.csv \
+  landing/fase1/bcb_entidades_supervisionadas.csv \
+  landing/fase1/susep_dados_cadastrais.csv \
+  gs://billionairewatcher-landing/raw/fase1/
+```
+
+Define the three `fase1_landing` external relations with CNPJ fields as
+`STRING`; never allow schema inference to turn identifiers into integers.
 
 ### CNPJ Normalization
 

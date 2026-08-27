@@ -1,6 +1,39 @@
 version: 2
 
 sources:
+  - name: fase1_landing
+    description: |
+      Raw fase 1 company-door files landed in GCS. The repository downloader
+      writes the BCB and SUSEP extracts as UTF-8 CSV and copies the Valor
+      control inventory without changing its semicolon-delimited contents.
+    database: billionairewatcher
+    schema: billionaire_watcher_raw
+    tables:
+      - name: controle_empresas_walk
+        description: Repository inventory used as seed A.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv
+            encoding: UTF-8
+            field_delimiter: ";"
+            skip_leading_rows: 1
+      - name: bcb_entidades_supervisionadas
+        description: Banco Central Unicad entities for the configured reference date.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/bcb_entidades_supervisionadas.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: susep_dados_cadastrais
+        description: Full SUSEP DadosCadastrais dump, fetched without $top.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/susep_dados_cadastrais.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+
   - name: br_me_cnpj
     description: Base dos Dados - Receita Federal CNPJ tables
     database: basedosdados
