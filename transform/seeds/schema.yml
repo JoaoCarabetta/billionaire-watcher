@@ -255,7 +255,10 @@ seeds:
     description: |
       Warehouse-enabled read-only extract of the live public graph's person
       nodes. Generated from public/grafo-publico.json where kind=person; this
-      seed does not add nodes or change the product JSON.
+      seed does not add nodes or change the product JSON. The landed extract
+      contains 929 valid p- ids. FRE shareholder hashes cover 927; the two
+      remaining issue #118 ids may still strong-match candidatos.cpf directly.
+      Warehouse inspection found no eight-hex collision among 2,653 FRE hashes.
     config:
       enabled: true
       column_types:

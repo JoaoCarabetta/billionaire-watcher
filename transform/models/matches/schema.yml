@@ -4,10 +4,12 @@ models:
   - name: graph_person_tse_events
     description: |
       Privacy boundary for Tribunal person events in cycles 2016, 2018, 2020,
-      2022, 2024, and the real TSE snapshot through 2026-10-04. Full warehouse
-      CPFs are converted immediately to p- plus eight hex and are never selected.
-      Donor rows whose document is masked or otherwise not complete are excluded
-      because they cannot support either a strong key or a distinct-hash review.
+      2022, and 2024. The 2026 branch is explicitly empty because no real TSE
+      Dados Abertos landing exists under gs://billionairewatcher-landing; the
+      test/ci seed is never used on dev. Full warehouse CPFs are converted
+      immediately to p- plus eight hex and are never selected. Donor rows whose
+      document is masked or otherwise not complete are excluded because they
+      cannot support either a strong key or a distinct-hash review.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

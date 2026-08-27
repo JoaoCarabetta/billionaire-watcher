@@ -32,22 +32,6 @@ unit_tests:
             2018 as ano,
             '***111***' as cpf_cnpj_doador,
             'NOME SEM CHAVE COMPLETA' as nome_doador
-      - input: source('tse_2026_snapshot', 'candidatos_2026_10_04')
-        format: sql
-        rows: |
-          select
-            cast(null as integer) as ano,
-            cast(null as varchar) as cpf,
-            cast(null as varchar) as nome
-          where false
-      - input: source('tse_2026_snapshot', 'receitas_candidato_2026_10_04')
-        format: sql
-        rows: |
-          select
-            cast(null as integer) as ano,
-            cast(null as varchar) as cpf_cnpj_doador,
-            cast(null as varchar) as nome_doador
-          where false
     expect:
       format: sql
       rows: |

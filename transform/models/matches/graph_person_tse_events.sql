@@ -1,7 +1,8 @@
 -- Privacy boundary for graph-person Tribunal matching.
 -- The raw document is used only to derive p- plus eight hex and is never output.
--- The 2026 source contract expects the real Dados Abertos snapshot tables
--- documented in sources.yml; no fixture receipts are substituted on dev.
+-- There is no real 2026 Dados Abertos landing under
+-- gs://billionairewatcher-landing. The 2026 CTEs stay explicitly empty until
+-- that landing exists; no object/table path or fixture receipt is invented.
 
 with closed_candidates as (
     select
@@ -25,22 +26,20 @@ closed_donors as (
 
 tse_2026_candidates as (
     select
-        ano as cycle,
-        'candidate' as event_kind,
-        nome as person_name,
-        regexp_replace(cast(cpf as string), '[^0-9]', '') as cpf_digits
-    from {{ source('tse_2026_snapshot', 'candidatos_2026_10_04') }}
-    where ano = 2026
+        cast(null as integer) as cycle,
+        cast(null as string) as event_kind,
+        cast(null as string) as person_name,
+        cast(null as string) as cpf_digits
+    where false
 ),
 
 tse_2026_donors as (
     select
-        ano as cycle,
-        'donor' as event_kind,
-        nome_doador as person_name,
-        regexp_replace(cast(cpf_cnpj_doador as string), '[^0-9]', '') as cpf_digits
-    from {{ source('tse_2026_snapshot', 'receitas_candidato_2026_10_04') }}
-    where ano = 2026
+        cast(null as integer) as cycle,
+        cast(null as string) as event_kind,
+        cast(null as string) as person_name,
+        cast(null as string) as cpf_digits
+    where false
 ),
 
 all_events as (
