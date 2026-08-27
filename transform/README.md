@@ -12,7 +12,8 @@ Issues #178 and #179 implement the company door and upward ownership walk:
 
 - **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
   from seed A union the CVM, BCB, and SUSEP seed-B registries, plus intermediate
-  holdings cited during the upward walk with `motivo_entrada = subida`.
+  holdings cited during the upward walk with `motivo_entrada = subida`. It
+  left-joins optional size floors without dropping uncovered companies.
 - **`pessoas_empresas`** (`models/pessoas_empresas.sql`): every cited natural
   person relationship reached from a walkable seed. FRE rows are
   `acionista_controlador` or `acionista`; Receita rows are always `socio`.
@@ -86,6 +87,50 @@ gcloud storage cp \
 
 Define the three `fase1_landing` external relations with CNPJ fields as
 `STRING`; never allow schema inference to turn identifiers into integers.
+
+### Land the company size-floor inputs
+
+The floor downloader writes seven raw extracts plus a checksum manifest:
+
+```bash
+cd transform
+python3 scripts/download_fase1_floor_sources.py \
+  --year 2026 \
+  --ifdata-period 202603 \
+  --output-dir landing/fase1/pisos
+```
+
+Upload the CSVs under
+`gs://billionairewatcher-landing/raw/fase1/pisos/`, matching
+`models/sources.yml`.
+
+The three floor families and exact sources are:
+
+- **Bolsa:** B3
+  [`GetInitialCompanies`](https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall/GetInitialCompanies)
+  with `type=1` and
+  [`GetListedSupplementCompany`](https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall/GetListedSupplementCompany)
+  for quantities; CVM
+  [`fca_cia_aberta_2026.zip`](https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FCA/DADOS/fca_cia_aberta_2026.zip)
+  maps `Codigo_Negociacao` to CNPJ; B3
+  [`COTAHIST_A2026.ZIP`](https://bvmf.bmfbovespa.com.br/InstDados/SerHist/COTAHIST_A2026.ZIP)
+  supplies official `PREULT` closes for `TPMERC=010`, `CODBDI=02`.
+  `basedosdados.br_b3_cotacoes.cotacoes` is a trade tape and is never used as
+  a COTAHIST substitute.
+- **Banks:** BCB
+  [`IfDataValores`](https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata/)
+  at **prudential grain only** (`TipoInstituicao=1`), `Relatorio='2'`,
+  `Conta=140220`, field `Saldo`. `IfDataCadastro` maps the reporter to its
+  leading `codigoCNPJ8`; the BCB registry supplies the real full headquarters
+  CNPJ. Individual and financial-conglomerate grains are never mixed in.
+- **Insurers:** SUSEP
+  [`ReceitasSeguros(Ano=@Ano)`](https://dados.susep.gov.br/olinda/servico/receitasoperacionais/versao/v1/odata/)
+  field `valor`, summed as annual-to-date emitted premiums. The SES field
+  `premio_ganho` is not used.
+
+`int_empresas_piso` resolves cross-family overlap with deterministic precedence
+Bolsa → IF.data → SUSEP. `empresas` left-joins it: no floor means
+`tem_piso=false`, never removal from the company door.
 
 ### CNPJ Normalization
 

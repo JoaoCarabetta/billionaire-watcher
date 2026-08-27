@@ -190,8 +190,24 @@ subida_companies as (
         false as tem_piso
     from subida_ranked
     where company_row = 1
+),
+
+all_companies as (
+    select * from seed_companies
+    union all
+    select * from subida_companies
 )
 
-select * from seed_companies
-union all
-select * from subida_companies
+select
+    companies.empresa_id,
+    companies.cnpj,
+    companies.razao_social,
+    companies.em_semente_a,
+    companies.fontes_semente_b,
+    companies.motivo_entrada,
+    companies.nao_caminha,
+    floors.valor_do_piso,
+    floors.fonte_do_piso,
+    coalesce(floors.tem_piso, false) as tem_piso
+from all_companies as companies
+left join {{ ref('int_empresas_piso') }} as floors using (empresa_id)

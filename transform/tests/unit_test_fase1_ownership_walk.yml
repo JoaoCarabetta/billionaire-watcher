@@ -17,6 +17,16 @@ unit_tests:
       - input: source('fase1_landing', 'susep_dados_cadastrais')
         format: sql
         fixture: fase1_e2e_susep_given
+      - input: ref('int_empresas_piso')
+        format: sql
+        rows: |
+          select
+            cast(null as varchar) as empresa_id,
+            cast(null as varchar) as cnpj,
+            cast(null as numeric) as valor_do_piso,
+            cast(null as varchar) as fonte_do_piso,
+            cast(null as boolean) as tem_piso
+          where false
       - input: ref('stg_cvm_fre_posicao_acionaria_2026')
         format: sql
         fixture: fase1_e2e_fre_given
