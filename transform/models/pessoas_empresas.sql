@@ -8,6 +8,43 @@ walk_roots as (
 
 {{ ownership_walk_ctes('walk_roots') }},
 
+{{ downward_hop_ctes('walked_ownership_edges') }},
+
+all_person_edges as (
+    select
+        cited_empresa_id,
+        owner_name,
+        owner_cpf,
+        papel,
+        fonte,
+        acionista_controlador,
+        participante_acordo_acionistas,
+        percentual_on,
+        percentual_total,
+        qualificacao,
+        data_referencia,
+        fonte_documento
+    from walked_ownership_edges
+    where owner_kind = 'pessoa'
+
+    union all
+
+    select
+        cited_empresa_id,
+        owner_name,
+        owner_cpf,
+        papel,
+        fonte,
+        acionista_controlador,
+        participante_acordo_acionistas,
+        percentual_on,
+        percentual_total,
+        qualificacao,
+        data_referencia,
+        fonte_documento
+    from downward_hop_person_edges
+),
+
 person_edges as (
     select
         case
@@ -25,8 +62,7 @@ person_edges as (
         qualificacao,
         data_referencia,
         fonte_documento
-    from walked_ownership_edges
-    where owner_kind = 'pessoa'
+    from all_person_edges
 )
 
 select

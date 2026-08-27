@@ -30,6 +30,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: ownership_qsa_socios_empty
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: ownership_qsa_estabelecimentos_empty
       - input: ref('int_empresas_piso')
         format: sql
         fixture: empresas_pisos_given

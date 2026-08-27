@@ -9,6 +9,14 @@ select
   true as fortuna_incompleta
 union all
 select
+  'p-f0a39f5c', 'CARLOS CPF COLISAO', '12355566600', null, null,
+  true, null, true
+union all
+select
+  'p-20953853', 'DAVI CPF COLISAO', '98755566611', null, null,
+  true, null, true
+union all
+select
   'p-provisorio-5244e17e4d3e00aa', 'CAMILA CITADA', null, null, null,
   false, null, true
 union all
@@ -27,3 +35,19 @@ union all
 select
   'p-provisorio-50179797a332df8b', 'JOAO SILVA', null, null, null,
   false, null, true
+union all
+select
+  'p-d9aa06c1', 'ELENA PARCEIRA DO HOP', '22255588800', null, null,
+  false, null, true
+union all
+select
+  'p-provisorio-53c0e5d1dcd6f9a4', 'IRENE PARCEIRA QSA DA FRE',
+  null, null, null, false, null, true
+union all
+select
+  'p-provisorio-4dbf258275ee4ca5', 'FABIO PARCEIRO DO HOP QSA',
+  null, null, null, false, null, true
+union all
+select
+  'p-provisorio-5ef96a534f962d30', 'SOFIA SOCIA ESTRANGEIRA',
+  null, null, null, false, null, true

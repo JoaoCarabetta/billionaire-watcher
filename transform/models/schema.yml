@@ -6,8 +6,9 @@ models:
       Fase 1 company door at one row per company. Contains the resolvable Valor
       inventory (seed A) union active CVM companies, selected BCB headquarters,
       and selected SUSEP companies (seed B), plus intermediate companies cited
-      while walking ownership upward. Size floors are optional metadata:
-      companies without a floor stay in the model and keep walking.
+      while walking ownership upward and one CPF-only downward hop from
+      oligarchs. Size floors are optional metadata: companies without a floor
+      stay in the model and keep walking.
     columns:
       - name: empresa_id
         description: Full 14-digit CNPJ, or nome plus normalized name for the five no-walk exceptions.
@@ -29,12 +30,12 @@ models:
         tests:
           - not_null
       - name: motivo_entrada
-        description: Entry reason; semente for A union B and subida for an intermediate owner.
+        description: Entry reason; semente for A union B, subida for an intermediate owner, or hop for a one-hop downward match.
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['semente', 'subida']
+                values: ['semente', 'subida', 'hop']
       - name: nao_caminha
         description: True only for Folha, Globo, Havan, Record, and Natura without CNPJ.
         tests:
@@ -70,7 +71,8 @@ models:
     description: |
       Natural people reached by walking upward from seed companies. CPF-backed
       identities use a one-way hash key; citations without CPF are scoped to
-      the cited company so unsupported homonym merges cannot occur.
+      the cited company so unsupported homonym merges cannot occur. Direct
+      natural-person partners of one-hop companies are also included.
     columns:
       - name: pessoa_id
         description: Stable CPF hash when CPF exists, otherwise a provisional name-and-company key.
@@ -90,7 +92,8 @@ models:
       - name: e_oligarca
         description: |
           True only for a FRE citation on a seed company with controller S or
-          at least 10 percent of circulating ordinary shares.
+          at least 10 percent of circulating ordinary shares. Hop-company
+          citations never change this flag.
         tests:
           - not_null
       - name: fortuna_valor
@@ -104,7 +107,8 @@ models:
     description: |
       One cited person-company relationship per person, company, source, and
       reference date. Receita rows are always socio and carry no inferred
-      control or percentages.
+      control or percentages. Includes direct citations on one-hop companies
+      but does not recurse through their partners.
     columns:
       - name: pessoa_id
         description: Foreign key to pessoas.
@@ -115,7 +119,7 @@ models:
                 to: ref('pessoas')
                 field: pessoa_id
       - name: empresa_id
-        description: Cited company, whether seed or subida.
+        description: Cited company, whether seed, subida, or hop.
         tests:
           - not_null
           - relationships:

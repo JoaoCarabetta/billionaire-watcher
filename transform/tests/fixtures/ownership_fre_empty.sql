@@ -1,5 +1,6 @@
 select
   cast(null as varchar) as CNPJ_Companhia,
+  cast(null as varchar) as Nome_Companhia,
   cast(null as date) as Data_Referencia,
   cast(null as bigint) as ID_Documento,
   cast(null as varchar) as Acionista,

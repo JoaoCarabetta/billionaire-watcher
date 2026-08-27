@@ -2,7 +2,9 @@ unit_tests:
   - name: test_fase1_ownership_walk_emits_empresas
     description: |
       End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
-      registries seed the walk; FRE and QSA legal-person owners enter as subida.
+      registries seed the walk; FRE and QSA legal-person owners enter as subida,
+      including a tipo 3 foreign holding without an invented CNPJ. A QSA mask
+      shared by two stored oligarch CPFs does not admit its company.
     model: empresas
     given:
       - input: source('fase1_landing', 'controle_empresas_walk')
@@ -36,6 +38,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_empresas_expect
@@ -43,7 +48,8 @@ unit_tests:
   - name: test_fase1_ownership_walk_emits_pessoas_empresas
     description: |
       End-to-end fase 1 seam, relationship output: all cited natural people
-      enter, QSA rows stay socio, old FRE documents and administrators do not.
+      enter, QSA rows stay socio, tipo 3 foreign partners do not stop, old FRE
+      documents and administrators do not enter.
     model: pessoas_empresas
     given:
       - input: ref('int_walk_roots')
@@ -58,6 +64,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_empresas_expect
@@ -67,7 +76,9 @@ unit_tests:
       End-to-end fase 1 seam, people output: Alice is an oligarch through
       controller S on a seed, Camila and the QSA partners are false, Diana's
       controller tie on a subida company is false, and the two CPF-less
-      JOAO SILVA citations remain separate people.
+      JOAO SILVA citations remain separate people. Sofia, a tipo 3 foreign
+      natural partner without CPF, remains a provisional non-oligarch. Carlos
+      and Davi are oligarchs whose colliding QSA mask is rejected.
     model: pessoas
     given:
       - input: ref('int_walk_roots')
@@ -82,6 +93,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_expect
