@@ -47,6 +47,15 @@ models:
         tests:
           - not_null
 
+  - name: int_walk_roots
+    description: Seed-company IDs permitted to start an upward ownership walk.
+    columns:
+      - name: root_empresa_id
+        description: Walkable seed empresa_id.
+        tests:
+          - not_null
+          - unique
+
   - name: pessoas
     description: |
       Natural people reached by walking upward from seed companies. CPF-backed

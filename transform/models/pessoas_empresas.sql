@@ -2,9 +2,8 @@ with recursive
 {{ ownership_edge_ctes() }},
 
 walk_roots as (
-    select empresa_id as root_empresa_id
-    from {{ ref('empresas') }}
-    where motivo_entrada = 'semente' and not nao_caminha
+    select root_empresa_id
+    from {{ ref('int_walk_roots') }}
 ),
 
 {{ ownership_walk_ctes('walk_roots') }},

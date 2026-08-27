@@ -19,6 +19,8 @@ Issues #178 and #179 implement the company door and upward ownership walk:
 - **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
   provisional identity, with `e_oligarca` derived only from qualifying FRE
   relationships on seed companies.
+- **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
+  of seed companies allowed to start a walk.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
   `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
   `person_id_from_cpf`, plus a cross-adapter empty string-array helper.

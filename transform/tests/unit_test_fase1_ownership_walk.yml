@@ -36,9 +36,9 @@ unit_tests:
       enter, QSA rows stay socio, old FRE documents and administrators do not.
     model: pessoas_empresas
     given:
-      - input: ref('empresas')
+      - input: ref('int_walk_roots')
         format: sql
-        fixture: fase1_e2e_empresas_expect
+        fixture: fase1_e2e_walk_roots_given
       - input: ref('stg_cvm_fre_posicao_acionaria_2026')
         format: sql
         fixture: fase1_e2e_fre_given
@@ -60,9 +60,9 @@ unit_tests:
       JOAO SILVA citations remain separate people.
     model: pessoas
     given:
-      - input: ref('empresas')
+      - input: ref('int_walk_roots')
         format: sql
-        fixture: fase1_e2e_empresas_expect
+        fixture: fase1_e2e_walk_roots_given
       - input: ref('stg_cvm_fre_posicao_acionaria_2026')
         format: sql
         fixture: fase1_e2e_fre_given

@@ -2,9 +2,8 @@ with recursive
 {{ ownership_edge_ctes() }},
 
 walk_roots as (
-    select empresa_id as root_empresa_id
-    from {{ ref('empresas') }}
-    where motivo_entrada = 'semente' and not nao_caminha
+    select root_empresa_id
+    from {{ ref('int_walk_roots') }}
 ),
 
 {{ ownership_walk_ctes('walk_roots') }},
@@ -26,11 +25,10 @@ person_citations as (
         edges.fonte,
         edges.acionista_controlador,
         edges.percentual_on,
-        seeds.empresa_id is not null as cited_on_seed
+        seeds.root_empresa_id is not null as cited_on_seed
     from walked_ownership_edges as edges
-    left join {{ ref('empresas') }} as seeds
-        on edges.cited_empresa_id = seeds.empresa_id
-        and seeds.motivo_entrada = 'semente'
+    left join walk_roots as seeds
+        on edges.cited_empresa_id = seeds.root_empresa_id
     where edges.owner_kind = 'pessoa'
 )
 
