@@ -155,6 +155,8 @@ walk_roots as (
 
 {{ ownership_walk_ctes('walk_roots') }},
 
+{{ downward_hop_ctes('walked_ownership_edges') }},
+
 subida_ranked as (
     select
         edges.owner_company_id as empresa_id,
@@ -192,10 +194,32 @@ subida_companies as (
     where company_row = 1
 ),
 
+hop_companies as (
+    select
+        hop.empresa_id,
+        hop.cnpj,
+        hop.razao_social,
+        false as em_semente_a,
+        {{ empty_string_array() }} as fontes_semente_b,
+        'hop' as motivo_entrada,
+        false as nao_caminha,
+        cast(null as numeric) as valor_do_piso,
+        cast(null as string) as fonte_do_piso,
+        false as tem_piso
+    from downward_hop_companies as hop
+    left join seed_companies as seeds using (empresa_id)
+    left join subida_companies as subida using (empresa_id)
+    where
+        seeds.empresa_id is null
+        and subida.empresa_id is null
+),
+
 all_companies as (
     select * from seed_companies
     union all
     select * from subida_companies
+    union all
+    select * from hop_companies
 )
 
 select

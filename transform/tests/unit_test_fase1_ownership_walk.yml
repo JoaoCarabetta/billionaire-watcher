@@ -36,6 +36,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_empresas_expect
@@ -58,6 +61,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_empresas_expect
@@ -82,6 +88,9 @@ unit_tests:
       - input: source('br_me_cnpj', 'socios')
         format: sql
         fixture: fase1_e2e_qsa_socios_given
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_expect

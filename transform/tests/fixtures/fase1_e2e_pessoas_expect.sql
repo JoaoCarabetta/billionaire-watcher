@@ -27,3 +27,15 @@ union all
 select
   'p-provisorio-50179797a332df8b', 'JOAO SILVA', null, null, null,
   false, null, true
+union all
+select
+  'p-d9aa06c1', 'ELENA PARCEIRA DO HOP', '22255588800', null, null,
+  false, null, true
+union all
+select
+  'p-provisorio-53c0e5d1dcd6f9a4', 'IRENE PARCEIRA QSA DA FRE',
+  null, null, null, false, null, true
+union all
+select
+  'p-provisorio-4dbf258275ee4ca5', 'FABIO PARCEIRO DO HOP QSA',
+  null, null, null, false, null, true

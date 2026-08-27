@@ -27,3 +27,13 @@ select
   '70000000000100', '70000000000100',
   'HOLDING QSA INTERMEDIARIA LTDA', false,
   cast([] as varchar[]), 'subida', false, null, null, false
+union all
+select
+  '30000000000100', '30000000000100',
+  'HOP FRE S.A.', false,
+  cast([] as varchar[]), 'hop', false, null, null, false
+union all
+select
+  '80000000000100', '80000000000100',
+  'HOP QSA LTDA', false,
+  cast([] as varchar[]), 'hop', false, null, null, false

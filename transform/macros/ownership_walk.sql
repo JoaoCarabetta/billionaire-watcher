@@ -49,6 +49,7 @@ fre_latest_documents as (
 fre_rows as (
     select
         fre.CNPJ_Companhia as company_key,
+        trim(cast(fre.Nome_Companhia as string)) as company_name,
         trim(cast(fre.Acionista as string)) as owner_name,
         {{ normalize_company_name('fre.Acionista') }} as owner_name_normalized,
         upper(trim(cast(fre.Tipo_Pessoa_Acionista as string))) as owner_type,
@@ -68,6 +69,7 @@ fre_rows as (
 fre_edges as (
     select
         company_key,
+        company_name,
         'fre' as fonte,
         case
             when
@@ -91,6 +93,7 @@ fre_edges as (
                 end
         end as owner_company_id,
         owner_name,
+        owner_document,
         case
             when length(owner_document) = 11
                 then lpad(owner_document, 11, '0')
@@ -121,6 +124,7 @@ fre_edges as (
 rf_companies as (
     select
         lpad({{ digits_only('cnpj_basico') }}, 8, '0') as cnpj_basico,
+        trim(cast(razao_social as string)) as razao_social,
         lpad({{ digits_only('natureza_juridica') }}, 4, '0') as natureza_juridica
     from {{ source('br_me_cnpj', 'empresas') }}
     where cast(data as date) = cast('{{ var("rf_partition_date") }}' as date)
@@ -129,6 +133,7 @@ rf_companies as (
 qsa_rows as (
     select
         lpad({{ digits_only('socios.cnpj_basico') }}, 8, '0') as company_key,
+        companies.razao_social as company_name,
         trim(cast(socios.nome as string)) as owner_name,
         {{ normalize_company_name('socios.nome') }} as owner_name_normalized,
         trim(cast(socios.tipo as string)) as owner_type,
@@ -140,8 +145,6 @@ qsa_rows as (
         on lpad({{ digits_only('socios.cnpj_basico') }}, 8, '0') = companies.cnpj_basico
     where
         cast(socios.data as date) = cast('{{ var("rf_partition_date") }}' as date)
-        -- 2054 is Sociedade Anônima Fechada: QSA is not a public shareholder book.
-        and companies.natureza_juridica != '2054'
         -- Keep ownership qualifications, including socio-administrador, but never
         -- turn administrators, directors, presidents, or councillors into owners.
         and lpad({{ digits_only('socios.qualificacao') }}, 2, '0') in (
@@ -152,9 +155,10 @@ qsa_rows as (
         )
 ),
 
-qsa_edges as (
+qsa_all_edges as (
     select
         company_key,
+        company_name,
         'qsa' as fonte,
         case
             when owner_type = '2' then 'pessoa'
@@ -169,6 +173,7 @@ qsa_edges as (
             end
         end as owner_company_id,
         owner_name,
+        owner_document,
         case
             when owner_type = '2' and length(owner_document) = 11
                 then lpad(owner_document, 11, '0')
@@ -191,10 +196,20 @@ qsa_edges as (
         owner_name_normalized != ''
         and owner_name_normalized != 'OUTROS'
         and owner_name_normalized not like '%TESOURARIA%'
+),
+
+qsa_edges as (
+    select edges.*
+    from qsa_all_edges as edges
+    inner join rf_companies as companies
+        on edges.company_key = companies.cnpj_basico
+    where
+        -- 2054 is Sociedade Anônima Fechada: QSA is not a public shareholder book.
+        companies.natureza_juridica != '2054'
         and not exists (
             select 1
             from fre_latest_documents
-            where left(CNPJ_Companhia, 8) = qsa_rows.company_key
+            where left(CNPJ_Companhia, 8) = edges.company_key
         )
 ),
 
@@ -202,6 +217,12 @@ ownership_edges as (
     select * from fre_edges
     union all
     select * from qsa_edges
+),
+
+all_ownership_citations as (
+    select * from fre_edges
+    union all
+    select * from qsa_all_edges
 )
 {%- endmacro %}
 
@@ -249,6 +270,7 @@ walked_ownership_edges as (
         edges.owner_kind,
         edges.owner_company_id,
         edges.owner_name,
+        edges.owner_document,
         edges.owner_cpf,
         edges.papel,
         edges.acionista_controlador,
@@ -267,5 +289,174 @@ walked_ownership_edges as (
             edges.fonte = 'qsa'
             and edges.company_key = left(walk.current_empresa_id, 8)
         )
+)
+{%- endmacro %}
+
+
+{% macro downward_hop_ctes(upward_edges_cte) -%}
+eligible_oligarch_cpfs as (
+    select distinct owner_cpf as cpf
+    from {{ upward_edges_cte }}
+    where
+        owner_kind = 'pessoa'
+        and fonte = 'fre'
+        and length(owner_cpf) = 11
+        and cited_empresa_id = root_empresa_id
+        and (
+            acionista_controlador
+            or percentual_on >= 10
+        )
+),
+
+eligible_oligarch_masks as (
+    select distinct
+        substr(cpf, 4, 6) as cpf_mask,
+        cpf
+    from eligible_oligarch_cpfs
+),
+
+fre_hop_company_keys as (
+    select distinct
+        edges.fonte,
+        edges.company_key,
+        edges.company_key as empresa_id,
+        edges.company_key as cnpj,
+        edges.company_name as razao_social
+    from fre_edges as edges
+    inner join eligible_oligarch_cpfs as oligarchs
+        on edges.owner_cpf = oligarchs.cpf
+    where
+        edges.owner_kind = 'pessoa'
+        and (
+            edges.acionista_controlador
+            or edges.percentual_on >= 10
+        )
+),
+
+qsa_hop_company_keys as (
+    select distinct
+        edges.fonte,
+        edges.company_key,
+        edges.company_name as razao_social
+    from qsa_all_edges as edges
+    inner join eligible_oligarch_masks as oligarchs
+        on edges.owner_document = oligarchs.cpf_mask
+    where
+        edges.owner_kind = 'pessoa'
+        and length(edges.owner_document) = 6
+),
+
+rf_hop_establishments_ranked as (
+    select
+        lpad({{ digits_only('cnpj_basico') }}, 8, '0') as cnpj_basico,
+        lpad({{ digits_only('cnpj') }}, 14, '0') as cnpj,
+        row_number() over (
+            partition by lpad({{ digits_only('cnpj_basico') }}, 8, '0')
+            order by
+                case
+                    when substr(lpad({{ digits_only('cnpj') }}, 14, '0'), 9, 4) = '0001'
+                        then 0
+                    else 1
+                end,
+                lpad({{ digits_only('cnpj') }}, 14, '0')
+        ) as establishment_row
+    from {{ source('br_me_cnpj', 'estabelecimentos') }}
+    where
+        cast(data as date) = cast('{{ var("rf_partition_date") }}' as date)
+        and length({{ digits_only('cnpj_basico') }}) = 8
+        and length({{ digits_only('cnpj') }}) = 14
+),
+
+rf_hop_headquarters as (
+    select cnpj_basico, cnpj
+    from rf_hop_establishments_ranked
+    where establishment_row = 1
+),
+
+qsa_hop_companies_resolved as (
+    select
+        companies.fonte,
+        companies.company_key,
+        coalesce(
+            headquarters.cnpj,
+            concat(
+                'nome:',
+                {{ normalize_company_name('companies.razao_social') }}
+            )
+        ) as empresa_id,
+        headquarters.cnpj,
+        companies.razao_social
+    from qsa_hop_company_keys as companies
+    left join rf_hop_headquarters as headquarters
+        on companies.company_key = headquarters.cnpj_basico
+),
+
+downward_hop_company_keys as (
+    select * from fre_hop_company_keys
+    union all
+    select * from qsa_hop_companies_resolved
+),
+
+downward_hop_companies as (
+    select
+        empresa_id,
+        max(cnpj) as cnpj,
+        max(razao_social) as razao_social
+    from downward_hop_company_keys
+    group by empresa_id
+),
+
+downward_hop_match_keys as (
+    select distinct empresa_id, fonte, company_key
+    from downward_hop_company_keys
+
+    union
+
+    select distinct
+        companies.empresa_id,
+        citations.fonte,
+        citations.company_key
+    from downward_hop_companies as companies
+    inner join all_ownership_citations as citations
+        on (
+            citations.fonte = 'fre'
+            and citations.company_key = companies.cnpj
+        ) or (
+            citations.fonte = 'qsa'
+            and citations.company_key = left(companies.cnpj, 8)
+        )
+    where companies.cnpj is not null
+),
+
+downward_hop_person_edges as (
+    select
+        keys.empresa_id as cited_empresa_id,
+        edges.fonte,
+        edges.owner_kind,
+        edges.owner_company_id,
+        edges.owner_name,
+        edges.owner_document,
+        coalesce(
+            edges.owner_cpf,
+            case
+                when edges.fonte = 'qsa' then oligarchs.cpf
+            end
+        ) as owner_cpf,
+        edges.papel,
+        edges.acionista_controlador,
+        edges.participante_acordo_acionistas,
+        edges.percentual_on,
+        edges.percentual_total,
+        edges.qualificacao,
+        edges.data_referencia,
+        edges.fonte_documento
+    from downward_hop_match_keys as keys
+    inner join all_ownership_citations as edges
+        on keys.fonte = edges.fonte
+        and keys.company_key = edges.company_key
+    left join eligible_oligarch_masks as oligarchs
+        on edges.fonte = 'qsa'
+        and edges.owner_document = oligarchs.cpf_mask
+    where edges.owner_kind = 'pessoa'
 )
 {%- endmacro %}

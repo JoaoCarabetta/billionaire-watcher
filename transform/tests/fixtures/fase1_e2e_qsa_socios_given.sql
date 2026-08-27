@@ -25,3 +25,15 @@ union all
 select
   cast('2026-01-11' as date), '60000000', '2',
   'JOAO SILVA', '***333333**', '22'
+union all
+select
+  cast('2026-01-11' as date), '30000000', '2',
+  'IRENE PARCEIRA QSA DA FRE', '***987654**', '22'
+union all
+select
+  cast('2026-01-11' as date), '80000000', '2',
+  'ALICE CONTROLADORA', '***444777**', '22'
+union all
+select
+  cast('2026-01-11' as date), '80000000', '2',
+  'FABIO PARCEIRO DO HOP QSA', '***654321**', '22'
