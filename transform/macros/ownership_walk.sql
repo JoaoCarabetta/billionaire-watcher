@@ -58,8 +58,8 @@ fre_rows as (
         fre.ID_Documento,
         upper(trim(cast(fre.Acionista_Controlador as string))) as controller_flag,
         upper(trim(cast(fre.Participante_Acordo_Acionistas as string))) as agreement_flag,
-        cast(fre.Percentual_Acao_Ordinaria_Circulacao as double) as percentual_on,
-        cast(fre.Percentual_Total_Acoes_Circulacao as double) as percentual_total
+        cast(fre.Percentual_Acao_Ordinaria_Circulacao as float64) as percentual_on,
+        cast(fre.Percentual_Total_Acoes_Circulacao as float64) as percentual_total
     from {{ ref('stg_cvm_fre_posicao_acionaria_2026') }} as fre
     inner join fre_latest_documents as latest
         on fre.CNPJ_Companhia = latest.CNPJ_Companhia
@@ -198,8 +198,8 @@ qsa_all_edges as (
         'socio' as papel,
         cast(null as boolean) as acionista_controlador,
         cast(null as boolean) as participante_acordo_acionistas,
-        cast(null as double) as percentual_on,
-        cast(null as double) as percentual_total,
+        cast(null as float64) as percentual_on,
+        cast(null as float64) as percentual_total,
         qualificacao,
         data_referencia,
         concat(
@@ -330,8 +330,8 @@ eligible_oligarch_masks as (
         substr(cpf, 4, 6) as cpf_mask,
         min(cpf) as cpf
     from eligible_oligarch_cpfs
-    group by substr(cpf, 4, 6)
-    having count(distinct cpf) = 1
+    group by 1
+    having count(*) = 1
 ),
 
 fre_hop_company_keys as (
@@ -420,12 +420,12 @@ upward_company_ids as (
     select root_empresa_id as empresa_id
     from {{ upward_edges_cte }}
 
-    union
+    union distinct
 
     select cited_empresa_id
     from {{ upward_edges_cte }}
 
-    union
+    union distinct
 
     select owner_company_id
     from {{ upward_edges_cte }}
@@ -452,7 +452,7 @@ downward_hop_match_keys as (
     select distinct empresa_id, fonte, company_key
     from downward_hop_company_keys
 
-    union
+    union distinct
 
     select distinct
         companies.empresa_id,
