@@ -251,6 +251,34 @@ seeds:
           - not_null
           - unique
 
+  - name: live_graph_person_ids
+    description: |
+      Warehouse-enabled read-only extract of the live public graph's person
+      nodes. Generated from public/grafo-publico.json where kind=person; this
+      seed does not add nodes or change the product JSON. The landed extract
+      contains 929 valid p- ids. FRE shareholder hashes cover 927. The two
+      remaining ids, p-da3e3836 (JOAQUIM DA SILVA FERREIRA) and p-e1365405
+      (EDUARDO DE ALMEIDA SANTOS), are the accepted issue #118 unique Tribunal
+      candidate-name hits. Their candidatos.cpf hashes are already those p- ids,
+      so they strong-match directly rather than remaining unresolved Formulário
+      misses. Warehouse inspection found no eight-hex collision among 2,653
+      FRE hashes.
+    config:
+      enabled: true
+      column_types:
+        person_id: STRING
+        label: STRING
+    columns:
+      - name: person_id
+        description: Existing public graph id in p- plus eight-hex form
+        tests:
+          - not_null
+          - unique
+      - name: label
+        description: Existing public graph display label
+        tests:
+          - not_null
+
   - name: top50_flags_seed
     description: Top-50 billionaire watcher group flags from Valor 1000 2025
     config:
