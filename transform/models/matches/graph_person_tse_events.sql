@@ -1,8 +1,9 @@
 -- Privacy boundary for graph-person Tribunal matching.
 -- The raw document is used only to derive p- plus eight hex and is never output.
 -- There is no real 2026 Dados Abertos landing under
--- gs://billionairewatcher-landing. The 2026 CTEs stay explicitly empty until
--- that landing exists; no object/table path or fixture receipt is invented.
+-- gs://billionairewatcher-landing/raw/tse/2026/. The 2026 CTEs stay explicitly
+-- empty until that exact prefix contains a real Tribunal landing; no fixture
+-- receipt is substituted.
 
 with closed_candidates as (
     select
