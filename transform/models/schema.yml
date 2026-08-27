@@ -6,7 +6,8 @@ models:
       Fase 1 company door at one row per company. Contains the resolvable Valor
       inventory (seed A) union active CVM companies, selected BCB headquarters,
       and selected SUSEP companies (seed B), plus intermediate companies cited
-      while walking ownership upward. Size floors are implemented separately.
+      while walking ownership upward. Size floors are optional metadata:
+      companies without a floor stay in the model and keep walking.
     columns:
       - name: empresa_id
         description: Full 14-digit CNPJ, or nome plus normalized name for the five no-walk exceptions.
@@ -39,11 +40,20 @@ models:
         tests:
           - not_null
       - name: valor_do_piso
-        description: Size-floor value; null until issue 180.
+        description: |
+          Optional BRL size floor: listed market value, prudential banking
+          assets, or annual-to-date emitted insurance premiums.
       - name: fonte_do_piso
-        description: Size-floor source; null until issue 180.
+        description: Exact source label for valor_do_piso; null when uncovered.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - bolsa_cotahist
+                  - ifdata_ativo_total
+                  - susep_premios_emitidos
       - name: tem_piso
-        description: False until issue 180 adds size-floor coverage.
+        description: True only when valor_do_piso and fonte_do_piso are present.
         tests:
           - not_null
 
@@ -152,3 +162,43 @@ models:
               - empresa_id
               - fonte
               - data_referencia
+
+  - name: int_empresas_piso
+    description: |
+      Optional company size floors at one row per 14-digit CNPJ. When a CNPJ
+      appears in more than one family, source precedence is Bolsa, IF.data,
+      then SUSEP. The model never emits rows for uncovered companies; empresas
+      left-joins it so missing floors do not become a door.
+    columns:
+      - name: empresa_id
+        description: Full 14-digit CNPJ, equal to cnpj.
+        tests:
+          - not_null
+          - unique
+      - name: cnpj
+        description: Full 14-digit CNPJ.
+        tests:
+          - not_null
+          - unique
+      - name: valor_do_piso
+        description: Floor value in Brazilian reais.
+        tests:
+          - not_null
+      - name: fonte_do_piso
+        description: Exact floor source label selected by family precedence.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - bolsa_cotahist
+                  - ifdata_ativo_total
+                  - susep_premios_emitidos
+      - name: tem_piso
+        description: Always true for rows emitted by this covered-only model.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true]
+                quote: false

@@ -103,3 +103,59 @@ models:
           - accepted_values:
               arguments:
                 values: ['ATIVO', 'CANCELADA']
+
+  - name: stg_bolsa_cotahist_piso
+    description: |
+      Market capitalization at one row per 14-digit issuer CNPJ. Share counts
+      come from B3 GetListedSupplementCompany. Tickers are mapped by CVM FCA
+      Codigo_Negociacao, and prices are each ticker's latest official PREULT
+      from COTAHIST_A2026 with TPMERC=010 and CODBDI=02. This model never uses
+      basedosdados.br_b3_cotacoes.cotacoes, which is a trade tape rather than
+      COTAHIST bars. When an issuer has several tickers for the same broad
+      common/preferred class, its most-traded ticker on the latest available
+      date supplies the representative close for B3's class-level quantity.
+    columns:
+      - name: cnpj
+        description: Full 14-digit listed-company CNPJ.
+        tests:
+          - not_null
+          - unique
+      - name: valor_do_piso
+        description: Sum of common and preferred share quantities times their selected closes.
+        tests:
+          - not_null
+
+  - name: stg_ifdata_ativo_total_piso
+    description: |
+      IF.data Ativo Total at one row per full bank-headquarters CNPJ. The model
+      exclusively uses TipoInstituicao=1, the prudential-conglomerate and
+      independent-institution grain, Relatorio=2, Conta=140220, and Saldo.
+      IfDataCadastro maps the prudential reporter to CnpjInstituicaoLider;
+      codigoCNPJ8 then joins to the BCB seed registry. Individual and financial
+      conglomerate rows are never mixed in.
+    columns:
+      - name: cnpj
+        description: Full 14-digit BCB headquarters CNPJ.
+        tests:
+          - not_null
+          - unique
+      - name: valor_do_piso
+        description: Prudential Ativo Total in Brazilian reais.
+        tests:
+          - not_null
+
+  - name: stg_susep_premios_emitidos_piso
+    description: |
+      Annual-to-date emitted insurance premiums at one row per 14-digit CNPJ,
+      summed from ReceitasSeguros.valor across month, group, and ramo. It does
+      not use premio_ganho from the SES dataset.
+    columns:
+      - name: cnpj
+        description: Full 14-digit insurer CNPJ.
+        tests:
+          - not_null
+          - unique
+      - name: valor_do_piso
+        description: Sum of ReceitasSeguros.valor in Brazilian reais.
+        tests:
+          - not_null
