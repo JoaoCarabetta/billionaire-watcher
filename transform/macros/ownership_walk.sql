@@ -326,10 +326,12 @@ eligible_oligarch_cpfs as (
 ),
 
 eligible_oligarch_masks as (
-    select distinct
+    select
         substr(cpf, 4, 6) as cpf_mask,
-        cpf
+        min(cpf) as cpf
     from eligible_oligarch_cpfs
+    group by substr(cpf, 4, 6)
+    having count(distinct cpf) = 1
 ),
 
 fre_hop_company_keys as (

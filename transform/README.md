@@ -178,9 +178,10 @@ CPF-less JOAO SILVA citations remain separate.
 
 Only people already identified as `e_oligarca` and carrying a full CPF can
 start the downward hop. FRE rows match the full 11 CPF digits; Receita QSA rows
-match the six-digit mask derived from that stored CPF. Names never start an
-invert. The lookup covers every latest FRE company and every QSA row, not only
-seed companies.
+match the six-digit mask derived from that stored CPF only when the mask maps
+to exactly one stored oligarch CPF. Colliding masks do not match, and names
+never start an invert. The lookup covers every latest FRE company and every
+QSA row, not only seed companies.
 
 Qualifying FRE companies (controller `S` or at least 10% ON) and every Receita
 company where the oligarch is a partner enter as `motivo_entrada = hop`.

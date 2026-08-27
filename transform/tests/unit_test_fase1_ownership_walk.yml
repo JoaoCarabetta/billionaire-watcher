@@ -3,7 +3,8 @@ unit_tests:
     description: |
       End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
       registries seed the walk; FRE and QSA legal-person owners enter as subida,
-      including a tipo 3 foreign holding without an invented CNPJ.
+      including a tipo 3 foreign holding without an invented CNPJ. A QSA mask
+      shared by two stored oligarch CPFs does not admit its company.
     model: empresas
     given:
       - input: source('fase1_landing', 'controle_empresas_walk')
@@ -76,7 +77,8 @@ unit_tests:
       controller S on a seed, Camila and the QSA partners are false, Diana's
       controller tie on a subida company is false, and the two CPF-less
       JOAO SILVA citations remain separate people. Sofia, a tipo 3 foreign
-      natural partner without CPF, remains a provisional non-oligarch.
+      natural partner without CPF, remains a provisional non-oligarch. Carlos
+      and Davi are oligarchs whose colliding QSA mask is rejected.
     model: pessoas
     given:
       - input: ref('int_walk_roots')

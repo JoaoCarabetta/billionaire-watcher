@@ -9,6 +9,14 @@ select
   true as fortuna_incompleta
 union all
 select
+  'p-f0a39f5c', 'CARLOS CPF COLISAO', '12355566600', null, null,
+  true, null, true
+union all
+select
+  'p-20953853', 'DAVI CPF COLISAO', '98755566611', null, null,
+  true, null, true
+union all
+select
   'p-provisorio-5244e17e4d3e00aa', 'CAMILA CITADA', null, null, null,
   false, null, true
 union all

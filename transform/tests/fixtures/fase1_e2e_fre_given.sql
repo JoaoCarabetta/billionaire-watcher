@@ -17,6 +17,14 @@ select
 union all
 select
   '10000000000100', 'LISTADA SEMENTE S.A.', cast('2026-06-30' as date), 100,
+  'CARLOS CPF COLISAO', 'PF', '123.555.666-00', 'S', 'N', 1.0, 1.0
+union all
+select
+  '10000000000100', 'LISTADA SEMENTE S.A.', cast('2026-06-30' as date), 100,
+  'DAVI CPF COLISAO', 'PF', '987.555.666-11', 'S', 'N', 1.0, 1.0
+union all
+select
+  '10000000000100', 'LISTADA SEMENTE S.A.', cast('2026-06-30' as date), 100,
   'CAMILA CITADA', 'PF', cast(null as varchar), 'N', 'S', 4.9, 4.9
 union all
 select

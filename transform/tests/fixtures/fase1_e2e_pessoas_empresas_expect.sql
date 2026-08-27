@@ -12,6 +12,18 @@ select
   'https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FRE/DADOS/fre_cia_aberta_2026.zip#fre_cia_aberta_posicao_acionaria_2026.csv;ID_Documento=100' as fonte_documento
 union all
 select
+  'p-f0a39f5c', '10000000000100',
+  'acionista_controlador', 'fre', true, false, 1.0, 1.0, null,
+  cast('2026-06-30' as date),
+  'https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FRE/DADOS/fre_cia_aberta_2026.zip#fre_cia_aberta_posicao_acionaria_2026.csv;ID_Documento=100'
+union all
+select
+  'p-20953853', '10000000000100',
+  'acionista_controlador', 'fre', true, false, 1.0, 1.0, null,
+  cast('2026-06-30' as date),
+  'https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FRE/DADOS/fre_cia_aberta_2026.zip#fre_cia_aberta_posicao_acionaria_2026.csv;ID_Documento=100'
+union all
+select
   'p-provisorio-5244e17e4d3e00aa', '10000000000100',
   'acionista', 'fre', false, true, 4.9, 4.9, null,
   cast('2026-06-30' as date),

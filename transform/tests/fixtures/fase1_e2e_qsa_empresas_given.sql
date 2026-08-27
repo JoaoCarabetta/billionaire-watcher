@@ -18,3 +18,6 @@ select
 union all
 select
   cast('2026-01-11' as date), '80000000', 'HOP QSA LTDA', '2062'
+union all
+select
+  cast('2026-01-11' as date), '81000000', 'MASCARA EM COLISAO LTDA', '2062'
