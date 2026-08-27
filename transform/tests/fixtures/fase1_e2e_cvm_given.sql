@@ -16,3 +16,6 @@ select
 union all
 select
   '91000000000100', 'HOMONIMO SEM CPF S.A.', 'CANCELADA'
+union all
+select
+  '13000000000100', 'HOLDING SEM PORTA S.A.', 'CANCELADA'

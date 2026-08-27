@@ -42,7 +42,9 @@ unit_tests:
     description: |
       End-to-end fase 1 seam, edge output: all cited natural people enter and
       company owners traversed by the existing walk point to the companies they
-      own. QSA rows stay socio, tipo 3 foreign partners do not stop, and old
+      own, including Formulário-tree person edges whose destination is the
+      parent holding (`ID_Acionista_Relacionado`) rather than the issuer.
+      QSA rows stay socio, tipo 3 foreign partners do not stop, and old
       FRE documents and administrators do not enter.
     model: vinculos
     given:
@@ -80,11 +82,12 @@ unit_tests:
 
   - name: test_fase1_ownership_walk_emits_percursos
     description: |
-      Every current e_oligarca person who qualifies on a seed Formulário has
-      at least one one-step percurso (person → seed) with fonte_documento and
-      regra_do_passo controlador_fre. Hop partners, holding-only controllers,
-      and non-qualifying seed citations do not get a path. Does not invent
-      multi-step inheritance paths.
+      Every e_oligarca person has a stored percurso to a seed Formulário door
+      with fonte_documento on every step. Wesley-shaped seed-Formulário people
+      keep a one-step path. Inherited holding partners (Quadro de Sócios or
+      Formulário tree) have a chain of at least two steps ending on the seed
+      door. Hop partners and controllers on a subida company that is not on a
+      seed door do not get a path.
     model: percursos
     given:
       - input: ref('vinculos')
@@ -104,10 +107,15 @@ unit_tests:
     description: |
       End-to-end fase 1 seam, people output: Alice is an oligarch through
       controller S on a seed and has one valued path plus incomplete hop paths.
-      Camila, Carlos, Davi, and Diana have only complete valued paths; the QSA
-      partners have no valued path because Receita cites no percentages.
-      Elena's cited percentage cannot be valued because her hop company has no
-      floor. The oligarch flags remain exactly those established by issue 181.
+      Camila, Carlos, Davi, and Ines have only complete valued paths; the QSA
+      partners of seeds have no valued path because Receita cites no percentages.
+      Felipe inherits e_oligarca as a Quadro de Sócios partner of a
+      Formulário-controller holding, with an incomplete fortune. Jose inherits
+      through the seed Formulário tree. Diana inherits because her holding sits
+      on a seed door with at least 10 percent ordinary. Elena's cited percentage
+      cannot be valued because her hop company has no floor. Hop partners stay
+      false. Ines stays false: controller on a subida company that is not on a
+      seed door.
     model: pessoas
     given:
       - input: ref('int_walk_roots')

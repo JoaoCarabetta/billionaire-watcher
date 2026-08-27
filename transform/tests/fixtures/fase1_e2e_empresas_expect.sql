@@ -43,3 +43,13 @@ select
   'nome:HOLDINGESTRANGEIRASEMCNPJ', null,
   'HOLDING ESTRANGEIRA SEM CNPJ', false,
   cast([] as varchar[]), 'subida', false, null, null, false
+union all
+select
+  '12000000000100', '12000000000100',
+  'HOLDING CONTROLADORA QSA LTDA', false,
+  cast([] as varchar[]), 'subida', false, null, null, false
+union all
+select
+  '13000000000100', '13000000000100',
+  'HOLDING SEM PORTA S.A.', false,
+  cast([] as varchar[]), 'subida', false, null, null, false

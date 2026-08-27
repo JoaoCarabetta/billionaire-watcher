@@ -88,3 +88,21 @@ select
   'socio', 'qsa', null, null, null, null, '38',
   cast('2026-01-11' as date),
   'basedosdados.br_me_cnpj.socios?data=2026-01-11&cnpj_basico=40000000'
+union all
+select
+  'p-provisorio-ff84fed3d3bd953a', '12000000000100',
+  'socio', 'qsa', null, null, null, null, '22',
+  cast('2026-01-11' as date),
+  'basedosdados.br_me_cnpj.socios?data=2026-01-11&cnpj_basico=12000000'
+union all
+select
+  'p-provisorio-46a7c8979f5f35ea', '12000000000100',
+  'acionista_controlador', 'fre', true, false, 99.0, 99.0, null,
+  cast('2026-06-30' as date),
+  'https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FRE/DADOS/fre_cia_aberta_2026.zip#fre_cia_aberta_posicao_acionaria_2026.csv;ID_Documento=100'
+union all
+select
+  'p-provisorio-c46282f6d5a5ac6d', '13000000000100',
+  'acionista_controlador', 'fre', true, false, 80.0, 80.0, null,
+  cast('2026-06-30' as date),
+  'https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FRE/DADOS/fre_cia_aberta_2026.zip#fre_cia_aberta_posicao_acionaria_2026.csv;ID_Documento=130'

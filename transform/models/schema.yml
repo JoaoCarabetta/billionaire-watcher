@@ -91,9 +91,11 @@ models:
         description: Reserved warehouse-only identity-matching evidence.
       - name: e_oligarca
         description: |
-          True only for a FRE citation on a seed company with controller S or
-          at least 10 percent of circulating ordinary shares. Hop-company
-          citations never change this flag.
+          True for a FRE citation on a seed company with controller S or at
+          least 10 percent of circulating ordinary shares, and for a cited
+          partner (FRE or QSA) of a holding that sits on that seed door or
+          owns through a vinculos chain to that door. Hop-company citations
+          never change this flag.
         tests:
           - not_null
       - name: fortuna_valor
@@ -201,12 +203,12 @@ models:
 
   - name: percursos
     description: |
-      One row per step of one concrete path from a current e_oligarca person
-      to a seed Formulário door. Step 1 is the person on the first company;
-      the last step is the holding (or the person) on the seed. Today's flag
-      is the seed Formulário citation, so fixture paths are one step. Every
-      step carries fonte_documento. Does not inherit e_oligarca up a holding
-      chain.
+      One row per step of one concrete path from an e_oligarca person to a
+      seed Formulário door. Step 1 is the person on the first company; the
+      last step is the holding (or the person) on the seed. Direct
+      seed-Formulário people have a one-step path. Partners of a holding on
+      that door have a multi-step path. Every step carries fonte_documento.
+      Hop citations never become a last step.
     columns:
       - name: pessoa_id
         description: The e_oligarca person this path justifies.

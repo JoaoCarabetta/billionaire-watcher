@@ -22,7 +22,7 @@ select
 union all
 select
   'p-provisorio-38456fff6f5e6fd9', 'DIANA HOLDING', null, null, null,
-  false, 480, false
+  true, 480, false
 union all
 select
   'p-provisorio-9c05347c3655101e', 'BRUNO SOCIO', null, null, null,
@@ -51,3 +51,15 @@ union all
 select
   'p-provisorio-5ef96a534f962d30', 'SOFIA SOCIA ESTRANGEIRA',
   null, null, null, false, null, true
+union all
+select
+  'p-provisorio-ff84fed3d3bd953a', 'FELIPE SOCIO DA HOLDING PORTA',
+  null, null, null, true, null, true
+union all
+select
+  'p-provisorio-46a7c8979f5f35ea', 'JOSE CITADO NA ARVORE',
+  null, null, null, true, cast(148.5 as numeric), false
+union all
+select
+  'p-provisorio-c46282f6d5a5ac6d', 'INES CONTROLADORA SEM PORTA',
+  null, null, null, false, 40, false

@@ -10,6 +10,34 @@ walk_roots as (
 
 {{ downward_hop_ctes('walked_ownership_edges') }},
 
+seed_door_holdings as (
+    select distinct owner_company_id as empresa_id
+    from walked_ownership_edges
+    where
+        owner_kind = 'empresa'
+        and owner_company_id is not null
+        and cited_empresa_id in (select root_empresa_id from walk_roots)
+        and fonte = 'fre'
+        and (
+            acionista_controlador
+            or percentual_on >= 10
+        )
+),
+
+-- Companies on a cited chain to a seed Formulário door: the door holding
+-- itself, then every company that owns it through walked vinculos. Hop
+-- companies never enter company_walk, so hop citations cannot inherit.
+holdings_on_chain as (
+    select distinct walk.current_empresa_id as empresa_id
+    from company_walk as walk
+    inner join seed_door_holdings as doors
+        on strpos(
+            walk.visited_path,
+            concat('|', doors.empresa_id, '|')
+        ) > 0
+    where walk.depth >= 1
+),
+
 fortune_company_edges as (
     select
         company_key,
@@ -171,10 +199,13 @@ upward_person_citations as (
         edges.fonte,
         edges.acionista_controlador,
         edges.percentual_on,
-        seeds.root_empresa_id is not null as cited_on_seed
+        seeds.root_empresa_id is not null as cited_on_seed,
+        door_chain.empresa_id is not null as cited_on_control_chain
     from walked_ownership_edges as edges
     left join walk_roots as seeds
         on edges.cited_empresa_id = seeds.root_empresa_id
+    left join holdings_on_chain as door_chain
+        on edges.cited_empresa_id = door_chain.empresa_id
     where edges.owner_kind = 'pessoa'
 ),
 
@@ -195,7 +226,8 @@ hop_person_citations as (
         edges.fonte,
         edges.acionista_controlador,
         edges.percentual_on,
-        false as cited_on_seed
+        false as cited_on_seed,
+        false as cited_on_control_chain
     from downward_hop_person_edges as edges
 ),
 
@@ -221,6 +253,10 @@ people_rollup as (
                         acionista_controlador
                         or percentual_on >= 10
                     )
+                    then 1
+                when
+                    cited_on_control_chain
+                    and fonte in ('fre', 'qsa')
                     then 1
                 else 0
             end
