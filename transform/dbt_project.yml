@@ -68,6 +68,12 @@ models:
       +materialized: table
       +meta:
         location: US
+    matches:
+      +schema: billionaire_watcher
+      +materialized: table
+      +enabled: true
+      +meta:
+        location: US
     graph:
       +schema: billionaire_watcher
       +materialized: table

@@ -1,0 +1,174 @@
+version: 2
+
+unit_tests:
+  - name: test_graph_person_tse_events_hashes_only_full_cpf
+    description: |
+      A full warehouse CPF becomes the same p- plus eight-hex strong key used
+      by the graph. Masked donor documents and out-of-window cycles emit no
+      event, and no source document is selected into the output.
+    model: graph_person_tse_events
+    given:
+      - input: source('br_tse_eleicoes', 'candidatos')
+        format: sql
+        rows: |
+          select
+            2016 as ano,
+            repeat('1', 11) as cpf,
+            '  ANA   MARIA  ' as nome
+          union all
+          select
+            2014 as ano,
+            repeat('1', 11) as cpf,
+            'ANA MARIA' as nome
+      - input: source('br_tse_eleicoes', 'receitas_candidato')
+        format: sql
+        rows: |
+          select
+            2024 as ano,
+            repeat('1', 11) as cpf_cnpj_doador,
+            'ANA MARIA' as nome_doador
+          union all
+          select
+            2018 as ano,
+            '***111***' as cpf_cnpj_doador,
+            'NOME SEM CHAVE COMPLETA' as nome_doador
+      - input: source('tse_2026_snapshot', 'candidatos_2026_10_04')
+        format: sql
+        rows: |
+          select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf,
+            cast(null as varchar) as nome
+          where false
+      - input: source('tse_2026_snapshot', 'receitas_candidato_2026_10_04')
+        format: sql
+        rows: |
+          select
+            cast(null as integer) as ano,
+            cast(null as varchar) as cpf_cnpj_doador,
+            cast(null as varchar) as nome_doador
+          where false
+    expect:
+      format: sql
+      rows: |
+        select
+          'p-534a4a8e' as person_id,
+          'ANA MARIA' as normalized_name,
+          2016 as cycle,
+          'candidate' as event_kind
+        union all
+        select
+          'p-534a4a8e',
+          'ANA MARIA',
+          2024,
+          'donor'
+
+  - name: test_graph_person_tse_match_strong_review_collision_and_no_hit
+    description: |
+      Strong ids alone set badge-class flags and cycles. One distinct hash on
+      exact normalized name is review, two hashes are collision, accents are
+      not folded, and the complete output schema has no raw CPF column.
+    model: graph_person_tse_match
+    given:
+      - input: ref('live_graph_person_ids')
+        format: sql
+        rows: |
+          select 'p-aaa11111' as person_id, 'PESSOA FORTE' as label
+          union all
+          select 'p-bbb22222', '  NOME   UNICO '
+          union all
+          select 'p-ccc33333', 'NOME COLISAO'
+          union all
+          select 'p-ddd44444', 'SEM EVENTO'
+          union all
+          select 'p-eee55555', 'JOSE ACENTO'
+      - input: ref('graph_person_tse_events')
+        format: sql
+        rows: |
+          select 'p-aaa11111' as person_id, 'PESSOA FORTE' as normalized_name, 2016 as cycle, 'candidate' as event_kind
+          union all
+          select 'p-aaa11111', 'PESSOA FORTE', 2026, 'candidate'
+          union all
+          select 'p-aaa11111', 'PESSOA FORTE', 2022, 'donor'
+          union all
+          select 'p-1111aaaa', 'NOME UNICO', 2020, 'candidate'
+          union all
+          select 'p-2222bbbb', 'NOME COLISAO', 2018, 'donor'
+          union all
+          select 'p-3333cccc', 'NOME COLISAO', 2024, 'donor'
+          union all
+          select 'p-4444dddd', 'JOSÉ ACENTO', 2022, 'candidate'
+    expect:
+      format: sql
+      rows: |
+        select
+          'p-aaa11111' as person_id,
+          'PESSOA FORTE' as label,
+          true as is_candidate_strong,
+          true as is_donor_strong,
+          '2016,2026' as candidate_cycles,
+          '2022' as donor_cycles,
+          'strong' as match_class
+        union all
+        select
+          'p-bbb22222',
+          '  NOME   UNICO ',
+          false,
+          false,
+          cast(null as varchar),
+          cast(null as varchar),
+          'name_review'
+        union all
+        select
+          'p-ccc33333',
+          'NOME COLISAO',
+          false,
+          false,
+          cast(null as varchar),
+          cast(null as varchar),
+          'collision'
+        union all
+        select
+          'p-ddd44444',
+          'SEM EVENTO',
+          false,
+          false,
+          cast(null as varchar),
+          cast(null as varchar),
+          'no_hit'
+        union all
+        select
+          'p-eee55555',
+          'JOSE ACENTO',
+          false,
+          false,
+          cast(null as varchar),
+          cast(null as varchar),
+          'no_hit'
+
+  - name: test_graph_person_tse_match_counts_one_row
+    description: Counts each graph person once in the required match classes.
+    model: graph_person_tse_match_counts
+    given:
+      - input: ref('graph_person_tse_match')
+        format: sql
+        rows: |
+          select 'p-aaa11111' as person_id, 'PESSOA FORTE' as label, true as is_candidate_strong, true as is_donor_strong, '2016,2026' as candidate_cycles, '2022' as donor_cycles, 'strong' as match_class
+          union all
+          select 'p-bbb22222', 'NOME UNICO', false, false, cast(null as varchar), cast(null as varchar), 'name_review'
+          union all
+          select 'p-ccc33333', 'NOME COLISAO', false, false, cast(null as varchar), cast(null as varchar), 'collision'
+          union all
+          select 'p-ddd44444', 'SEM EVENTO', false, false, cast(null as varchar), cast(null as varchar), 'no_hit'
+          union all
+          select 'p-eee55555', 'JOSE ACENTO', false, false, cast(null as varchar), cast(null as varchar), 'no_hit'
+    expect:
+      format: sql
+      rows: |
+        select
+          5 as graph_persons,
+          1 as strong_candidate_hits,
+          1 as strong_donor_hits,
+          1 as name_only_review,
+          1 as collisions,
+          2 as no_hit
