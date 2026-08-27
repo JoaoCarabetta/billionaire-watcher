@@ -151,7 +151,9 @@ shareholder-position file, never be inferred from RF alone.
 The walk filters QSA to ownership qualifications: administrator-, director-,
 president-, and council-only rows never become owners. QSA has no percentage or
 control signal, so those fields remain null. A closed S.A. (`natureza_juridica`
-2054) stops because QSA is not a public shareholder book.
+2054) stops because QSA is not a public shareholder book. QSA `tipo=3`
+(foreign partner) is a company when its document has 14 digits and otherwise a
+natural person with a provisional identity when no full CPF is available.
 
 ### Upward ownership walk
 

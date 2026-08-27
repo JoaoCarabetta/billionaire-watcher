@@ -162,11 +162,24 @@ qsa_all_edges as (
         'qsa' as fonte,
         case
             when owner_type = '2' then 'pessoa'
-            when owner_type = '1' then 'empresa'
+            when
+                owner_type = '3'
+                and coalesce(length(owner_document), 0) != 14
+                then 'pessoa'
+            when owner_type = '1' or (
+                owner_type = '3'
+                and length(owner_document) = 14
+            ) then 'empresa'
             else 'parada'
         end as owner_kind,
         case
-            when owner_type = '1' then case
+            when
+                owner_type = '1'
+                or (
+                    owner_type = '3'
+                    and length(owner_document) = 14
+                )
+                then case
                 when length(owner_document) = 14
                     then lpad(owner_document, 14, '0')
                 else concat('nome:', owner_name_normalized)
@@ -175,7 +188,9 @@ qsa_all_edges as (
         owner_name,
         owner_document,
         case
-            when owner_type = '2' and length(owner_document) = 11
+            when
+                owner_type in ('2', '3')
+                and length(owner_document) = 11
                 then lpad(owner_document, 11, '0')
         end as owner_cpf,
         'socio' as papel,

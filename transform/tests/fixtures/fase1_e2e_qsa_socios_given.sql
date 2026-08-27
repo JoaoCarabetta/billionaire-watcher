@@ -19,12 +19,16 @@ select
   'ADMINISTRADOR NAO SOCIO', '***222222**', '05'
 union all
 select
-  cast('2026-01-11' as date), '40000000', '1',
+  cast('2026-01-11' as date), '40000000', '3',
   'HOLDING QSA INTERMEDIARIA LTDA', '70000000000100', '48'
 union all
 select
   cast('2026-01-11' as date), '60000000', '2',
   'JOAO SILVA', '***333333**', '22'
+union all
+select
+  cast('2026-01-11' as date), '40000000', '3',
+  'SOFIA SOCIA ESTRANGEIRA', 'PASSAPORTE-123', '22'
 union all
 select
   cast('2026-01-11' as date), '30000000', '2',

@@ -46,7 +46,8 @@ unit_tests:
   - name: test_fase1_ownership_walk_emits_pessoas_empresas
     description: |
       End-to-end fase 1 seam, relationship output: all cited natural people
-      enter, QSA rows stay socio, old FRE documents and administrators do not.
+      enter, QSA rows stay socio, tipo 3 foreign partners do not stop, old FRE
+      documents and administrators do not enter.
     model: pessoas_empresas
     given:
       - input: ref('int_walk_roots')
@@ -73,7 +74,8 @@ unit_tests:
       End-to-end fase 1 seam, people output: Alice is an oligarch through
       controller S on a seed, Camila and the QSA partners are false, Diana's
       controller tie on a subida company is false, and the two CPF-less
-      JOAO SILVA citations remain separate people.
+      JOAO SILVA citations remain separate people. Sofia, a tipo 3 foreign
+      partner without CPF, remains a provisional non-oligarch.
     model: pessoas
     given:
       - input: ref('int_walk_roots')

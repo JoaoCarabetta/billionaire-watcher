@@ -39,3 +39,7 @@ union all
 select
   'p-provisorio-4dbf258275ee4ca5', 'FABIO PARCEIRO DO HOP QSA',
   null, null, null, false, null, true
+union all
+select
+  'p-provisorio-5ef96a534f962d30', 'SOFIA SOCIA ESTRANGEIRA',
+  null, null, null, false, null, true

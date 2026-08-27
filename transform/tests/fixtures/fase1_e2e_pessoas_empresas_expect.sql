@@ -70,3 +70,9 @@ select
   'socio', 'qsa', null, null, null, null, '22',
   cast('2026-01-11' as date),
   'basedosdados.br_me_cnpj.socios?data=2026-01-11&cnpj_basico=80000000'
+union all
+select
+  'p-provisorio-5ef96a534f962d30', '40000000000100',
+  'socio', 'qsa', null, null, null, null, '22',
+  cast('2026-01-11' as date),
+  'basedosdados.br_me_cnpj.socios?data=2026-01-11&cnpj_basico=40000000'
