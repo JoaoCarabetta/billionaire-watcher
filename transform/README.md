@@ -152,8 +152,11 @@ The walk filters QSA to ownership qualifications: administrator-, director-,
 president-, and council-only rows never become owners. QSA has no percentage or
 control signal, so those fields remain null. A closed S.A. (`natureza_juridica`
 2054) stops because QSA is not a public shareholder book. QSA `tipo=3`
-(foreign partner) is a company when its document has 14 digits and otherwise a
-natural person with a provisional identity when no full CPF is available.
+(foreign partner) uses an 11/14-digit document first, then Receita's
+person-specific/legal-person qualification labels. A foreign legal partner
+without CNPJ uses the existing `nome:` company key; a foreign natural partner
+without CPF uses the existing provisional person key. Neither invents a
+document.
 
 ### Upward ownership walk
 

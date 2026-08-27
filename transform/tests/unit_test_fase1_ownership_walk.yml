@@ -2,7 +2,8 @@ unit_tests:
   - name: test_fase1_ownership_walk_emits_empresas
     description: |
       End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
-      registries seed the walk; FRE and QSA legal-person owners enter as subida.
+      registries seed the walk; FRE and QSA legal-person owners enter as subida,
+      including a tipo 3 foreign holding without an invented CNPJ.
     model: empresas
     given:
       - input: source('fase1_landing', 'controle_empresas_walk')
@@ -75,7 +76,7 @@ unit_tests:
       controller S on a seed, Camila and the QSA partners are false, Diana's
       controller tie on a subida company is false, and the two CPF-less
       JOAO SILVA citations remain separate people. Sofia, a tipo 3 foreign
-      partner without CPF, remains a provisional non-oligarch.
+      natural partner without CPF, remains a provisional non-oligarch.
     model: pessoas
     given:
       - input: ref('int_walk_roots')

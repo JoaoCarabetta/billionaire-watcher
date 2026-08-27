@@ -155,31 +155,33 @@ qsa_rows as (
         )
 ),
 
+qsa_classified_rows as (
+    select
+        *,
+        case
+            when owner_type = '1' then 'empresa'
+            when owner_type = '2' then 'pessoa'
+            when owner_type = '3' and length(owner_document) = 14 then 'empresa'
+            when owner_type = '3' and length(owner_document) = 11 then 'pessoa'
+            -- Receita qualification labels explicitly identify these as legal
+            -- persons; generic/unknown foreign partners stay provisional people.
+            when owner_type = '3' and qualificacao in (
+                '20', '21', '37', '48', '57', '78', '79'
+            ) then 'empresa'
+            when owner_type = '3' then 'pessoa'
+            else 'parada'
+        end as owner_kind
+    from qsa_rows
+),
+
 qsa_all_edges as (
     select
         company_key,
         company_name,
         'qsa' as fonte,
+        owner_kind,
         case
-            when owner_type = '2' then 'pessoa'
-            when
-                owner_type = '3'
-                and coalesce(length(owner_document), 0) != 14
-                then 'pessoa'
-            when owner_type = '1' or (
-                owner_type = '3'
-                and length(owner_document) = 14
-            ) then 'empresa'
-            else 'parada'
-        end as owner_kind,
-        case
-            when
-                owner_type = '1'
-                or (
-                    owner_type = '3'
-                    and length(owner_document) = 14
-                )
-                then case
+            when owner_kind = 'empresa' then case
                 when length(owner_document) = 14
                     then lpad(owner_document, 14, '0')
                 else concat('nome:', owner_name_normalized)
@@ -189,7 +191,7 @@ qsa_all_edges as (
         owner_document,
         case
             when
-                owner_type in ('2', '3')
+                owner_kind = 'pessoa'
                 and length(owner_document) = 11
                 then lpad(owner_document, 11, '0')
         end as owner_cpf,
@@ -206,7 +208,7 @@ qsa_all_edges as (
             '&cnpj_basico=',
             company_key
         ) as fonte_documento
-    from qsa_rows
+    from qsa_classified_rows
     where
         owner_name_normalized != ''
         and owner_name_normalized != 'OUTROS'

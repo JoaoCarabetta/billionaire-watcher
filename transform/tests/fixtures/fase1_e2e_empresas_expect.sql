@@ -37,3 +37,8 @@ select
   '80000000000100', '80000000000100',
   'HOP QSA LTDA', false,
   cast([] as varchar[]), 'hop', false, null, null, false
+union all
+select
+  'nome:HOLDINGESTRANGEIRASEMCNPJ', null,
+  'HOLDING ESTRANGEIRA SEM CNPJ', false,
+  cast([] as varchar[]), 'subida', false, null, null, false

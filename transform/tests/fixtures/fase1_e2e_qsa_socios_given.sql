@@ -28,7 +28,11 @@ select
 union all
 select
   cast('2026-01-11' as date), '40000000', '3',
-  'SOFIA SOCIA ESTRANGEIRA', 'PASSAPORTE-123', '22'
+  'SOFIA SOCIA ESTRANGEIRA', cast(null as varchar), '38'
+union all
+select
+  cast('2026-01-11' as date), '40000000', '3',
+  'HOLDING ESTRANGEIRA SEM CNPJ', cast(null as varchar), '37'
 union all
 select
   cast('2026-01-11' as date), '30000000', '2',
