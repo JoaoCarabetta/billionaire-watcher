@@ -38,7 +38,7 @@ USE_PUBLISHED_FACTS=true npm run build
 
 ## Published Facts Contract
 
-The published facts schema (from `transform/models/facts/published_facts.sql`):
+The published facts schema (formerly built by `transform/models/facts/published_facts.sql`; that dbt model was removed with the old warehouse layer — this contract describes the frozen v0 artifacts the site still consumes):
 
 ```sql
 fact_id              string      -- Unique fact identifier

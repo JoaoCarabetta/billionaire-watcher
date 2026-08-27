@@ -22,64 +22,6 @@ models:
       +materialized: table
       +meta:
         location: US
-    vehicles:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    unlisted:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    gestoras:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    holdings:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    inventory:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    hops:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    freeze:
-      +schema: billionaire_watcher
-      +materialized: table
-      +meta:
-        location: US
-    facts:
-      +schema: billionaire_watcher
-      +materialized: table
-      +meta:
-        location: US
-    matches:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: true
-      +meta:
-        location: US
-    graph:
-      +schema: billionaire_watcher
-      +materialized: table
-      +enabled: "{{ target.name in ['test', 'ci'] }}"
-      +meta:
-        location: US
 
 seeds:
   billionaire_watcher:
@@ -89,4 +31,3 @@ seeds:
 
 vars:
   rf_partition_date: '2026-01-11'
-  holding_owned_size_warning_threshold: 40
