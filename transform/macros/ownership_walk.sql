@@ -58,8 +58,8 @@ fre_rows as (
         fre.ID_Documento,
         upper(trim(cast(fre.Acionista_Controlador as string))) as controller_flag,
         upper(trim(cast(fre.Participante_Acordo_Acionistas as string))) as agreement_flag,
-        cast(fre.Percentual_Acao_Ordinaria_Circulacao as {{ dbt.type_float() }}) as percentual_on,
-        cast(fre.Percentual_Total_Acoes_Circulacao as {{ dbt.type_float() }}) as percentual_total
+        cast(fre.Percentual_Acao_Ordinaria_Circulacao as {% if target.type == 'bigquery' %} float64 {% else %} double {% endif %}) as percentual_on,
+        cast(fre.Percentual_Total_Acoes_Circulacao as {% if target.type == 'bigquery' %} float64 {% else %} double {% endif %}) as percentual_total
     from {{ ref('stg_cvm_fre_posicao_acionaria_2026') }} as fre
     inner join fre_latest_documents as latest
         on fre.CNPJ_Companhia = latest.CNPJ_Companhia
@@ -198,8 +198,8 @@ qsa_all_edges as (
         'socio' as papel,
         cast(null as boolean) as acionista_controlador,
         cast(null as boolean) as participante_acordo_acionistas,
-        cast(null as {{ dbt.type_float() }}) as percentual_on,
-        cast(null as {{ dbt.type_float() }}) as percentual_total,
+        cast(null as {% if target.type == 'bigquery' %} float64 {% else %} double {% endif %}) as percentual_on,
+        cast(null as {% if target.type == 'bigquery' %} float64 {% else %} double {% endif %}) as percentual_total,
         qualificacao,
         data_referencia,
         concat(
