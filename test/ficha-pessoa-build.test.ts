@@ -116,6 +116,30 @@ describe('Built /pessoa/ fichas and sitemap (issue #147)', () => {
     expect(fs.existsSync(pessoaDistPath(distPath, MUFFATO_ID))).toBe(false);
   });
 
+  it('Joaquim built ficha has doador from sidecar ∩ mint, cites 2024, and does not mint candidates or Eduardo (issue #169)', () => {
+    if (buildFailed) throw new Error(`Build failed: ${buildError}`);
+    const joaquim = withoutJsonLdAndPageTools(fs.readFileSync(pessoaDistPath(distPath, JOAQUIM_ID), 'utf-8'));
+    expect(joaquim).toMatch(/<span class="ficha-badge">doador<\/span>/);
+    expect(joaquim).not.toMatch(/<span class="ficha-badge">político<\/span>/);
+    expect(joaquim).toContain('2024');
+    expect(joaquim).toContain('Base dos Dados - TSE Eleições');
+    expect(joaquim).toContain('basedosdados.org/queries/tse-receitas');
+    expect(joaquim).toMatch(/<sup class="citation-marker">\[1\]<\/sup>/);
+    expect(joaquim).not.toContain('2016');
+    expect(joaquim).not.toContain('2018');
+    expect(joaquim).not.toContain('2020');
+    expect(joaquim).not.toContain('2022');
+    expect(firstMainBlockText(joaquim)).not.toMatch(/o doador/i);
+    const ivan = withoutJsonLdAndPageTools(fs.readFileSync(pessoaDistPath(distPath, IVAN_ID), 'utf-8'));
+    expect(ivan).not.toMatch(/<span class="ficha-badge">/);
+    expect(ivan).not.toContain('político');
+    expect(ivan).not.toContain('doador');
+    expect(fs.existsSync(pessoaDistPath(distPath, EDUARDO_ID))).toBe(false);
+    for (const id of ['p-33bb4f86', 'p-55b17a37', 'p-77cb38bd', 'p-e72fa01a']) {
+      expect(fs.existsSync(pessoaDistPath(distPath, id))).toBe(false);
+    }
+  });
+
   it('does not mint tesouraria, outros, or União as /pessoa/ pages', () => {
     if (buildFailed) throw new Error(`Build failed: ${buildError}`);
     expect(fs.existsSync(pessoaDistPath(distPath, 'tesouraria-00864214'))).toBe(false);

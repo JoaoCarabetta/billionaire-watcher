@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { mintCitedPessoas, renderFichaHtml } from '../src/lib/mint-pessoa';
+import { badgesForMintedPessoa, loadCommittedTseMatch } from '../src/lib/mint-tse-badges';
 import { lookupPersonMoney } from '../src/lib/grafo-money';
 import type { GrafoData } from '../src/lib/grafo-elements';
 import { firstMainBlockText, h1Text } from './ficha-html';
@@ -171,8 +172,14 @@ describe('Mint cited /pessoa/ fichas (issue #147)', () => {
     });
 
     it('public ficha HTML has no eleven-digit Cadastro, no UBO, no biography voice', () => {
+      const tseRows = loadCommittedTseMatch();
       for (const pessoa of minted) {
-        const html = renderFichaHtml(pessoa, lookupPersonMoney(money, pessoa.id));
+        const html = renderFichaHtml(
+          pessoa,
+          lookupPersonMoney(money, pessoa.id),
+          '',
+          badgesForMintedPessoa(pessoa, tseRows)
+        );
         expect(html, `${pessoa.id} must not contain eleven-digit Cadastro`).not.toMatch(/(?<!\d)\d{11}(?!\d)/);
         expect(html, `${pessoa.id} must not contain UBO`).not.toMatch(/\bUBO\b/i);
         expect(html, `${pessoa.id} must not say dono`).not.toMatch(/\bdono\b/i);

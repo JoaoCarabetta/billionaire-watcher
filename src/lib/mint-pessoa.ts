@@ -12,6 +12,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { GrafoData, GrafoEdge, GrafoNode } from './grafo-elements';
 import { lookupPersonMoney, type GrafoMoneyFile, type PersonMoney } from './grafo-money';
+import {
+  TSE_CLOSED_CYCLE_LOCATOR,
+  TSE_CLOSED_CYCLE_PUBLISHER,
+  type MintedTseBadges,
+} from './mint-tse-badges';
 
 export type CitedPessoaRole = 'acionista controlador' | 'sócio-administrador';
 
@@ -256,6 +261,77 @@ function fieldLine(name: string, value: string): string {
   );
 }
 
+function fieldLineWithCitation(name: string, value: string, n: number): string {
+  return (
+    '<p><span class="ficha-field">' +
+    escapeHtml(name) +
+    '</span> ' +
+    escapeHtml(value) +
+    '<sup class="citation-marker">[' +
+    n +
+    ']</sup></p>'
+  );
+}
+
+function formatCycleList(years: number[]): string {
+  return years.join(', ');
+}
+
+function renderTseBlock(tse: MintedTseBadges | null | undefined): string {
+  if (!tse || tse.badges.length === 0) {
+    return '';
+  }
+  const badges = tse.badges
+    .map(
+      (badge) =>
+        '<p><span class="ficha-field">Selo</span> <span class="ficha-badge">' +
+        escapeHtml(badge) +
+        '</span></p>'
+    )
+    .join('');
+  const hasCandidateCycles = tse.candidate_cycles.length > 0;
+  const hasDonorCycles = tse.donor_cycles.length > 0;
+  if (!hasCandidateCycles && !hasDonorCycles) {
+    return badges;
+  }
+  const both = hasCandidateCycles && hasDonorCycles;
+  let cycles = '';
+  if (hasCandidateCycles) {
+    cycles += fieldLineWithCitation(
+      both ? 'Ciclos como candidato' : 'Ciclos citados',
+      formatCycleList(tse.candidate_cycles),
+      1
+    );
+  }
+  if (hasDonorCycles) {
+    cycles += fieldLineWithCitation(
+      both ? 'Ciclos como doador' : 'Ciclos citados',
+      formatCycleList(tse.donor_cycles),
+      1
+    );
+  }
+  return (
+    badges +
+    cycles +
+    '<section class="citations">' +
+      '<h2>Referências</h2>' +
+      '<ol>' +
+        '<li id="citation-1">' +
+          '<strong>' +
+          escapeHtml(TSE_CLOSED_CYCLE_PUBLISHER) +
+          '</strong>' +
+          ' — ' +
+          '<a href="' +
+          escapeHtml(TSE_CLOSED_CYCLE_LOCATOR) +
+          '">' +
+          escapeHtml(TSE_CLOSED_CYCLE_LOCATOR) +
+          '</a>' +
+        '</li>' +
+      '</ol>' +
+    '</section>'
+  );
+}
+
 function renderMoneyBlock(money: PersonMoney | null): string {
   if (!money) {
     return '';
@@ -316,7 +392,8 @@ export function pessoaResumoSentences(pessoa: CitedPessoa, money: PersonMoney | 
 export function renderFichaHtml(
   pessoa: CitedPessoa,
   money: PersonMoney | null,
-  extraBodyHtml = ''
+  extraBodyHtml = '',
+  tse: MintedTseBadges | null = null
 ): string {
   const dateIso = money?.date || pessoa.date;
   const dateLine = dateIso ? fieldLine('Data', formatDatePt(dateIso)) : '';
@@ -336,8 +413,11 @@ export function renderFichaHtml(
           'a:hover{text-decoration:underline}' +
           '.back-link{display:inline-block;margin-bottom:1rem;font-size:.9rem}' +
           '.ficha-field{color:#666;font-size:.85rem}' +
+          '.ficha-badge{font-weight:600}' +
+          '.citation-marker{color:#0066cc;font-weight:bold;margin-left:.1em}' +
           'section{margin:2rem 0}' +
           '.resumo p{margin:0 0 .75rem}' +
+          '.citations h2{font-size:1.2rem;margin-bottom:1rem}' +
           'footer{margin-top:3rem;padding-top:2rem;border-top:1px solid #ddd}' +
         '</style>' +
       '</head>' +
@@ -350,6 +430,7 @@ export function renderFichaHtml(
           fieldLine('Empresa', pessoa.company_label) +
           fieldLine('Fonte', pessoa.source) +
           dateLine +
+          renderTseBlock(tse) +
           renderMoneyBlock(money) +
           '<footer><p><a href="/metodologia">Metodologia →</a></p></footer>' +
         '</main>' +

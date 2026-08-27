@@ -25,6 +25,7 @@ import {
   renderFichaHtml,
   type CitedPessoa,
 } from '../../lib/mint-pessoa';
+import { badgesForMintedPessoa, loadCommittedTseMatch } from '../../lib/mint-tse-badges';
 import PageTools from '../../components/PageTools.astro';
 
 export async function getStaticPaths() {
@@ -57,7 +58,8 @@ if (ficha) {
     renderFichaHtml(
       ficha,
       fichaMoneyFor(ficha, loadPublicMoney()),
-      '<script src="/register-page-tools.js"></script>'
+      '<script src="/register-page-tools.js"></script>',
+      badgesForMintedPessoa(ficha, loadCommittedTseMatch())
     ),
     {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
