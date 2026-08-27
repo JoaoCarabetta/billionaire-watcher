@@ -1,0 +1,24 @@
+unit_tests:
+  - name: test_empresas_seed_a_union_b
+    description: |
+      Locks the issue 178 final grain: duplicate seed sources collapse by
+      empresa_id, leading zeros survive, all active CVM fixture companies enter,
+      BCB cooperative types 3/9/11 stay out, and nao_caminha is limited to the
+      five named no-CNPJ exceptions.
+    model: empresas
+    given:
+      - input: source('fase1_landing', 'controle_empresas_walk')
+        format: sql
+        fixture: empresas_seed_a_given
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        fixture: empresas_cvm_given
+      - input: source('fase1_landing', 'bcb_entidades_supervisionadas')
+        format: sql
+        fixture: empresas_bcb_given
+      - input: source('fase1_landing', 'susep_dados_cadastrais')
+        format: sql
+        fixture: empresas_susep_given
+    expect:
+      format: sql
+      fixture: empresas_expect

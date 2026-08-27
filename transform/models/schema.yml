@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: empresas
+    description: |
+      Fase 1 company door at one row per company. Contains the resolvable Valor
+      inventory (seed A) union active CVM companies, selected BCB headquarters,
+      and selected SUSEP companies (seed B). Ownership walking and size floors
+      are intentionally not implemented here.
+    columns:
+      - name: empresa_id
+        description: Full 14-digit CNPJ, or nome plus normalized name for the five no-walk exceptions.
+        tests:
+          - not_null
+          - unique
+      - name: cnpj
+        description: Nullable full 14-digit CNPJ stored as a string with leading zeros.
+      - name: razao_social
+        description: Company name from seed A when present, otherwise CVM, BCB, then SUSEP.
+        tests:
+          - not_null
+      - name: em_semente_a
+        description: Whether the company has a resolvable row in the Valor control inventory.
+        tests:
+          - not_null
+      - name: fontes_semente_b
+        description: Sorted subset of cvm, bcb, and susep whose filters admitted the company.
+        tests:
+          - not_null
+      - name: motivo_entrada
+        description: Entry reason; fixed to semente in issue 178.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['semente']
+      - name: nao_caminha
+        description: True only for Folha, Globo, Havan, Record, and Natura without CNPJ.
+        tests:
+          - not_null
+      - name: valor_do_piso
+        description: Size-floor value; null until issue 180.
+      - name: fonte_do_piso
+        description: Size-floor source; null until issue 180.
+      - name: tem_piso
+        description: False until issue 180 adds size-floor coverage.
+        tests:
+          - not_null

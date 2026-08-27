@@ -1,6 +1,7 @@
 target/
 dbt_packages/
 logs/
+landing/
 profiles.yml
 .user.yml
 *.pyc
