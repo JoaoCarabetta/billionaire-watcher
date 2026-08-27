@@ -54,7 +54,7 @@ full SUSEP dump without `$top`:
 
 ```bash
 cd transform
-python scripts/download_fase1_company_sources.py \
+python3 scripts/download_fase1_company_sources.py \
   --bcb-date 08-01-2026 \
   --output-dir landing/fase1
 ```
