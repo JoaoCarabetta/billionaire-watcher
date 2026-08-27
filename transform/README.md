@@ -7,8 +7,8 @@ dbt-bigquery project skeleton for the Billionaire Watcher civic archive.
 The old warehouse layer (freeze walk, hops, valor-universo graph, person-money,
 facts, TSE matches and their seeds) was removed. The design of the replacement
 pipeline — the node tables `empresas` and `pessoas`, the written edge table
-`vinculos`, and the compatibility view `pessoas_empresas` with the
-`e_oligarca` flag — lives in
+`vinculos`, the justifying-path table `percursos`, and the compatibility view
+`pessoas_empresas` with the `e_oligarca` flag — lives in
 [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
 Issues #178, #179, and #181 implement the company door and ownership walk:
 
@@ -20,6 +20,11 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
 - **`vinculos`** (`models/vinculos.sql`): every cited person-company edge plus
   each company-company edge traversed by the upward walk. The destination is
   always the owned company.
+- **`percursos`** (`models/percursos.sql`): one row per step of each concrete
+  cited path from a current `e_oligarca` person to a seed Formulário door.
+  Today's flag is that door, so stored paths are one step (person → seed) with
+  `fonte_documento` and `regra_do_passo`. Hop citations never become a last
+  step. Holding-chain inheritance of the flag is a later ticket.
 - **`pessoas_empresas`** (`models/pessoas_empresas.sql`): compatibility view
   over person-origin rows in `vinculos`, with the original columns.
 - **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
