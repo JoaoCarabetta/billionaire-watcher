@@ -48,12 +48,17 @@ fre_latest_documents as (
 
 fre_rows as (
     select
-        fre.CNPJ_Companhia as company_key,
+        fre.CNPJ_Companhia as issuer_company_key,
         trim(cast(fre.Nome_Companhia as string)) as company_name,
         trim(cast(fre.Acionista as string)) as owner_name,
         {{ normalize_company_name('fre.Acionista') }} as owner_name_normalized,
         upper(trim(cast(fre.Tipo_Pessoa_Acionista as string))) as owner_type,
         {{ digits_only('fre.CPF_CNPJ_Acionista') }} as owner_document,
+        fre.ID_Acionista_Relacionado,
+        trim(cast(fre.Acionista_Relacionado as string)) as related_name,
+        {{ normalize_company_name('fre.Acionista_Relacionado') }} as related_name_normalized,
+        upper(trim(cast(fre.Tipo_Pessoa_Acionista_Relacionado as string))) as related_type,
+        {{ digits_only('fre.CPF_CNPJ_Acionista_Relacionado') }} as related_document,
         fre.Data_Referencia as data_referencia,
         fre.ID_Documento,
         upper(trim(cast(fre.Acionista_Controlador as string))) as controller_flag,
@@ -66,9 +71,31 @@ fre_rows as (
         and fre.ID_Documento = latest.ID_Documento
 ),
 
+-- Destination is the issuer for a first-level row. Nested rows on the same
+-- document (ID_Acionista_Relacionado) point at the parent company in that
+-- Formulário tree, not at the issuer and not at a side-channel Quadro de Sócios.
 fre_edges as (
     select
-        company_key,
+        case
+            when
+                ID_Acionista_Relacionado is not null
+                and ID_Acionista_Relacionado != 0
+                and (
+                    related_type in ('PJ', 'PESSOA JURIDICA', 'PESSOA JURÍDICA')
+                    or length(related_document) = 14
+                )
+                then case
+                    when length(related_document) = 14
+                        then lpad(related_document, 14, '0')
+                    when
+                        related_name_normalized != ''
+                        and related_name_normalized != 'OUTROS'
+                        and related_name_normalized not like '%TESOURARIA%'
+                        then concat('nome:', related_name_normalized)
+                    else issuer_company_key
+                end
+            else issuer_company_key
+        end as company_key,
         company_name,
         'fre' as fonte,
         case
@@ -119,6 +146,15 @@ fre_edges as (
         owner_name_normalized != ''
         and owner_name_normalized != 'OUTROS'
         and owner_name_normalized not like '%TESOURARIA%'
+        -- Nested rows that would only point at Outros or treasury are a stop.
+        and not (
+            ID_Acionista_Relacionado is not null
+            and ID_Acionista_Relacionado != 0
+            and (
+                related_name_normalized = 'OUTROS'
+                or related_name_normalized like '%TESOURARIA%'
+            )
+        )
 ),
 
 rf_companies as (

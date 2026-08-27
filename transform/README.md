@@ -21,15 +21,16 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
   each company-company edge traversed by the upward walk. The destination is
   always the owned company.
 - **`percursos`** (`models/percursos.sql`): one row per step of each concrete
-  cited path from a current `e_oligarca` person to a seed Formulário door.
-  Today's flag is that door, so stored paths are one step (person → seed) with
-  `fonte_documento` and `regra_do_passo`. Hop citations never become a last
-  step. Holding-chain inheritance of the flag is a later ticket.
+  cited path from an `e_oligarca` person to a seed Formulário door. Direct
+  seed-Formulário people have a one-step path. Inherited holding partners
+  have a multi-step path with `fonte_documento` and `regra_do_passo` on every
+  step. Hop citations never become a last step.
 - **`pessoas_empresas`** (`models/pessoas_empresas.sql`): compatibility view
   over person-origin rows in `vinculos`, with the original columns.
 - **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
-  provisional identity, with `e_oligarca` derived only from qualifying FRE
-  relationships on seed companies. Hop citations never change the flag.
+  provisional identity, with `e_oligarca` true on a seed Formulário door and
+  for cited partners of a holding that sits on that door (and the same up
+  the chain). Hop citations never change the flag.
 - **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
   of seed companies allowed to start a walk.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
@@ -179,9 +180,11 @@ unknown shareholder types, and cycles. It does not use
 
 The unit seam in `tests/unit_test_fase1_ownership_walk.yml` uses the three seed
 registries plus FRE and QSA slices. Alice Controladora is true through
-controller `S` on a seed; Camila Citada is false below 10%; Diana Holding stays
-false because her controller citation is on a `subida` company; and the two
-CPF-less JOAO SILVA citations remain separate.
+controller `S` on a seed; Camila Citada is false below 10%; Felipe is true as
+a Quadro de Sócios partner of a Formulário-controller holding; Diana Holding
+is true because her holding sits on that seed door; Ines stays false because
+her controller citation is on a `subida` company that is not on a seed door;
+and the two CPF-less JOAO SILVA citations remain separate.
 
 ### One-hop downward invert
 

@@ -53,3 +53,7 @@ union all
 select
   cast('2026-01-11' as date), '81000000', '2',
   'LAURA FORA POR COLISAO', '***112233**', '22'
+union all
+select
+  cast('2026-01-11' as date), '12000000', '2',
+  'FELIPE SOCIO DA HOLDING PORTA', '***777888**', '22'
