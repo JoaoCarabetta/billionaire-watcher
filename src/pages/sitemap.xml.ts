@@ -16,6 +16,7 @@ export const GET: APIRoute = () => {
     { loc: '/doacoes/', priority: '0.8' },
     { loc: '/grafo/', priority: '0.8' },
     { loc: '/grafo-publico.json', priority: '0.7' },
+    { loc: '/grafo-quantidades.json', priority: '0.7' },
     ...freezePersons.map(person => ({
       loc: `/pessoa/${person.person_id}/`,
       priority: '0.7'

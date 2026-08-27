@@ -1,0 +1,346 @@
+{
+  "rows": [
+    {
+      "id": "00001180000126",
+      "cnpj_basico": "00001180",
+      "ticker": "ELET3",
+      "classe": "ordinaria",
+      "quantidade": 2028544286,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147675 Versao 22"
+    },
+    {
+      "id": "00001180000126",
+      "cnpj_basico": "00001180",
+      "ticker": "ELET6",
+      "classe": "preferencial",
+      "quantidade": 280088314,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147675 Versao 22"
+    },
+    {
+      "id": "00864214000106",
+      "cnpj_basico": "00864214",
+      "ticker": "ENGI3",
+      "classe": "ordinaria",
+      "quantidade": 609526325,
+      "source_doc": "Energisa IR 14 Aug 2026",
+      "source_locator": "table 6.1"
+    },
+    {
+      "id": "00864214000106",
+      "cnpj_basico": "00864214",
+      "ticker": "ENGI4",
+      "classe": "preferencial",
+      "quantidade": 89144004,
+      "source_doc": "Energisa IR 14 Aug 2026",
+      "source_locator": "table 6.1"
+    },
+    {
+      "id": "01083200000118",
+      "cnpj_basico": "01083200",
+      "ticker": "NEOE3",
+      "classe": "ordinaria",
+      "quantidade": 1213797248,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146731 Versao 9"
+    },
+    {
+      "id": "01838723000127",
+      "cnpj_basico": "01838723",
+      "ticker": "BRFS3",
+      "classe": "ordinaria",
+      "quantidade": 1682473246,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148266 Versao 8"
+    },
+    {
+      "id": "02429144000193",
+      "cnpj_basico": "02429144",
+      "ticker": "CPFE3",
+      "classe": "ordinaria",
+      "quantidade": 1152254440,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148068 Versao 5"
+    },
+    {
+      "id": "02558157000162",
+      "cnpj_basico": "02558157",
+      "ticker": "VIVT3",
+      "classe": "ordinaria",
+      "quantidade": 3261287392,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147290 Versao 7"
+    },
+    {
+      "id": "02916265000160",
+      "cnpj_basico": "02916265",
+      "ticker": "JBSS3",
+      "classe": "ordinaria",
+      "quantidade": 2218116370,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148263 Versao 19"
+    },
+    {
+      "id": "03220438000173",
+      "cnpj_basico": "03220438",
+      "ticker": "EQTL3",
+      "classe": "ordinaria",
+      "quantidade": 1253847835,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148115 Versao 37"
+    },
+    {
+      "id": "03853896000140",
+      "cnpj_basico": "03853896",
+      "ticker": "MRFG3",
+      "classe": "ordinaria",
+      "quantidade": 857928119,
+      "source_doc": "CVM FRE item 17.1 Capital Emitido",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148261 Versao 15"
+    },
+    {
+      "id": "06047087000139",
+      "cnpj_basico": "06047087",
+      "ticker": "RDOR3",
+      "classe": "ordinaria",
+      "quantidade": 2289292590,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147426 Versao 10"
+    },
+    {
+      "id": "06057223000171",
+      "cnpj_basico": "06057223",
+      "ticker": "ASAI3",
+      "classe": "ordinaria",
+      "quantidade": 1352245185,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147799 Versao 24"
+    },
+    {
+      "id": "07415333000120",
+      "cnpj_basico": "07415333",
+      "ticker": "SIMH3",
+      "classe": "ordinaria",
+      "quantidade": 873040533,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147447 Versao 7"
+    },
+    {
+      "id": "07526557000100",
+      "cnpj_basico": "07526557",
+      "ticker": "ABEV3",
+      "classe": "ordinaria",
+      "quantidade": 15761638756,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147076 Versao 7"
+    },
+    {
+      "id": "07689002000189",
+      "cnpj_basico": "07689002",
+      "ticker": "EMBR3",
+      "classe": "ordinaria",
+      "quantidade": 740465044,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147260 Versao 9"
+    },
+    {
+      "id": "16404287000155",
+      "cnpj_basico": "16404287",
+      "ticker": "SUZB3",
+      "classe": "ordinaria",
+      "quantidade": 1264117615,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146712 Versao 11"
+    },
+    {
+      "id": "16670085000155",
+      "cnpj_basico": "16670085",
+      "ticker": "RENT3",
+      "classe": "ordinaria",
+      "quantidade": 1082620720,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147999 Versao 13"
+    },
+    {
+      "id": "17155730000164",
+      "cnpj_basico": "17155730",
+      "ticker": "CMIG3",
+      "classe": "ordinaria",
+      "quantidade": 956601911,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148065 Versao 11"
+    },
+    {
+      "id": "17155730000164",
+      "cnpj_basico": "17155730",
+      "ticker": "CMIG4",
+      "classe": "preferencial",
+      "quantidade": 1905179984,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148065 Versao 11"
+    },
+    {
+      "id": "24990777000109",
+      "cnpj_basico": "24990777",
+      "ticker": "GMAT3",
+      "classe": "ordinaria",
+      "quantidade": 2248469834,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146536 Versao 9"
+    },
+    {
+      "id": "33000167000101",
+      "cnpj_basico": "33000167",
+      "ticker": "PETR3",
+      "classe": "ordinaria",
+      "quantidade": 7442231382,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148031 Versao 28"
+    },
+    {
+      "id": "33000167000101",
+      "cnpj_basico": "33000167",
+      "ticker": "PETR4",
+      "classe": "preferencial",
+      "quantidade": 5446501379,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148031 Versao 28"
+    },
+    {
+      "id": "33042730000104",
+      "cnpj_basico": "33042730",
+      "ticker": "CSNA3",
+      "classe": "ordinaria",
+      "quantidade": 1326093947,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147221 Versao 8"
+    },
+    {
+      "id": "33256439000139",
+      "cnpj_basico": "33256439",
+      "ticker": "UGPA3",
+      "classe": "ordinaria",
+      "quantidade": 1115507182,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146605 Versao 7"
+    },
+    {
+      "id": "33453598000123",
+      "cnpj_basico": "33453598",
+      "ticker": "RAIZ4",
+      "classe": "preferencial",
+      "quantidade": 1358936900,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2025-03-31 ID_Documento 150921 Versao 26"
+    },
+    {
+      "id": "33592510000154",
+      "cnpj_basico": "33592510",
+      "ticker": "VALE3",
+      "classe": "ordinaria",
+      "quantidade": 4539007568,
+      "source_doc": "CVM FRE item 17.1 Capital Emitido",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147435 Versao 23"
+    },
+    {
+      "id": "33611500000119",
+      "cnpj_basico": "33611500",
+      "ticker": "GGBR3",
+      "classe": "ordinaria",
+      "quantidade": 718346219,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148343 Versao 15"
+    },
+    {
+      "id": "33611500000119",
+      "cnpj_basico": "33611500",
+      "ticker": "GGBR4",
+      "classe": "preferencial",
+      "quantidade": 1309848730,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148343 Versao 15"
+    },
+    {
+      "id": "34274233000102",
+      "cnpj_basico": "34274233",
+      "ticker": "VBBR3",
+      "classe": "ordinaria",
+      "quantidade": 1119000000,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148521 Versao 19"
+    },
+    {
+      "id": "42150391000170",
+      "cnpj_basico": "42150391",
+      "ticker": "BRKM3",
+      "classe": "ordinaria",
+      "quantidade": 451668652,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147168 Versao 11"
+    },
+    {
+      "id": "42150391000170",
+      "cnpj_basico": "42150391",
+      "ticker": "BRKM5",
+      "classe": "preferencial",
+      "quantidade": 345539182,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147168 Versao 11"
+    },
+    {
+      "id": "43776517000180",
+      "cnpj_basico": "43776517",
+      "ticker": "SBSP3",
+      "classe": "ordinaria",
+      "quantidade": 683509868,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148172 Versao 22"
+    },
+    {
+      "id": "47960950000121",
+      "cnpj_basico": "47960950",
+      "ticker": "MGLU3",
+      "classe": "ordinaria",
+      "quantidade": 738995248,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146869 Versao 6"
+    },
+    {
+      "id": "50746577000115",
+      "cnpj_basico": "50746577",
+      "ticker": "CSAN3",
+      "classe": "ordinaria",
+      "quantidade": 1866570932,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 148267 Versao 17"
+    },
+    {
+      "id": "61585865000151",
+      "cnpj_basico": "61585865",
+      "ticker": "RADL3",
+      "classe": "ordinaria",
+      "quantidade": 1718007200,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 146900 Versao 13"
+    },
+    {
+      "id": "67620377000114",
+      "cnpj_basico": "67620377",
+      "ticker": "BEEF3",
+      "classe": "ordinaria",
+      "quantidade": 607283407,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147278 Versao 7"
+    },
+    {
+      "id": "84429695000111",
+      "cnpj_basico": "84429695",
+      "ticker": "WEGE3",
+      "classe": "ordinaria",
+      "quantidade": 4197317998,
+      "source_doc": "CVM FRE item 17.1 Capital Integralizado",
+      "source_locator": "Data_Referencia 2024-12-31 ID_Documento 147065 Versao 5"
+    }
+  ]
+}

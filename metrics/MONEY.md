@@ -30,9 +30,9 @@ O painel da pessoa em `/grafo` lê `public/grafo-dinheiro.json` (um registro por
 
 Prices are **#123** (merged PR 125): `transform/seeds/b3_listed_prices.csv` only. Unadjusted PREULT from B3 COTAHIST_A2025.ZIP. Source label **Brasil Bolsa Balcão**. Date on every money row: **2025-05-16**. Default is not `listed_prices_fixture.csv`. Recorded fixture quotes are skipped and never printed.
 
-- Energisa: **ENGI3** 12.21 and **ENGI4** 8.50 × `graph_edges` / Energisa edges fixture quantities (609526325 ordinary, 89144004 preferred; Energisa IR 14 Aug 2026 table 6.1).
+- Energisa: **ENGI3** 12.21 and **ENGI4** 8.50 × hop quantities (609526325 ordinary, 89144004 preferred; Energisa IR 14 Aug 2026 table 6.1).
 - **ENGI11** is a unit. No money without a unit quantity. The script does not invent that quantity.
-- Every other listed seed with a B3 quote **and** a quantity gets money (32 seeds this run). Quantities: CVM FRE item 17.1 on or before the quote date (`metrics/listed_capital_quantities.csv`). Quote without quantity → no money.
+- Every other listed seed with a B3 quote **and** a quantity gets money (32 seeds this run). Quantities: public sidecar `grafo-quantidades.json` (Energisa hop qty; other priced classes from CVM FRE item 17.1 `metrics/listed_capital_quantities.csv`). Quote without quantity → no money.
 - Claro Telecom Participações (`cnpj_basico` 07043628): no Bolsa class; omitted.
 
 Energisa V from the command = **8200040462.25** (ENGI3 12.21 × 609526325 + ENGI4 8.50 × 89144004).
