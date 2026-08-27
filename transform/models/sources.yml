@@ -3,9 +3,9 @@ version: 2
 sources:
   - name: fase1_landing
     description: |
-      Raw fase 1 company-door files landed in GCS. The repository downloader
-      writes the BCB and SUSEP extracts as UTF-8 CSV and copies the Valor
-      control inventory without changing its semicolon-delimited contents.
+      Raw fase 1 company-door and size-floor files landed in GCS. Repository
+      downloaders preserve source fields; dbt owns normalization and business
+      logic. CNPJ columns in external tables must always be declared STRING.
     database: billionairewatcher
     schema: billionaire_watcher_raw
     tables:
@@ -30,6 +30,68 @@ sources:
         config:
           meta:
             external_location: gs://billionairewatcher-landing/raw/fase1/susep_dados_cadastrais.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: b3_listed_companies
+        description: GetInitialCompanies response rows restricted to type=1.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_companies.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: b3_listed_supplement
+        description: GetListedSupplementCompany share quantities for type=1 issuers.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_supplement.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: b3_cotahist_2026
+        description: |
+          B3 COTAHIST_A2026 records with TPMERC=010 and CODBDI=02. PREULT is
+          retained as integer cents. This is not the Base dos Dados trade tape.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_cotahist_2026.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: cvm_fca_valor_mobiliario_2026
+        description: CVM FCA securities file used to map Codigo_Negociacao to CNPJ.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/cvm_fca_valor_mobiliario_2026.csv
+            encoding: ISO-8859-1
+            field_delimiter: ";"
+            skip_leading_rows: 1
+      - name: ifdata_cadastro
+        description: |
+          IF.data quarter registry used to map prudential reporter codes to
+          the leading institution's 8-digit CNPJ.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_cadastro.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: ifdata_ativo_total_prudencial
+        description: |
+          IF.data Relatorio 2, Conta 140220 (Ativo Total), exclusively at
+          TipoInstituicao=1 (prudential) grain.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_ativo_total_prudencial.csv
+            encoding: UTF-8
+            field_delimiter: ","
+            skip_leading_rows: 1
+      - name: susep_receitas_seguros_2026
+        description: SUSEP ReceitasSeguros(Ano='2026') premiums rows.
+        config:
+          meta:
+            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/susep_receitas_seguros_2026.csv
             encoding: UTF-8
             field_delimiter: ","
             skip_leading_rows: 1
