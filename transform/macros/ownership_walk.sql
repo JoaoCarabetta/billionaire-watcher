@@ -406,10 +406,33 @@ qsa_hop_companies_resolved as (
         on companies.company_key = headquarters.cnpj_basico
 ),
 
-downward_hop_company_keys as (
+downward_hop_company_keys_raw as (
     select * from fre_hop_company_keys
     union all
     select * from qsa_hop_companies_resolved
+),
+
+upward_company_ids as (
+    select root_empresa_id as empresa_id
+    from {{ upward_edges_cte }}
+
+    union
+
+    select cited_empresa_id
+    from {{ upward_edges_cte }}
+
+    union
+
+    select owner_company_id
+    from {{ upward_edges_cte }}
+    where owner_kind = 'empresa' and owner_company_id is not null
+),
+
+downward_hop_company_keys as (
+    select candidates.*
+    from downward_hop_company_keys_raw as candidates
+    left join upward_company_ids as upward using (empresa_id)
+    where upward.empresa_id is null
 ),
 
 downward_hop_companies as (
