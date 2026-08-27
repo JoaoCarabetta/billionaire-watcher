@@ -6,13 +6,14 @@ select
   cast(['cvm'] as varchar[]) as fontes_semente_b,
   'semente' as motivo_entrada,
   false as nao_caminha,
-  cast(null as numeric) as valor_do_piso,
-  cast(null as varchar) as fonte_do_piso,
-  false as tem_piso
+  cast(1000 as numeric) as valor_do_piso,
+  'bolsa_cotahist' as fonte_do_piso,
+  true as tem_piso
 union all
 select
   '40000000000100', '40000000000100', 'BANCO SEMENTE', false,
-  cast(['bcb'] as varchar[]), 'semente', false, null, null, false
+  cast(['bcb'] as varchar[]), 'semente', false,
+  cast(2000 as numeric), 'ifdata_ativo_total', true
 union all
 select
   '60000000000100', '60000000000100', 'SEGURADORA SEMENTE', false,

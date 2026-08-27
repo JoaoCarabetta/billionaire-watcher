@@ -5,24 +5,24 @@ select
   cast(null as varchar) as filiacao,
   cast(null as date) as data_nascimento,
   true as e_oligarca,
-  cast(null as numeric) as fortuna_valor,
+  cast(50 as numeric) as fortuna_valor,
   true as fortuna_incompleta
 union all
 select
   'p-f0a39f5c', 'CARLOS CPF COLISAO', '12355566600', null, null,
-  true, null, true
+  true, 10, false
 union all
 select
   'p-20953853', 'DAVI CPF COLISAO', '98755566611', null, null,
-  true, null, true
+  true, 10, false
 union all
 select
   'p-provisorio-5244e17e4d3e00aa', 'CAMILA CITADA', null, null, null,
-  false, null, true
+  false, 49, false
 union all
 select
   'p-provisorio-38456fff6f5e6fd9', 'DIANA HOLDING', null, null, null,
-  false, null, true
+  false, 480, false
 union all
 select
   'p-provisorio-9c05347c3655101e', 'BRUNO SOCIO', null, null, null,

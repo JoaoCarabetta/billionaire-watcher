@@ -97,9 +97,14 @@ models:
         tests:
           - not_null
       - name: fortuna_valor
-        description: Fortune estimate; null until issue 182.
+        description: |
+          Sum of each leaf-company floor times the product of cited total-share
+          percentages along that person's complete ownership paths. Paths with
+          a missing percentage or missing leaf floor do not contribute.
       - name: fortuna_incompleta
-        description: Whether cited paths remain unvalued or lack percentages.
+        description: |
+          True when at least one cited ownership path for the person has a
+          missing total-share percentage or its leaf company has no floor.
         tests:
           - not_null
 

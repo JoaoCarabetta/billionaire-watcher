@@ -21,14 +21,7 @@ unit_tests:
         fixture: fase1_e2e_susep_given
       - input: ref('int_empresas_piso')
         format: sql
-        rows: |
-          select
-            cast(null as varchar) as empresa_id,
-            cast(null as varchar) as cnpj,
-            cast(null as numeric) as valor_do_piso,
-            cast(null as varchar) as fonte_do_piso,
-            cast(null as boolean) as tem_piso
-          where false
+        fixture: fase1_e2e_empresas_pisos_given
       - input: ref('stg_cvm_fre_posicao_acionaria_2026')
         format: sql
         fixture: fase1_e2e_fre_given
@@ -74,16 +67,19 @@ unit_tests:
   - name: test_fase1_ownership_walk_emits_pessoas
     description: |
       End-to-end fase 1 seam, people output: Alice is an oligarch through
-      controller S on a seed, Camila and the QSA partners are false, Diana's
-      controller tie on a subida company is false, and the two CPF-less
-      JOAO SILVA citations remain separate people. Sofia, a tipo 3 foreign
-      natural partner without CPF, remains a provisional non-oligarch. Carlos
-      and Davi are oligarchs whose colliding QSA mask is rejected.
+      controller S on a seed and has one valued path plus incomplete hop paths.
+      Camila, Carlos, Davi, and Diana have only complete valued paths; the QSA
+      partners have no valued path because Receita cites no percentages.
+      Elena's cited percentage cannot be valued because her hop company has no
+      floor. The oligarch flags remain exactly those established by issue 181.
     model: pessoas
     given:
       - input: ref('int_walk_roots')
         format: sql
         fixture: fase1_e2e_walk_roots_given
+      - input: ref('int_empresas_piso')
+        format: sql
+        fixture: fase1_e2e_empresas_pisos_given
       - input: ref('stg_cvm_fre_posicao_acionaria_2026')
         format: sql
         fixture: fase1_e2e_fre_given
