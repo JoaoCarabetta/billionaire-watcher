@@ -78,6 +78,28 @@ unit_tests:
       format: sql
       fixture: fase1_e2e_pessoas_empresas_expect
 
+  - name: test_fase1_ownership_walk_emits_percursos
+    description: |
+      Every current e_oligarca person who qualifies on a seed Formulário has
+      at least one one-step percurso (person → seed) with fonte_documento and
+      regra_do_passo controlador_fre. Hop partners, holding-only controllers,
+      and non-qualifying seed citations do not get a path. Does not invent
+      multi-step inheritance paths.
+    model: percursos
+    given:
+      - input: ref('vinculos')
+        format: sql
+        fixture: fase1_e2e_vinculos_expect
+      - input: ref('empresas')
+        format: sql
+        fixture: fase1_e2e_empresas_expect
+      - input: ref('pessoas')
+        format: sql
+        fixture: fase1_e2e_pessoas_expect
+    expect:
+      format: sql
+      fixture: fase1_e2e_percursos_expect
+
   - name: test_fase1_ownership_walk_emits_pessoas
     description: |
       End-to-end fase 1 seam, people output: Alice is an oligarch through

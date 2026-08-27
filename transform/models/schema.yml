@@ -199,6 +199,137 @@ models:
               - fonte
               - data_referencia
 
+  - name: percursos
+    description: |
+      One row per step of one concrete path from a current e_oligarca person
+      to a seed Formulário door. Step 1 is the person on the first company;
+      the last step is the holding (or the person) on the seed. Today's flag
+      is the seed Formulário citation, so fixture paths are one step. Every
+      step carries fonte_documento. Does not inherit e_oligarca up a holding
+      chain.
+    columns:
+      - name: pessoa_id
+        description: The e_oligarca person this path justifies.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('pessoas')
+                field: pessoa_id
+      - name: empresa_semente_id
+        description: Seed company at the end of the path (motivo_entrada semente or em_semente_a).
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('empresas')
+                field: empresa_id
+      - name: percurso_id
+        description: Identity of that concrete path.
+        tests:
+          - not_null
+      - name: passo
+        description: 1 is the person on the first company; the last step is the door on the seed.
+        tests:
+          - not_null
+      - name: origem_tipo
+        description: Whether this step's cited owner is a pessoa or empresa.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['pessoa', 'empresa']
+      - name: origem_pessoa_id
+        description: Person owner ID; set only when origem_tipo is pessoa.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('pessoas')
+                field: pessoa_id
+      - name: origem_empresa_id
+        description: Company owner ID; set only when origem_tipo is empresa.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('empresas')
+                field: empresa_id
+      - name: destino_empresa_id
+        description: Owned company of this step. Destination of an edge is always a company.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('empresas')
+                field: empresa_id
+      - name: papel
+        description: acionista_controlador, acionista, or socio.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['acionista_controlador', 'acionista', 'socio']
+      - name: fonte
+        description: fre for CVM shareholder position or qsa for Receita QSA.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['fre', 'qsa']
+      - name: acionista_controlador
+        description: FRE controller flag; null for QSA.
+      - name: participante_acordo_acionistas
+        description: FRE shareholders-agreement flag; null for QSA.
+      - name: percentual_on
+        description: FRE percentage of circulating ordinary shares; null for QSA.
+      - name: percentual_total
+        description: FRE percentage of all circulating shares; null for QSA.
+      - name: qualificacao
+        description: Receita partner qualification; null for FRE.
+      - name: data_referencia
+        description: FRE reference date or Receita partition date.
+        tests:
+          - not_null
+      - name: regra_do_passo
+        description: controlador_fre, dez_por_cento_on, or socio_qsa.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - controlador_fre
+                  - dez_por_cento_on
+                  - socio_qsa
+      - name: fonte_documento
+        description: Exact source citation on this step. Required for a complete justification.
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: |
+              (
+                origem_tipo = 'pessoa'
+                and origem_pessoa_id is not null
+                and origem_empresa_id is null
+              ) or (
+                origem_tipo = 'empresa'
+                and origem_pessoa_id is null
+                and origem_empresa_id is not null
+              )
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: |
+              passo != 1
+              or (
+                origem_tipo = 'pessoa'
+                and origem_pessoa_id is not null
+              )
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - percurso_id
+              - passo
+
   - name: pessoas_empresas
     description: |
       Compatibility view of person-origin rows from vinculos, exposing the
