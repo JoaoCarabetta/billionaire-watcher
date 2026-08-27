@@ -6,9 +6,9 @@ select
   cast(['cvm', 'susep'] as varchar[]) as fontes_semente_b,
   'semente' as motivo_entrada,
   false as nao_caminha,
-  cast(null as numeric) as valor_do_piso,
-  cast(null as varchar) as fonte_do_piso,
-  false as tem_piso
+  cast(1200 as numeric) as valor_do_piso,
+  'bolsa_cotahist' as fonte_do_piso,
+  true as tem_piso
 union all
 select
   '00123456000199', '00123456000199', 'COMPANHIA ATIVA COM ZERO', false,
@@ -16,11 +16,13 @@ select
 union all
 select
   '01234567000189', '01234567000189', 'BANCO COM ZERO INICIAL', false,
-  cast(['bcb'] as varchar[]), 'semente', false, null, null, false
+  cast(['bcb'] as varchar[]), 'semente', false, cast(500 as numeric),
+  'ifdata_ativo_total', true
 union all
 select
   '00999999000199', '00999999000199', 'SEGURADORA COM ZERO INICIAL', false,
-  cast(['susep'] as varchar[]), 'semente', false, null, null, false
+  cast(['susep'] as varchar[]), 'semente', false, cast(300 as numeric),
+  'susep_premios_emitidos', true
 union all
 select
   'nome:NATURAECO', null, 'Natura & Co.', true,
