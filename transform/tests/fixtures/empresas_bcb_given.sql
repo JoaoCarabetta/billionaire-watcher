@@ -1,5 +1,5 @@
 select
-  1234567000189::bigint as codigoCNPJ14,
+  '01234567000189' as codigoCNPJ14,
   'BANCO COM ZERO INICIAL' as nomeEntidadeInteresse,
   3 as codigoTipoSituacaoPessoaJuridica,
   8 as codigoTipoEntidadeSupervisionada
@@ -13,3 +13,5 @@ union all
 select 52345678000193, 'BANCO SEM FUNCIONAMENTO', 8, 2
 union all
 select 62345678000294, 'FILIAL NAO SEDE', 3, 2
+union all
+select 123456789, 'CHAVE CURTA NAO E CNPJ', 3, 2

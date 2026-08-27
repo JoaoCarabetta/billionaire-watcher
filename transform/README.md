@@ -8,11 +8,19 @@ The old warehouse layer (freeze walk, hops, valor-universo graph, person-money,
 facts, TSE matches and their seeds) was removed. The design of the replacement
 pipeline — the three tables `empresas`, `pessoas`, and `pessoas_empresas` with
 the `e_oligarca` flag — lives in [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
-Issue #178 implements the first slice of that replacement:
+Issues #178 and #179 implement the company door and upward ownership walk:
 
 - **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
-  from seed A union the CVM, BCB, and SUSEP seed-B registries. It does not walk
-  ownership or calculate a size floor.
+  from seed A union the CVM, BCB, and SUSEP seed-B registries, plus intermediate
+  holdings cited during the upward walk with `motivo_entrada = subida`.
+- **`pessoas_empresas`** (`models/pessoas_empresas.sql`): every cited natural
+  person relationship reached from a walkable seed. FRE rows are
+  `acionista_controlador` or `acionista`; Receita rows are always `socio`.
+- **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
+  provisional identity, with `e_oligarca` derived only from qualifying FRE
+  relationships on seed companies.
+- **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
+  of seed companies allowed to start a walk.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
   `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
   `person_id_from_cpf`, plus a cross-adapter empty string-array helper.
@@ -22,7 +30,7 @@ Issue #178 implements the first slice of that replacement:
 
 | Model | Description | Grain |
 |-------|-------------|-------|
-| `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE 6.1 shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
+| `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
 | `stg_cvm_fre_capital_social_2026` | CVM FRE 17.1 capital social | (CNPJ_Companhia, ID_Documento, Tipo_Capital, ID_Capital_Social) |
 | `stg_cvm_cad_cia_aberta` | CVM listed company registry | CNPJ_CIA |
 
@@ -91,8 +99,29 @@ Define the three `fase1_landing` external relations with CNPJ fields as
 
 RF CNPJ `socios` lists **sócio** (partner) relationships as recorded in the
 Quadro de Sócios e Administradores. It does **NOT** compute beneficial
-ownership. Any controlador interpretation must come from CVM FRE 6.1, never be
-inferred from RF alone.
+ownership. Any controlador interpretation must come from the CVM FRE
+shareholder-position file, never be inferred from RF alone.
+
+The walk filters QSA to ownership qualifications: administrator-, director-,
+president-, and council-only rows never become owners. QSA has no percentage or
+control signal, so those fields remain null. A closed S.A. (`natureza_juridica`
+2054) stops because QSA is not a public shareholder book.
+
+### Upward ownership walk
+
+For each seed with `nao_caminha = false`, the recursive walk uses the largest
+`ID_Documento` per company from
+`fre_cia_aberta_posicao_acionaria_2026.csv`. Companies without a FRE position
+use Receita `socios` and `empresas` at `rf_partition_date`. It stops at
+`Outros`, treasury shares, closed S.A.s without a public shareholder book,
+unknown shareholder types, and cycles. It does not use
+`fre_cia_historico_emissor`, the frozen public graph, or hop JSON.
+
+The unit seam in `tests/unit_test_fase1_ownership_walk.yml` uses the three seed
+registries plus FRE and QSA slices. Alice Controladora is true through
+controller `S` on a seed; Camila Citada is false below 10%; Diana Holding stays
+false because her controller citation is on a `subida` company; and the two
+CPF-less JOAO SILVA citations remain separate.
 
 ## Setup
 
