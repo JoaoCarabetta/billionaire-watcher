@@ -1,0 +1,77 @@
+unit_tests:
+  - name: test_fase1_ownership_walk_emits_empresas
+    description: |
+      End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
+      registries seed the walk; FRE and QSA legal-person owners enter as subida.
+    model: empresas
+    given:
+      - input: source('fase1_landing', 'controle_empresas_walk')
+        format: sql
+        fixture: fase1_e2e_seed_a_given
+      - input: ref('stg_cvm_cad_cia_aberta')
+        format: sql
+        fixture: fase1_e2e_cvm_given
+      - input: source('fase1_landing', 'bcb_entidades_supervisionadas')
+        format: sql
+        fixture: fase1_e2e_bcb_given
+      - input: source('fase1_landing', 'susep_dados_cadastrais')
+        format: sql
+        fixture: fase1_e2e_susep_given
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: fase1_e2e_fre_given
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: fase1_e2e_qsa_empresas_given
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        fixture: fase1_e2e_qsa_socios_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_empresas_expect
+
+  - name: test_fase1_ownership_walk_emits_pessoas_empresas
+    description: |
+      End-to-end fase 1 seam, relationship output: all cited natural people
+      enter, QSA rows stay socio, old FRE documents and administrators do not.
+    model: pessoas_empresas
+    given:
+      - input: ref('empresas')
+        format: sql
+        fixture: fase1_e2e_empresas_expect
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: fase1_e2e_fre_given
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: fase1_e2e_qsa_empresas_given
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        fixture: fase1_e2e_qsa_socios_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_pessoas_empresas_expect
+
+  - name: test_fase1_ownership_walk_emits_pessoas
+    description: |
+      End-to-end fase 1 seam, people output: Alice is an oligarch through
+      controller S on a seed, Camila and the QSA partners are false, Diana's
+      controller tie on a subida company is false, and the two CPF-less
+      JOAO SILVA citations remain separate people.
+    model: pessoas
+    given:
+      - input: ref('empresas')
+        format: sql
+        fixture: fase1_e2e_empresas_expect
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: fase1_e2e_fre_given
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: fase1_e2e_qsa_empresas_given
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        fixture: fase1_e2e_qsa_socios_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_pessoas_expect

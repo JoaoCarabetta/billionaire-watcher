@@ -27,7 +27,7 @@ select
   cast([] as varchar[]), 'semente', true, null, null, false
 union all
 select
-  'nome:GLOBO', null, 'Globo', true,
+  '11222333000144', '11222333000144', 'Globo', true,
   cast([] as varchar[]), 'semente', true, null, null, false
 union all
 select

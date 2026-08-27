@@ -1,4 +1,4 @@
-with seed_a_normalized as (
+with recursive seed_a_normalized as (
     select
         trim(cast(nome as string)) as razao_social,
         {{ digits_only('identificador') }} as identificador_digits,
@@ -20,8 +20,11 @@ seed_a as (
         razao_social,
         true as em_semente_a,
         cast(null as string) as fonte_semente_b,
-        nome_normalizado in ('FOLHA', 'GLOBO', 'HAVAN', 'RECORD', 'NATURAECO')
-            and length(identificador_digits) != 14 as nao_caminha
+        nome_normalizado in ('FOLHA', 'GLOBO', 'HAVAN', 'RECORD')
+            or (
+                nome_normalizado = 'NATURAECO'
+                and length(identificador_digits) != 14
+            ) as nao_caminha
     from seed_a_normalized
     where
         length(identificador_digits) = 14
@@ -44,12 +47,12 @@ seed_b_cvm as (
 
 seed_b_bcb_normalized as (
     select
-        lpad({{ digits_only('codigoCNPJ14') }}, 14, '0') as cnpj,
+        {{ digits_only('codigoCNPJ14') }} as cnpj,
         cast(nomeEntidadeInteresse as string) as razao_social,
         cast(codigoTipoSituacaoPessoaJuridica as integer) as codigo_situacao,
         cast(codigoTipoEntidadeSupervisionada as integer) as codigo_tipo
     from {{ source('fase1_landing', 'bcb_entidades_supervisionadas') }}
-    where length({{ digits_only('codigoCNPJ14') }}) between 1 and 14
+    where length({{ digits_only('codigoCNPJ14') }}) = 14
 ),
 
 seed_b_bcb as (
@@ -72,11 +75,11 @@ seed_b_bcb as (
 
 seed_b_susep_normalized as (
     select
-        lpad({{ digits_only('entcgc') }}, 14, '0') as cnpj,
+        {{ digits_only('entcgc') }} as cnpj,
         cast(entnome as string) as razao_social,
         cast(mercodigo as integer) as mercodigo
     from {{ source('fase1_landing', 'susep_dados_cadastrais') }}
-    where length({{ digits_only('entcgc') }}) between 1 and 14
+    where length({{ digits_only('entcgc') }}) = 14
 ),
 
 seed_b_susep as (
@@ -124,18 +127,71 @@ seed_b_sources as (
     from all_seed_rows
     where fonte_semente_b is not null
     group by empresa_id
+),
+
+{{ ownership_edge_ctes() }},
+
+seed_companies as (
+    select
+        companies.empresa_id,
+        companies.cnpj,
+        companies.razao_social,
+        companies.em_semente_a,
+        coalesce(sources.fontes_semente_b, {{ empty_string_array() }}) as fontes_semente_b,
+        'semente' as motivo_entrada,
+        companies.nao_caminha,
+        cast(null as numeric) as valor_do_piso,
+        cast(null as string) as fonte_do_piso,
+        false as tem_piso
+    from company_rollup as companies
+    left join seed_b_sources as sources using (empresa_id)
+),
+
+walk_roots as (
+    select empresa_id as root_empresa_id
+    from seed_companies
+    where not nao_caminha
+),
+
+{{ ownership_walk_ctes('walk_roots') }},
+
+subida_ranked as (
+    select
+        edges.owner_company_id as empresa_id,
+        case
+            when edges.owner_company_id not like 'nome:%'
+                then edges.owner_company_id
+        end as cnpj,
+        edges.owner_name as razao_social,
+        row_number() over (
+            partition by edges.owner_company_id
+            order by edges.fonte, edges.owner_name
+        ) as company_row
+    from walked_ownership_edges as edges
+    left join seed_companies as seeds
+        on edges.owner_company_id = seeds.empresa_id
+    where
+        edges.owner_kind = 'empresa'
+        and edges.owner_company_id is not null
+        and seeds.empresa_id is null
+),
+
+subida_companies as (
+    select
+        empresa_id,
+        cnpj,
+        razao_social,
+        false as em_semente_a,
+        {{ empty_string_array() }} as fontes_semente_b,
+        'subida' as motivo_entrada,
+        false as nao_caminha,
+        cast(null as numeric) as valor_do_piso,
+        cast(null as string) as fonte_do_piso,
+        false as tem_piso
+    from subida_ranked
+    where company_row = 1
 )
 
-select
-    companies.empresa_id,
-    companies.cnpj,
-    companies.razao_social,
-    companies.em_semente_a,
-    coalesce(sources.fontes_semente_b, {{ empty_string_array() }}) as fontes_semente_b,
-    'semente' as motivo_entrada,
-    companies.nao_caminha,
-    cast(null as numeric) as valor_do_piso,
-    cast(null as string) as fonte_do_piso,
-    false as tem_piso
-from company_rollup as companies
-left join seed_b_sources as sources using (empresa_id)
+select * from seed_companies
+union all
+select * from subida_companies

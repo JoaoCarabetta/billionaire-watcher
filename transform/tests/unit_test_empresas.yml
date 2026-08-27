@@ -3,8 +3,8 @@ unit_tests:
     description: |
       Locks the issue 178 final grain: duplicate seed sources collapse by
       empresa_id, leading zeros survive, all active CVM fixture companies enter,
-      BCB cooperative types 3/9/11 stay out, and nao_caminha is limited to the
-      five named no-CNPJ exceptions.
+      short BCB/SUSEP keys stay out, BCB cooperative types 3/9/11 stay out,
+      closed groups never walk, and Natura walks whenever it has a full CNPJ.
     model: empresas
     given:
       - input: source('fase1_landing', 'controle_empresas_walk')
@@ -19,6 +19,15 @@ unit_tests:
       - input: source('fase1_landing', 'susep_dados_cadastrais')
         format: sql
         fixture: empresas_susep_given
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: ownership_fre_empty
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: ownership_qsa_empresas_empty
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        fixture: ownership_qsa_socios_empty
     expect:
       format: sql
       fixture: empresas_expect

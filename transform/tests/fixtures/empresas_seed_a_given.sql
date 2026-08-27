@@ -2,7 +2,7 @@ select 'JBS' as nome, '02916265000160' as identificador
 union all
 select 'Natura & Co.', 'vazio'
 union all
-select 'Globo', 'globo'
+select 'Globo', '11222333000144'
 union all
 select 'Havan', 'havan'
 union all
