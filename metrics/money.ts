@@ -15,10 +15,9 @@
  * PREULT, date 2025-05-16). Default is never listed_prices_fixture.csv.
  * Recorded fixture quotes are skipped and never printed.
  * Claro (cnpj_basico 07043628) has no Bolsa class. ENGI11 is a unit: no money
- * without a unit quantity (do not invent one). Energisa V uses graph_edges
- * ordinary/preferred quantities × ENGI3/ENGI4. Other listadas use CVM FRE
- * item 17.1 capital quantities on or before the quote date, only when a B3
- * class also has a quantity.
+ * without a unit quantity (do not invent one). Quantities: public sidecar
+ * public/grafo-quantidades.json (Energisa hop qty × ENGI3/ENGI4; other priced
+ * classes from CVM FRE item 17.1). Only when a B3 class also has a quantity.
  */
 
 import { readFileSync } from 'node:fs';
@@ -165,6 +164,7 @@ export const DEFAULT_PRICES_RELATIVE = join('transform', 'seeds', 'b3_listed_pri
 export const DEFAULT_QTY_RELATIVE_PATHS = [
   join('metrics', 'listed_capital_quantities.csv'),
   join('transform', 'seeds', 'energisa_edges_fixture.csv'),
+  join('public', 'grafo-quantidades.json'),
 ];
 
 type SliceGroup = {
@@ -291,6 +291,90 @@ export function loadPriceRows(filePath: string, cwd = process.cwd()): PriceInput
   }));
 }
 
+function sidecarRawRows(parsed: unknown): Array<Record<string, unknown>> {
+  if (Array.isArray(parsed)) {
+    return parsed as Array<Record<string, unknown>>;
+  }
+  if (parsed && typeof parsed === 'object') {
+    const obj = parsed as Record<string, unknown>;
+    if (Array.isArray(obj.rows)) {
+      return obj.rows as Array<Record<string, unknown>>;
+    }
+    if (Array.isArray(obj.quantities)) {
+      return obj.quantities as Array<Record<string, unknown>>;
+    }
+  }
+  return [];
+}
+
+function qtySourceFromSidecarRow(row: Record<string, unknown>): string | undefined {
+  const parts = [row.source_doc, row.source_locator, row.source]
+    .map((part) => (typeof part === 'string' ? part.trim() : ''))
+    .filter((part) => part.length > 0);
+  return parts.length > 0 ? parts.join(' ') : undefined;
+}
+
+export function loadQtyRowsFromSidecar(filePath: string, cwd = process.cwd()): QtyInputRow[] {
+  const resolved = isAbsolute(filePath) ? filePath : join(cwd, filePath);
+  const parsed = JSON.parse(readFileSync(resolved, 'utf8')) as unknown;
+  const grouped = new Map<string, QtyInputRow>();
+  for (const row of sidecarRawRows(parsed)) {
+    const classe = typeof row.classe === 'string' ? row.classe : '';
+    if (isUnitClass(classe)) {
+      continue;
+    }
+    const id = typeof row.id === 'string' ? row.id : '';
+    const rawBasico = typeof row.cnpj_basico === 'string' ? row.cnpj_basico.replace(/\D/g, '') : '';
+    const basico =
+      rawBasico.length === 8
+        ? rawBasico
+        : rawBasico.length >= 14
+          ? rawBasico.slice(0, 8)
+          : /^\d{14}$/.test(id)
+            ? id.slice(0, 8)
+            : '';
+    if (!/^\d{8}$/.test(basico)) {
+      continue;
+    }
+    const existing = grouped.get(basico) ?? { cnpj_basico: basico };
+    const quantidade = parseOptionalNumber(
+      row.quantidade === undefined || row.quantidade === null ? undefined : String(row.quantidade)
+    );
+    if (isOrdinaryClass(classe) && quantidade !== undefined) {
+      existing.qty_ordinarias = quantidade;
+    } else if (isPreferredClass(classe) && quantidade !== undefined) {
+      existing.qty_preferenciais = quantidade;
+    }
+    const ordinarias = parseOptionalNumber(
+      row.qty_ordinarias === undefined || row.qty_ordinarias === null ? undefined : String(row.qty_ordinarias)
+    );
+    const preferenciais = parseOptionalNumber(
+      row.qty_preferenciais === undefined || row.qty_preferenciais === null
+        ? undefined
+        : String(row.qty_preferenciais)
+    );
+    if (ordinarias !== undefined) {
+      existing.qty_ordinarias = ordinarias;
+    }
+    if (preferenciais !== undefined) {
+      existing.qty_preferenciais = preferenciais;
+    }
+    const source = qtySourceFromSidecarRow(row);
+    if (source) {
+      existing.source = source;
+    }
+    if (
+      existing.qty_ordinarias === undefined &&
+      existing.qty_preferenciais === undefined &&
+      existing.qty_unit === undefined
+    ) {
+      continue;
+    }
+    grouped.set(basico, existing);
+  }
+  return [...grouped.values()];
+}
+
 export function loadQtyRowsFromEdgesFixture(filePath: string, cwd = process.cwd()): QtyInputRow[] {
   const grouped = new Map<string, QtyInputRow>();
   for (const row of loadCsvFile(filePath, cwd)) {
@@ -329,7 +413,9 @@ export function loadQtyRows(filePaths: string | string[], cwd = process.cwd()): 
   const paths = Array.isArray(filePaths) ? filePaths : [filePaths];
   const grouped = new Map<string, QtyInputRow>();
   for (const filePath of paths) {
-    for (const row of loadQtyRowsFromEdgesFixture(filePath, cwd)) {
+    const fromJson = filePath.replace(/\\/g, '/').endsWith('.json');
+    const rows = fromJson ? loadQtyRowsFromSidecar(filePath, cwd) : loadQtyRowsFromEdgesFixture(filePath, cwd);
+    for (const row of rows) {
       grouped.set(row.cnpj_basico, row);
     }
   }
