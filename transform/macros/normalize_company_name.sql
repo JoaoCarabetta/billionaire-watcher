@@ -6,6 +6,13 @@ regexp_replace(cast({{ col }} as string), r'[^0-9]', '')
 {%- endif -%}
 {%- endmacro %}
 
+{% macro valid_document(expr, n) -%}
+(
+    length({{ expr }}) = {{ n }}
+    and {{ expr }} != repeat('0', {{ n }})
+)
+{%- endmacro %}
+
 {% macro prefix8_from_cnpj14(col) -%}
 case
     when length({{ digits_only(col) }}) = 14 then left({{ digits_only(col) }}, 8)

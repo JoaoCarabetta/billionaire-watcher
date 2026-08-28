@@ -103,6 +103,34 @@ unit_tests:
       format: sql
       fixture: fase1_e2e_percursos_expect
 
+  - name: test_fase1_ownership_walk_rejects_zero_cnpj_hub
+    description: |
+      A FRE legal-person row with CPF_CNPJ_Acionista 00.000.000/0000-00
+      becomes a nome: owner key, never the shared 00000000000000 hub.
+      Two issuers whose zero-document shareholders have different names
+      stay disconnected. An older Data_Referencia on the same edge is
+      dropped in favor of the latest date.
+    model: vinculos
+    given:
+      - input: ref('int_walk_roots')
+        format: sql
+        fixture: zero_cnpj_walk_roots_given
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: zero_cnpj_fre_given
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: ownership_qsa_empresas_empty
+      - input: source('br_me_cnpj', 'socios')
+        format: sql
+        fixture: ownership_qsa_socios_empty
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: ownership_qsa_estabelecimentos_empty
+    expect:
+      format: sql
+      fixture: zero_cnpj_vinculos_expect
+
   - name: test_fase1_ownership_walk_emits_pessoas
     description: |
       End-to-end fase 1 seam, people output: Alice is an oligarch through

@@ -34,8 +34,10 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
 - **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
   of seed companies allowed to start a walk.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
-  `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
-  `person_id_from_cpf`, plus a cross-adapter empty string-array helper.
+  `valid_document`, `prefix8_from_cnpj14`, `normalize_company_name`,
+  `normalize_person_name`, `person_id_from_cpf`, plus a cross-adapter empty
+  string-array helper. All-zero CPF/CNPJ placeholders are treated as absent
+  documents so they cannot collapse distinct owners into one hub.
 
 - **CVM staging readers** (`models/staging/`): pure type-cast/normalize readers,
   reusable by the fase 1 pipeline:

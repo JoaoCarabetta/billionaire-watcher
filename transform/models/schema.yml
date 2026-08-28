@@ -80,7 +80,7 @@ models:
           - not_null
           - unique
       - name: nome
-        description: Person name as cited by FRE or Receita QSA.
+        description: Canonical cited name (most frequent, then shortest) from FRE or Receita QSA.
         tests:
           - not_null
       - name: cpf
@@ -114,8 +114,9 @@ models:
     description: |
       Written ownership-edge table. Each row points from a cited person or
       company to the company it owns, at one row per origin, destination,
-      source, and reference date. Includes company edges traversed by the
-      upward walk and direct person citations on one-hop companies.
+      and source, keeping only the latest reference date. Includes company
+      edges traversed by the upward walk and direct person citations on
+      one-hop companies.
     columns:
       - name: origem_tipo
         description: Whether the cited owner is a pessoa or empresa.
@@ -199,7 +200,6 @@ models:
               - origem_empresa_id
               - destino_empresa_id
               - fonte
-              - data_referencia
 
   - name: percursos
     description: |

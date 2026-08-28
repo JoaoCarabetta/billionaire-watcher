@@ -118,3 +118,12 @@ group by
     destino_empresa_id,
     fonte,
     data_referencia
+qualify row_number() over (
+    partition by
+        origem_tipo,
+        origem_pessoa_id,
+        origem_empresa_id,
+        destino_empresa_id,
+        fonte
+    order by data_referencia desc
+) = 1

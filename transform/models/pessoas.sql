@@ -237,32 +237,53 @@ person_citations as (
     select * from hop_person_citations
 ),
 
-people_rollup as (
+name_counts as (
     select
         pessoa_id,
-        max(nome) as nome,
-        max(cpf) as cpf,
+        nome,
+        count(*) as cnt
+    from person_citations
+    group by pessoa_id, nome
+),
+
+canonical_names as (
+    select
+        pessoa_id,
+        nome
+    from name_counts
+    qualify row_number() over (
+        partition by pessoa_id
+        order by cnt desc, length(nome), nome
+    ) = 1
+),
+
+people_rollup as (
+    select
+        citations.pessoa_id,
+        names.nome,
+        max(citations.cpf) as cpf,
         cast(null as string) as filiacao,
         cast(null as date) as data_nascimento,
         max(
             case
                 when
-                    cited_on_seed
-                    and fonte = 'fre'
+                    citations.cited_on_seed
+                    and citations.fonte = 'fre'
                     and (
-                        acionista_controlador
-                        or percentual_on >= 10
+                        citations.acionista_controlador
+                        or citations.percentual_on >= 10
                     )
                     then 1
                 when
-                    cited_on_control_chain
-                    and fonte in ('fre', 'qsa')
+                    citations.cited_on_control_chain
+                    and citations.fonte in ('fre', 'qsa')
                     then 1
                 else 0
             end
         ) = 1 as e_oligarca
-    from person_citations
-    group by pessoa_id
+    from person_citations as citations
+    inner join canonical_names as names using (pessoa_id)
+    group by citations.pessoa_id, names.nome
 )
 
 select

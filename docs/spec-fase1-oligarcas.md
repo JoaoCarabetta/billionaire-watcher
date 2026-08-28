@@ -328,9 +328,13 @@ mesmo seam que a CI existente (`.github/workflows/dbt-ci.yml`, `dbt parse` +
 1. **Ponta a ponta única** (acima): cadastros + FRE + QSA → três tabelas com
    `e_oligarca` conhecido. É o teste que trava a definição.
 2. **Contratos de grão**: `empresas.empresa_id` único; `pessoas.pessoa_id`
-   único; `pessoas_empresas` único em (`pessoa_id`, `empresa_id`, `fonte`,
-   `data_referencia`); zeros à esquerda preservados (o exemplo canônico JBS
-   `02916265000160` já está nos testes dos leitores CVM mantidos).
+   único; `vinculos` único em (`origem_tipo`, `origem_pessoa_id`,
+   `origem_empresa_id`, `destino_empresa_id`, `fonte`), ficando só a
+   `data_referencia` mais recente; `pessoas_empresas` único em (`pessoa_id`,
+   `empresa_id`, `fonte`, `data_referencia`); zeros à esquerda preservados
+   (o exemplo canônico JBS `02916265000160` já está nos testes dos leitores
+   CVM mantidos). CPF/CNPJ composto só de zeros é documento ausente, não
+   um nó compartilhado.
 3. **Regras negativas dentro do teste ponta a ponta**, não como seams novos:
    sócio da Receita nunca emite `papel` = `acionista_controlador`; homônimos
    sem CPF não se fundem; empresa de hop não flipa `e_oligarca`; `tem_piso` =

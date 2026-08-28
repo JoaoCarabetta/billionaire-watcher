@@ -22,6 +22,11 @@ select
 union all
 select
   '10000000000100', 'LISTADA SEMENTE S.A.', cast('2026-06-30' as date), 100,
+  'ALICE CONTROLADORA   NOME', 'PF', '111.444.777-35',
+  null, null, null, null, 'S', 'N', 5.0, 5.0
+union all
+select
+  '10000000000100', 'LISTADA SEMENTE S.A.', cast('2026-06-30' as date), 100,
   'CARLOS CPF COLISAO', 'PF', '123.555.666-00',
   null, null, null, null, 'S', 'N', 1.0, 1.0
 union all

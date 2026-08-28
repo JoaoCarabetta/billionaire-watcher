@@ -82,10 +82,10 @@ fre_edges as (
                 and ID_Acionista_Relacionado != 0
                 and (
                     related_type in ('PJ', 'PESSOA JURIDICA', 'PESSOA JURÍDICA')
-                    or length(related_document) = 14
+                    or {{ valid_document('related_document', 14) }}
                 )
                 then case
-                    when length(related_document) = 14
+                    when {{ valid_document('related_document', 14) }}
                         then lpad(related_document, 14, '0')
                     when
                         related_name_normalized != ''
@@ -101,20 +101,20 @@ fre_edges as (
         case
             when
                 owner_type in ('PF', 'PESSOA FISICA', 'PESSOA FÍSICA')
-                or length(owner_document) = 11
+                or {{ valid_document('owner_document', 11) }}
                 then 'pessoa'
             when
                 owner_type in ('PJ', 'PESSOA JURIDICA', 'PESSOA JURÍDICA')
-                or length(owner_document) = 14
+                or {{ valid_document('owner_document', 14) }}
                 then 'empresa'
             else 'parada'
         end as owner_kind,
         case
             when
                 owner_type in ('PJ', 'PESSOA JURIDICA', 'PESSOA JURÍDICA')
-                or length(owner_document) = 14
+                or {{ valid_document('owner_document', 14) }}
                 then case
-                    when length(owner_document) = 14
+                    when {{ valid_document('owner_document', 14) }}
                         then lpad(owner_document, 14, '0')
                     else concat('nome:', owner_name_normalized)
                 end
@@ -122,7 +122,7 @@ fre_edges as (
         owner_name,
         owner_document,
         case
-            when length(owner_document) = 11
+            when {{ valid_document('owner_document', 11) }}
                 then lpad(owner_document, 11, '0')
         end as owner_cpf,
         case
@@ -197,8 +197,8 @@ qsa_classified_rows as (
         case
             when owner_type = '1' then 'empresa'
             when owner_type = '2' then 'pessoa'
-            when owner_type = '3' and length(owner_document) = 14 then 'empresa'
-            when owner_type = '3' and length(owner_document) = 11 then 'pessoa'
+            when owner_type = '3' and {{ valid_document('owner_document', 14) }} then 'empresa'
+            when owner_type = '3' and {{ valid_document('owner_document', 11) }} then 'pessoa'
             -- Receita qualification labels explicitly identify these as legal
             -- persons; generic/unknown foreign partners stay provisional people.
             when owner_type = '3' and qualificacao in (
@@ -218,7 +218,7 @@ qsa_all_edges as (
         owner_kind,
         case
             when owner_kind = 'empresa' then case
-                when length(owner_document) = 14
+                when {{ valid_document('owner_document', 14) }}
                     then lpad(owner_document, 14, '0')
                 else concat('nome:', owner_name_normalized)
             end
@@ -228,7 +228,7 @@ qsa_all_edges as (
         case
             when
                 owner_kind = 'pessoa'
-                and length(owner_document) = 11
+                and {{ valid_document('owner_document', 11) }}
                 then lpad(owner_document, 11, '0')
         end as owner_cpf,
         'socio' as papel,
