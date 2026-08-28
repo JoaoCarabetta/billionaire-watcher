@@ -14,6 +14,14 @@ const graph = createGraph(document.querySelector("#cy"), {
   },
 });
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 async function plant(kind, id) {
   const entity = await getEntity(kind, id);
   if (!entity) return;
@@ -33,7 +41,9 @@ input.addEventListener("input", async () => {
   hits.innerHTML = rows
     .map((row) => {
       const flag = row.e_oligarca ? ' <span class="badge clay">oligarca</span>' : "";
-      return `<li><a href="#${row.kind}/${encodeURIComponent(row.id)}">${row.nome}${flag}</a></li>`;
+      const kind = encodeURIComponent(row.kind);
+      const id = encodeURIComponent(row.id);
+      return `<li><a href="#${kind}/${id}">${escapeHtml(row.nome)}${flag}</a></li>`;
     })
     .join("");
 });
