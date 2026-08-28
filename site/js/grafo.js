@@ -1,6 +1,8 @@
 import {
   entityHref,
   getEntity,
+  isMissingShard,
+  missingShardsHtml,
   parseHash,
   searchNames,
 } from "./data.js";
@@ -8,11 +10,6 @@ import { createGraph } from "./graph.js";
 
 const input = document.querySelector("#busca");
 const hits = document.querySelector("#hits");
-const graph = createGraph(document.querySelector("#cy"), {
-  onOpen: (kind, id) => {
-    window.location.href = entityHref(kind, id);
-  },
-});
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -22,9 +19,35 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function showHitsNotice(html) {
+  hits.innerHTML = `<li>${html}</li>`;
+}
+
+const graph = createGraph(document.querySelector("#cy"), {
+  onOpen: (kind, id) => {
+    window.location.href = entityHref(kind, id);
+  },
+  onMissingShards: () => showHitsNotice(missingShardsHtml()),
+});
+
 async function plant(kind, id) {
-  const entity = await getEntity(kind, id);
-  if (!entity) return;
+  let entity;
+  try {
+    entity = await getEntity(kind, id);
+  } catch (error) {
+    showHitsNotice(
+      isMissingShard(error)
+        ? missingShardsHtml()
+        : `<p class="empty">${escapeHtml(error.message)}</p>`,
+    );
+    return;
+  }
+  if (!entity) {
+    showHitsNotice(
+      `<p class="empty">Não achei ${escapeHtml(kind)} ${escapeHtml(id)}.</p>`,
+    );
+    return;
+  }
   graph.addEntity(entity);
   await graph.expand(kind, id);
   hits.innerHTML = "";
@@ -37,7 +60,17 @@ input.addEventListener("input", async () => {
     hits.innerHTML = "";
     return;
   }
-  const rows = await searchNames(query);
+  let rows;
+  try {
+    rows = await searchNames(query);
+  } catch (error) {
+    showHitsNotice(
+      isMissingShard(error)
+        ? missingShardsHtml()
+        : `<p class="empty">${escapeHtml(error.message)}</p>`,
+    );
+    return;
+  }
   hits.innerHTML = rows
     .map((row) => {
       const flag = row.e_oligarca ? ' <span class="badge clay">oligarca</span>' : "";

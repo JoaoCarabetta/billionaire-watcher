@@ -72,6 +72,21 @@ def public_text(value: str | None) -> str | None:
     return re.sub(r"\s+", " ", cleaned).strip()
 
 
+def redact_public_fields(payload):
+    """Strip 11-digit tokens from public text keys before any shard is written."""
+    if isinstance(payload, dict):
+        out = {}
+        for key, value in payload.items():
+            if key in PUBLIC_TEXT_KEYS and isinstance(value, str):
+                out[key] = public_text(value)
+            else:
+                out[key] = redact_public_fields(value)
+        return out
+    if isinstance(payload, list):
+        return [redact_public_fields(item) for item in payload]
+    return payload
+
+
 def _assert_safe_sql(sql: str) -> None:
     if FORBIDDEN_SQL.search(sql):
         raise SystemExit(
@@ -155,10 +170,10 @@ def export(out_dir: Path) -> None:
             "kind": "empresa",
             "nome": public_text(row.razao_social),
             "cnpj": row.cnpj,
-            "motivo_entrada": row.motivo_entrada,
+            "motivo_entrada": public_text(row.motivo_entrada),
             "em_semente_a": bool(row.em_semente_a),
             "valor_do_piso": _num(row.valor_do_piso),
-            "fonte_do_piso": row.fonte_do_piso,
+            "fonte_do_piso": public_text(row.fonte_do_piso),
             "tem_piso": bool(row.tem_piso),
         }
 
@@ -262,11 +277,11 @@ def export(out_dir: Path) -> None:
             "origem_tipo": row.origem_tipo,
             "origem_id": row.origem_pessoa_id or row.origem_empresa_id,
             "destino_id": row.destino_empresa_id,
-            "papel": row.papel,
-            "fonte": row.fonte,
+            "papel": public_text(row.papel),
+            "fonte": public_text(row.fonte),
             "percentual_on": _num(row.percentual_on),
             "percentual_total": _num(row.percentual_total),
-            "regra_do_passo": row.regra_do_passo,
+            "regra_do_passo": public_text(row.regra_do_passo),
             "fonte_documento": public_text(row.fonte_documento),
         }
         dest = empresas.get(row.destino_empresa_id)
@@ -354,8 +369,8 @@ def export(out_dir: Path) -> None:
         )
         dest_nome = empresas.get(dest_id, {}).get("nome", dest_id)
         edge = {
-            "papel": row.papel,
-            "fonte": row.fonte,
+            "papel": public_text(row.papel),
+            "fonte": public_text(row.fonte),
             "percentual_on": _num(row.percentual_on),
             "percentual_total": _num(row.percentual_total),
         }
@@ -426,6 +441,7 @@ def export(out_dir: Path) -> None:
         )
 
     def write_json(path: Path, payload) -> None:
+        payload = redact_public_fields(payload)
         leak = _public_text_cpf(payload)
         if leak:
             raise SystemExit(f"refusing to write 11-digit sequence in {path}: {leak}")

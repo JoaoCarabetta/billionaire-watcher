@@ -58,6 +58,22 @@ describe("export script security", () => {
   });
 });
 
+describe("Cloudflare Pages 404", () => {
+  it("keeps a root 404.html with root-relative assets", () => {
+    const html = fs.readFileSync(path.join(siteDir, "404.html"), "utf8");
+    expect(html).toMatch(/href="\/css\/arquivo\.css"/);
+    expect(html).toMatch(/href="\/index\.html"/);
+    expect(html).not.toMatch(/href="css\//);
+  });
+
+  it("does not use an unsupported /* /404.html 404 rewrite", () => {
+    const redirects = fs.readFileSync(path.join(siteDir, "_redirects"), "utf8");
+    expect(redirects).toMatch(/404\.html/);
+    expect(redirects).toMatch(/Pages/);
+    expect(redirects).not.toMatch(/^\s*\/\*\s+\/404\.html\s+404\s*$/m);
+  });
+});
+
 describe("published site has no CPF", () => {
   it("does not embed 11-digit sequences in HTML, JS, or dados shards", () => {
     const files = walkFiles(siteDir).filter((file) => {

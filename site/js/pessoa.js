@@ -3,6 +3,8 @@ import {
   formatBrl,
   getEntity,
   grafoHref,
+  isMissingShard,
+  missingShardsHtml,
   parseHash,
 } from "./data.js";
 import { createGraph } from "./graph.js";
@@ -101,7 +103,15 @@ async function boot() {
     ficha.innerHTML = '<p class="empty">Escolha uma pessoa na <a href="index.html">lista de oligarcas</a>.</p>';
     return;
   }
-  const entity = await getEntity(parsed.kind, parsed.id);
+  let entity;
+  try {
+    entity = await getEntity(parsed.kind, parsed.id);
+  } catch (error) {
+    ficha.innerHTML = isMissingShard(error)
+      ? missingShardsHtml()
+      : `<p class="empty">${escapeHtml(error.message)}</p>`;
+    return;
+  }
   if (!entity) {
     ficha.innerHTML = `<p class="empty">Não achei ${escapeHtml(parsed.kind)} ${escapeHtml(parsed.id)}.</p>`;
     return;
@@ -114,6 +124,10 @@ async function boot() {
   const graph = createGraph(document.querySelector("#cy"), {
     onOpen: (kind, id) => {
       window.location.href = entityHref(kind, id);
+    },
+    onMissingShards: () => {
+      const meta = grafoSec.querySelector(".meta");
+      if (meta) meta.innerHTML = missingShardsHtml();
     },
   });
   graph.addEntity(entity, { x: 260, y: 200 });

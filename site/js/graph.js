@@ -1,4 +1,10 @@
-import { entityHref, getAdj, nodeKey, parseNodeKey } from "./data.js";
+import {
+  entityHref,
+  getAdj,
+  isMissingShard,
+  nodeKey,
+  parseNodeKey,
+} from "./data.js";
 
 const STYLE = [
   {
@@ -47,7 +53,7 @@ const STYLE = [
   },
 ];
 
-export function createGraph(container, { onOpen } = {}) {
+export function createGraph(container, { onOpen, onMissingShards } = {}) {
   const cy = window.cytoscape({
     container,
     style: STYLE,
@@ -81,7 +87,16 @@ export function createGraph(container, { onOpen } = {}) {
 
   async function expand(kind, id) {
     const sourceKey = nodeKey(kind, id);
-    const neighbors = await getAdj(kind, id);
+    let neighbors;
+    try {
+      neighbors = await getAdj(kind, id);
+    } catch (error) {
+      if (isMissingShard(error)) {
+        if (onMissingShards) onMissingShards(error);
+        return;
+      }
+      throw error;
+    }
     const origin = cy.getElementById(sourceKey);
     const ox = origin.length ? origin.position("x") : 240;
     const oy = origin.length ? origin.position("y") : 200;

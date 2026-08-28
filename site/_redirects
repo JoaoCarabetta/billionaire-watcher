@@ -1,0 +1,4 @@
+# Cloudflare Pages serves /404.html for unknown paths automatically.
+# Do not add `/* /404.html 404` — Pages ignores non-3xx rewrites
+# (https://developers.cloudflare.com/pages/configuration/redirects/).
+# A root 404.html is also what keeps Pages from SPA-falling-back to index.html.

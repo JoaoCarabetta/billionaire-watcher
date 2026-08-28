@@ -97,9 +97,15 @@ headers.forEach((th) => {
   });
 });
 
-rows = await loadJson("dados/oligarcas.json");
+try {
+  rows = await loadJson("dados/oligarcas.json");
+} catch (error) {
+  contagem.textContent = error.message;
+  rows = [];
+}
 if (!rows) {
-  contagem.textContent = "Export ausente. Rode scripts/export_site_data.py.";
+  contagem.textContent =
+    "Lista local ausente. Rode python3 scripts/export_site_data.py.";
 } else {
   apply();
 }

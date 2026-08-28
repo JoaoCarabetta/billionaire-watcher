@@ -1,14 +1,24 @@
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const root = path.join(fileURLToPath(new URL(".", import.meta.url)), "..");
 import {
+  assertEntityShards,
   bucketId,
   entityHref,
+  getAdj,
+  getEntity,
+  isMissingShard,
+  MissingShardError,
+  MISSING_SHARDS_HINT,
   normalizeName,
   parseHash,
+  publicText,
+  redactPublicFields,
+  resetDataCaches,
+  searchNames,
   searchPrefix,
 } from "../site/js/data.js";
 
@@ -70,8 +80,13 @@ describe("hash routing", () => {
   });
 });
 
-describe("CPF redaction in export", () => {
-  it("strips an 11-digit token glued to a QSA name", () => {
+describe("CPF redaction", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    resetDataCaches();
+  });
+
+  it("strips an 11-digit token glued to a QSA name in Python and JS", () => {
     const cleaned = execFileSync(
       "python3",
       [
@@ -82,6 +97,99 @@ describe("CPF redaction in export", () => {
     );
     expect(cleaned).toBe("VITOR TESTE");
     expect(cleaned).not.toMatch(/\d{11}/);
+    expect(publicText("VITOR TESTE 34237325806")).toBe("VITOR TESTE");
+    expect(publicText(null)).toBe(null);
+  });
+
+  it("redacts public text keys and leaves ids alone", () => {
+    const dirty = {
+      id: "34237325806",
+      nome: "VITOR 34237325806",
+      passos: [{ papel: "socio 34237325806", origem_id: "34237325806" }],
+    };
+    const jsClean = redactPublicFields(dirty);
+    expect(jsClean).toEqual({
+      id: "34237325806",
+      nome: "VITOR",
+      passos: [{ papel: "socio", origem_id: "34237325806" }],
+    });
+
+    const pyClean = execFileSync(
+      "python3",
+      [
+        "-c",
+        "import json,sys; from scripts.export_site_data import redact_public_fields; print(json.dumps(redact_public_fields(json.loads(sys.argv[1])), ensure_ascii=False), end='')",
+        JSON.stringify(dirty),
+      ],
+      { encoding: "utf-8", cwd: root },
+    );
+    expect(JSON.parse(pyClean)).toEqual(jsClean);
+  });
+
+  it("strips CPF when loading a shard through getEntity", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            "pessoa:x": { id: "x", kind: "pessoa", nome: "ANA 10987654321" },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+    const entity = await getEntity("pessoa", "x");
+    expect(entity.nome).toBe("ANA");
+    expect(entity.nome).not.toMatch(/\d{11}/);
+  });
+});
+
+describe("missing shards", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    resetDataCaches();
+  });
+
+  function stub404() {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("not found", { status: 404 })),
+    );
+  }
+
+  it("getEntity and getAdj throw MissingShardError on 404", async () => {
+    stub404();
+    await expect(getEntity("pessoa", "id-sem-shard")).rejects.toBeInstanceOf(
+      MissingShardError,
+    );
+    await expect(getAdj("pessoa", "id-sem-adj")).rejects.toMatchObject({
+      name: "MissingShardError",
+      message: MISSING_SHARDS_HINT,
+    });
+    expect(isMissingShard(new MissingShardError("dados/e/000.json"))).toBe(true);
+    expect(isMissingShard(new Error("falha"))).toBe(false);
+  });
+
+  it("searchNames treats a sparse prefix 404 as empty when e/ shards exist", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url) => {
+        if (String(url).includes("/busca/")) {
+          return new Response("not found", { status: 404 });
+        }
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }),
+    );
+    await expect(searchNames("ZZ")).resolves.toEqual([]);
+  });
+
+  it("searchNames fails closed when e/ shards are also gone", async () => {
+    stub404();
+    await expect(searchNames("Joesley")).rejects.toBeInstanceOf(MissingShardError);
+    await expect(assertEntityShards()).rejects.toBeInstanceOf(MissingShardError);
   });
 });
 
