@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ficha — Billionaire Watcher</title>
+  <link rel="stylesheet" href="css/arquivo.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <h1>Billionaire Watcher</h1>
+      <nav>
+        <a href="index.html">Oligarcas</a>
+        <a href="grafo.html">Grafo</a>
+        <a href="metodologia.html">Metodologia</a>
+      </nav>
+    </header>
+    <article id="ficha">
+      <p class="empty">Carregando…</p>
+    </article>
+    <section id="grafo-sec" hidden>
+      <h3>Vizinhança</h3>
+      <p class="meta">Toque um nó para expandir; toque de novo para abrir a ficha.</p>
+      <div class="graph-box" id="cy"></div>
+    </section>
+    <footer class="colophon">
+      Cada passo de percurso carrega <code>fonte_documento</code>.
+      Hop não herda <code>e_oligarca</code>.
+    </footer>
+  </div>
+  <script src="vendor/cytoscape.min.js"></script>
+  <script type="module" src="js/pessoa.js"></script>
+</body>
+</html>

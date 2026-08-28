@@ -1,31 +1,38 @@
 # billionaire-watcher
-Arquivo cívico de poder econômico no Brasil — dossiês HTML gerados de dados públicos
 
-## Commands
+Arquivo cívico de poder econômico no Brasil. O armazém (dbt / BigQuery) marca
+quem é `e_oligarca`. O sítio é HTML/CSS/JS estático em `site/`: uma tabela,
+fichas com percursos citados, e um grafo que só expande vizinhos.
+
+## Sítio
 
 ```sh
-npm test        # Run tests
-npm run build   # Build static site to ./dist/
-npm run metrics -- public/grafo-publico.json  # Relevance tables from the public graph
-npm run money -- public/grafo-publico.json    # Dinheiro sob controle (B3 2025-05-16; not a fortuna rank)
+npm test
+# depois do export:
+python3 -m http.server 4173 --directory site
 ```
 
-## Agent Readiness
+Cloudflare Pages: **sem build**, diretório de saída `site/` (ajuste no painel;
+não dá para gravar isso só no repositório).
 
-This site is designed to be readable by AI agents. After the first public deploy on Cloudflare Pages, rescan at https://is-agentic.com/ to verify agent-readiness score.
+`site/dados/oligarcas.json` vai no git (a tabela abre sem BigQuery). Fichas e
+grafo precisam dos shards gerados abaixo.
 
-Features:
-- Static HTML with content in initial response (no JS-only body)
-- Semantic HTML with proper headings, lists, and tables
-- `sitemap.xml` listing all routes
-- `llms.txt` explaining archive structure and navigation
-- Real 404 page (not soft-404 SPA)
-- Visible citations in HTML text
+### Exportar o armazém
 
-### Continuous Validation
+```sh
+export GOOGLE_APPLICATION_CREDENTIALS=/caminho/da-service-account.json
+python3 scripts/export_site_data.py --out site/dados
+```
 
-The [Is Agentic CI workflow](.github/workflows/is-agentic-ci.yml) runs automatically to verify agent-readiness on the deployed site at https://billionaire-watcher.pages.dev/
+O script **não** lê `cpf`, `filiacao` nem `data_nascimento`. Qualquer sequência
+de 11 dígitos nos JSON aborta a escrita.
 
-- **Triggers:** Push to main (site files) + weekday schedule
-- **Command:** `npx is-agentic https://billionaire-watcher.pages.dev/ --json`
-- **Failure Policy:** Fails only on Essential tier issues; Recommended API/OAuth/MCP gaps do not block
+## Armazém
+
+Ver [transform/README.md](transform/README.md) e
+[docs/spec-fase1-oligarcas.md](docs/spec-fase1-oligarcas.md).
+
+```sh
+cd transform && dbt test --select test_type:unit --target test
+```

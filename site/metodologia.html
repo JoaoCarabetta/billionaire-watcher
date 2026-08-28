@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metodologia — Billionaire Watcher</title>
+  <link rel="stylesheet" href="css/arquivo.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <h1>Billionaire Watcher</h1>
+      <nav>
+        <a href="index.html">Oligarcas</a>
+        <a href="grafo.html">Grafo</a>
+        <a href="metodologia.html" aria-current="page">Metodologia</a>
+      </nav>
+    </header>
+    <h2>Como o arquivo marca um oligarca</h2>
+    <p>
+      A unidade é a pessoa natural. <code>e_oligarca</code> é verdadeiro quando
+      o Formulário de Referência da CVM cita a pessoa como controlador
+      (<code>Acionista_Controlador = S</code>) ou com pelo menos 10% das ações
+      ordinárias em circulação numa empresa da semente (Valor ∪ CVM ATIVO ∪ BCB ∪ SUSEP),
+      ou quando ela é sócia citada de uma holding que senta nessa porta —
+      e a cadeia de pessoas jurídicas acima dela.
+    </p>
+    <p>
+      O hop para baixo (outras empresas da mesma pessoa no Brasil) nunca herda
+      a flag. S.A. fechada de natureza 2054 não tem livro QSA. O Formulário
+      ganha do Quadro de Sócios no mesmo CNPJ8. CPF de 11 dígitos não entra no HTML.
+    </p>
+    <p>
+      A fortuna soma, em cada caminho completo, o piso da empresa-folha vezes
+      o produto dos percentuais totais citados. Caminho sem percentual ou sem
+      piso deixa <code>fortuna_incompleta</code> verdadeiro.
+    </p>
+    <p>
+      O sítio não desenha o grafo inteiro (dezenas de milhares de arestas).
+      A lista é a porta de entrada; o grafo é a vizinhança de um nó, expandida
+      sob demanda a partir de <code>vinculos</code>.
+    </p>
+    <p>
+      Especificação completa:
+      <a href="https://github.com/JoaoCarabetta/billionaire-watcher/blob/main/docs/spec-fase1-oligarcas.md">docs/spec-fase1-oligarcas.md</a>.
+    </p>
+    <footer class="colophon">Fontes públicas: CVM, Receita Federal via Base dos Dados, BCB, SUSEP, B3.</footer>
+  </div>
+</body>
+</html>

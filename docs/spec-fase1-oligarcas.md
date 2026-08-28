@@ -6,10 +6,10 @@ hops, valor-universo, person-money, facts) foi removida do repositório junto co
 esta especificação; a implementação do pipeline descrito aqui é trabalho futuro,
 fora do PR que introduz este arquivo.
 
-O site estático de 4 de outubro (Astro + Cloudflare Pages), com
-`public/grafo-publico.json`, as fichas em `/pessoa/` e `/empresa/` e a página
-`/metodologia`, permanece congelado como artefato v0. Ele **não** é fonte de
-verdade do novo pipeline e não é reescrito por esta fase.
+O sítio público é HTML/CSS/JS estático em `site/`, alimentado por um export
+das tabelas fase 1 (`scripts/export_site_data.py` → `site/dados/`). A lista
+de oligarcas é a porta de entrada; o grafo é vizinhança sob demanda. O
+artefato Astro + `grafo-publico.json` (v0) foi removido.
 
 ## Problema
 
@@ -260,9 +260,8 @@ em `empresas` com `motivo_entrada` = `subida`.
 Os leitores dbt mantidos no repositório
 (`stg_cvm_fre_posicao_acionaria_2026`, `stg_cvm_fre_capital_social_2026`,
 `stg_cvm_cad_cia_aberta`) são reutilizáveis: são somente leitura, sem grão
-antigo. O JSON `public/grafo-publico.json` e o grafo de hops de 2189 nós da
-issue #174 **não** são fonte de verdade — permanecem apenas como artefato v0 do
-site.
+antigo. O JSON v0 `grafo-publico.json` e o grafo de hops da issue #174
+**não** são fonte de verdade e foram removidos do sítio.
 
 #### Para baixo (um hop, travado)
 
@@ -351,9 +350,8 @@ costura ponta a ponta.
 - **Família** como unidade (a unidade é a pessoa natural).
 - **Livro de acionistas de S.A. fechada**: sem fonte pública; a caminhada para
   em `Outros`/tesouraria/fechada sem livro, e o buraco fica documentado.
-- **Reescrita do `/grafo`** e das fichas do site de 4 de outubro: artefatos v0
-  congelados (`public/grafo-publico.json`, `data/hops/valor-universo.json`,
-  fichas, `/metodologia`). A issue #22 (texto do congelamento) não é reescrita.
+- **Artefato Astro v0**: removido. O sítio atual lê o armazém fase 1 via
+  `scripts/export_site_data.py`.
 - **Forbes como definição**: no máximo lista de conferência editorial; nunca
   entra no critério `e_oligarca`.
 - **Inventar fortuna**: sem percentual citado não há valor; caminhos

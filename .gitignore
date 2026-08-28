@@ -1,3 +1,10 @@
+__pycache__/
+
+# generated graph shards (run scripts/export_site_data.py)
+site/dados/e/
+site/dados/adj/
+site/dados/busca/
+
 # build output
 dist/
 # generated types

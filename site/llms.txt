@@ -1,0 +1,15 @@
+# Billionaire Watcher
+
+Arquivo cívico de poder econômico no Brasil. Site estático (HTML/CSS/JS) sobre o armazém fase 1.
+
+## Rotas
+
+- / — tabela de pessoas com e_oligarca
+- /pessoa.html#pessoa/{id} — ficha com percursos citados e ego-grafo
+- /pessoa.html#empresa/{id} — ficha de empresa
+- /grafo.html — busca e expansão progressiva; o grafo completo não é renderizado
+- /metodologia.html — critério documental
+
+## Princípios
+
+Fatos citados com fontes públicas (CVM Formulário, Receita QSA). Sem CPF de 11 dígitos no HTML. Hop não herda e_oligarca.

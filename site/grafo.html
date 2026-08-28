@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grafo — Billionaire Watcher</title>
+  <link rel="stylesheet" href="css/arquivo.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <h1>Billionaire Watcher</h1>
+      <nav>
+        <a href="index.html">Oligarcas</a>
+        <a href="grafo.html" aria-current="page">Grafo</a>
+        <a href="metodologia.html">Metodologia</a>
+      </nav>
+    </header>
+    <p class="lede">
+      O grafo completo não cabe numa tela. Busque um nome, plante o nó,
+      expanda vizinhos. Toque de novo para abrir a ficha.
+    </p>
+    <div class="toolbar">
+      <input type="search" id="busca" placeholder="Buscar pessoa ou empresa" autocomplete="off">
+    </div>
+    <ul class="search-hits" id="hits"></ul>
+    <div class="graph-box" id="cy"></div>
+    <footer class="colophon">Pessoa em barro, empresa em musgo, semente com aro dourado.</footer>
+  </div>
+  <script src="vendor/cytoscape.min.js"></script>
+  <script type="module" src="js/grafo.js"></script>
+</body>
+</html>

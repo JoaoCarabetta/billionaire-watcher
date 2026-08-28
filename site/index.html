@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oligarcas — Billionaire Watcher</title>
+  <link rel="stylesheet" href="css/arquivo.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <h1>Billionaire Watcher</h1>
+      <nav>
+        <a href="index.html" aria-current="page">Oligarcas</a>
+        <a href="grafo.html">Grafo</a>
+        <a href="metodologia.html">Metodologia</a>
+      </nav>
+    </header>
+    <p class="lede">
+      Pessoas naturais com <code>e_oligarca</code> no armazém fase 1:
+      controlador ou pelo menos 10% ON em uma porta de semente do Formulário,
+      ou sócio citado de uma holding nessa porta. A fortuna soma pisos ×
+      percentuais citados; caminhos incompletos ficam marcados.
+    </p>
+    <div class="toolbar">
+      <input type="search" id="filtro" placeholder="Filtrar por nome" autocomplete="off">
+      <span class="meta" id="contagem">Carregando…</span>
+    </div>
+    <noscript><p class="empty">Esta tabela precisa de JavaScript para ler <code>dados/oligarcas.json</code>.</p></noscript>
+    <table class="lista" id="tabela">
+      <thead>
+        <tr>
+          <th data-sort="nome" aria-sort="none">Nome</th>
+          <th class="num" data-sort="fortuna_valor" aria-sort="none">Fortuna citada</th>
+          <th class="num" data-sort="n_percursos" aria-sort="none">Percursos</th>
+          <th data-sort="semente" aria-sort="none">Portas semente</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <footer class="colophon">
+      Arquivo cívico de poder econômico no Brasil. Sem CPF no HTML.
+      Fontes: CVM Formulário de Referência e Receita Federal (QSA).
+    </footer>
+  </div>
+  <script type="module" src="js/index.js"></script>
+</body>
+</html>

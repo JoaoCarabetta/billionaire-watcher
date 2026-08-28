@@ -1,0 +1,34 @@
+name: Site CI
+
+on:
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - 'test/site-*.js'
+      - 'package.json'
+      - '.github/workflows/site-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - 'test/site-*.js'
+      - 'package.json'
+      - '.github/workflows/site-ci.yml'
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci
+      - run: npm test

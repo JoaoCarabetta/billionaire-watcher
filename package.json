@@ -6,26 +6,10 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "metrics": "node --experimental-strip-types --disable-warning=ExperimentalWarning metrics/run.ts",
-    "money": "node --experimental-strip-types --disable-warning=ExperimentalWarning metrics/money-run.ts"
-  },
-  "dependencies": {
-    "astro": "^7.2.6",
-    "cytoscape": "^3.34.2"
-  },
-  "allowScripts": {
-    "esbuild": true
+    "export": "python3 scripts/export_site_data.py --out site/dados"
   },
   "devDependencies": {
-    "@vitest/ui": "^4.1.11",
-    "jsdom": "^29.1.1",
-    "vitest": "^4.1.11",
-    "yaml": "^2.9.0"
+    "vitest": "^4.1.11"
   }
 }
