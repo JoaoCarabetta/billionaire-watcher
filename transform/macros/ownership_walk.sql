@@ -280,13 +280,50 @@ all_ownership_citations as (
 {%- endmacro %}
 
 
-{% macro ownership_walk_ctes(roots_cte) -%}
+{% macro ownership_edges_from_int() -%}
+ownership_edges as (
+    select * from {{ ref('int_ownership_edges') }}
+),
+
+all_ownership_citations as (
+    select * from {{ ref('int_ownership_citations') }}
+),
+
+fre_edges as (
+    select * from {{ ref('int_ownership_edges') }}
+    where fonte = 'fre'
+),
+
+qsa_all_edges as (
+    select * from {{ ref('int_ownership_citations') }}
+    where fonte = 'qsa'
+)
+{%- endmacro %}
+
+
+{% macro company_walk_from_int() -%}
+company_walk as (
+    select
+        root_empresa_id,
+        empresa_id as current_empresa_id,
+        empresa_cnpj8 as current_cnpj8,
+        depth
+    from {{ ref('int_company_walk') }}
+)
+{%- endmacro %}
+
+
+{% macro ownership_reachability_cte(roots_cte) -%}
 company_walk as (
     select
         root_empresa_id,
         root_empresa_id as current_empresa_id,
+        case
+            when length(root_empresa_id) = 14
+                then left(root_empresa_id, 8)
+        end as current_cnpj8,
         0 as depth,
-        concat('|', root_empresa_id, '|') as visited_path
+        {{ walk_visited_seed('root_empresa_id') }} as visited
     from {{ roots_cte }}
 
     union all
@@ -294,27 +331,32 @@ company_walk as (
     select
         walk.root_empresa_id,
         edges.owner_company_id as current_empresa_id,
+        case
+            when length(edges.owner_company_id) = 14
+                then left(edges.owner_company_id, 8)
+        end as current_cnpj8,
         walk.depth + 1 as depth,
-        concat(walk.visited_path, edges.owner_company_id, '|') as visited_path
+        {{ walk_visited_append('walk.visited', 'edges.owner_company_id') }} as visited
     from company_walk as walk
     inner join ownership_edges as edges
         on (
-            edges.fonte = 'fre'
+            edges.fonte != 'qsa'
             and edges.company_key = walk.current_empresa_id
         ) or (
             edges.fonte = 'qsa'
-            and edges.company_key = left(walk.current_empresa_id, 8)
+            and walk.current_cnpj8 is not null
+            and edges.company_key = walk.current_cnpj8
         )
     where
         edges.owner_kind = 'empresa'
         and edges.owner_company_id is not null
-        and strpos(
-            walk.visited_path,
-            concat('|', edges.owner_company_id, '|')
-        ) = 0
-        and walk.depth < 50
-),
+        and {{ walk_id_not_visited('edges.owner_company_id', 'walk.visited') }}
+        and walk.depth < {{ var('ownership_walk_max_depth', 15) }}
+)
+{%- endmacro %}
 
+
+{% macro walked_ownership_edges_cte() -%}
 walked_ownership_edges as (
     select distinct
         walk.root_empresa_id,
@@ -336,12 +378,60 @@ walked_ownership_edges as (
     from company_walk as walk
     inner join ownership_edges as edges
         on (
-            edges.fonte = 'fre'
+            edges.fonte != 'qsa'
             and edges.company_key = walk.current_empresa_id
         ) or (
             edges.fonte = 'qsa'
-            and edges.company_key = left(walk.current_empresa_id, 8)
+            and walk.current_cnpj8 is not null
+            and edges.company_key = walk.current_cnpj8
         )
+)
+{%- endmacro %}
+
+
+{% macro ownership_walk_ctes(roots_cte) -%}
+{{ ownership_reachability_cte(roots_cte) }},
+
+{{ walked_ownership_edges_cte() }}
+{%- endmacro %}
+
+
+{% macro holdings_on_chain_cte() -%}
+holdings_on_chain_walk as (
+    select
+        empresa_id,
+        0 as depth,
+        {{ walk_visited_seed('empresa_id') }} as visited
+    from seed_door_holdings
+
+    union all
+
+    select
+        edges.owner_company_id as empresa_id,
+        chain.depth + 1 as depth,
+        {{ walk_visited_append('chain.visited', 'edges.owner_company_id') }} as visited
+    from holdings_on_chain_walk as chain
+    inner join ownership_edges as edges
+        on edges.owner_kind = 'empresa'
+        and edges.owner_company_id is not null
+        and (
+            (
+                edges.fonte != 'qsa'
+                and edges.company_key = chain.empresa_id
+            ) or (
+                edges.fonte = 'qsa'
+                and length(chain.empresa_id) = 14
+                and edges.company_key = left(chain.empresa_id, 8)
+            )
+        )
+    where
+        {{ walk_id_not_visited('edges.owner_company_id', 'chain.visited') }}
+        and chain.depth < {{ var('ownership_walk_max_depth', 15) }}
+),
+
+holdings_on_chain as (
+    select distinct empresa_id
+    from holdings_on_chain_walk
 )
 {%- endmacro %}
 

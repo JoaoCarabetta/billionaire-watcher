@@ -21,15 +21,12 @@ unit_tests:
       - input: source('fase1_landing', 'susep_dados_cadastrais')
         format: sql
         fixture: empresas_susep_given
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+      - input: ref('int_ownership_edges')
         format: sql
-        fixture: ownership_fre_empty
-      - input: source('br_me_cnpj', 'empresas')
+        fixture: ownership_edges_empty
+      - input: ref('int_ownership_citations')
         format: sql
-        fixture: ownership_qsa_empresas_empty
-      - input: source('br_me_cnpj', 'socios')
-        format: sql
-        fixture: ownership_qsa_socios_empty
+        fixture: ownership_edges_empty
       - input: source('br_me_cnpj', 'estabelecimentos')
         format: sql
         fixture: ownership_qsa_estabelecimentos_empty

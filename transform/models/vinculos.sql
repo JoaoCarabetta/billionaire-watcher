@@ -1,12 +1,9 @@
-with recursive
-{{ ownership_edge_ctes() }},
+with
+{{ ownership_edges_from_int() }},
 
-walk_roots as (
-    select root_empresa_id
-    from {{ ref('int_walk_roots') }}
-),
+{{ company_walk_from_int() }},
 
-{{ ownership_walk_ctes('walk_roots') }},
+{{ walked_ownership_edges_cte() }},
 
 {{ downward_hop_ctes('walked_ownership_edges') }},
 

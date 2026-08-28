@@ -31,3 +31,4 @@ seeds:
 
 vars:
   rf_partition_date: '2026-01-11'
+  ownership_walk_max_depth: 15

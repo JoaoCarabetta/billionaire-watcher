@@ -129,7 +129,7 @@ seed_b_sources as (
     group by empresa_id
 ),
 
-{{ ownership_edge_ctes() }},
+{{ ownership_edges_from_int() }},
 
 seed_companies as (
     select

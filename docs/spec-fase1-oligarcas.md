@@ -239,7 +239,9 @@ Três fontes, uma por família, gravadas em `valor_do_piso` / `fonte_do_piso` /
 De cada empresa em A ∪ B (exceto `nao_caminha`), subir a propriedade até chegar
 a pessoa natural, ou parar em: acionista `Outros`, ações em tesouraria, ou S.A.
 fechada sem livro de acionistas público. Holdings intermediárias citadas entram
-em `empresas` com `motivo_entrada` = `subida`.
+em `empresas` com `motivo_entrada` = `subida`. No armazém, FRE ∪ QSA é
+materializado uma vez (`int_ownership_edges`); a recursão caminha essa tabela
+pequena, não o Quadro de Sócios cru a cada passo.
 
 - **Companhia listada com Formulário de Referência:** usar
   `fre_cia_aberta_posicao_acionaria_YYYY.csv` dentro de

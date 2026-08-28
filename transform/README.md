@@ -31,11 +31,18 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
   provisional identity, with `e_oligarca` true on a seed Formulário door and
   for cited partners of a holding that sits on that door (and the same up
   the chain). Hop citations never change the flag.
+- **`int_ownership_edges`** / **`int_ownership_citations`**: FRE ∪ QSA
+  materialized once. The walk omits Quadro de Sócios where a Formulário
+  exists; the hop reads every citation.
 - **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
   of seed companies allowed to start a walk.
+- **`int_company_walk`**: reachability `(root_empresa_id, empresa_id, depth)`
+  on that edge table. Cycle detection uses a visited array. `vinculos` and
+  `pessoas` read this table; `empresas` still walks locally from its own seed
+  CTE so the DAG does not cycle.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
   `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
-  `person_id_from_cpf`, plus a cross-adapter empty string-array helper.
+  `person_id_from_cpf`, plus cross-adapter array helpers for the walk.
 
 - **CVM staging readers** (`models/staging/`): pure type-cast/normalize readers,
   reusable by the fase 1 pipeline:
@@ -175,16 +182,23 @@ For each seed with `nao_caminha = false`, the recursive walk uses the largest
 `fre_cia_aberta_posicao_acionaria_2026.csv`. Companies without a FRE position
 use Receita `socios` and `empresas` at `rf_partition_date`. It stops at
 `Outros`, treasury shares, closed S.A.s without a public shareholder book,
-unknown shareholder types, and cycles. It does not use
+unknown shareholder types, and cycles. Depth is capped by
+`ownership_walk_max_depth` (15). It does not use
 `fre_cia_historico_emissor`, the frozen public graph, or hop JSON.
 
+FRE and QSA are scanned once into `int_ownership_edges` /
+`int_ownership_citations`. The walk joins that small table (exact key for
+Formulário, eight-digit key for Quadro de Sócios) and does not rescan Receita
+inside recursion.
+
 The unit seam in `tests/unit_test_fase1_ownership_walk.yml` uses the three seed
-registries plus FRE and QSA slices. Alice Controladora is true through
-controller `S` on a seed; Camila Citada is false below 10%; Felipe is true as
-a Quadro de Sócios partner of a Formulário-controller holding; Diana Holding
-is true because her holding sits on that seed door; Ines stays false because
-her controller citation is on a `subida` company that is not on a seed door;
-and the two CPF-less JOAO SILVA citations remain separate.
+registries plus the materialized edge/walk fixtures derived from FRE and QSA
+slices. Alice Controladora is true through controller `S` on a seed; Camila
+Citada is false below 10%; Felipe is true as a Quadro de Sócios partner of a
+Formulário-controller holding; Diana Holding is true because her holding sits
+on that seed door; Ines stays false because her controller citation is on a
+`subida` company that is not on a seed door; and the two CPF-less JOAO SILVA
+citations remain separate.
 
 ### One-hop downward invert
 
