@@ -1,16 +1,32 @@
-with recursive
-{{ ownership_edges_from_int() }},
-
+with
 walk_roots as (
     select root_empresa_id
     from {{ ref('int_walk_roots') }}
 ),
 
-{{ company_walk_from_int() }},
+walked_ownership_edges as (
+    select * from {{ ref('int_walked_ownership_edges') }}
+),
 
-{{ walked_ownership_edges_cte() }},
-
-{{ downward_hop_ctes('walked_ownership_edges') }},
+downward_hop_person_edges as (
+    select
+        cited_empresa_id,
+        fonte,
+        owner_kind,
+        owner_company_id,
+        owner_name,
+        owner_document,
+        owner_cpf,
+        papel,
+        acionista_controlador,
+        participante_acordo_acionistas,
+        percentual_on,
+        percentual_total,
+        qualificacao,
+        data_referencia,
+        fonte_documento
+    from {{ ref('int_downward_hop') }}
+),
 
 seed_door_holdings as (
     select distinct owner_company_id as empresa_id
@@ -26,70 +42,9 @@ seed_door_holdings as (
         )
 ),
 
--- Companies on a cited chain to a seed Formulário door: the door holding
--- itself, then every company that owns it through walked vinculos. Walk
--- up from those doors on the materialized edge table. Hop companies
--- never enter company_walk, so hop citations cannot inherit.
 {{ holdings_on_chain_cte() }},
 
-fortune_company_edges as (
-    select
-        company_key,
-        fonte,
-        owner_company_id,
-        max(percentual_total) as percentual_total
-    from ownership_edges
-    where owner_kind = 'empresa' and owner_company_id is not null
-    group by company_key, fonte, owner_company_id
-),
-
-fortune_company_paths as (
-    select
-        root_empresa_id,
-        root_empresa_id as current_empresa_id,
-        case
-            when length(root_empresa_id) = 14
-                then left(root_empresa_id, 8)
-        end as current_cnpj8,
-        0 as depth,
-        concat('|', root_empresa_id, '|') as visited_path,
-        cast(1.0 as {{ dbt.type_float() }}) as cited_share
-    from walk_roots
-
-    union all
-
-    select
-        paths.root_empresa_id,
-        edges.owner_company_id as current_empresa_id,
-        case
-            when length(edges.owner_company_id) = 14
-                then left(edges.owner_company_id, 8)
-        end as current_cnpj8,
-        paths.depth + 1 as depth,
-        concat(paths.visited_path, edges.owner_company_id, '|') as visited_path,
-        case
-            when
-                paths.cited_share is not null
-                and edges.percentual_total is not null
-                then paths.cited_share * edges.percentual_total / 100.0
-        end as cited_share
-    from fortune_company_paths as paths
-    inner join fortune_company_edges as edges
-        on (
-            edges.fonte != 'qsa'
-            and edges.company_key = paths.current_empresa_id
-        ) or (
-            edges.fonte = 'qsa'
-            and paths.current_cnpj8 is not null
-            and edges.company_key = paths.current_cnpj8
-        )
-    where
-        strpos(
-            paths.visited_path,
-            concat('|', edges.owner_company_id, '|')
-        ) = 0
-        and paths.depth < {{ var('ownership_walk_max_depth', 15) }}
-),
+{{ iterative_fortune_paths('walk_roots', ref('int_pj_cone_edges')) }},
 
 upward_fortune_paths_raw as (
     select
@@ -116,18 +71,12 @@ upward_fortune_paths_raw as (
             and edges.percentual_total is not null
             and coalesce(floors.tem_piso, false) as path_is_valued
     from fortune_company_paths as paths
-    inner join ownership_edges as edges
-        on (
-            edges.fonte != 'qsa'
-            and edges.company_key = paths.current_empresa_id
-        ) or (
-            edges.fonte = 'qsa'
-            and paths.current_cnpj8 is not null
-            and edges.company_key = paths.current_cnpj8
-        )
+    inner join walked_ownership_edges as edges
+        on edges.root_empresa_id = paths.root_empresa_id
+        and edges.cited_empresa_id = paths.current_empresa_id
+        and edges.owner_kind = 'pessoa'
     left join {{ ref('int_empresas_piso') }} as floors
         on paths.root_empresa_id = floors.empresa_id
-    where edges.owner_kind = 'pessoa'
 ),
 
 upward_fortune_paths as (

@@ -9,6 +9,29 @@ unit_tests:
       no-CNPJ exceptions stay in empresas with tem_piso=false.
     model: empresas
     given:
+      - input: ref('int_seed_companies')
+        format: sql
+        fixture: empresas_seed_companies_expect
+      - input: ref('int_walked_ownership_edges')
+        format: sql
+        fixture: walked_ownership_edges_empty
+      - input: ref('int_downward_hop')
+        format: sql
+        fixture: downward_hop_empty
+      - input: ref('int_empresas_piso')
+        format: sql
+        fixture: empresas_pisos_given
+    expect:
+      format: sql
+      fixture: empresas_expect
+
+  - name: test_int_seed_companies_seed_a_union_b
+    description: |
+      Locks the issue 178 seed grain on int_seed_companies: duplicate sources
+      collapse by empresa_id, leading zeros survive, closed groups never walk,
+      and Natura walks whenever it has a full CNPJ.
+    model: int_seed_companies
+    given:
       - input: source('fase1_landing', 'controle_empresas_walk')
         format: sql
         fixture: empresas_seed_a_given
@@ -21,21 +44,9 @@ unit_tests:
       - input: source('fase1_landing', 'susep_dados_cadastrais')
         format: sql
         fixture: empresas_susep_given
-      - input: ref('int_ownership_edges')
-        format: sql
-        fixture: ownership_edges_empty
-      - input: ref('int_ownership_citations')
-        format: sql
-        fixture: ownership_edges_empty
-      - input: source('br_me_cnpj', 'estabelecimentos')
-        format: sql
-        fixture: ownership_qsa_estabelecimentos_empty
-      - input: ref('int_empresas_piso')
-        format: sql
-        fixture: empresas_pisos_given
     expect:
       format: sql
-      fixture: empresas_expect
+      fixture: empresas_seed_companies_expect
 
   - name: test_stg_bolsa_cotahist_piso
     description: |

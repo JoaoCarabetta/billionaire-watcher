@@ -58,6 +58,23 @@ models:
         tests:
           - not_null
 
+  - name: int_seed_companies
+    description: |
+      Seed A ∪ B company door before the upward walk. int_walk_roots and
+      empresas read this table so the walk does not depend on the final
+      empresas grain.
+    columns:
+      - name: empresa_id
+        tests:
+          - not_null
+          - unique
+      - name: razao_social
+        tests:
+          - not_null
+      - name: nao_caminha
+        tests:
+          - not_null
+
   - name: int_walk_roots
     description: Seed-company IDs permitted to start an upward ownership walk.
     columns:
@@ -69,10 +86,10 @@ models:
 
   - name: int_ownership_edges
     description: |
-      FRE ∪ QSA ownership edges used by the upward walk. QSA is omitted when a
-      Formulário exists for that eight-digit CNPJ, and closed S.A.s (2054) never
-      contribute Quadro de Sócios rows. Materialized once so empresas, vinculos,
-      and pessoas do not rescan Receita inside the recursive walk.
+      FRE ∪ QSA ownership edges used by the upward walk, filtered from
+      int_ownership_citations. QSA is omitted when a Formulário exists for
+      that eight-digit CNPJ, and closed S.A.s (2054) never contribute Quadro
+      de Sócios rows.
     columns:
       - name: company_key
         description: Owned-company join key (14-digit CNPJ or name key for FRE; eight-digit CNPJ for QSA).
@@ -106,11 +123,75 @@ models:
               arguments:
                 values: ['fre', 'qsa']
 
+  - name: int_pj_walk_edges
+    description: |
+      Legal-person ownership edges only (~670k). The iterative walk joins this
+      table on from_id and never sees natural-person socios.
+    columns:
+      - name: from_id
+        tests:
+          - not_null
+      - name: to_id
+        tests:
+          - not_null
+
+  - name: int_pj_cone_edges
+    description: |
+      Legal-person edges whose from_id is a company reached by int_company_walk.
+      Fortune and inherit walks use this cone instead of the full PJ graph.
+    columns:
+      - name: from_id
+        tests:
+          - not_null
+      - name: to_id
+        tests:
+          - not_null
+
+  - name: int_rf_headquarters
+    description: |
+      One headquarters CNPJ14 per eight-digit CNPJ, preferring the 0001
+      establishment. The downward hop resolves QSA companies from this table
+      instead of scanning estabelecimentos.
+    columns:
+      - name: cnpj_basico
+        tests:
+          - not_null
+          - unique
+      - name: cnpj
+        tests:
+          - not_null
+
+  - name: int_walked_ownership_edges
+    description: |
+      All FRE and QSA citations on companies reached by int_company_walk,
+      including natural-person socios. One hash join after the PJ walk.
+    columns:
+      - name: root_empresa_id
+        tests:
+          - not_null
+      - name: cited_empresa_id
+        tests:
+          - not_null
+
+  - name: int_downward_hop
+    description: |
+      One-hop downward invert from seed-Formulário oligarchs and the natural
+      people cited on those hop companies. Built once from walked edges,
+      citations, and int_rf_headquarters.
+    columns:
+      - name: empresa_id
+        tests:
+          - not_null
+      - name: cited_empresa_id
+        tests:
+          - not_null
+
   - name: int_company_walk
     description: |
       Reachability from each walkable seed to companies found by walking
-      int_ownership_edges upward. One row per (root, company), with the
-      shortest depth. Cycle detection uses a visited array, not a path string.
+      int_pj_walk_edges upward in 15 iterative BFS expansions. One row per
+      (root, company), with the shortest depth. Immediate self-edges are
+      skipped; the final group-by keeps the shortest depth.
     columns:
       - name: root_empresa_id
         tests:

@@ -280,41 +280,54 @@ all_ownership_citations as (
 {%- endmacro %}
 
 
-{% macro ownership_edges_from_int() -%}
-ownership_edges as (
-    select * from {{ ref('int_ownership_edges') }}
-),
-
-all_ownership_citations as (
-    select * from {{ ref('int_ownership_citations') }}
-),
-
-fre_edges as (
-    select * from {{ ref('int_ownership_edges') }}
-    where fonte = 'fre'
-),
-
-qsa_all_edges as (
-    select * from {{ ref('int_ownership_citations') }}
-    where fonte = 'qsa'
-)
-{%- endmacro %}
-
-
-{% macro company_walk_from_int() -%}
-company_walk as (
+{% macro iterative_company_walk(roots_relation, edges_relation, prefix='company') -%}
+{%- set max_depth = var('ownership_walk_max_depth', 15) | int -%}
+{{ prefix }}_frontier_0 as (
     select
         root_empresa_id,
-        empresa_id as current_empresa_id,
-        empresa_cnpj8 as current_cnpj8,
-        depth
-    from {{ ref('int_company_walk') }}
+        root_empresa_id as empresa_id,
+        case
+            when length(root_empresa_id) = 14
+                then left(root_empresa_id, 8)
+        end as empresa_cnpj8,
+        0 as depth
+    from {{ roots_relation }}
+),
+
+{%- for depth in range(1, max_depth + 1) %}
+{{ prefix }}_frontier_{{ depth }} as (
+    select distinct
+        prev.root_empresa_id,
+        pj.to_id as empresa_id,
+        case
+            when length(pj.to_id) = 14
+                then left(pj.to_id, 8)
+        end as empresa_cnpj8,
+        {{ depth }} as depth
+    from {{ prefix }}_frontier_{{ depth - 1 }} as prev
+    cross join {{ walk_join_key_unnest('prev.empresa_id', 'prev.empresa_cnpj8') }}
+    inner join {{ edges_relation }} as pj
+        on pj.from_id = join_key
+    where
+        join_key is not null
+        and pj.to_id != prev.empresa_id
+),
+{%- endfor %}
+
+{{ prefix }}_walk as (
+    {%- for depth in range(0, max_depth + 1) %}
+    select * from {{ prefix }}_frontier_{{ depth }}
+    {%- if not loop.last %}
+    union all
+    {%- endif %}
+    {%- endfor %}
 )
 {%- endmacro %}
 
 
-{% macro ownership_reachability_cte(roots_cte) -%}
-company_walk as (
+{% macro iterative_fortune_paths(roots_relation, edges_relation) -%}
+{%- set max_depth = var('ownership_walk_max_depth', 15) | int -%}
+fortune_frontier_0 as (
     select
         root_empresa_id,
         root_empresa_id as current_empresa_id,
@@ -323,115 +336,63 @@ company_walk as (
                 then left(root_empresa_id, 8)
         end as current_cnpj8,
         0 as depth,
-        {{ walk_visited_seed('root_empresa_id') }} as visited
-    from {{ roots_cte }}
+        concat('|', root_empresa_id, '|') as visited_path,
+        cast(1.0 as {{ dbt.type_float() }}) as cited_share
+    from {{ roots_relation }}
+),
 
-    union all
-
+{%- for depth in range(1, max_depth + 1) %}
+fortune_frontier_{{ depth }} as (
     select
-        walk.root_empresa_id,
-        edges.owner_company_id as current_empresa_id,
+        prev.root_empresa_id,
+        pj.to_id as current_empresa_id,
         case
-            when length(edges.owner_company_id) = 14
-                then left(edges.owner_company_id, 8)
+            when length(pj.to_id) = 14
+                then left(pj.to_id, 8)
         end as current_cnpj8,
-        walk.depth + 1 as depth,
-        {{ walk_visited_append('walk.visited', 'edges.owner_company_id') }} as visited
-    from company_walk as walk
-    inner join ownership_edges as edges
-        on (
-            edges.fonte != 'qsa'
-            and edges.company_key = walk.current_empresa_id
-        ) or (
-            edges.fonte = 'qsa'
-            and walk.current_cnpj8 is not null
-            and edges.company_key = walk.current_cnpj8
-        )
+        {{ depth }} as depth,
+        concat(prev.visited_path, pj.to_id, '|') as visited_path,
+        case
+            when
+                prev.cited_share is not null
+                and pj.percentual_total is not null
+                then prev.cited_share * pj.percentual_total / 100.0
+        end as cited_share
+    from fortune_frontier_{{ depth - 1 }} as prev
+    cross join {{ walk_join_key_unnest('prev.current_empresa_id', 'prev.current_cnpj8') }}
+    inner join {{ edges_relation }} as pj
+        on pj.from_id = join_key
     where
-        edges.owner_kind = 'empresa'
-        and edges.owner_company_id is not null
-        and {{ walk_id_not_visited('edges.owner_company_id', 'walk.visited') }}
-        and walk.depth < {{ var('ownership_walk_max_depth', 15) }}
+        join_key is not null
+        and strpos(
+            prev.visited_path,
+            concat('|', pj.to_id, '|')
+        ) = 0
+),
+{%- endfor %}
+
+fortune_company_paths as (
+    {%- for depth in range(0, max_depth + 1) %}
+    select * from fortune_frontier_{{ depth }}
+    {%- if not loop.last %}
+    union all
+    {%- endif %}
+    {%- endfor %}
 )
-{%- endmacro %}
-
-
-{% macro walked_ownership_edges_cte() -%}
-walked_ownership_edges as (
-    select distinct
-        walk.root_empresa_id,
-        walk.current_empresa_id as cited_empresa_id,
-        edges.fonte,
-        edges.owner_kind,
-        edges.owner_company_id,
-        edges.owner_name,
-        edges.owner_document,
-        edges.owner_cpf,
-        edges.papel,
-        edges.acionista_controlador,
-        edges.participante_acordo_acionistas,
-        edges.percentual_on,
-        edges.percentual_total,
-        edges.qualificacao,
-        edges.data_referencia,
-        edges.fonte_documento
-    from company_walk as walk
-    inner join ownership_edges as edges
-        on (
-            edges.fonte != 'qsa'
-            and edges.company_key = walk.current_empresa_id
-        ) or (
-            edges.fonte = 'qsa'
-            and walk.current_cnpj8 is not null
-            and edges.company_key = walk.current_cnpj8
-        )
-)
-{%- endmacro %}
-
-
-{% macro ownership_walk_ctes(roots_cte) -%}
-{{ ownership_reachability_cte(roots_cte) }},
-
-{{ walked_ownership_edges_cte() }}
 {%- endmacro %}
 
 
 {% macro holdings_on_chain_cte() -%}
-holdings_on_chain_walk as (
-    select
-        empresa_id,
-        0 as depth,
-        {{ walk_visited_seed('empresa_id') }} as visited
+seed_door_as_roots as (
+    select empresa_id as root_empresa_id
     from seed_door_holdings
-
-    union all
-
-    select
-        edges.owner_company_id as empresa_id,
-        chain.depth + 1 as depth,
-        {{ walk_visited_append('chain.visited', 'edges.owner_company_id') }} as visited
-    from holdings_on_chain_walk as chain
-    inner join ownership_edges as edges
-        on edges.owner_kind = 'empresa'
-        and edges.owner_company_id is not null
-        and (
-            (
-                edges.fonte != 'qsa'
-                and edges.company_key = chain.empresa_id
-            ) or (
-                edges.fonte = 'qsa'
-                and length(chain.empresa_id) = 14
-                and edges.company_key = left(chain.empresa_id, 8)
-            )
-        )
-    where
-        {{ walk_id_not_visited('edges.owner_company_id', 'chain.visited') }}
-        and chain.depth < {{ var('ownership_walk_max_depth', 15) }}
 ),
+
+{{ iterative_company_walk('seed_door_as_roots', ref('int_pj_cone_edges'), 'holdings') }},
 
 holdings_on_chain as (
     select distinct empresa_id
-    from holdings_on_chain_walk
+    from holdings_walk
 )
 {%- endmacro %}
 
@@ -491,31 +452,9 @@ qsa_hop_company_keys as (
         and length(edges.owner_document) = 6
 ),
 
-rf_hop_establishments_ranked as (
-    select
-        lpad({{ digits_only('cnpj_basico') }}, 8, '0') as cnpj_basico,
-        lpad({{ digits_only('cnpj') }}, 14, '0') as cnpj,
-        row_number() over (
-            partition by lpad({{ digits_only('cnpj_basico') }}, 8, '0')
-            order by
-                case
-                    when substr(lpad({{ digits_only('cnpj') }}, 14, '0'), 9, 4) = '0001'
-                        then 0
-                    else 1
-                end,
-                lpad({{ digits_only('cnpj') }}, 14, '0')
-        ) as establishment_row
-    from {{ source('br_me_cnpj', 'estabelecimentos') }}
-    where
-        cast(data as date) = cast('{{ var("rf_partition_date") }}' as date)
-        and length({{ digits_only('cnpj_basico') }}) = 8
-        and length({{ digits_only('cnpj') }}) = 14
-),
-
 rf_hop_headquarters as (
     select cnpj_basico, cnpj
-    from rf_hop_establishments_ranked
-    where establishment_row = 1
+    from {{ ref('int_rf_headquarters') }}
 ),
 
 qsa_hop_companies_resolved as (

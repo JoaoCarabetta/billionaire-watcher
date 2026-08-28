@@ -1,25 +1,4 @@
 unit_tests:
-  - name: test_fase1_int_ownership_edges
-    description: |
-      FRE ∪ filtered QSA edges: latest Formulário document wins, QSA is
-      omitted on an eight-digit CNPJ that has FRE, closed S.A.s (2054) and
-      administrators never enter, and nested Formulário rows point at the
-      parent holding.
-    model: int_ownership_edges
-    given:
-      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
-        format: sql
-        fixture: fase1_e2e_fre_given
-      - input: source('br_me_cnpj', 'empresas')
-        format: sql
-        fixture: fase1_e2e_qsa_empresas_given
-      - input: source('br_me_cnpj', 'socios')
-        format: sql
-        fixture: fase1_e2e_qsa_socios_given
-    expect:
-      format: sql
-      fixture: fase1_e2e_ownership_edges_expect
-
   - name: test_fase1_int_ownership_citations
     description: |
       Hop citations keep QSA rows on companies that also have a Formulário,
@@ -39,6 +18,50 @@ unit_tests:
       format: sql
       fixture: fase1_e2e_ownership_citations_expect
 
+  - name: test_fase1_int_ownership_edges
+    description: |
+      Walk edges are citations minus QSA on an eight-digit CNPJ that has FRE
+      and minus closed S.A.s (2054).
+    model: int_ownership_edges
+    given:
+      - input: ref('int_ownership_citations')
+        format: sql
+        fixture: fase1_e2e_ownership_citations_expect
+      - input: ref('stg_cvm_fre_posicao_acionaria_2026')
+        format: sql
+        fixture: fase1_e2e_fre_given
+      - input: source('br_me_cnpj', 'empresas')
+        format: sql
+        fixture: fase1_e2e_qsa_empresas_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_ownership_edges_expect
+
+  - name: test_fase1_int_pj_walk_edges
+    description: The walk graph keeps only legal-person owners.
+    model: int_pj_walk_edges
+    given:
+      - input: ref('int_ownership_edges')
+        format: sql
+        fixture: fase1_e2e_ownership_edges_expect
+    expect:
+      format: sql
+      fixture: fase1_e2e_pj_walk_edges_expect
+
+  - name: test_fase1_int_pj_cone_edges
+    description: PJ edges whose from_id is a company reached by the walk.
+    model: int_pj_cone_edges
+    given:
+      - input: ref('int_company_walk')
+        format: sql
+        fixture: fase1_e2e_company_walk_expect
+      - input: ref('int_pj_walk_edges')
+        format: sql
+        fixture: fase1_e2e_pj_walk_edges_expect
+    expect:
+      format: sql
+      fixture: fase1_e2e_pj_walk_edges_expect
+
   - name: test_fase1_int_company_walk
     description: |
       Reachability from the three walkable seeds to cited intermediate
@@ -48,20 +71,60 @@ unit_tests:
       - input: ref('int_walk_roots')
         format: sql
         fixture: fase1_e2e_walk_roots_given
+      - input: ref('int_pj_walk_edges')
+        format: sql
+        fixture: fase1_e2e_pj_walk_edges_expect
+    expect:
+      format: sql
+      fixture: fase1_e2e_company_walk_expect
+
+  - name: test_fase1_int_walked_ownership_edges
+    description: Person and company citations attach only to reached companies.
+    model: int_walked_ownership_edges
+    given:
+      - input: ref('int_company_walk')
+        format: sql
+        fixture: fase1_e2e_company_walk_expect
       - input: ref('int_ownership_edges')
         format: sql
         fixture: fase1_e2e_ownership_edges_expect
     expect:
       format: sql
-      fixture: fase1_e2e_company_walk_expect
+      fixture: fase1_e2e_walked_ownership_edges_expect
 
-  - name: test_fase1_ownership_walk_emits_empresas
+  - name: test_fase1_int_rf_headquarters
+    description: One headquarters CNPJ14 per eight-digit key, preferring 0001.
+    model: int_rf_headquarters
+    given:
+      - input: source('br_me_cnpj', 'estabelecimentos')
+        format: sql
+        fixture: fase1_e2e_qsa_estabelecimentos_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_rf_headquarters_expect
+
+  - name: test_fase1_int_downward_hop
     description: |
-      End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
-      registries seed the walk; FRE and QSA legal-person owners enter as subida,
-      including a tipo 3 foreign holding without an invented CNPJ. A QSA mask
-      shared by two stored oligarch CPFs does not admit its company.
-    model: empresas
+      Alice's unique CPF mask admits the QSA hop company; the colliding
+      Carlos/Davi mask does not. FRE hop companies enter with their partners.
+    model: int_downward_hop
+    given:
+      - input: ref('int_walked_ownership_edges')
+        format: sql
+        fixture: fase1_e2e_walked_ownership_edges_expect
+      - input: ref('int_ownership_citations')
+        format: sql
+        fixture: fase1_e2e_ownership_citations_expect
+      - input: ref('int_rf_headquarters')
+        format: sql
+        fixture: fase1_e2e_rf_headquarters_expect
+    expect:
+      format: sql
+      fixture: fase1_e2e_downward_hop_expect
+
+  - name: test_fase1_int_seed_companies
+    description: The three e2e registries collapse to the walkable seed door.
+    model: int_seed_companies
     given:
       - input: source('fase1_landing', 'controle_empresas_walk')
         format: sql
@@ -75,18 +138,30 @@ unit_tests:
       - input: source('fase1_landing', 'susep_dados_cadastrais')
         format: sql
         fixture: fase1_e2e_susep_given
+    expect:
+      format: sql
+      fixture: fase1_e2e_seed_companies_expect
+
+  - name: test_fase1_ownership_walk_emits_empresas
+    description: |
+      End-to-end fase 1 seam, empresas output: the CVM, BCB, and SUSEP
+      registries seed the walk; FRE and QSA legal-person owners enter as subida,
+      including a tipo 3 foreign holding without an invented CNPJ. A QSA mask
+      shared by two stored oligarch CPFs does not admit its company.
+    model: empresas
+    given:
+      - input: ref('int_seed_companies')
+        format: sql
+        fixture: fase1_e2e_seed_companies_expect
+      - input: ref('int_walked_ownership_edges')
+        format: sql
+        fixture: fase1_e2e_walked_ownership_edges_expect
+      - input: ref('int_downward_hop')
+        format: sql
+        fixture: fase1_e2e_downward_hop_expect
       - input: ref('int_empresas_piso')
         format: sql
         fixture: fase1_e2e_empresas_pisos_given
-      - input: ref('int_ownership_edges')
-        format: sql
-        fixture: fase1_e2e_ownership_edges_expect
-      - input: ref('int_ownership_citations')
-        format: sql
-        fixture: fase1_e2e_ownership_citations_expect
-      - input: source('br_me_cnpj', 'estabelecimentos')
-        format: sql
-        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_empresas_expect
@@ -101,21 +176,12 @@ unit_tests:
       FRE documents and administrators do not enter.
     model: vinculos
     given:
-      - input: ref('int_walk_roots')
+      - input: ref('int_walked_ownership_edges')
         format: sql
-        fixture: fase1_e2e_walk_roots_given
-      - input: ref('int_company_walk')
+        fixture: fase1_e2e_walked_ownership_edges_expect
+      - input: ref('int_downward_hop')
         format: sql
-        fixture: fase1_e2e_company_walk_expect
-      - input: ref('int_ownership_edges')
-        format: sql
-        fixture: fase1_e2e_ownership_edges_expect
-      - input: ref('int_ownership_citations')
-        format: sql
-        fixture: fase1_e2e_ownership_citations_expect
-      - input: source('br_me_cnpj', 'estabelecimentos')
-        format: sql
-        fixture: fase1_e2e_qsa_estabelecimentos_given
+        fixture: fase1_e2e_downward_hop_expect
     expect:
       format: sql
       fixture: fase1_e2e_vinculos_expect
@@ -174,21 +240,18 @@ unit_tests:
       - input: ref('int_walk_roots')
         format: sql
         fixture: fase1_e2e_walk_roots_given
-      - input: ref('int_company_walk')
+      - input: ref('int_walked_ownership_edges')
         format: sql
-        fixture: fase1_e2e_company_walk_expect
+        fixture: fase1_e2e_walked_ownership_edges_expect
+      - input: ref('int_downward_hop')
+        format: sql
+        fixture: fase1_e2e_downward_hop_expect
+      - input: ref('int_pj_cone_edges')
+        format: sql
+        fixture: fase1_e2e_pj_walk_edges_expect
       - input: ref('int_empresas_piso')
         format: sql
         fixture: fase1_e2e_empresas_pisos_given
-      - input: ref('int_ownership_edges')
-        format: sql
-        fixture: fase1_e2e_ownership_edges_expect
-      - input: ref('int_ownership_citations')
-        format: sql
-        fixture: fase1_e2e_ownership_citations_expect
-      - input: source('br_me_cnpj', 'estabelecimentos')
-        format: sql
-        fixture: fase1_e2e_qsa_estabelecimentos_given
     expect:
       format: sql
       fixture: fase1_e2e_pessoas_expect

@@ -28,3 +28,12 @@ list_append({{ visited_expression }}, {{ id_expression }})
 not list_contains({{ visited_expression }}, {{ id_expression }})
 {%- endif -%}
 {%- endmacro %}
+
+
+{% macro walk_join_key_unnest(id_expression, cnpj8_expression) -%}
+{%- if target.type == 'bigquery' -%}
+unnest([{{ id_expression }}, {{ cnpj8_expression }}]) as join_key
+{%- else -%}
+unnest([{{ id_expression }}, {{ cnpj8_expression }}]) as _walk_jk(join_key)
+{%- endif -%}
+{%- endmacro %}

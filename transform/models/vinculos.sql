@@ -1,13 +1,4 @@
-with
-{{ ownership_edges_from_int() }},
-
-{{ company_walk_from_int() }},
-
-{{ walked_ownership_edges_cte() }},
-
-{{ downward_hop_ctes('walked_ownership_edges') }},
-
-all_person_edges as (
+with all_person_edges as (
     select
         cited_empresa_id,
         owner_name,
@@ -21,7 +12,7 @@ all_person_edges as (
         qualificacao,
         data_referencia,
         fonte_documento
-    from walked_ownership_edges
+    from {{ ref('int_walked_ownership_edges') }}
     where owner_kind = 'pessoa'
 
     union all
@@ -39,7 +30,7 @@ all_person_edges as (
         qualificacao,
         data_referencia,
         fonte_documento
-    from downward_hop_person_edges
+    from {{ ref('int_downward_hop') }}
 ),
 
 raw_vinculos as (
@@ -79,7 +70,7 @@ raw_vinculos as (
         qualificacao,
         data_referencia,
         fonte_documento
-    from walked_ownership_edges
+    from {{ ref('int_walked_ownership_edges') }}
     where owner_kind = 'empresa' and owner_company_id is not null
 )
 

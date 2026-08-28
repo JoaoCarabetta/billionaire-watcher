@@ -240,8 +240,11 @@ De cada empresa em A ∪ B (exceto `nao_caminha`), subir a propriedade até cheg
 a pessoa natural, ou parar em: acionista `Outros`, ações em tesouraria, ou S.A.
 fechada sem livro de acionistas público. Holdings intermediárias citadas entram
 em `empresas` com `motivo_entrada` = `subida`. No armazém, FRE ∪ QSA é
-materializado uma vez (`int_ownership_edges`); a recursão caminha essa tabela
-pequena, não o Quadro de Sócios cru a cada passo.
+materializado uma vez (`int_ownership_citations` → `int_ownership_edges`); a
+caminhada sobe só as arestas PJ (`int_pj_walk_edges`, ~670k) em expansões BFS
+iterativas, sem CTE recursiva e sem os 24 milhões de sócios pessoa a cada
+passo. Fortuna e herança de `e_oligarca` usam o cone já alcançado
+(`int_pj_cone_edges`).
 
 - **Companhia listada com Formulário de Referência:** usar
   `fre_cia_aberta_posicao_acionaria_YYYY.csv` dentro de

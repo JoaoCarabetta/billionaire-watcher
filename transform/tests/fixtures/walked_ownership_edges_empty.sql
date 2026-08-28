@@ -1,0 +1,18 @@
+select
+  cast(null as varchar) as root_empresa_id,
+  cast(null as varchar) as cited_empresa_id,
+  cast(null as varchar) as fonte,
+  cast(null as varchar) as owner_kind,
+  cast(null as varchar) as owner_company_id,
+  cast(null as varchar) as owner_name,
+  cast(null as varchar) as owner_document,
+  cast(null as varchar) as owner_cpf,
+  cast(null as varchar) as papel,
+  cast(null as boolean) as acionista_controlador,
+  cast(null as boolean) as participante_acordo_acionistas,
+  cast(null as double) as percentual_on,
+  cast(null as double) as percentual_total,
+  cast(null as varchar) as qualificacao,
+  cast(null as date) as data_referencia,
+  cast(null as varchar) as fonte_documento
+where false

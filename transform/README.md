@@ -12,11 +12,10 @@ pipeline — the node tables `empresas` and `pessoas`, the written edge table
 [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
 Issues #178, #179, and #181 implement the company door and ownership walk:
 
-- **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
-  from seed A union the CVM, BCB, and SUSEP seed-B registries, plus intermediate
-  holdings cited during the upward walk with `motivo_entrada = subida` and
-  companies found by the one-hop invert with `motivo_entrada = hop`. It
-  left-joins optional size floors without dropping uncovered companies.
+- **`empresas`** (`models/empresas.sql`): one company per `empresa_id`. It
+  unions `int_seed_companies` with holdings from `int_walked_ownership_edges`
+  (`motivo_entrada = subida`) and hop companies from `int_downward_hop`.
+  Size floors join without dropping uncovered companies.
 - **`vinculos`** (`models/vinculos.sql`): every cited person-company edge plus
   each company-company edge traversed by the upward walk. The destination is
   always the owned company.
@@ -31,15 +30,22 @@ Issues #178, #179, and #181 implement the company door and ownership walk:
   provisional identity, with `e_oligarca` true on a seed Formulário door and
   for cited partners of a holding that sits on that door (and the same up
   the chain). Hop citations never change the flag.
-- **`int_ownership_edges`** / **`int_ownership_citations`**: FRE ∪ QSA
-  materialized once. The walk omits Quadro de Sócios where a Formulário
-  exists; the hop reads every citation.
-- **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
-  of seed companies allowed to start a walk.
+- **`int_ownership_citations`**: FRE ∪ QSA scanned once. The hop reads this
+  table, including Quadro de Sócios on companies that also have a Formulário.
+- **`int_ownership_edges`**: citations minus QSA on a Formulário issuer CNPJ8
+  and minus closed S.A.s (2054).
+- **`int_pj_walk_edges`**: legal-person edges only (~670k). The iterative walk
+  hash-joins `from_id` and never sees natural-person socios.
+- **`int_pj_cone_edges`**: PJ edges inside the walked cone. Fortune and inherit
+  walk this table instead of the full 670k graph.
+- **`int_seed_companies`** / **`int_walk_roots`**: seed A ∪ B, then the
+  walkable subset. Roots do not depend on `empresas`.
 - **`int_company_walk`**: reachability `(root_empresa_id, empresa_id, depth)`
-  on that edge table. Cycle detection uses a visited array. `vinculos` and
-  `pessoas` read this table; `empresas` still walks locally from its own seed
-  CTE so the DAG does not cycle.
+  on the PJ graph via 15 iterative BFS expansions (not a recursive CTE).
+- **`int_walked_ownership_edges`**: all citations on reached companies, one
+  hash join after the walk.
+- **`int_rf_headquarters`** / **`int_downward_hop`**: one headquarters CNPJ14
+  per CNPJ8; the hop resolves QSA companies from that table.
 - **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
   `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
   `person_id_from_cpf`, plus cross-adapter array helpers for the walk.
@@ -177,7 +183,7 @@ document.
 
 ### Upward ownership walk
 
-For each seed with `nao_caminha = false`, the recursive walk uses the largest
+For each seed with `nao_caminha = false`, the walk uses the largest
 `ID_Documento` per company from
 `fre_cia_aberta_posicao_acionaria_2026.csv`. Companies without a FRE position
 use Receita `socios` and `empresas` at `rf_partition_date`. It stops at
@@ -186,10 +192,10 @@ unknown shareholder types, and cycles. Depth is capped by
 `ownership_walk_max_depth` (15). It does not use
 `fre_cia_historico_emissor`, the frozen public graph, or hop JSON.
 
-FRE and QSA are scanned once into `int_ownership_edges` /
-`int_ownership_citations`. The walk joins that small table (exact key for
-Formulário, eight-digit key for Quadro de Sócios) and does not rescan Receita
-inside recursion.
+FRE and QSA are scanned once into `int_ownership_citations`. The walk uses
+`int_pj_walk_edges` (legal-person owners only) with a hash join on `from_id`
+and 15 iterative BFS expansions. Natural-person socios attach afterwards in
+`int_walked_ownership_edges`. Fortune and inherit walk `int_pj_cone_edges`.
 
 The unit seam in `tests/unit_test_fase1_ownership_walk.yml` uses the three seed
 registries plus the materialized edge/walk fixtures derived from FRE and QSA
