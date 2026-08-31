@@ -1,0 +1,11 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+data,data,date,Receita snapshot partition copied from basedosdados.br_me_cnpj.empresas.,2026-01(1)2026-01,no,,,
+ano,ano,int64,Year extracted from the partition date.,(1),no,,,
+mes,mes,int64,Month extracted from the partition date.,(1),no,,,
+cnpj_basico,cnpj_basico,string,8-digit company root. One row per company in the snapshot.,(1),no,,,
+razao_social,razao_social,string,Legal name.,(1),no,,,
+natureza_juridica,natureza_juridica,string,"Legal-nature code, 4 digits. Walk later skips 2054 (SA fechada) because QSA is not a public book.",(1),yes,,,
+qualificacao_responsavel,qualificacao_responsavel,string,Qualification of the responsible person.,(1),yes,,,
+capital_social,capital_social,float64,Share capital as filed.,(1),no,,BRL,
+porte,porte,string,Company size class.,(1),yes,,,
+ente_federativo,ente_federativo,string,Federative entity when the company is public.,(1),no,,,

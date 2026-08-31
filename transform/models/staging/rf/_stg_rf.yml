@@ -1,0 +1,346 @@
+version: 2
+
+models:
+  - name: stg_rf_socio
+    description: >
+      Receita QSA partners at rf_partition_date, copied from basedosdados.br_me_cnpj.socios. One row per partner citation. No natural primary key. Ownership qualificacao filter is not applied.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+          description: >
+            cnpj_basico is 8 digits.
+          config:
+            where: "data = '{{ var('rf_partition_date') }}'"
+    columns:
+      - name: data
+        data_type: date
+        description: >
+          Receita snapshot partition copied from basedosdados.br_me_cnpj.socios.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: ano
+        data_type: int64
+        description: >
+          Year extracted from the partition date.
+      - name: mes
+        data_type: int64
+        description: >
+          Month extracted from the partition date.
+      - name: cnpj_basico
+        data_type: string
+        description: >
+          8-digit company root. Leading zeros preserved.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: tipo
+        data_type: string
+        description: >
+          Partner type: 1 PJ, 2 PF, 3 foreign.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['1', '2', '3']
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: nome
+        data_type: string
+        description: >
+          Partner name or razão social as filed.
+      - name: documento
+        data_type: string
+        description: >
+          Masked CPF or CNPJ. Match later with a mask derived from the warehouse CPF, never by name alone.
+      - name: qualificacao
+        data_type: string
+        description: >
+          RF qualification code, 2 digits. Walk later keeps the ownership set and drops administrators.
+      - name: data_entrada_sociedade
+        data_type: date
+        description: >
+          Date the partner entered the company.
+      - name: id_pais
+        data_type: string
+        description: >
+          Country id when published.
+      - name: cpf_representante_legal
+        data_type: string
+        description: >
+          Legal-representative CPF (often masked).
+      - name: nome_representante_legal
+        data_type: string
+        description: >
+          Legal-representative name.
+      - name: qualificacao_representante_legal
+        data_type: string
+        description: >
+          Legal-representative qualification code.
+      - name: faixa_etaria
+        data_type: string
+        description: >
+          Age band of a natural-person partner.
+  - name: stg_rf_empresa
+    description: >
+      Receita company registry at rf_partition_date, copied from basedosdados.br_me_cnpj.empresas. One row per cnpj_basico. natureza_juridica 2054 (SA fechada) stays in staging.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data
+              - cnpj_basico
+          config:
+            where: "data = '{{ var('rf_partition_date') }}'"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+          description: >
+            cnpj_basico is 8 digits.
+          config:
+            where: "data = '{{ var('rf_partition_date') }}'"
+    columns:
+      - name: data
+        data_type: date
+        description: >
+          Receita snapshot partition copied from basedosdados.br_me_cnpj.empresas.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: ano
+        data_type: int64
+        description: >
+          Year extracted from the partition date.
+      - name: mes
+        data_type: int64
+        description: >
+          Month extracted from the partition date.
+      - name: cnpj_basico
+        data_type: string
+        description: >
+          8-digit company root. One row per company in the snapshot.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name.
+      - name: natureza_juridica
+        data_type: string
+        description: >
+          Legal-nature code, 4 digits. Walk later skips 2054 (SA fechada) because QSA is not a public book.
+      - name: qualificacao_responsavel
+        data_type: string
+        description: >
+          Qualification of the responsible person.
+      - name: capital_social
+        data_type: float64
+        description: >
+          Share capital as filed.
+      - name: porte
+        data_type: string
+        description: >
+          Company size class.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['00', '01', '03', '05']
+              config:
+                severity: warn
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: ente_federativo
+        data_type: string
+        description: >
+          Federative entity when the company is public.
+  - name: stg_rf_estabelecimento
+    description: >
+      Receita establishments at rf_partition_date, copied from basedosdados.br_me_cnpj.estabelecimentos. One row per 14-digit cnpj.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data
+              - cnpj
+          config:
+            where: "data = '{{ var('rf_partition_date') }}'"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "cnpj is null or length(cnpj) = 14"
+          description: >
+            Establishment CNPJ is 14 digits.
+          config:
+            where: "data = '{{ var('rf_partition_date') }}'"
+    columns:
+      - name: data
+        data_type: date
+        description: >
+          Receita snapshot partition copied from basedosdados.br_me_cnpj.estabelecimentos.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: ano
+        data_type: int64
+        description: >
+          Year extracted from the partition date.
+      - name: mes
+        data_type: int64
+        description: >
+          Month extracted from the partition date.
+      - name: cnpj
+        data_type: string
+        description: >
+          14-digit establishment CNPJ.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: cnpj_basico
+        data_type: string
+        description: >
+          8-digit company root.
+        data_tests:
+          - not_null:
+              config:
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: cnpj_ordem
+        data_type: string
+        description: >
+          4-digit establishment order. Headquarters are 0001.
+      - name: cnpj_dv
+        data_type: string
+        description: >
+          2-digit check digits.
+      - name: identificador_matriz_filial
+        data_type: string
+        description: >
+          1 matriz / 2 filial.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['1', '2']
+              config:
+                severity: warn
+                where: "data = '{{ var('rf_partition_date') }}'"
+      - name: nome_fantasia
+        data_type: string
+        description: >
+          Trade name of the establishment.
+      - name: situacao_cadastral
+        data_type: string
+        description: >
+          Cadastral situation code.
+      - name: data_situacao_cadastral
+        data_type: date
+        description: >
+          Date of the current cadastral situation.
+      - name: motivo_situacao_cadastral
+        data_type: string
+        description: >
+          Motive of the cadastral situation.
+      - name: nome_cidade_exterior
+        data_type: string
+        description: >
+          Foreign city when the establishment is abroad.
+      - name: id_pais
+        data_type: string
+        description: >
+          Country id.
+      - name: data_inicio_atividade
+        data_type: date
+        description: >
+          Activity start date.
+      - name: cnae_fiscal_principal
+        data_type: string
+        description: >
+          Primary CNAE.
+      - name: cnae_fiscal_secundaria
+        data_type: string
+        description: >
+          Secondary CNAEs, source delimiter preserved.
+      - name: sigla_uf
+        data_type: string
+        description: >
+          Federation unit.
+      - name: id_municipio
+        data_type: string
+        description: >
+          IBGE 7-digit municipality id.
+      - name: id_municipio_rf
+        data_type: string
+        description: >
+          Receita municipality id, distinct from IBGE.
+      - name: tipo_logradouro
+        data_type: string
+        description: >
+          Street type.
+      - name: logradouro
+        data_type: string
+        description: >
+          Street name.
+      - name: numero
+        data_type: string
+        description: >
+          Street number.
+      - name: complemento
+        data_type: string
+        description: >
+          Address complement.
+      - name: bairro
+        data_type: string
+        description: >
+          Neighborhood.
+      - name: cep
+        data_type: string
+        description: >
+          Postal code.
+      - name: ddd_1
+        data_type: string
+        description: >
+          Primary telephone area code.
+      - name: telefone_1
+        data_type: string
+        description: >
+          Primary telephone.
+      - name: ddd_2
+        data_type: string
+        description: >
+          Secondary telephone area code.
+      - name: telefone_2
+        data_type: string
+        description: >
+          Secondary telephone.
+      - name: ddd_fax
+        data_type: string
+        description: >
+          Fax area code.
+      - name: fax
+        data_type: string
+        description: >
+          Fax number.
+      - name: email
+        data_type: string
+        description: >
+          Establishment email.
+      - name: situacao_especial
+        data_type: string
+        description: >
+          Special situation when present.
+      - name: data_situacao_especial
+        data_type: date
+        description: >
+          Special-situation date.

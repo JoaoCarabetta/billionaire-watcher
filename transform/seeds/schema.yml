@@ -8,6 +8,44 @@ version: 2
 # They are NOT warehouse raw inputs and must not be loaded into raw, staging, or marts.
 
 seeds:
+  - name: dicionario
+    description: |
+      Unified Base dos Dados-style dictionary for coded staging columns.
+      One row per (table, column, key). Enabled on every target, unlike the
+      frozen v0 site seeds. Keys keep leading zeros when the digit count is
+      meaningful (qualificacao 2 digits, natureza_juridica 4).
+    config:
+      enabled: true
+      column_types:
+        id_tabela: STRING
+        nome_coluna: STRING
+        chave: STRING
+        valor: STRING
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_tabela
+              - nome_coluna
+              - chave
+    columns:
+      - name: id_tabela
+        description: Staging model name (stg_*)
+        tests:
+          - not_null
+      - name: nome_coluna
+        description: Staging column name
+        tests:
+          - not_null
+      - name: chave
+        description: Source code / enum key as stored after hygiene
+        tests:
+          - not_null
+      - name: valor
+        description: Human-readable label (inicial maiúscula, resto minúsculo)
+        tests:
+          - not_null
+
   - name: b3_listed_prices
     description: |
       Warehouse-enabled, dated closes for the verified Bolsa classes used by /grafo.

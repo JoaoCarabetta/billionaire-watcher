@@ -1,0 +1,78 @@
+version: 2
+
+models:
+  - name: stg_valor_empresa_inventario
+    description: >
+      Valor 1000 walk inventory (seed A), typed and renamed. One row per inventory company. identificador is not unique: the sentinel vazio is shared by companies without a CNPJ, and a handful of names repeat. Hygiene only — no seed filter.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            id_cnpj is 14 digits when the inventory key is a CNPJ. Canonical JBS is 02916265000160.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Vintage of the Valor 1000 inventory used as seed A.
+        data_tests:
+          - not_null
+      - name: identificador
+        data_type: string
+        description: >
+          Source inventory key: 14-digit CNPJ, closed-group slug (folha/globo/havan/record), or the sentinel vazio when the magazine row has no CNPJ.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          14-digit CNPJ when identificador is digits-only; null for slugs and vazio.
+      - name: nome
+        data_type: string
+        description: >
+          Display name as published in the walk inventory (razão-ish, not a legal name key).
+        data_tests:
+          - not_null
+      - name: tipo_societario
+        data_type: string
+        description: >
+          Legal form as classified in the inventory.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['sociedade anônima aberta', 'sociedade anônima fechada', 'desconhecido']
+      - name: indicador_grafo
+        data_type: string
+        description: >
+          Whether the company already sits on the frozen v0 public graph.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['sim', 'não']
+      - name: motivo
+        data_type: string
+        description: >
+          Free-text reason the row is in the inventory (rank family, extra, skip).
+      - name: situacao_passeio
+        data_type: string
+        description: >
+          Walk status assigned when the inventory was built.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['só inventário', 'árvore no grafo', 'pulada-já-semente', 'grupo sem sócio', 'buraco', 'inventário-fechada-não-andar']
+      - name: indicador_formulario
+        data_type: string
+        description: >
+          Whether a Formulário de Referência shareholder file was found.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['sim', 'não', 'buraco']
+      - name: notas
+        data_type: string
+        description: >
+          Operator notes; mostly empty.

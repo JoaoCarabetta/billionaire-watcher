@@ -1,0 +1,137 @@
+version: 2
+
+models:
+  - name: stg_bcb_entidade_supervisionada
+    description: >
+      BCB Unicad supervised entities, typed and renamed. Seed-B tipo/situação/0001 filters are not applied here.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Unicad line CNPJ is 14 digits.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "cnpj_basico is null or length(cnpj_basico) = 8"
+          description: >
+            Institution CNPJ is 8 digits.
+    columns:
+      - name: data_base
+        data_type: date
+        description: >
+          Unicad dataBase used in the OData call.
+      - name: id_cnpj
+        data_type: string
+        description: >
+          14-digit CNPJ of this Unicad row (line identifier). Headquarters end in 0001.
+        data_tests:
+          - unique
+          - not_null
+      - name: cnpj_basico
+        data_type: string
+        description: >
+          8-digit institution CNPJ. Join key to IF.data.
+        data_tests:
+          - not_null
+      - name: nome
+        data_type: string
+        description: >
+          Supervised-entity name.
+      - name: tipo_situacao
+        data_type: string
+        description: >
+          Legal-person situation code. Seed B later keeps 3 (em funcionamento).
+      - name: tipo_entidade
+        data_type: string
+        description: >
+          Supervised-entity type. Seed B later keeps {2,4,5,6,7,8,13,28,39} and drops {3,9,11}.
+  - name: stg_bcb_ifdata_cadastro
+    description: >
+      IF.data quarter registry mapping reporter codes to the leading CNPJ8. Situacao = A is applied in the floor model.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: data
+        data_type: date
+        description: >
+          IF.data quarter date for this reporter.
+      - name: ano_mes
+        data_type: string
+        description: >
+          YYYYMM quarter derived from Data. Not a landed column of its own.
+      - name: id_instituicao
+        data_type: string
+        description: >
+          Reporter code. Join to valores via coalesce(id_conglomerado_prudencial, id_instituicao).
+        data_tests:
+          - unique
+          - not_null
+      - name: id_conglomerado_prudencial
+        data_type: string
+        description: >
+          Prudential conglomerate code when the reporter is a member.
+      - name: cnpj_basico_lider
+        data_type: string
+        description: >
+          Leading institution CNPJ8.
+      - name: nome
+        data_type: string
+        description: >
+          Reporter name.
+      - name: situacao
+        data_type: string
+        description: >
+          Reporter situation. Floor later keeps A.
+  - name: stg_bcb_ifdata_ativo_total
+    description: >
+      IF.data Relatorio 2 Conta 140220 (Ativo Total), prudential grain. The landed extract is already TipoInstituicao=1.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - tipo_instituicao
+              - id_instituicao
+              - ano_mes
+              - conta
+    columns:
+      - name: ano_mes
+        data_type: string
+        description: >
+          YYYYMM of the IF.data quarter.
+        data_tests:
+          - not_null
+      - name: tipo_instituicao
+        data_type: int64
+        description: >
+          Institution grain. Landed extract is already TipoInstituicao=1 (prudential). Never mix 2 or 3.
+      - name: id_instituicao
+        data_type: string
+        description: >
+          Prudential reporter code. Joins cadastro.
+        data_tests:
+          - not_null
+      - name: numero_relatorio
+        data_type: string
+        description: >
+          Report number. Landed extract is Relatorio 2.
+      - name: conta
+        data_type: string
+        description: >
+          Account code. Landed extract is 140220 (Ativo Total).
+        data_tests:
+          - not_null
+      - name: nome_conta
+        data_type: string
+        description: >
+          Account label as published.
+      - name: saldo
+        data_type: numeric
+        description: >
+          Ativo Total balance. Floor later uses this as valor_do_piso.

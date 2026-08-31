@@ -257,12 +257,15 @@ em `empresas` com `motivo_entrada` = `subida`.
   `tem_informacao_de_controle` = não. **Nunca** mintar administradores ou
   diretores como donos.
 
-Os leitores dbt mantidos no repositório
-(`stg_cvm_fre_posicao_acionaria_2026`, `stg_cvm_fre_capital_social_2026`,
-`stg_cvm_cad_cia_aberta`) são reutilizáveis: são somente leitura, sem grão
-antigo. O JSON `public/grafo-publico.json` e o grafo de hops de 2189 nós da
-issue #174 **não** são fonte de verdade — permanecem apenas como artefato v0 do
-site.
+Os leitores dbt de staging
+(`stg_cvm_fre_posicao_acionaria`, `stg_cvm_fre_capital_social`,
+`stg_cvm_cia_aberta` e os demais `stg_*` em `transform/models/staging/`) são
+somente higiene (tipos, `lpad`, nomes Base dos Dados). Não aplicam o filtro
+da semente B. Os nomes originais das colunas-fonte (`CNPJ_CIA`,
+`Acionista_Controlador`, …) continuam a ser a citação; o mapa para o nome
+padronizado está em `transform/architecture/`. O JSON `public/grafo-publico.json`
+e o grafo de hops de 2189 nós da issue #174 **não** são fonte de verdade —
+permanecem apenas como artefato v0 do site.
 
 #### Para baixo (um hop, travado)
 
