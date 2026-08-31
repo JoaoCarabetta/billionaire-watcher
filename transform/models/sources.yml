@@ -1,178 +1,104 @@
 version: 2
 
 sources:
-  - name: fase1_landing
-    description: |
-      Raw fase 1 company-door and size-floor files landed in GCS. Repository
-      downloaders preserve source fields; dbt owns normalization and business
-      logic. CNPJ columns in external tables must always be declared STRING.
+  - name: valor
+    description: Valor 1000 inventory used as seed A. Editorial starting list, not the oligarch definition.
     database: billionairewatcher
-    schema: billionaire_watcher_raw
+    schema: raw
     tables:
       - name: controle_empresas_walk
-        description: Repository inventory used as seed A.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv
-            encoding: UTF-8
-            field_delimiter: ";"
-            skip_leading_rows: 1
-      - name: bcb_entidades_supervisionadas
-        description: Banco Central Unicad entities for the configured reference date.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/bcb_entidades_supervisionadas.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: susep_dados_cadastrais
-        description: Full SUSEP DadosCadastrais dump, fetched without $top.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/susep_dados_cadastrais.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_listed_companies
-        description: GetInitialCompanies response rows restricted to type=1.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_companies.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_listed_supplement
-        description: GetListedSupplementCompany share quantities for type=1 issuers.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_supplement.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_cotahist_2026
+        identifier: valor_controle_empresas_walk
         description: |
-          B3 COTAHIST_A2026 records with TPMERC=010 and CODBDI=02. PREULT is
-          retained as integer cents. This is not the Base dos Dados trade tape.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_cotahist_2026.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: cvm_fca_valor_mobiliario_2026
-        description: CVM FCA securities file used to map Codigo_Negociacao to CNPJ.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/cvm_fca_valor_mobiliario_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-      - name: ifdata_cadastro
-        description: |
-          IF.data quarter registry used to map prudential reporter codes to
-          the leading institution's 8-digit CNPJ.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_cadastro.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: ifdata_ativo_total_prudencial
-        description: |
-          IF.data Relatorio 2, Conta 140220 (Ativo Total), exclusively at
-          TipoInstituicao=1 (prudential) grain.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_ativo_total_prudencial.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: susep_receitas_seguros_2026
-        description: SUSEP ReceitasSeguros(Ano='2026') premiums rows.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/susep_receitas_seguros_2026.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
+          Repository inventory at data/controle-empresas-walk.csv, landed as-is.
+          CNPJ lives in identificador and must stay STRING.
 
-  - name: br_me_cnpj
-    description: Base dos Dados - Receita Federal CNPJ tables
-    database: basedosdados
-    schema: br_me_cnpj
+  - name: cvm
+    description: Comissão de Valores Mobiliários files landed in GCS. All identifier columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: cad_cia_aberta
+        identifier: cvm_cad_cia_aberta
+        description: Listed-company registry. Filter SIT in staging, not here.
+      - name: fre_posicao_acionaria_2026
+        identifier: cvm_fre_posicao_acionaria_2026
+        description: FRE shareholder positions for 2026. CPF_CNPJ fields may be masked.
+      - name: fre_capital_social_2026
+        identifier: cvm_fre_capital_social_2026
+        description: |
+          FRE item 17.1 capital social 2026. Autorizado / Emitido / Subscrito /
+          Integralizado are different views, not addends.
+      - name: fca_valor_mobiliario_2026
+        identifier: cvm_fca_valor_mobiliario_2026
+        description: FCA securities file used later to map Codigo_Negociacao to CNPJ.
+
+  - name: bcb
+    description: Banco Central Unicad and IF.data extracts. CNPJ columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: entidades_supervisionadas
+        identifier: bcb_entidades_supervisionadas
+        description: Unicad entities for the configured dataBase. Seed filters belong in staging.
+      - name: ifdata_cadastro
+        identifier: bcb_ifdata_cadastro
+        description: IF.data quarter registry mapping reporter codes to the leading CNPJ8.
+      - name: ifdata_ativo_total_prudencial
+        identifier: bcb_ifdata_ativo_total_prudencial
+        description: |
+          IF.data Relatorio 2, Conta 140220 (Ativo Total), TipoInstituicao=1 only.
+
+  - name: susep
+    description: Superintendência de Seguros Privados extracts. CNPJ columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: dados_cadastrais
+        identifier: susep_dados_cadastrais
+        description: Full DadosCadastrais dump, fetched without $top.
+      - name: receitas_seguros_2026
+        identifier: susep_receitas_seguros_2026
+        description: ReceitasSeguros(Ano='2026') emitted premiums. Not SES premio_ganho.
+
+  - name: b3
+    description: Brasil Bolsa Balcão listed-company and official close extracts.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: listed_companies
+        identifier: b3_listed_companies
+        description: GetInitialCompanies rows restricted to type=1.
+      - name: listed_supplement
+        identifier: b3_listed_supplement
+        description: GetListedSupplementCompany share quantities for type=1 issuers.
+      - name: cotahist_2026
+        identifier: b3_cotahist_2026
+        description: |
+          COTAHIST_A2026 records with TPMERC=010 and CODBDI=02. PREULT is
+          integer cents. This is not the Base dos Dados trade tape.
+
+  - name: rf
+    description: |
+      Receita Federal CNPJ snapshot copied from Base dos Dados into this
+      project. One partition only. Downstream models must not query
+      basedosdados.br_me_cnpj directly.
+    database: billionairewatcher
+    schema: raw
     tables:
       - name: socios
-        description: RF CNPJ sócios (partners), partitioned by data
-        columns:
-          - name: data
-            description: Partition date
-          - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
-          - name: tipo
-            description: Partner type (PJ/PF)
-          - name: nome
-            description: Partner name
-          - name: documento
-            description: CPF or CNPJ (masked per BD)
-          - name: qualificacao
-            description: Partner qualification code
-          
+        identifier: rf_socios
+        description: QSA partners at rf_partition_date. documento may be masked.
       - name: empresas
-        description: RF CNPJ empresas (companies), partitioned by data
-        columns:
-          - name: data
-            description: Partition date
-          - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
-          - name: razao_social
-            description: Company legal name
-          - name: natureza_juridica
-            description: Legal nature code
-          - name: capital_social
-            description: Share capital
-          
+        identifier: rf_empresas
+        description: Company registry at rf_partition_date. cnpj_basico is 8-digit STRING.
       - name: estabelecimentos
-        description: RF CNPJ estabelecimentos (establishments), partitioned by data
-        columns:
-          - name: data
-            description: Partition date
-          - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
-          - name: cnpj
-            description: 14-digit full CNPJ (STRING with leading zeros)
+        identifier: rf_estabelecimentos
+        description: Establishments at rf_partition_date. cnpj is 14-digit STRING.
 
-  - name: gcs_cvm
-    description: CVM files on GCS (latin-1, semicolon-delimited)
+  - name: warehouse
+    description: Load inventory for the raw dataset.
     database: billionairewatcher
-    schema: billionaire_watcher_raw
+    schema: raw
     tables:
-      - name: fre_posicao_acionaria_2026
-        description: CVM FRE shareholder position 2026 (external table from GCS)
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_posicao_acionaria_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-          
-      - name: cad_cia_aberta
-        description: CVM registered listed companies (external table from GCS)
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-
-      - name: fre_capital_social_2026
-        description: |
-          CVM FRE item 17.1 capital social 2026 (external table from GCS).
-          Company-level Quantidade_Acoes_Ordinarias / Quantidade_Acoes_Preferenciais.
-          Do not sum Tipo_Capital rows (Autorizado / Emitido / Subscrito / Integralizado
-          are different views of the same capital, not addends).
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_capital_social_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
+      - name: _manifest
+        description: One row per raw table with source URL, as-of date, GCS URI, checksum, and row count.
