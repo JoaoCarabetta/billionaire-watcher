@@ -50,7 +50,7 @@ All identifier columns (CNPJ, CPF) are STRING. Query `raw._manifest` for source 
 
 | Origin | Table | Landed from |
 |---|---|---|
-| valor | `valor_controle_empresas_walk` | `data/controle-empresas-walk.csv` |
+| valor | `valor_controle_empresas_walk` | `gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv` |
 | cvm | `cvm_cad_cia_aberta` | dados.cvm.gov.br cadastro |
 | cvm | `cvm_fre_posicao_acionaria_2026` | FRE posição acionária 2026 |
 | cvm | `cvm_fre_capital_social_2026` | FRE capital social 2026 |
@@ -117,8 +117,6 @@ dbt parse --target test
 
 GitHub Actions runs `dbt parse` on every PR and push that touches `transform/`. No GCP credentials required.
 
-Frozen v0 seed CSVs under `seeds/` stay because site tests read those file paths. They are disabled on the warehouse target and are not raw inputs.
-
 ## Warehouse IDs
 
 - **GCP Project**: `billionairewatcher`
@@ -130,7 +128,3 @@ The previous datasets `billionaire_watcher`, `billionaire_watcher_raw`, and
 `graph_probe` were emptied. The loader service account cannot delete dataset
 objects (`bigquery.datasets.delete`). Drop those three empty leftovers from the
 console or an owner account when convenient.
-
-## License
-
-See [LICENSE](../LICENSE).

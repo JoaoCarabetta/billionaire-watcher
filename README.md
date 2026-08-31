@@ -1,41 +1,13 @@
 # billionaire-watcher
-Arquivo cívico de poder econômico no Brasil — dossiês HTML gerados de dados públicos
 
-## Commands
+Warehouse and local graph for mapping economic power in Brazil.
 
-```sh
-npm test        # Run tests
-npm run build   # Build static site to ./dist/
-npm run metrics -- public/grafo-publico.json  # Relevance tables from the public graph
-npm run money -- public/grafo-publico.json    # Dinheiro sob controle (B3 2025-05-16; not a fortuna rank)
-```
-
-## Agent Readiness
-
-This site is designed to be readable by AI agents. After the first public deploy on Cloudflare Pages, rescan at https://is-agentic.com/ to verify agent-readiness score.
-
-Features:
-- Static HTML with content in initial response (no JS-only body)
-- Semantic HTML with proper headings, lists, and tables
-- `sitemap.xml` listing all routes
-- `llms.txt` explaining archive structure and navigation
-- Real 404 page (not soft-404 SPA)
-- Visible citations in HTML text
-
-### Continuous Validation
-
-The [Is Agentic CI workflow](.github/workflows/is-agentic-ci.yml) runs automatically to verify agent-readiness on the deployed site at https://billionaire-watcher.pages.dev/
-
-<<<<<<< Updated upstream
-- **Triggers:** Push to main (site files) + weekday schedule
-- **Command:** `npx is-agentic https://billionaire-watcher.pages.dev/ --json`
-- **Failure Policy:** Fails only on Essential tier issues; Recommended API/OAuth/MCP gaps do not block
-
-## Armazém
-
-Três datasets no projeto `billionairewatcher`: `raw`, `staging`, `marts`.
-Ver [transform/README.md](transform/README.md) e
-[docs/spec-fase1-oligarcas.md](docs/spec-fase1-oligarcas.md).
+| Path | Role |
+|---|---|
+| [AGENTS.md](AGENTS.md) | Rules for working in this repo |
+| [transform/](transform/README.md) | dbt on BigQuery (`raw` → `staging` → `marts`) |
+| [graph/](graph/README.md) | Local Memgraph scratch pad |
+| [docs/spec-fase1-oligarcas.md](docs/spec-fase1-oligarcas.md) | Warehouse specification (source of truth) |
 
 ```sh
 cd transform && dbt parse --target test

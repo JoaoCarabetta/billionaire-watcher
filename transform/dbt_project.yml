@@ -29,7 +29,6 @@ models:
 
 seeds:
   billionaire_watcher:
-    +enabled: "{{ target.name in ['test', 'ci'] }}"
     dicionario:
       +enabled: true
 

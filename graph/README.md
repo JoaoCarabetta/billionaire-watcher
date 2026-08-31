@@ -1,6 +1,6 @@
 # Local Memgraph
 
-Scratch pad for Cypher walks on the frozen v0 public graph. The warehouse walk in [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md) stays the source of truth.
+Scratch pad for Cypher walks on the frozen v0 public graph. The warehouse walk in [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md) is the source of truth.
 
 ```sh
 cd graph
@@ -19,4 +19,4 @@ MATCH path = (c:Empresa {id: "00864214000106"})<-[:OWNS*1..3]-(n)
 RETURN path
 ```
 
-Load is a copy of [public/grafo-publico.json](../public/grafo-publico.json) (`Pessoa` / `Empresa` / `OWNS`). Not the full Receita QSA.
+Load is a copy of [grafo-publico.json](grafo-publico.json) (`Pessoa` / `Empresa` / `OWNS`). Not the full Receita QSA.
