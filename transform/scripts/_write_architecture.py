@@ -65,6 +65,33 @@ TABLES["stg_valor_empresa_inventario"] = [
     row("notas", "notas", "string", "Operator notes; mostly empty."),
 ]
 
+TABLES["stg_valor_ranking"] = [
+    row("", "ano", "int64", "Vintage of the Valor 1000 industrial ranking.", "2025(1)2025", observations="Added in staging."),
+    row("rank_2024", "posicao", "int64", "Rank in the 2025 industrial list (edition uses FY 2024 figures).", "2025(1)2025", observations="All ranks are seed A."),
+    row("empresa", "nome", "string", "Magazine display name."),
+    row("razao_social", "razao_social", "string", "Legal name as published by Valor.", observations="No CNPJ in this file."),
+    row("source_url", "url_fonte", "string", "Valor ranking page URL."),
+    row("retrieved_at", "data_coleta", "date", "Date the JSON extract was retrieved."),
+]
+
+TABLES["stg_valor_banco"] = [
+    row("", "ano", "int64", "Vintage of the Valor 1000 banks ranking.", "2025(1)2025", observations="Added in staging."),
+    row("rank_2024", "posicao", "int64", "Rank in the 2025 banks list.", "2025(1)2025", observations="All rows are seed A."),
+    row("empresa", "nome", "string", "Magazine display name."),
+    row("razao_social", "razao_social", "string", "Legal name as published by Valor.", observations="No CNPJ in this file."),
+    row("source_url", "url_fonte", "string", "Valor ranking page URL."),
+    row("retrieved_at", "data_coleta", "date", "Date the JSON extract was retrieved."),
+]
+
+TABLES["stg_valor_seguradora"] = [
+    row("", "ano", "int64", "Vintage of the Valor 1000 insurers ranking (ramos gerais).", "2025(1)2025", observations="Added in staging."),
+    row("rank_2024", "posicao", "int64", "Rank in the 2025 insurers list.", "2025(1)2025", observations="All rows are seed A."),
+    row("empresa", "nome", "string", "Magazine display name."),
+    row("razao_social", "razao_social", "string", "Legal name as published by Valor.", observations="No CNPJ in this file."),
+    row("source_url", "url_fonte", "string", "Valor ranking page URL."),
+    row("retrieved_at", "data_coleta", "date", "Date the JSON extract was retrieved."),
+]
+
 TABLES["stg_cvm_cia_aberta"] = [
     row("", "ano", "int64", "Reference year of the landed cadastro extract.", "2026(1)2026", observations="Added in staging."),
     row("CNPJ_CIA", "id_cnpj", "string", "Issuer CNPJ, digits only, padded to 14."),

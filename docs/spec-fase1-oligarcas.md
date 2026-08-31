@@ -82,16 +82,12 @@ do projeto dbt (`digits_only`, `prefix8_from_cnpj14`, `normalize_company_name`,
 
 | coluna | tipo | descrição |
 |---|---|---|
-| `empresa_id` | STRING, PK | Cadastro Nacional da Pessoa Jurídica com 14 dígitos (somente dígitos) quando existe; senão chave de nome normalizado com prefixo `nome:` (caso Natura-sem-CNPJ e fechadas da semente A) |
-| `cnpj` | STRING(14), nullable | 14 dígitos quando existe; nunca inventar sufixo `/0001` |
-| `razao_social` | STRING | razão social da fonte que a trouxe |
-| `em_semente_a` | BOOL | linha do inventário Valor (ver semente A) |
-| `fontes_semente_b` | ARRAY<STRING> | subconjunto de `cvm`, `bcb`, `susep` |
-| `motivo_entrada` | STRING | `semente`, `subida` (holding intermediária citada na caminhada para cima) ou `hop` (inversão para baixo) |
-| `nao_caminha` | BOOL | verdadeiro para grupos fechados Folha, Globo, Havan, Record e Natura-sem-CNPJ: ficam na semente A e **não** caminham |
-| `valor_do_piso` | NUMERIC, nullable | piso de tamanho em reais (ver colunas de tamanho) |
-| `fonte_do_piso` | STRING, nullable | `bolsa_cotahist`, `ifdata_ativo_total` ou `susep_premios_emitidos` |
-| `tem_piso` | BOOL | falso quando nenhuma das três fontes cobre a empresa |
+| `cnpj` | STRING(14), PK | 14 dígitos; nunca inventar sufixo `/0001`. Nesta passagem (só semente A) não é nulo |
+| `razao_social` | STRING | razão social da Receita do `cnpj_basico` casado; senão a razão publicada na fonte que a trouxe |
+| `capital_social` | FLOAT64, nullable | `capital_social` da Receita para esse `cnpj_basico`, em reais |
+| `motivo_entrada_categoria` | STRING | `semente`, `subida` (holding intermediária citada na caminhada para cima) ou `hop` (inversão para baixo). Nesta passagem só `semente` |
+| `motivo_entrada_descricao` | STRING | citação da fonte que a trouxe, p.ex. `Valor 1000 2025, ranking industrial, posição 1` |
+| `motivo_entrada_date` | DATE | data da fonte que justificou a entrada (semente A: publicação do Valor 1000 2025, `2025-09-16`) |
 
 O piso **não é porta**: empresa sem piso continua na tabela e continua
 caminhando. O piso só existe para ordenar e para a estimativa de fortuna.
@@ -328,7 +324,7 @@ mesmo seam que a CI existente (`.github/workflows/dbt-ci.yml`, `dbt parse` +
 
 1. **Ponta a ponta única** (acima): cadastros + FRE + QSA → três tabelas com
    `e_oligarca` conhecido. É o teste que trava a definição.
-2. **Contratos de grão**: `empresas.empresa_id` único; `pessoas.pessoa_id`
+2. **Contratos de grão**: `empresas.cnpj` único; `pessoas.pessoa_id`
    único; `pessoas_empresas` único em (`pessoa_id`, `empresa_id`, `fonte`,
    `data_referencia`); zeros à esquerda preservados (o exemplo canônico JBS
    `02916265000160` já está nos testes dos leitores CVM mantidos).

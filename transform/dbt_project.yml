@@ -26,6 +26,9 @@ models:
         enforced: true
     marts:
       +schema: marts
+      +persist_docs:
+        relation: true
+        columns: true
 
 seeds:
   billionaire_watcher:
@@ -34,3 +37,4 @@ seeds:
 
 vars:
   rf_partition_date: '2026-01-11'
+  valor_1000_2025_publication_date: '2025-09-16'

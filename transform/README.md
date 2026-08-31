@@ -6,9 +6,9 @@ Three BigQuery datasets in project `billionairewatcher` (location `US`):
 |---|---|
 | `raw` | As ingested. One native table per source file or snapshot. No business filters. |
 | `staging` | Typed, renamed (Base dos Dados style), still one model per origin. Hygiene only — seed-B filters stay for intermediate/marts. |
-| `marts` | Entities ready to serve (`empresas`, `pessoas`, `pessoas_empresas`). Empty until the next pass. |
+| `marts` | Entities ready to serve. This pass: `empresas` is seed A only (Valor 1000 2025 industrial 1–1000 ∪ banks ∪ insurers). `pessoas` and `pessoas_empresas` are still empty. |
 
-The endpoint remains [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md). This pass owns `raw` and `staging`.
+The endpoint remains [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md). Seed A is the three Valor lists in `data/valor1000-2025/`, not `controle-empresas-walk.csv` and not ad-hoc extras (Itaúsa, Folha). `empresas.motivo_entrada_descricao` cites the list and rank.
 
 ## Staging
 
@@ -16,7 +16,10 @@ Architecture CSVs in [`architecture/`](architecture/) are the source of truth fo
 
 | Staging model | Raw source | Grain |
 |---|---|---|
-| `stg_valor_empresa_inventario` | `valor.controle_empresas_walk` | one inventory company (`identificador` is not unique) |
+| `stg_valor_ranking` | `valor.ranking_2025` | one industrial magazine company |
+| `stg_valor_banco` | `valor.bancos_2025` | one bank |
+| `stg_valor_seguradora` | `valor.seguradoras_2025` | one insurer |
+| `stg_valor_empresa_inventario` | `valor.controle_empresas_walk` | historical walk inventory — not seed A |
 | `stg_cvm_cia_aberta` | `cvm.cad_cia_aberta` | one issuer |
 | `stg_cvm_fre_posicao_acionaria` | `cvm.fre_posicao_acionaria_2026` | company × document × shareholder |
 | `stg_cvm_fre_capital_social` | `cvm.fre_capital_social_2026` | company × document × capital view |
@@ -36,9 +39,12 @@ Architecture CSVs in [`architecture/`](architecture/) are the source of truth fo
 Naming follows the [Base dos Dados style manual](https://basedosdados.org/docs/style_data) (snake_case, singular, no year in the table name, `id_` only for entity keys, `proporcao_` 0–100). Deviations: `stg_` prefix, `NUMERIC` for money, identifiers always STRING. Original source names stay in architecture `original_name` and in the spec citations.
 
 ```bash
-dbt run --select staging --target dev
-dbt test --select staging --target dev
+dbt run --select staging empresas --target dev
+dbt test --select staging empresas --target dev
+dbt test --select test_type:unit --target test
 ```
+
+`marts.empresas` is seed A only: Valor 1000 2025 industrial ranks 1–1000 ∪ banks ∪ insurers. Grain is `cnpj` (never null; never invent `/0001`). `razao_social` and `capital_social` come from Receita when matched. `motivo_entrada_categoria` is `semente`; `motivo_entrada_descricao` cites the list and rank; `motivo_entrada_date` is the Valor 1000 2025 publication date (`2025-09-16`). No walk inventory, no Itaúsa/Folha extras.
 
 DuckDB CI only parses. Models that read `raw` need the BigQuery `dev` target.
 
@@ -50,7 +56,10 @@ All identifier columns (CNPJ, CPF) are STRING. Query `raw._manifest` for source 
 
 | Origin | Table | Landed from |
 |---|---|---|
-| valor | `valor_controle_empresas_walk` | `gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv` |
+| valor | `valor_ranking_2025` | `gs://billionairewatcher-landing/raw/valor/2025/ranking.csv` |
+| valor | `valor_bancos_2025` | `gs://billionairewatcher-landing/raw/valor/2025/bancos.csv` |
+| valor | `valor_seguradoras_2025` | `gs://billionairewatcher-landing/raw/valor/2025/seguradoras.csv` |
+| valor | `valor_controle_empresas_walk` | historical walk file — not seed A |
 | cvm | `cvm_cad_cia_aberta` | dados.cvm.gov.br cadastro |
 | cvm | `cvm_fre_posicao_acionaria_2026` | FRE posição acionária 2026 |
 | cvm | `cvm_fre_capital_social_2026` | FRE capital social 2026 |
@@ -90,7 +99,11 @@ Upload to the objects already used by the loader:
 gcloud storage cp landing/fase1/cad_cia_aberta.csv \
   gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
 gcloud storage cp \
-  landing/fase1/controle-empresas-walk.csv \
+  landing/fase1/ranking.csv \
+  landing/fase1/bancos.csv \
+  landing/fase1/seguradoras.csv \
+  gs://billionairewatcher-landing/raw/valor/2025/
+gcloud storage cp \
   landing/fase1/bcb_entidades_supervisionadas.csv \
   landing/fase1/susep_dados_cadastrais.csv \
   gs://billionairewatcher-landing/raw/fase1/

@@ -6,12 +6,87 @@ sources:
     database: billionairewatcher
     schema: raw
     tables:
+      - name: ranking_2025
+        identifier: valor_ranking_2025
+        description: |
+          Valor 1000 2025 industrial ranking (1000 rows). Landed from
+          data/valor1000-2025/ranking.csv. No CNPJ. All ranks are seed A.
+        columns:
+          - name: rank_2024
+            data_type: string
+          - name: rank_2023
+            data_type: string
+          - name: empresa
+            data_type: string
+          - name: sede
+            data_type: string
+          - name: setor
+            data_type: string
+          - name: razao_social
+            data_type: string
+          - name: ranking_source
+            data_type: string
+          - name: source_url
+            data_type: string
+          - name: source_json
+            data_type: string
+          - name: retrieved_at
+            data_type: string
+      - name: bancos_2025
+        identifier: valor_bancos_2025
+        description: |
+          Valor 1000 2025 banks ranking (100 rows). Landed from
+          data/valor1000-2025/bancos.csv. No CNPJ. All rows are seed A.
+        columns:
+          - name: rank_2024
+            data_type: string
+          - name: rank_2023
+            data_type: string
+          - name: empresa
+            data_type: string
+          - name: sede
+            data_type: string
+          - name: capital_origem
+            data_type: string
+          - name: razao_social
+            data_type: string
+          - name: ranking_source
+            data_type: string
+          - name: source_url
+            data_type: string
+          - name: source_json
+            data_type: string
+          - name: retrieved_at
+            data_type: string
+      - name: seguradoras_2025
+        identifier: valor_seguradoras_2025
+        description: |
+          Valor 1000 2025 insurers ranking, ramos gerais (50 rows). Landed from
+          data/valor1000-2025/seguradoras.csv. No CNPJ. All rows are seed A.
+        columns:
+          - name: rank_2024
+            data_type: string
+          - name: rank_2023
+            data_type: string
+          - name: empresa
+            data_type: string
+          - name: sede
+            data_type: string
+          - name: razao_social
+            data_type: string
+          - name: ranking_source
+            data_type: string
+          - name: source_url
+            data_type: string
+          - name: source_json
+            data_type: string
+          - name: retrieved_at
+            data_type: string
       - name: controle_empresas_walk
         identifier: valor_controle_empresas_walk
         description: |
-          Inventory landed at gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv.
-          CNPJ lives in identificador and must stay STRING. Staging reader:
-          stg_valor_empresa_inventario. identificador=vazio is a sentinel, not unique.
+          Historical walk-control inventory. Not seed A. Staging reader:
+          stg_valor_empresa_inventario. Do not feed marts.empresas.
         columns:
           - name: nome
             data_type: string

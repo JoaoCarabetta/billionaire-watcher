@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Download the four raw inputs for the fase 1 company door.
+"""Download the fase 1 company-door files.
 
-The script only lands files. dbt owns all business filters and deduplication.
+Copies the three Valor 1000 lists from data/valor1000-2025/ and fetches
+CVM, Unicad, and SUSEP. The script only lands files. dbt owns seed filters.
 """
 
 from __future__ import annotations
@@ -115,9 +116,15 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     repository_root = Path(__file__).resolve().parents[2]
-    seed_a_source = repository_root / "data" / "controle-empresas-walk.csv"
-    seed_a_output = output_dir / "controle-empresas-walk.csv"
-    shutil.copyfile(seed_a_source, seed_a_output)
+    valor_dir = repository_root / "data" / "valor1000-2025"
+    valor_outputs = []
+    for name in ("ranking.csv", "bancos.csv", "seguradoras.csv"):
+        source = valor_dir / name
+        if not source.is_file():
+            raise FileNotFoundError(f"Valor 1000 list missing: {source}")
+        destination = output_dir / name
+        shutil.copyfile(source, destination)
+        valor_outputs.append(destination)
 
     cvm_output = output_dir / "cad_cia_aberta.csv"
     cvm_output.write_bytes(fetch_bytes(CVM_URL))
@@ -150,7 +157,7 @@ def main() -> None:
     susep_output = output_dir / "susep_dados_cadastrais.csv"
     write_csv(susep_output, susep_rows, SUSEP_COLUMNS, ("entcgc", "entnome"))
 
-    outputs = (seed_a_output, cvm_output, bcb_output, susep_output)
+    outputs = (*valor_outputs, cvm_output, bcb_output, susep_output)
     manifest = {
         "bcb_date": args.bcb_date,
         "checks": {

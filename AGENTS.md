@@ -31,7 +31,7 @@ GCP project `billionairewatcher`, location `US`. Custom schemas are written as-i
 | Landing | `gs://billionairewatcher-landing/` | Files only. Downloaders do not filter seed B or compute floors. |
 | `raw` | `raw` | Native tables, all identifiers STRING. dbt **declares** them in `models/sources.yml`; it does not build them. Loader: `transform/scripts/load_raw.py`. |
 | `staging` | `staging` | One model per origin. Hygiene only: types, `lpad`, Base dos Dados names. **No** seed-B filters, **no** walk, **no** `e_oligarca`. Contracts enforced. |
-| `marts` | `marts` | Endpoint: `empresas`, `pessoas`, `pessoas_empresas`. Empty until the next pass. Seed-B, walk, and oligarch flag live here (or in intermediate models that feed marts), never in staging. |
+| `marts` | `marts` | Endpoint: `empresas`, `pessoas`, `pessoas_empresas`. `empresas` this pass is one row per CNPJ from seed A (Valor lists, no extras): `cnpj`, `razao_social`, `capital_social`, `motivo_entrada_*`. Seed B, walk, and `e_oligarca` live here later, never in staging. |
 
 Receita tables in this project are a **copy** of Base dos Dados partition `{{ var("rf_partition_date") }}` (`2026-01-11`). Staging and marts query **this** project, not `basedosdados.br_me_cnpj`.
 
@@ -76,8 +76,9 @@ DuckDB `test` only **parses**. `dbt run` / `dbt test` against models that read `
 # transform — from transform/
 dbt deps
 dbt parse --target test
-dbt run --select staging --target dev
-dbt test --select staging --target dev
+dbt test --select test_type:unit --target test
+dbt run --select staging empresas --target dev
+dbt test --select staging empresas --target dev
 
 # land files (no filters), then load raw
 python3 scripts/download_fase1_company_sources.py --bcb-date 08-01-2026 --output-dir landing/fase1

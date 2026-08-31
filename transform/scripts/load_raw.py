@@ -43,6 +43,33 @@ class CsvSource:
 
 CSV_SOURCES: tuple[CsvSource, ...] = (
     CsvSource(
+        table="valor_ranking_2025",
+        origin="valor",
+        gcs_path="raw/valor/2025/ranking.csv",
+        encoding="utf-8",
+        field_delimiter=",",
+        source_url="repository:data/valor1000-2025/ranking.csv",
+        as_of_date="2025",
+    ),
+    CsvSource(
+        table="valor_bancos_2025",
+        origin="valor",
+        gcs_path="raw/valor/2025/bancos.csv",
+        encoding="utf-8",
+        field_delimiter=",",
+        source_url="repository:data/valor1000-2025/bancos.csv",
+        as_of_date="2025",
+    ),
+    CsvSource(
+        table="valor_seguradoras_2025",
+        origin="valor",
+        gcs_path="raw/valor/2025/seguradoras.csv",
+        encoding="utf-8",
+        field_delimiter=",",
+        source_url="repository:data/valor1000-2025/seguradoras.csv",
+        as_of_date="2025",
+    ),
+    CsvSource(
         table="valor_controle_empresas_walk",
         origin="valor",
         gcs_path="raw/fase1/controle-empresas-walk.csv",

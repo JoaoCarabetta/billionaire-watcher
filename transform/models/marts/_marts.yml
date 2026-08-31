@@ -1,0 +1,144 @@
+version: 2
+
+models:
+  - name: empresas
+    description: >
+      One row per company (CNPJ) in seed A this pass: Valor 1000 2025
+      industrial 1–1000 ∪ banks ∪ insurers. No walk inventory, no
+      Itaúsa/Folha extras, no seed B. cnpj is the 14-digit headquarters
+      (Receita matriz, else CVM / B3 / BCB / SUSEP). razao_social and
+      capital_social come from Receita when the match has a cnpj_basico.
+      motivo_entrada_date is the Valor 1000 2025 publication date
+      (2025-09-16). One rebrand exception: Valor CCR S.A. is Motiva
+      Infraestrutura 02846056000197. Never invent /0001.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "length(cnpj) = 14"
+          description: >
+            CNPJ is always 14 digits. Never invent a /0001 suffix.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "motivo_entrada_categoria = 'semente'"
+          description: >
+            This pass every company entered as semente.
+    columns:
+      - name: cnpj
+        data_type: string
+        description: >
+          14-digit headquarters CNPJ. Primary key. Receita first (real
+          matriz, else an existing estabelecimento); CVM / B3 / BCB /
+          SUSEP if Receita has no name hit. Never null this pass.
+        data_tests:
+          - unique
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name of that CNPJ. Receita razão when the match found a
+          cnpj_basico; otherwise the Valor published razão.
+        data_tests:
+          - not_null
+      - name: capital_social
+        data_type: float64
+        description: >
+          Receita capital_social for the matched cnpj_basico, in BRL.
+      - name: motivo_entrada_categoria
+        data_type: string
+        description: >
+          semente, subida, or hop. This pass is only semente.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['semente']
+      - name: motivo_entrada_descricao
+        data_type: string
+        description: >
+          Citeable reason the company entered: Valor 1000 2025 list name
+          and posição, semicolon-separated when more than one list cites
+          the same CNPJ.
+        data_tests:
+          - not_null
+      - name: motivo_entrada_date
+        data_type: date
+        description: >
+          As-of date of the source that justified entry. Seed A is the
+          Valor 1000 2025 publication date (var valor_1000_2025_publication_date).
+        data_tests:
+          - not_null
+
+unit_tests:
+  - name: empresas_semente_a_valor_listas
+    description: >
+      Unique Receita razão gets the matriz CNPJ; an ambiguous razão takes
+      the largest capital_social; Cia. matches Companhia. Grain is CNPJ.
+    model: empresas
+    given:
+      - input: ref('stg_valor_ranking')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Petrobras' as nome, 'Petroleo Brasileiro S.A. Petrobras' as razao_social
+          union all
+          select 1000, 'JBS', 'JBS S.A.'
+      - input: ref('stg_valor_banco')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Itau Unibanco' as nome, 'Cia. Itau Unibanco Holding S.A.' as razao_social
+      - input: ref('stg_valor_seguradora')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Bradesco Seguros' as nome, 'Bradesco Seguros S.A.' as razao_social
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '33000167' as cnpj_basico, 'Petroleo Brasileiro S.A. Petrobras' as razao_social, 100.0 as capital_social
+          union all
+          select date '2026-01-11', '02916265', 'JBS S/A', 23631071304.24
+          union all
+          select date '2026-01-11', '07452328', 'JBS S.A.', 1000.0
+          union all
+          select date '2026-01-11', '60872504', 'COMPANHIA ITAU UNIBANCO HOLDING S.A.', 90000000000.0
+          union all
+          select date '2026-01-11', '33032580', 'Bradesco Seguros S.A.', 1.0
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '33000167000158' as cnpj, '33000167' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '02916265000160', '02916265', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '07452328000100', '07452328', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '60872504000123', '60872504', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '33032580000109', '33032580', '0001', '1', '02'
+      - input: ref('stg_cvm_cia_aberta')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial, cast(null as varchar) as situacao
+          where false
+      - input: ref('stg_b3_empresa_listada')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial
+          where false
+      - input: ref('stg_bcb_entidade_supervisionada')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
+          where false
+      - input: ref('stg_susep_dado_cadastral')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
+          where false
+    expect:
+      rows:
+        - {cnpj: '33000167000158', razao_social: Petroleo Brasileiro S.A. Petrobras, capital_social: 100.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '02916265000160', razao_social: JBS S/A, capital_social: 23631071304.24, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1000", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '60872504000123', razao_social: COMPANHIA ITAU UNIBANCO HOLDING S.A., capital_social: 90000000000.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, bancos, posição 1", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '33032580000109', razao_social: Bradesco Seguros S.A., capital_social: 1.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, seguradoras, posição 1", motivo_entrada_date: '2025-09-16'}
