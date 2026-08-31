@@ -1,0 +1,8 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,ReceitasSeguros year parameter.,2026(1)2026,no,,,Added in staging.
+cnpj,id_cnpj,string,"Insurer CNPJ, padded to 14.",(1),no,,,
+entnome,nome,string,Insurer name.,(1),no,,,
+mesreferencia,mes_referencia,string,Reference month as published by Olinda.,(1),no,,,
+grupo,grupo,string,Premium group.,(1),no,,,
+ramo,ramo,string,Insurance branch.,(1),no,,,
+valor,valor,numeric,Emitted premiums (prêmios emitidos). Not SES premio_ganho.,(1),no,,BRL,

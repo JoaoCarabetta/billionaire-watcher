@@ -1,0 +1,8 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+Data,data,date,IF.data quarter date for this reporter.,(1),no,,,
+Data,ano_mes,string,YYYYMM quarter derived from Data. Not a landed column of its own.,(1),no,,,
+CodInst,id_instituicao,string,"Reporter code. Join to valores via coalesce(id_conglomerado_prudencial, id_instituicao).",(1),no,,,
+CodConglomeradoPrudencial,id_conglomerado_prudencial,string,Prudential conglomerate code when the reporter is a member.,(1),no,,,
+CnpjInstituicaoLider,cnpj_basico_lider,string,Leading institution CNPJ8.,(1),no,,,
+NomeInstituicao,nome,string,Reporter name.,(1),no,,,
+Situacao,situacao,string,Reporter situation. Floor later keeps A.,(1),yes,,,

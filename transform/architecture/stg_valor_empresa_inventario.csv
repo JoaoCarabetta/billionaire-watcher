@@ -1,0 +1,11 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,Vintage of the Valor 1000 inventory used as seed A.,2025(1)2025,no,,,Added in staging; not in the CSV.
+identificador,identificador,string,"Source inventory key: 14-digit CNPJ, closed-group slug (folha/globo/havan/record), or the sentinel vazio when the magazine row has no CNPJ.",(1),yes,,,Not unique. Hundreds of rows share vazio.
+identificador,id_cnpj,string,14-digit CNPJ when identificador is digits-only; null for slugs and vazio.,(1),no,,,Never invent a /0001 suffix.
+nome,nome,string,"Display name as published in the walk inventory (razão-ish, not a legal name key).",(1),no,,,
+tipo_societario,tipo_societario,string,Legal form as classified in the inventory.,(1),yes,,,
+no_grafo,indicador_grafo,string,Whether the company already sits on the frozen v0 public graph.,(1),yes,,,
+porque,motivo,string,"Free-text reason the row is in the inventory (rank family, extra, skip).",(1),no,,,
+situacao_do_passeio,situacao_passeio,string,Walk status assigned when the inventory was built.,(1),yes,,,
+no_formulario,indicador_formulario,string,Whether a Formulário de Referência shareholder file was found.,(1),yes,,,
+notas,notas,string,Operator notes; mostly empty.,(1),no,,,

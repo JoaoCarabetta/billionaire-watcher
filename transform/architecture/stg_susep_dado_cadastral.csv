@@ -1,0 +1,5 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,Year of the cadastro dump.,2026(1)2026,no,,,Added in staging.
+entcgc,id_cnpj,string,"Supervised-entity CNPJ, padded to 14.",(1),no,,,
+entnome,nome,string,Supervised-entity name.,(1),no,,,
+mercodigo,tipo_mercado,string,"SUSEP market code. Seed B later keeps {1,2,3,4,6} and drops 5.",(1),yes,,,

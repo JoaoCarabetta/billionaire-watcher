@@ -1,0 +1,8 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,Year of the supplement pull.,2026(1)2026,no,,,Added in staging.
+code,codigo_emissor,string,B3 issuing-company code. Joins listed_companies.issuingCompany.,(1),no,,,
+codeCVM,id_cvm,string,CVM issuer code.,(1),no,,,
+tradingName,nome_comercial,string,Trading name.,(1),no,,,
+numberCommonShares,quantidade_acao_ordinaria,numeric,Ordinary shares outstanding. Brazilian thousands/decimal parsed when needed.,(1),no,,acao,
+numberPreferredShares,quantidade_acao_preferencial,numeric,Preferred shares outstanding.,(1),no,,acao,
+totalNumberShares,quantidade_total_acao,numeric,Total shares outstanding.,(1),no,,acao,

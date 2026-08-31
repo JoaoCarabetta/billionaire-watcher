@@ -1,0 +1,139 @@
+version: 2
+
+models:
+  - name: stg_b3_empresa_listada
+    description: >
+      B3 GetInitialCompanies rows. Landed extract is already type=1.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Listed-issuer CNPJ is 14 digits.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Year of the listed-company pull.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Issuer CNPJ, padded to 14. Downloader already zfilled.
+        data_tests:
+          - unique
+          - not_null
+      - name: id_cvm
+        data_type: string
+        description: >
+          CVM issuer code.
+      - name: codigo_emissor
+        data_type: string
+        description: >
+          B3 issuing-company code. Joins the supplement code.
+        data_tests:
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name from GetInitialCompanies.
+      - name: nome_comercial
+        data_type: string
+        description: >
+          Trading name.
+      - name: tipo
+        data_type: string
+        description: >
+          B3 company type. Landed extract is already type=1.
+  - name: stg_b3_empresa_listada_complemento
+    description: >
+      B3 GetListedSupplementCompany share quantities. Brazilian thousands/decimal are parsed when present.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Year of the supplement pull.
+        data_tests:
+          - not_null
+      - name: codigo_emissor
+        data_type: string
+        description: >
+          B3 issuing-company code. Joins listed_companies.issuingCompany.
+        data_tests:
+          - unique
+          - not_null
+      - name: id_cvm
+        data_type: string
+        description: >
+          CVM issuer code.
+      - name: nome_comercial
+        data_type: string
+        description: >
+          Trading name.
+      - name: quantidade_acao_ordinaria
+        data_type: numeric
+        description: >
+          Ordinary shares outstanding. Brazilian thousands/decimal parsed when needed.
+      - name: quantidade_acao_preferencial
+        data_type: numeric
+        description: >
+          Preferred shares outstanding.
+      - name: quantidade_total_acao
+        data_type: numeric
+        description: >
+          Total shares outstanding.
+  - name: stg_b3_cotahist
+    description: >
+      COTAHIST official close for vista lote-padrão (TPMERC=010, CODBDI=02). PREULT is integer cents in raw; preco_fechamento is BRL. This is not basedosdados.br_b3_cotacoes.cotacoes.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ticker
+              - data_pregao
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "preco_fechamento is null or preco_fechamento >= 0"
+          description: >
+            Official close cannot be negative.
+    columns:
+      - name: data_pregao
+        data_type: date
+        description: >
+          Trading session date (source YYYYMMDD).
+        data_tests:
+          - not_null
+      - name: ticker
+        data_type: string
+        description: >
+          B3 trading code. Joins FCA Codigo_Negociacao.
+        data_tests:
+          - not_null
+      - name: codigo_bdi
+        data_type: string
+        description: >
+          BDI code. Landed extract is already 02 (lote-padrão).
+      - name: tipo_mercado
+        data_type: string
+        description: >
+          Market type. Landed extract is already 010 (vista).
+      - name: preco_fechamento
+        data_type: numeric
+        description: >
+          Official close. Source PREULT is integer cents; staging divides by 100.
+        data_tests:
+          - not_null
+      - name: quantidade_negocio
+        data_type: int64
+        description: >
+          Number of trades in the session.
