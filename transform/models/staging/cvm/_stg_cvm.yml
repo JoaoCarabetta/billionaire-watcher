@@ -1,0 +1,590 @@
+version: 2
+
+models:
+  - name: stg_cvm_cia_aberta
+    description: >
+      CVM listed-company registry (cad_cia_aberta), typed and renamed. One row per issuer. SIT = ATIVO is the seed-B cut and is not applied here.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Issuer CNPJ is 14 digits. Canonical JBS is 02916265000160.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Reference year of the landed cadastro extract.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Issuer CNPJ, digits only, padded to 14.
+        data_tests:
+          - not_null
+      - name: id_cvm
+        data_type: string
+        description: >
+          CVM issuer code. STRING so leading zeros are not lost.
+        data_tests:
+          - unique
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Registered legal name (denominação social).
+        data_tests:
+          - not_null
+      - name: nome_comercial
+        data_type: string
+        description: >
+          Trade name.
+      - name: data_registro
+        data_type: date
+        description: >
+          CVM registration date.
+      - name: data_constituicao
+        data_type: date
+        description: >
+          Incorporation date.
+      - name: data_cancelamento
+        data_type: date
+        description: >
+          Registration cancellation date.
+      - name: motivo_cancelamento
+        data_type: string
+        description: >
+          Cancellation motive when SIT is not ATIVO.
+      - name: situacao
+        data_type: string
+        description: >
+          Registration situation. Seed B later keeps ATIVO only.
+      - name: data_inicio_situacao
+        data_type: date
+        description: >
+          Date the current SIT started.
+      - name: setor_atividade
+        data_type: string
+        description: >
+          Activity sector as coded by CVM.
+      - name: tipo_mercado
+        data_type: string
+        description: >
+          Market type (Bolsa / Balcão).
+      - name: categoria_registro
+        data_type: string
+        description: >
+          Registration category (A/B).
+      - name: data_inicio_categoria
+        data_type: date
+        description: >
+          Date the registration category started.
+      - name: situacao_emissor
+        data_type: string
+        description: >
+          Issuer situation distinct from SIT.
+      - name: data_inicio_situacao_emissor
+        data_type: date
+        description: >
+          Date the issuer situation started.
+      - name: tipo_controle_acionario
+        data_type: string
+        description: >
+          Control type (PRIVADO/ESTATAL/ESTRANGEIRO). Not the controlling person.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['PRIVADO', 'ESTATAL', 'ESTRANGEIRO']
+              config:
+                severity: warn
+      - name: tipo_endereco
+        data_type: string
+        description: >
+          Address type of the issuer headquarters.
+      - name: logradouro
+        data_type: string
+        description: >
+          Street of the issuer headquarters.
+      - name: complemento
+        data_type: string
+        description: >
+          Address complement.
+      - name: bairro
+        data_type: string
+        description: >
+          Neighborhood.
+      - name: nome_municipio
+        data_type: string
+        description: >
+          Municipality name as written by CVM. Not an IBGE id.
+      - name: sigla_uf
+        data_type: string
+        description: >
+          Federation unit of the headquarters.
+      - name: nome_pais
+        data_type: string
+        description: >
+          Country name.
+      - name: cep
+        data_type: string
+        description: >
+          Postal code. STRING, never INT64.
+      - name: ddd
+        data_type: string
+        description: >
+          Telephone area code.
+      - name: telefone
+        data_type: string
+        description: >
+          Telephone number.
+      - name: ddd_fax
+        data_type: string
+        description: >
+          Fax area code.
+      - name: fax
+        data_type: string
+        description: >
+          Fax number.
+      - name: email
+        data_type: string
+        description: >
+          Issuer email.
+      - name: tipo_responsavel
+        data_type: string
+        description: >
+          Role of the named responsible person.
+      - name: nome_responsavel
+        data_type: string
+        description: >
+          Name of the responsible person.
+      - name: data_inicio_responsavel
+        data_type: date
+        description: >
+          Date the responsible person started.
+      - name: logradouro_responsavel
+        data_type: string
+        description: >
+          Street of the responsible person.
+      - name: complemento_responsavel
+        data_type: string
+        description: >
+          Complement of the responsible person.
+      - name: bairro_responsavel
+        data_type: string
+        description: >
+          Neighborhood of the responsible person.
+      - name: nome_municipio_responsavel
+        data_type: string
+        description: >
+          Municipality of the responsible person.
+      - name: sigla_uf_responsavel
+        data_type: string
+        description: >
+          UF of the responsible person.
+      - name: nome_pais_responsavel
+        data_type: string
+        description: >
+          Country of the responsible person.
+      - name: cep_responsavel
+        data_type: string
+        description: >
+          Postal code of the responsible person.
+      - name: ddd_responsavel
+        data_type: string
+        description: >
+          Telephone area code of the responsible person.
+      - name: telefone_responsavel
+        data_type: string
+        description: >
+          Telephone of the responsible person.
+      - name: ddd_fax_responsavel
+        data_type: string
+        description: >
+          Fax area code of the responsible person.
+      - name: fax_responsavel
+        data_type: string
+        description: >
+          Fax of the responsible person.
+      - name: email_responsavel
+        data_type: string
+        description: >
+          Email of the responsible person.
+      - name: id_cnpj_auditor
+        data_type: string
+        description: >
+          Auditor firm CNPJ, padded to 14 when digits exist.
+      - name: nome_auditor
+        data_type: string
+        description: >
+          Auditor firm name.
+  - name: stg_cvm_fre_posicao_acionaria
+    description: >
+      FRE shareholder positions, typed and renamed. One row per (company, document, shareholder). Walk later keeps max(id_documento) per company. Controller / 10% ON cuts are not applied here.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_cnpj
+              - data_referencia
+              - id_documento
+              - id_acionista
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Issuer CNPJ is 14 digits.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "proporcao_acao_ordinaria_circulacao is null or (proporcao_acao_ordinaria_circulacao >= 0 and proporcao_acao_ordinaria_circulacao <= 100)"
+          description: >
+            Ordinary-share percent is on the 0-100 scale.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "proporcao_total_acao_circulacao is null or (proporcao_total_acao_circulacao >= 0 and proporcao_total_acao_circulacao <= 100)"
+          description: >
+            Total-share percent is on the 0-100 scale.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          FRE extract year.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Issuer CNPJ, digits only, padded to 14.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_cvm_cia_aberta')
+                field: id_cnpj
+              config:
+                severity: warn
+      - name: data_referencia
+        data_type: date
+        description: >
+          Reference date of this FRE shareholder position.
+      - name: versao
+        data_type: int64
+        description: >
+          Document version number inside the FRE package.
+      - name: id_documento
+        data_type: string
+        description: >
+          FRE document id. Walk later keeps max(id_documento) per company.
+        data_tests:
+          - not_null
+      - name: nome_companhia
+        data_type: string
+        description: >
+          Issuer name as written on the FRE.
+      - name: id_acionista
+        data_type: string
+        description: >
+          Shareholder id inside the document.
+        data_tests:
+          - not_null
+      - name: nome_acionista
+        data_type: string
+        description: >
+          Shareholder name as cited. Keep Outros and tesouraria rows.
+      - name: tipo_pessoa_acionista
+        data_type: string
+        description: >
+          Shareholder person type.
+      - name: documento_acionista
+        data_type: string
+        description: >
+          Shareholder CPF (11) or CNPJ (14) when digits are complete; otherwise the masked source string. Warehouse-only.
+      - name: id_acionista_relacionado
+        data_type: string
+        description: >
+          Related-shareholder id when the row is a related holding.
+      - name: nome_acionista_relacionado
+        data_type: string
+        description: >
+          Related-shareholder name.
+      - name: tipo_pessoa_acionista_relacionado
+        data_type: string
+        description: >
+          Related-shareholder person type.
+      - name: documento_acionista_relacionado
+        data_type: string
+        description: >
+          Related-shareholder CPF/CNPJ or mask.
+      - name: quantidade_acao_ordinaria_circulacao
+        data_type: int64
+        description: >
+          Ordinary shares in circulation attributed to this shareholder.
+      - name: proporcao_acao_ordinaria_circulacao
+        data_type: float64
+        description: >
+          Percent of ordinary shares in circulation (0-100). Criterion uses >= 10.
+      - name: quantidade_acao_preferencial_circulacao
+        data_type: int64
+        description: >
+          Preferred shares in circulation.
+      - name: proporcao_acao_preferencial_circulacao
+        data_type: float64
+        description: >
+          Percent of preferred shares in circulation (0-100).
+      - name: quantidade_total_acao_circulacao
+        data_type: int64
+        description: >
+          Total shares in circulation.
+      - name: proporcao_total_acao_circulacao
+        data_type: float64
+        description: >
+          Percent of total shares in circulation (0-100).
+      - name: nacionalidade
+        data_type: string
+        description: >
+          Shareholder nationality.
+      - name: sigla_uf
+        data_type: string
+        description: >
+          UF of the shareholder when resident in Brazil.
+      - name: indicador_residente_exterior
+        data_type: string
+        description: >
+          Whether the shareholder lives abroad.
+      - name: nome_representante_legal
+        data_type: string
+        description: >
+          Legal representative name.
+      - name: tipo_pessoa_representante_legal
+        data_type: string
+        description: >
+          Legal representative person type.
+      - name: documento_representante_legal
+        data_type: string
+        description: >
+          Legal representative CPF/CNPJ. Official source spelling uses lowercase l.
+      - name: data_composicao_capital_social
+        data_type: string
+        description: >
+          Capital-composition date as published (kept string; formats vary).
+      - name: data_ultima_alteracao
+        data_type: date
+        description: >
+          Last change date of this position.
+      - name: indicador_acionista_controlador
+        data_type: string
+        description: >
+          S/N controller flag from the FRE. This is the citeable control signal.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['S', 'N']
+              config:
+                severity: warn
+      - name: indicador_participante_acordo_acionistas
+        data_type: string
+        description: >
+          S/N shareholders-agreement flag. No separate acordo CSV exists.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['S', 'N']
+              config:
+                severity: warn
+  - name: stg_cvm_fre_capital_social
+    description: >
+      FRE capital social (item 17.1), typed and renamed. Autorizado / Emitido / Subscrito / Integralizado are views, not addends.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_cnpj
+              - id_documento
+              - tipo_capital
+              - id_capital_social
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Issuer CNPJ is 14 digits.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          FRE extract year.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Issuer CNPJ, digits only, padded to 14.
+        data_tests:
+          - not_null
+      - name: data_referencia
+        data_type: date
+        description: >
+          Reference date of this capital-social view.
+      - name: versao
+        data_type: int64
+        description: >
+          Document version number.
+      - name: id_documento
+        data_type: string
+        description: >
+          FRE document id.
+        data_tests:
+          - not_null
+      - name: nome_companhia
+        data_type: string
+        description: >
+          Issuer name as written on the FRE.
+      - name: id_capital_social
+        data_type: string
+        description: >
+          Capital-social line id inside the document.
+      - name: tipo_capital
+        data_type: string
+        description: >
+          Capital view: Autorizado / Emitido / Subscrito / Integralizado. Views, not addends.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Autorizado', 'Emitido', 'Subscrito', 'Integralizado']
+              config:
+                severity: warn
+      - name: data_autorizacao_aprovacao
+        data_type: string
+        description: >
+          Authorization/approval date as published.
+      - name: valor_capital
+        data_type: numeric
+        description: >
+          Capital amount in this view.
+      - name: prazo_integralizacao
+        data_type: string
+        description: >
+          Paid-in deadline when published.
+      - name: quantidade_acao_ordinaria
+        data_type: int64
+        description: >
+          Ordinary share count in this view.
+      - name: quantidade_acao_preferencial
+        data_type: int64
+        description: >
+          Preferred share count in this view.
+      - name: quantidade_total_acao
+        data_type: int64
+        description: >
+          Total share count in this view.
+  - name: stg_cvm_fca_valor_mobiliario
+    description: >
+      FCA securities file used to map ticker to CNPJ. Bolsa / still-listed filters belong in the floor model, not here.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Issuer CNPJ is 14 digits.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          FCA extract year.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Issuer CNPJ, digits only, padded to 14.
+        data_tests:
+          - not_null
+      - name: data_referencia
+        data_type: date
+        description: >
+          Reference date of the FCA filing.
+      - name: versao
+        data_type: int64
+        description: >
+          Document version number.
+      - name: id_documento
+        data_type: string
+        description: >
+          FCA document id. Floor later keeps the latest per (CNPJ, ticker).
+        data_tests:
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Issuer legal name on the FCA.
+      - name: tipo_valor_mobiliario
+        data_type: string
+        description: >
+          Security type (Ações Ordinárias, Ações Preferenciais…).
+      - name: sigla_classe_acao_preferencial
+        data_type: string
+        description: >
+          Preferred-class ticker suffix when present.
+      - name: classe_acao_preferencial
+        data_type: string
+        description: >
+          Preferred-class description.
+      - name: ticker
+        data_type: string
+        description: >
+          B3 trading code. Joins COTAHIST CODNEG.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_b3_cotahist')
+                field: ticker
+              config:
+                severity: warn
+      - name: composicao_bdr_unit
+        data_type: string
+        description: >
+          BDR/unit composition when the security is a unit.
+      - name: tipo_mercado
+        data_type: string
+        description: >
+          Market (Bolsa / Balcão). Floor later keeps Bolsa.
+      - name: sigla_entidade_administradora
+        data_type: string
+        description: >
+          Exchange acronym.
+      - name: nome_entidade_administradora
+        data_type: string
+        description: >
+          Exchange name.
+      - name: data_inicio_negociacao
+        data_type: date
+        description: >
+          First trading date.
+      - name: data_fim_negociacao
+        data_type: date
+        description: >
+          Last trading date. Empty means still listed.
+      - name: segmento
+        data_type: string
+        description: >
+          Listing segment (Novo Mercado, Nível 2, …).
+      - name: data_inicio_listagem
+        data_type: date
+        description: >
+          Listing start date.
+      - name: data_fim_listagem
+        data_type: date
+        description: >
+          Listing end date.

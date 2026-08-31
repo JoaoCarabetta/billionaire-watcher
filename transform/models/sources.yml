@@ -1,178 +1,584 @@
 version: 2
 
 sources:
-  - name: fase1_landing
-    description: |
-      Raw fase 1 company-door and size-floor files landed in GCS. Repository
-      downloaders preserve source fields; dbt owns normalization and business
-      logic. CNPJ columns in external tables must always be declared STRING.
+  - name: valor
+    description: Valor 1000 inventory used as seed A. Editorial starting list, not the oligarch definition.
     database: billionairewatcher
-    schema: billionaire_watcher_raw
+    schema: raw
     tables:
       - name: controle_empresas_walk
-        description: Repository inventory used as seed A.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv
-            encoding: UTF-8
-            field_delimiter: ";"
-            skip_leading_rows: 1
-      - name: bcb_entidades_supervisionadas
-        description: Banco Central Unicad entities for the configured reference date.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/bcb_entidades_supervisionadas.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: susep_dados_cadastrais
-        description: Full SUSEP DadosCadastrais dump, fetched without $top.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/susep_dados_cadastrais.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_listed_companies
-        description: GetInitialCompanies response rows restricted to type=1.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_companies.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_listed_supplement
-        description: GetListedSupplementCompany share quantities for type=1 issuers.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_listed_supplement.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: b3_cotahist_2026
+        identifier: valor_controle_empresas_walk
         description: |
-          B3 COTAHIST_A2026 records with TPMERC=010 and CODBDI=02. PREULT is
-          retained as integer cents. This is not the Base dos Dados trade tape.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/b3_cotahist_2026.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: cvm_fca_valor_mobiliario_2026
-        description: CVM FCA securities file used to map Codigo_Negociacao to CNPJ.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/cvm_fca_valor_mobiliario_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-      - name: ifdata_cadastro
-        description: |
-          IF.data quarter registry used to map prudential reporter codes to
-          the leading institution's 8-digit CNPJ.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_cadastro.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: ifdata_ativo_total_prudencial
-        description: |
-          IF.data Relatorio 2, Conta 140220 (Ativo Total), exclusively at
-          TipoInstituicao=1 (prudential) grain.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/ifdata_ativo_total_prudencial.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
-      - name: susep_receitas_seguros_2026
-        description: SUSEP ReceitasSeguros(Ano='2026') premiums rows.
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/fase1/pisos/susep_receitas_seguros_2026.csv
-            encoding: UTF-8
-            field_delimiter: ","
-            skip_leading_rows: 1
+          Repository inventory at data/controle-empresas-walk.csv, landed as-is.
+          CNPJ lives in identificador and must stay STRING. Staging reader:
+          stg_valor_empresa_inventario. identificador=vazio is a sentinel, not unique.
+        columns:
+          - name: nome
+            data_type: string
+          - name: identificador
+            data_type: string
+            description: 14-digit CNPJ, closed-group slug, or vazio
+          - name: tipo_societario
+            data_type: string
+          - name: no_grafo
+            data_type: string
+          - name: porque
+            data_type: string
+          - name: situacao_do_passeio
+            data_type: string
+          - name: no_formulario
+            data_type: string
+          - name: notas
+            data_type: string
 
-  - name: br_me_cnpj
-    description: Base dos Dados - Receita Federal CNPJ tables
-    database: basedosdados
-    schema: br_me_cnpj
+  - name: cvm
+    description: Comissão de Valores Mobiliários files landed in GCS. All identifier columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: cad_cia_aberta
+        identifier: cvm_cad_cia_aberta
+        description: |
+          Listed-company registry. Staging reader: stg_cvm_cia_aberta.
+          Seed-B filter SIT=ATIVO is applied later, not in raw or staging.
+        columns:
+          - name: CNPJ_CIA
+            data_type: string
+          - name: DENOM_SOCIAL
+            data_type: string
+          - name: DENOM_COMERC
+            data_type: string
+          - name: DT_REG
+            data_type: string
+          - name: DT_CONST
+            data_type: string
+          - name: DT_CANCEL
+            data_type: string
+          - name: MOTIVO_CANCEL
+            data_type: string
+          - name: SIT
+            data_type: string
+          - name: DT_INI_SIT
+            data_type: string
+          - name: CD_CVM
+            data_type: string
+          - name: SETOR_ATIV
+            data_type: string
+          - name: TP_MERC
+            data_type: string
+          - name: CATEG_REG
+            data_type: string
+          - name: DT_INI_CATEG
+            data_type: string
+          - name: SIT_EMISSOR
+            data_type: string
+          - name: DT_INI_SIT_EMISSOR
+            data_type: string
+          - name: CONTROLE_ACIONARIO
+            data_type: string
+            description: PRIVADO/ESTATAL/ESTRANGEIRO — type of control, not the person
+          - name: TP_ENDER
+            data_type: string
+          - name: LOGRADOURO
+            data_type: string
+          - name: COMPL
+            data_type: string
+          - name: BAIRRO
+            data_type: string
+          - name: MUN
+            data_type: string
+          - name: UF
+            data_type: string
+          - name: PAIS
+            data_type: string
+          - name: CEP
+            data_type: string
+          - name: DDD_TEL
+            data_type: string
+          - name: TEL
+            data_type: string
+          - name: DDD_FAX
+            data_type: string
+          - name: FAX
+            data_type: string
+          - name: EMAIL
+            data_type: string
+          - name: TP_RESP
+            data_type: string
+          - name: RESP
+            data_type: string
+          - name: DT_INI_RESP
+            data_type: string
+          - name: LOGRADOURO_RESP
+            data_type: string
+          - name: COMPL_RESP
+            data_type: string
+          - name: BAIRRO_RESP
+            data_type: string
+          - name: MUN_RESP
+            data_type: string
+          - name: UF_RESP
+            data_type: string
+          - name: PAIS_RESP
+            data_type: string
+          - name: CEP_RESP
+            data_type: string
+          - name: DDD_TEL_RESP
+            data_type: string
+          - name: TEL_RESP
+            data_type: string
+          - name: DDD_FAX_RESP
+            data_type: string
+          - name: FAX_RESP
+            data_type: string
+          - name: EMAIL_RESP
+            data_type: string
+          - name: CNPJ_AUDITOR
+            data_type: string
+          - name: AUDITOR
+            data_type: string
+      - name: fre_posicao_acionaria_2026
+        identifier: cvm_fre_posicao_acionaria_2026
+        description: |
+          FRE shareholder positions for 2026. Staging reader:
+          stg_cvm_fre_posicao_acionaria. CPF_CNPJ fields may be masked.
+        columns:
+          - name: CNPJ_Companhia
+            data_type: string
+          - name: Data_Referencia
+            data_type: string
+          - name: Versao
+            data_type: string
+          - name: ID_Documento
+            data_type: string
+          - name: Nome_Companhia
+            data_type: string
+          - name: ID_Acionista
+            data_type: string
+          - name: Acionista
+            data_type: string
+          - name: Tipo_Pessoa_Acionista
+            data_type: string
+          - name: CPF_CNPJ_Acionista
+            data_type: string
+          - name: ID_Acionista_Relacionado
+            data_type: string
+          - name: Acionista_Relacionado
+            data_type: string
+          - name: Tipo_Pessoa_Acionista_Relacionado
+            data_type: string
+          - name: CPF_CNPJ_Acionista_Relacionado
+            data_type: string
+          - name: Quantidade_Acao_Ordinaria_Circulacao
+            data_type: string
+          - name: Percentual_Acao_Ordinaria_Circulacao
+            data_type: string
+          - name: Quantidade_Acao_Preferencial_Circulacao
+            data_type: string
+          - name: Percentual_Acao_Preferencial_Circulacao
+            data_type: string
+          - name: Quantidade_Total_Acoes_Circulacao
+            data_type: string
+          - name: Percentual_Total_Acoes_Circulacao
+            data_type: string
+          - name: Nacionalidade
+            data_type: string
+          - name: Sigla_UF
+            data_type: string
+          - name: Residente_Exterior
+            data_type: string
+          - name: Representante_Legal
+            data_type: string
+          - name: Tipo_Pessoa_Representante_Legal
+            data_type: string
+          - name: CPF_CNPJ_Representante_legal
+            data_type: string
+            description: Official CVM spelling uses a lowercase L
+          - name: Data_Composicao_Capital_Social
+            data_type: string
+          - name: Data_Ultima_Alteracao
+            data_type: string
+          - name: Acionista_Controlador
+            data_type: string
+          - name: Participante_Acordo_Acionistas
+            data_type: string
+      - name: fre_capital_social_2026
+        identifier: cvm_fre_capital_social_2026
+        description: |
+          FRE item 17.1 capital social 2026. Staging reader: stg_cvm_fre_capital_social.
+          Autorizado / Emitido / Subscrito / Integralizado are views, not addends.
+        columns:
+          - name: CNPJ_Companhia
+            data_type: string
+          - name: Data_Referencia
+            data_type: string
+          - name: Versao
+            data_type: string
+          - name: ID_Documento
+            data_type: string
+          - name: Nome_Companhia
+            data_type: string
+          - name: ID_Capital_Social
+            data_type: string
+          - name: Tipo_Capital
+            data_type: string
+          - name: Data_Autorizacao_Aprovacao
+            data_type: string
+          - name: Valor_Capital
+            data_type: string
+          - name: Prazo_Integralizacao
+            data_type: string
+          - name: Quantidade_Acoes_Ordinarias
+            data_type: string
+          - name: Quantidade_Acoes_Preferenciais
+            data_type: string
+          - name: Quantidade_Total_Acoes
+            data_type: string
+      - name: fca_valor_mobiliario_2026
+        identifier: cvm_fca_valor_mobiliario_2026
+        description: |
+          FCA securities file. Staging reader: stg_cvm_fca_valor_mobiliario.
+          Codigo_Negociacao maps to COTAHIST CODNEG.
+        columns:
+          - name: CNPJ_Companhia
+            data_type: string
+          - name: Data_Referencia
+            data_type: string
+          - name: Versao
+            data_type: string
+          - name: ID_Documento
+            data_type: string
+          - name: Nome_Empresarial
+            data_type: string
+          - name: Valor_Mobiliario
+            data_type: string
+          - name: Sigla_Classe_Acao_Preferencial
+            data_type: string
+          - name: Classe_Acao_Preferencial
+            data_type: string
+          - name: Codigo_Negociacao
+            data_type: string
+          - name: Composicao_BDR_Unit
+            data_type: string
+          - name: Mercado
+            data_type: string
+          - name: Sigla_Entidade_Administradora
+            data_type: string
+          - name: Entidade_Administradora
+            data_type: string
+          - name: Data_Inicio_Negociacao
+            data_type: string
+          - name: Data_Fim_Negociacao
+            data_type: string
+          - name: Segmento
+            data_type: string
+          - name: Data_Inicio_Listagem
+            data_type: string
+          - name: Data_Fim_Listagem
+            data_type: string
+
+  - name: bcb
+    description: Banco Central Unicad and IF.data extracts. CNPJ columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: entidades_supervisionadas
+        identifier: bcb_entidades_supervisionadas
+        description: |
+          Unicad entities for the configured dataBase. Staging reader:
+          stg_bcb_entidade_supervisionada. Seed-B tipo/situação filters are later.
+        columns:
+          - name: database
+            data_type: string
+          - name: codigoCNPJ14
+            data_type: string
+          - name: codigoCNPJ8
+            data_type: string
+          - name: nomeEntidadeInteresse
+            data_type: string
+          - name: codigoTipoSituacaoPessoaJuridica
+            data_type: string
+          - name: codigoTipoEntidadeSupervisionada
+            data_type: string
+      - name: ifdata_cadastro
+        identifier: bcb_ifdata_cadastro
+        description: |
+          IF.data quarter registry. Staging reader: stg_bcb_ifdata_cadastro.
+        columns:
+          - name: CodInst
+            data_type: string
+          - name: Data
+            data_type: string
+          - name: NomeInstituicao
+            data_type: string
+          - name: CodConglomeradoPrudencial
+            data_type: string
+          - name: CnpjInstituicaoLider
+            data_type: string
+          - name: Situacao
+            data_type: string
+      - name: ifdata_ativo_total_prudencial
+        identifier: bcb_ifdata_ativo_total_prudencial
+        description: |
+          IF.data Relatorio 2, Conta 140220 (Ativo Total), TipoInstituicao=1 only.
+          Staging reader: stg_bcb_ifdata_ativo_total.
+        columns:
+          - name: TipoInstituicao
+            data_type: string
+          - name: CodInst
+            data_type: string
+          - name: AnoMes
+            data_type: string
+          - name: NumeroRelatorio
+            data_type: string
+          - name: Conta
+            data_type: string
+          - name: NomeColuna
+            data_type: string
+          - name: Saldo
+            data_type: string
+
+  - name: susep
+    description: Superintendência de Seguros Privados extracts. CNPJ columns are STRING.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: dados_cadastrais
+        identifier: susep_dados_cadastrais
+        description: |
+          Full DadosCadastrais dump, fetched without $top. Staging reader:
+          stg_susep_dado_cadastral. mercodigo filter is later.
+        columns:
+          - name: mercodigo
+            data_type: string
+          - name: entnome
+            data_type: string
+          - name: entcgc
+            data_type: string
+      - name: receitas_seguros_2026
+        identifier: susep_receitas_seguros_2026
+        description: |
+          ReceitasSeguros(Ano='2026') emitted premiums. Not SES premio_ganho.
+          Staging reader: stg_susep_receita_seguro.
+        columns:
+          - name: entnome
+            data_type: string
+          - name: cnpj
+            data_type: string
+          - name: mesreferencia
+            data_type: string
+          - name: grupo
+            data_type: string
+          - name: ramo
+            data_type: string
+          - name: valor
+            data_type: string
+
+  - name: b3
+    description: Brasil Bolsa Balcão listed-company and official close extracts.
+    database: billionairewatcher
+    schema: raw
+    tables:
+      - name: listed_companies
+        identifier: b3_listed_companies
+        description: |
+          GetInitialCompanies rows restricted to type=1. Staging reader:
+          stg_b3_empresa_listada.
+        columns:
+          - name: codeCVM
+            data_type: string
+          - name: issuingCompany
+            data_type: string
+          - name: companyName
+            data_type: string
+          - name: tradingName
+            data_type: string
+          - name: cnpj
+            data_type: string
+          - name: type
+            data_type: string
+      - name: listed_supplement
+        identifier: b3_listed_supplement
+        description: |
+          GetListedSupplementCompany share quantities. Staging reader:
+          stg_b3_empresa_listada_complemento.
+        columns:
+          - name: code
+            data_type: string
+          - name: codeCVM
+            data_type: string
+          - name: tradingName
+            data_type: string
+          - name: numberCommonShares
+            data_type: string
+          - name: numberPreferredShares
+            data_type: string
+          - name: totalNumberShares
+            data_type: string
+      - name: cotahist_2026
+        identifier: b3_cotahist_2026
+        description: |
+          COTAHIST_A2026 records with TPMERC=010 and CODBDI=02. PREULT is
+          integer cents. Staging reader: stg_b3_cotahist (divides by 100).
+          This is not the Base dos Dados trade tape.
+        columns:
+          - name: DATA_PREGAO
+            data_type: string
+          - name: CODBDI
+            data_type: string
+          - name: CODNEG
+            data_type: string
+          - name: TPMERC
+            data_type: string
+          - name: PREULT
+            data_type: string
+          - name: NUMNEG
+            data_type: string
+
+  - name: rf
+    description: |
+      Receita Federal CNPJ snapshot copied from Base dos Dados into this
+      project. One partition only. Downstream models must not query
+      basedosdados.br_me_cnpj directly. Staging readers: stg_rf_socio,
+      stg_rf_empresa, stg_rf_estabelecimento.
+    database: billionairewatcher
+    schema: raw
     tables:
       - name: socios
-        description: RF CNPJ sócios (partners), partitioned by data
+        identifier: rf_socios
+        description: QSA partners at rf_partition_date. documento may be masked.
         columns:
           - name: data
-            description: Partition date
+            data_type: date
+          - name: ano
+            data_type: int64
+          - name: mes
+            data_type: int64
           - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
+            data_type: string
           - name: tipo
-            description: Partner type (PJ/PF)
+            data_type: string
           - name: nome
-            description: Partner name
+            data_type: string
           - name: documento
-            description: CPF or CNPJ (masked per BD)
+            data_type: string
           - name: qualificacao
-            description: Partner qualification code
-          
+            data_type: string
+          - name: data_entrada_sociedade
+            data_type: date
+          - name: id_pais
+            data_type: string
+          - name: cpf_representante_legal
+            data_type: string
+          - name: nome_representante_legal
+            data_type: string
+          - name: qualificacao_representante_legal
+            data_type: string
+          - name: faixa_etaria
+            data_type: string
       - name: empresas
-        description: RF CNPJ empresas (companies), partitioned by data
+        identifier: rf_empresas
+        description: Company registry at rf_partition_date. cnpj_basico is 8-digit STRING.
         columns:
           - name: data
-            description: Partition date
+            data_type: date
+          - name: ano
+            data_type: int64
+          - name: mes
+            data_type: int64
           - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
+            data_type: string
           - name: razao_social
-            description: Company legal name
+            data_type: string
           - name: natureza_juridica
-            description: Legal nature code
+            data_type: string
+          - name: qualificacao_responsavel
+            data_type: string
           - name: capital_social
-            description: Share capital
-          
+            data_type: float64
+          - name: porte
+            data_type: string
+          - name: ente_federativo
+            data_type: string
       - name: estabelecimentos
-        description: RF CNPJ estabelecimentos (establishments), partitioned by data
+        identifier: rf_estabelecimentos
+        description: Establishments at rf_partition_date. cnpj is 14-digit STRING.
         columns:
           - name: data
-            description: Partition date
-          - name: cnpj_basico
-            description: 8-digit CNPJ base (STRING with leading zeros)
+            data_type: date
+          - name: ano
+            data_type: int64
+          - name: mes
+            data_type: int64
           - name: cnpj
-            description: 14-digit full CNPJ (STRING with leading zeros)
+            data_type: string
+          - name: cnpj_basico
+            data_type: string
+          - name: cnpj_ordem
+            data_type: string
+          - name: cnpj_dv
+            data_type: string
+          - name: identificador_matriz_filial
+            data_type: string
+          - name: nome_fantasia
+            data_type: string
+          - name: situacao_cadastral
+            data_type: string
+          - name: data_situacao_cadastral
+            data_type: date
+          - name: motivo_situacao_cadastral
+            data_type: string
+          - name: nome_cidade_exterior
+            data_type: string
+          - name: id_pais
+            data_type: string
+          - name: data_inicio_atividade
+            data_type: date
+          - name: cnae_fiscal_principal
+            data_type: string
+          - name: cnae_fiscal_secundaria
+            data_type: string
+          - name: sigla_uf
+            data_type: string
+          - name: id_municipio
+            data_type: string
+          - name: id_municipio_rf
+            data_type: string
+          - name: tipo_logradouro
+            data_type: string
+          - name: logradouro
+            data_type: string
+          - name: numero
+            data_type: string
+          - name: complemento
+            data_type: string
+          - name: bairro
+            data_type: string
+          - name: cep
+            data_type: string
+          - name: ddd_1
+            data_type: string
+          - name: telefone_1
+            data_type: string
+          - name: ddd_2
+            data_type: string
+          - name: telefone_2
+            data_type: string
+          - name: ddd_fax
+            data_type: string
+          - name: fax
+            data_type: string
+          - name: email
+            data_type: string
+          - name: situacao_especial
+            data_type: string
+          - name: data_situacao_especial
+            data_type: date
 
-  - name: gcs_cvm
-    description: CVM files on GCS (latin-1, semicolon-delimited)
+  - name: warehouse
+    description: Load inventory for the raw dataset.
     database: billionairewatcher
-    schema: billionaire_watcher_raw
+    schema: raw
     tables:
-      - name: fre_posicao_acionaria_2026
-        description: CVM FRE shareholder position 2026 (external table from GCS)
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_posicao_acionaria_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-          
-      - name: cad_cia_aberta
-        description: CVM registered listed companies (external table from GCS)
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/cad_cia_aberta.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
-
-      - name: fre_capital_social_2026
-        description: |
-          CVM FRE item 17.1 capital social 2026 (external table from GCS).
-          Company-level Quantidade_Acoes_Ordinarias / Quantidade_Acoes_Preferenciais.
-          Do not sum Tipo_Capital rows (Autorizado / Emitido / Subscrito / Integralizado
-          are different views of the same capital, not addends).
-        config:
-          meta:
-            external_location: gs://billionairewatcher-landing/raw/cvm/fre/2026/fre_cia_aberta_capital_social_2026.csv
-            encoding: ISO-8859-1
-            field_delimiter: ";"
-            skip_leading_rows: 1
+      - name: _manifest
+        description: One row per raw table with source URL, as-of date, GCS URI, checksum, and row count.

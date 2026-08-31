@@ -1,0 +1,337 @@
+id_tabela,nome_coluna,chave,valor
+stg_valor_empresa_inventario,tipo_societario,sociedade anônima aberta,Sociedade anônima aberta
+stg_valor_empresa_inventario,tipo_societario,sociedade anônima fechada,Sociedade anônima fechada
+stg_valor_empresa_inventario,tipo_societario,desconhecido,Desconhecido
+stg_valor_empresa_inventario,indicador_grafo,sim,Sim
+stg_valor_empresa_inventario,indicador_formulario,sim,Sim
+stg_valor_empresa_inventario,indicador_grafo,não,Não
+stg_valor_empresa_inventario,indicador_formulario,não,Não
+stg_valor_empresa_inventario,indicador_formulario,buraco,Buraco
+stg_valor_empresa_inventario,situacao_passeio,só inventário,Só inventário
+stg_valor_empresa_inventario,situacao_passeio,árvore no grafo,Árvore no grafo
+stg_valor_empresa_inventario,situacao_passeio,pulada-já-semente,"Pulada, já semente"
+stg_valor_empresa_inventario,situacao_passeio,grupo sem sócio,Grupo sem sócio
+stg_valor_empresa_inventario,situacao_passeio,buraco,Buraco
+stg_valor_empresa_inventario,situacao_passeio,inventário-fechada-não-andar,"Inventário, fechada, não andar"
+stg_valor_empresa_inventario,identificador,folha,Folha
+stg_valor_empresa_inventario,identificador,globo,Globo
+stg_valor_empresa_inventario,identificador,havan,Havan
+stg_valor_empresa_inventario,identificador,record,Record
+stg_valor_empresa_inventario,identificador,vazio,Sem CNPJ (sentinela)
+stg_cvm_cia_aberta,situacao,ATIVO,Ativo
+stg_cvm_cia_aberta,situacao,CANCELADA,Cancelada
+stg_cvm_cia_aberta,situacao,SUSPENSO,Suspenso
+stg_cvm_cia_aberta,tipo_controle_acionario,PRIVADO,Privado
+stg_cvm_cia_aberta,tipo_controle_acionario,ESTATAL,Estatal
+stg_cvm_cia_aberta,tipo_controle_acionario,ESTRANGEIRO,Estrangeiro
+stg_cvm_fre_posicao_acionaria,indicador_acionista_controlador,S,Sim
+stg_cvm_fre_posicao_acionaria,indicador_acionista_controlador,N,Não
+stg_cvm_fre_posicao_acionaria,indicador_participante_acordo_acionistas,S,Sim
+stg_cvm_fre_posicao_acionaria,indicador_participante_acordo_acionistas,N,Não
+stg_cvm_fre_posicao_acionaria,indicador_residente_exterior,S,Sim
+stg_cvm_fre_posicao_acionaria,indicador_residente_exterior,N,Não
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,Pessoa Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,Pessoa Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,PF,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista,PJ,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,Pessoa Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,Pessoa Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,PF,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_acionista_relacionado,PJ,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,Pessoa Física,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,Pessoa Jurídica,Pessoa jurídica
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,PF,Pessoa física
+stg_cvm_fre_posicao_acionaria,tipo_pessoa_representante_legal,PJ,Pessoa jurídica
+stg_cvm_fre_capital_social,tipo_capital,Autorizado,Autorizado
+stg_cvm_fre_capital_social,tipo_capital,Emitido,Emitido
+stg_cvm_fre_capital_social,tipo_capital,Subscrito,Subscrito
+stg_cvm_fre_capital_social,tipo_capital,Integralizado,Integralizado
+stg_bcb_entidade_supervisionada,tipo_situacao,3,Em funcionamento
+stg_bcb_entidade_supervisionada,tipo_entidade,2,Banco comercial
+stg_bcb_entidade_supervisionada,tipo_entidade,3,Cooperativa de crédito (excluída da semente B)
+stg_bcb_entidade_supervisionada,tipo_entidade,4,Banco múltiplo
+stg_bcb_entidade_supervisionada,tipo_entidade,5,Caixa econômica
+stg_bcb_entidade_supervisionada,tipo_entidade,6,Banco de desenvolvimento
+stg_bcb_entidade_supervisionada,tipo_entidade,7,Banco de investimento
+stg_bcb_entidade_supervisionada,tipo_entidade,8,"Sociedade de crédito, financiamento e investimento"
+stg_bcb_entidade_supervisionada,tipo_entidade,9,Sociedade de crédito imobiliário (excluída da semente B)
+stg_bcb_entidade_supervisionada,tipo_entidade,11,Sociedade de arrendamento mercantil (excluída da semente B)
+stg_bcb_entidade_supervisionada,tipo_entidade,13,Companhia hipotecária
+stg_bcb_entidade_supervisionada,tipo_entidade,28,Banco cooperativo
+stg_bcb_entidade_supervisionada,tipo_entidade,39,Associação de poupança e empréstimo
+stg_bcb_ifdata_cadastro,situacao,A,Ativa
+stg_bcb_ifdata_cadastro,situacao,I,Inativa
+stg_bcb_ifdata_ativo_total,tipo_instituicao,1,Conglomerado prudencial
+stg_bcb_ifdata_ativo_total,tipo_instituicao,2,Conglomerado financeiro
+stg_bcb_ifdata_ativo_total,tipo_instituicao,3,Instituição individual
+stg_susep_dado_cadastral,tipo_mercado,1,Seguros
+stg_susep_dado_cadastral,tipo_mercado,2,Previdência complementar aberta
+stg_susep_dado_cadastral,tipo_mercado,3,Capitalização
+stg_susep_dado_cadastral,tipo_mercado,4,Resseguros
+stg_susep_dado_cadastral,tipo_mercado,5,Corretores / outro mercado (fora da semente B)
+stg_susep_dado_cadastral,tipo_mercado,6,Entidade supervisionada adicional
+stg_b3_empresa_listada,tipo,1,Companhia listada (GetInitialCompanies type=1)
+stg_rf_socio,tipo,1,Pessoa jurídica
+stg_rf_socio,tipo,2,Pessoa física
+stg_rf_socio,tipo,3,Sócio estrangeiro
+stg_rf_socio,qualificacao,05,Administrador
+stg_rf_socio,qualificacao_representante_legal,05,Administrador
+stg_rf_empresa,qualificacao_responsavel,05,Administrador
+stg_rf_socio,qualificacao,08,Conselheiro de administração
+stg_rf_socio,qualificacao_representante_legal,08,Conselheiro de administração
+stg_rf_empresa,qualificacao_responsavel,08,Conselheiro de administração
+stg_rf_socio,qualificacao,09,Curador
+stg_rf_socio,qualificacao_representante_legal,09,Curador
+stg_rf_empresa,qualificacao_responsavel,09,Curador
+stg_rf_socio,qualificacao,10,Diretor
+stg_rf_socio,qualificacao_representante_legal,10,Diretor
+stg_rf_empresa,qualificacao_responsavel,10,Diretor
+stg_rf_socio,qualificacao,11,Interventor
+stg_rf_socio,qualificacao_representante_legal,11,Interventor
+stg_rf_empresa,qualificacao_responsavel,11,Interventor
+stg_rf_socio,qualificacao,12,Inventariante
+stg_rf_socio,qualificacao_representante_legal,12,Inventariante
+stg_rf_empresa,qualificacao_responsavel,12,Inventariante
+stg_rf_socio,qualificacao,13,Liquidante
+stg_rf_socio,qualificacao_representante_legal,13,Liquidante
+stg_rf_empresa,qualificacao_responsavel,13,Liquidante
+stg_rf_socio,qualificacao,14,Mãe
+stg_rf_socio,qualificacao_representante_legal,14,Mãe
+stg_rf_empresa,qualificacao_responsavel,14,Mãe
+stg_rf_socio,qualificacao,15,Pai
+stg_rf_socio,qualificacao_representante_legal,15,Pai
+stg_rf_empresa,qualificacao_responsavel,15,Pai
+stg_rf_socio,qualificacao,16,Presidente
+stg_rf_socio,qualificacao_representante_legal,16,Presidente
+stg_rf_empresa,qualificacao_responsavel,16,Presidente
+stg_rf_socio,qualificacao,17,Procurador
+stg_rf_socio,qualificacao_representante_legal,17,Procurador
+stg_rf_empresa,qualificacao_responsavel,17,Procurador
+stg_rf_socio,qualificacao,18,Síndico
+stg_rf_socio,qualificacao_representante_legal,18,Síndico
+stg_rf_empresa,qualificacao_responsavel,18,Síndico
+stg_rf_socio,qualificacao,19,Sociedade consorciada
+stg_rf_socio,qualificacao_representante_legal,19,Sociedade consorciada
+stg_rf_empresa,qualificacao_responsavel,19,Sociedade consorciada
+stg_rf_socio,qualificacao,20,Sociedade filiada
+stg_rf_socio,qualificacao_representante_legal,20,Sociedade filiada
+stg_rf_empresa,qualificacao_responsavel,20,Sociedade filiada
+stg_rf_socio,qualificacao,21,Sócio
+stg_rf_socio,qualificacao_representante_legal,21,Sócio
+stg_rf_empresa,qualificacao_responsavel,21,Sócio
+stg_rf_socio,qualificacao,22,Sócio capitalista
+stg_rf_socio,qualificacao_representante_legal,22,Sócio capitalista
+stg_rf_empresa,qualificacao_responsavel,22,Sócio capitalista
+stg_rf_socio,qualificacao,23,Sócio comanditado
+stg_rf_socio,qualificacao_representante_legal,23,Sócio comanditado
+stg_rf_empresa,qualificacao_responsavel,23,Sócio comanditado
+stg_rf_socio,qualificacao,24,Sócio comanditário
+stg_rf_socio,qualificacao_representante_legal,24,Sócio comanditário
+stg_rf_empresa,qualificacao_responsavel,24,Sócio comanditário
+stg_rf_socio,qualificacao,25,Sócio de indústria
+stg_rf_socio,qualificacao_representante_legal,25,Sócio de indústria
+stg_rf_empresa,qualificacao_responsavel,25,Sócio de indústria
+stg_rf_socio,qualificacao,26,Sócio pessoa jurídica domiciliado no exterior
+stg_rf_socio,qualificacao_representante_legal,26,Sócio pessoa jurídica domiciliado no exterior
+stg_rf_empresa,qualificacao_responsavel,26,Sócio pessoa jurídica domiciliado no exterior
+stg_rf_socio,qualificacao,28,Sócio-gerente
+stg_rf_socio,qualificacao_representante_legal,28,Sócio-gerente
+stg_rf_empresa,qualificacao_responsavel,28,Sócio-gerente
+stg_rf_socio,qualificacao,29,Sócio ou acionista incapaz
+stg_rf_socio,qualificacao_representante_legal,29,Sócio ou acionista incapaz
+stg_rf_empresa,qualificacao_responsavel,29,Sócio ou acionista incapaz
+stg_rf_socio,qualificacao,30,Tradutor / intérprete
+stg_rf_socio,qualificacao_representante_legal,30,Tradutor / intérprete
+stg_rf_empresa,qualificacao_responsavel,30,Tradutor / intérprete
+stg_rf_socio,qualificacao,31,Sócio pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao_representante_legal,31,Sócio pessoa física residente ou domiciliado no exterior
+stg_rf_empresa,qualificacao_responsavel,31,Sócio pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao,32,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao_representante_legal,32,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_empresa,qualificacao_responsavel,32,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao,33,Titular pessoa jurídica domiciliada no exterior
+stg_rf_socio,qualificacao_representante_legal,33,Titular pessoa jurídica domiciliada no exterior
+stg_rf_empresa,qualificacao_responsavel,33,Titular pessoa jurídica domiciliada no exterior
+stg_rf_socio,qualificacao,34,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_socio,qualificacao_representante_legal,34,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_empresa,qualificacao_responsavel,34,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_socio,qualificacao,35,Tesoureiro
+stg_rf_socio,qualificacao_representante_legal,35,Tesoureiro
+stg_rf_empresa,qualificacao_responsavel,35,Tesoureiro
+stg_rf_socio,qualificacao,36,Titular de empresa individual imobiliária
+stg_rf_socio,qualificacao_representante_legal,36,Titular de empresa individual imobiliária
+stg_rf_empresa,qualificacao_responsavel,36,Titular de empresa individual imobiliária
+stg_rf_socio,qualificacao,37,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_socio,qualificacao_representante_legal,37,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_empresa,qualificacao_responsavel,37,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_socio,qualificacao,38,Sócio pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao_representante_legal,38,Sócio pessoa física residente ou domiciliado no Brasil
+stg_rf_empresa,qualificacao_responsavel,38,Sócio pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao,39,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao_representante_legal,39,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_empresa,qualificacao_responsavel,39,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao,40,Diretor residente no exterior
+stg_rf_socio,qualificacao_representante_legal,40,Diretor residente no exterior
+stg_rf_empresa,qualificacao_responsavel,40,Diretor residente no exterior
+stg_rf_socio,qualificacao,41,Presidente residente no exterior
+stg_rf_socio,qualificacao_representante_legal,41,Presidente residente no exterior
+stg_rf_empresa,qualificacao_responsavel,41,Presidente residente no exterior
+stg_rf_socio,qualificacao,42,Conselheiro de administração residente no exterior
+stg_rf_socio,qualificacao_representante_legal,42,Conselheiro de administração residente no exterior
+stg_rf_empresa,qualificacao_responsavel,42,Conselheiro de administração residente no exterior
+stg_rf_socio,qualificacao,43,Administrador residente no exterior
+stg_rf_socio,qualificacao_representante_legal,43,Administrador residente no exterior
+stg_rf_empresa,qualificacao_responsavel,43,Administrador residente no exterior
+stg_rf_socio,qualificacao,46,Ministro de estado
+stg_rf_socio,qualificacao_representante_legal,46,Ministro de estado
+stg_rf_empresa,qualificacao_responsavel,46,Ministro de estado
+stg_rf_socio,qualificacao,47,Sócio pessoa física residente no Brasil
+stg_rf_socio,qualificacao_representante_legal,47,Sócio pessoa física residente no Brasil
+stg_rf_empresa,qualificacao_responsavel,47,Sócio pessoa física residente no Brasil
+stg_rf_socio,qualificacao,48,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_socio,qualificacao_representante_legal,48,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_empresa,qualificacao_responsavel,48,Sócio pessoa jurídica domiciliado no Brasil
+stg_rf_socio,qualificacao,49,Sócio-administrador
+stg_rf_socio,qualificacao_representante_legal,49,Sócio-administrador
+stg_rf_empresa,qualificacao_responsavel,49,Sócio-administrador
+stg_rf_socio,qualificacao,50,Administrador residente ou domiciliado no exterior
+stg_rf_socio,qualificacao_representante_legal,50,Administrador residente ou domiciliado no exterior
+stg_rf_empresa,qualificacao_responsavel,50,Administrador residente ou domiciliado no exterior
+stg_rf_socio,qualificacao,51,Cônsul
+stg_rf_socio,qualificacao_representante_legal,51,Cônsul
+stg_rf_empresa,qualificacao_responsavel,51,Cônsul
+stg_rf_socio,qualificacao,52,Sócio com capital
+stg_rf_socio,qualificacao_representante_legal,52,Sócio com capital
+stg_rf_empresa,qualificacao_responsavel,52,Sócio com capital
+stg_rf_socio,qualificacao,53,Sócio sem capital
+stg_rf_socio,qualificacao_representante_legal,53,Sócio sem capital
+stg_rf_empresa,qualificacao_responsavel,53,Sócio sem capital
+stg_rf_socio,qualificacao,54,Fundador
+stg_rf_socio,qualificacao_representante_legal,54,Fundador
+stg_rf_empresa,qualificacao_responsavel,54,Fundador
+stg_rf_socio,qualificacao,55,Sócio comanditado pessoa física
+stg_rf_socio,qualificacao_representante_legal,55,Sócio comanditado pessoa física
+stg_rf_empresa,qualificacao_responsavel,55,Sócio comanditado pessoa física
+stg_rf_socio,qualificacao,56,Sócio comanditário pessoa jurídica
+stg_rf_socio,qualificacao_representante_legal,56,Sócio comanditário pessoa jurídica
+stg_rf_empresa,qualificacao_responsavel,56,Sócio comanditário pessoa jurídica
+stg_rf_socio,qualificacao,57,Sócio comanditário pessoa física
+stg_rf_socio,qualificacao_representante_legal,57,Sócio comanditário pessoa física
+stg_rf_empresa,qualificacao_responsavel,57,Sócio comanditário pessoa física
+stg_rf_socio,qualificacao,58,Sócio comanditado pessoa jurídica
+stg_rf_socio,qualificacao_representante_legal,58,Sócio comanditado pessoa jurídica
+stg_rf_empresa,qualificacao_responsavel,58,Sócio comanditado pessoa jurídica
+stg_rf_socio,qualificacao,59,Produtor rural
+stg_rf_socio,qualificacao_representante_legal,59,Produtor rural
+stg_rf_empresa,qualificacao_responsavel,59,Produtor rural
+stg_rf_socio,qualificacao,63,Cotista
+stg_rf_socio,qualificacao_representante_legal,63,Cotista
+stg_rf_empresa,qualificacao_responsavel,63,Cotista
+stg_rf_socio,qualificacao,64,Administrador judicial
+stg_rf_socio,qualificacao_representante_legal,64,Administrador judicial
+stg_rf_empresa,qualificacao_responsavel,64,Administrador judicial
+stg_rf_socio,qualificacao,65,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao_representante_legal,65,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_empresa,qualificacao_responsavel,65,Titular pessoa física residente ou domiciliado no Brasil
+stg_rf_socio,qualificacao,66,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao_representante_legal,66,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_empresa,qualificacao_responsavel,66,Titular pessoa física residente ou domiciliado no exterior
+stg_rf_socio,qualificacao,67,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_socio,qualificacao_representante_legal,67,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_empresa,qualificacao_responsavel,67,Titular pessoa jurídica domiciliada no Brasil
+stg_rf_socio,qualificacao,68,Titular pessoa jurídica domiciliada no exterior
+stg_rf_socio,qualificacao_representante_legal,68,Titular pessoa jurídica domiciliada no exterior
+stg_rf_empresa,qualificacao_responsavel,68,Titular pessoa jurídica domiciliada no exterior
+stg_rf_socio,qualificacao,70,Ouvidor
+stg_rf_socio,qualificacao_representante_legal,70,Ouvidor
+stg_rf_empresa,qualificacao_responsavel,70,Ouvidor
+stg_rf_socio,qualificacao,72,Inventariante
+stg_rf_socio,qualificacao_representante_legal,72,Inventariante
+stg_rf_empresa,qualificacao_responsavel,72,Inventariante
+stg_rf_socio,qualificacao,73,Liquidante
+stg_rf_socio,qualificacao_representante_legal,73,Liquidante
+stg_rf_empresa,qualificacao_responsavel,73,Liquidante
+stg_rf_socio,qualificacao,74,Sócio ou acionista pessoa física
+stg_rf_socio,qualificacao_representante_legal,74,Sócio ou acionista pessoa física
+stg_rf_empresa,qualificacao_responsavel,74,Sócio ou acionista pessoa física
+stg_rf_socio,qualificacao,75,Sócio ou acionista pessoa jurídica
+stg_rf_socio,qualificacao_representante_legal,75,Sócio ou acionista pessoa jurídica
+stg_rf_empresa,qualificacao_responsavel,75,Sócio ou acionista pessoa jurídica
+stg_rf_socio,qualificacao,76,Presidente com poderes de administração no exterior
+stg_rf_socio,qualificacao_representante_legal,76,Presidente com poderes de administração no exterior
+stg_rf_empresa,qualificacao_responsavel,76,Presidente com poderes de administração no exterior
+stg_rf_socio,qualificacao,77,Administrador residente no Brasil
+stg_rf_socio,qualificacao_representante_legal,77,Administrador residente no Brasil
+stg_rf_empresa,qualificacao_responsavel,77,Administrador residente no Brasil
+stg_rf_socio,qualificacao,78,Titular pessoa física incapaz ou relativamente incapaz
+stg_rf_socio,qualificacao_representante_legal,78,Titular pessoa física incapaz ou relativamente incapaz
+stg_rf_empresa,qualificacao_responsavel,78,Titular pessoa física incapaz ou relativamente incapaz
+stg_rf_socio,qualificacao,79,Produtor rural pessoa jurídica
+stg_rf_socio,qualificacao_representante_legal,79,Produtor rural pessoa jurídica
+stg_rf_empresa,qualificacao_responsavel,79,Produtor rural pessoa jurídica
+stg_rf_empresa,natureza_juridica,2011,Empresa pública
+stg_rf_empresa,natureza_juridica,2038,Sociedade de economia mista
+stg_rf_empresa,natureza_juridica,2046,Sociedade anônima aberta
+stg_rf_empresa,natureza_juridica,2054,Sociedade anônima fechada
+stg_rf_empresa,natureza_juridica,2062,Sociedade empresária limitada
+stg_rf_empresa,natureza_juridica,2135,Empresário individual
+stg_rf_empresa,natureza_juridica,2143,Cooperativa
+stg_rf_empresa,natureza_juridica,2232,Sociedade simples
+stg_rf_empresa,natureza_juridica,2240,Sociedade simples limitada
+stg_rf_empresa,natureza_juridica,2305,Empresa individual de responsabilidade limitada (natureza empresária)
+stg_rf_empresa,natureza_juridica,2313,Empresa individual de responsabilidade limitada (natureza simples)
+stg_rf_empresa,natureza_juridica,2321,Sociedade unipessoal de advogados
+stg_rf_empresa,natureza_juridica,2330,Cooperativa de consumo
+stg_rf_empresa,natureza_juridica,3034,Serviço notarial e registral (cartório)
+stg_rf_empresa,natureza_juridica,3069,Fundação privada
+stg_rf_empresa,natureza_juridica,3077,Serviço social autônomo
+stg_rf_empresa,natureza_juridica,3085,Condomínio edilício
+stg_rf_empresa,natureza_juridica,3107,Comissão de conciliação prévia
+stg_rf_empresa,natureza_juridica,3115,Entidade de mediação e arbitragem
+stg_rf_empresa,natureza_juridica,3131,Entidade sindical
+stg_rf_empresa,natureza_juridica,3204,Estabelecimento no Brasil de sociedade estrangeira
+stg_rf_empresa,natureza_juridica,3212,Estabelecimento no Brasil de empresa binacional argentino-brasileira
+stg_rf_empresa,natureza_juridica,3220,Empresa domiciliada no exterior
+stg_rf_empresa,natureza_juridica,3239,Clube/fundo de investimento
+stg_rf_empresa,natureza_juridica,3247,Sociedade simples pura
+stg_rf_empresa,natureza_juridica,3255,Sociedade em conta de participação
+stg_rf_empresa,natureza_juridica,3263,Sociedade simples limitada
+stg_rf_empresa,natureza_juridica,3271,Órgão de direção nacional de partido político
+stg_rf_empresa,natureza_juridica,3280,Órgão de direção regional de partido político
+stg_rf_empresa,natureza_juridica,3298,Órgão de direção local de partido político
+stg_rf_empresa,natureza_juridica,3301,Comitê financeiro de partido político
+stg_rf_empresa,natureza_juridica,3306,Frente pleiteira
+stg_rf_empresa,natureza_juridica,3999,Associação privada
+stg_rf_empresa,natureza_juridica,4014,Empresa individual imobiliária
+stg_rf_empresa,natureza_juridica,4090,Candidato a cargo político eletivo
+stg_rf_empresa,natureza_juridica,4120,Produtor rural (pessoa física)
+stg_rf_empresa,natureza_juridica,5010,Organização internacional
+stg_rf_empresa,natureza_juridica,5029,Representação diplomática estrangeira
+stg_rf_empresa,natureza_juridica,5037,Outras instituições extraterritoriais
+stg_rf_empresa,porte,00,Não informado
+stg_rf_empresa,porte,01,Microempresa
+stg_rf_empresa,porte,03,Empresa de pequeno porte
+stg_rf_empresa,porte,05,Demais
+stg_rf_estabelecimento,identificador_matriz_filial,1,Matriz
+stg_rf_estabelecimento,identificador_matriz_filial,2,Filial
+stg_rf_estabelecimento,situacao_cadastral,01,Nula
+stg_rf_estabelecimento,situacao_cadastral,02,Ativa
+stg_rf_estabelecimento,situacao_cadastral,03,Suspensa
+stg_rf_estabelecimento,situacao_cadastral,04,Inapta
+stg_rf_estabelecimento,situacao_cadastral,08,Baixada
+stg_rf_socio,faixa_etaria,0,Não se aplica
+stg_rf_socio,faixa_etaria,1,0 a 12 anos
+stg_rf_socio,faixa_etaria,2,13 a 17 anos
+stg_rf_socio,faixa_etaria,3,18 a 20 anos
+stg_rf_socio,faixa_etaria,4,21 a 30 anos
+stg_rf_socio,faixa_etaria,5,31 a 40 anos
+stg_rf_socio,faixa_etaria,6,41 a 50 anos
+stg_rf_socio,faixa_etaria,7,51 a 60 anos
+stg_rf_socio,faixa_etaria,8,61 a 70 anos
+stg_rf_socio,faixa_etaria,9,Mais de 70 anos

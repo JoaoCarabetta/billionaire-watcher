@@ -1,0 +1,7 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+DATA_PREGAO,data_pregao,date,Trading session date (source YYYYMMDD).,2026(1)2026,no,,,
+CODNEG,ticker,string,B3 trading code. Joins FCA Codigo_Negociacao.,(1),no,,,
+CODBDI,codigo_bdi,string,BDI code. Landed extract is already 02 (lote-padrão).,(1),no,,,
+TPMERC,tipo_mercado,string,Market type. Landed extract is already 010 (vista).,(1),no,,,
+PREULT,preco_fechamento,numeric,Official close. Source PREULT is integer cents; staging divides by 100.,(1),no,,BRL,
+NUMNEG,quantidade_negocio,int64,Number of trades in the session.,(1),no,,1,

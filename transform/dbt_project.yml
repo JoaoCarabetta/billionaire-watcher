@@ -18,16 +18,20 @@ models:
   billionaire_watcher:
     +materialized: table
     staging:
-      +schema: billionaire_watcher
-      +materialized: table
-      +meta:
-        location: US
+      +schema: staging
+      +persist_docs:
+        relation: true
+        columns: true
+      +contract:
+        enforced: true
+    marts:
+      +schema: marts
 
 seeds:
   billionaire_watcher:
-    +schema: billionaire_watcher
-    +meta:
-      location: US
+    +enabled: "{{ target.name in ['test', 'ci'] }}"
+    dicionario:
+      +enabled: true
 
 vars:
   rf_partition_date: '2026-01-11'

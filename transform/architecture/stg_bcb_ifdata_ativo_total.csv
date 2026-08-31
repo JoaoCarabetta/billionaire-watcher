@@ -1,0 +1,8 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+AnoMes,ano_mes,string,YYYYMM of the IF.data quarter.,2026-03(1)2026-03,no,,,
+TipoInstituicao,tipo_instituicao,int64,Institution grain. Landed extract is already TipoInstituicao=1 (prudential). Never mix 2 or 3.,(1),yes,,,
+CodInst,id_instituicao,string,Prudential reporter code. Joins cadastro.,(1),no,,,
+NumeroRelatorio,numero_relatorio,string,Report number. Landed extract is Relatorio 2.,(1),no,,,
+Conta,conta,string,Account code. Landed extract is 140220 (Ativo Total).,(1),no,,,
+NomeColuna,nome_conta,string,Account label as published.,(1),no,,,
+Saldo,saldo,numeric,Ativo Total balance. Floor later uses this as valor_do_piso.,(1),no,,BRL,

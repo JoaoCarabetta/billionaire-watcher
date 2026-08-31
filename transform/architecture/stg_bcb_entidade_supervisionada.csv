@@ -1,0 +1,7 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+database,data_base,date,Unicad dataBase used in the OData call.,2026-08(1)2026-08,no,,,Landed as MM-DD-YYYY (08-01-2026).
+codigoCNPJ14,id_cnpj,string,14-digit CNPJ of this Unicad row (line identifier). Headquarters end in 0001.,(1),no,,,
+codigoCNPJ8,cnpj_basico,string,8-digit institution CNPJ. Join key to IF.data.,(1),no,,,
+nomeEntidadeInteresse,nome,string,Supervised-entity name.,(1),no,,,
+codigoTipoSituacaoPessoaJuridica,tipo_situacao,string,Legal-person situation code. Seed B later keeps 3 (em funcionamento).,(1),yes,,,
+codigoTipoEntidadeSupervisionada,tipo_entidade,string,"Supervised-entity type. Seed B later keeps {2,4,5,6,7,8,13,28,39} and drops {3,9,11}.",(1),yes,,,

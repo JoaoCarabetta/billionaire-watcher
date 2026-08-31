@@ -1,0 +1,15 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,FRE extract year.,2026(1)2026,no,,,Added in staging.
+CNPJ_Companhia,id_cnpj,string,"Issuer CNPJ, digits only, padded to 14.",(1),no,,,
+Data_Referencia,data_referencia,date,Reference date of this capital-social view.,(1),no,,,
+Versao,versao,int64,Document version number.,(1),no,,,
+ID_Documento,id_documento,string,FRE document id.,(1),no,,,
+Nome_Companhia,nome_companhia,string,Issuer name as written on the FRE.,(1),no,,,
+ID_Capital_Social,id_capital_social,string,Capital-social line id inside the document.,(1),no,,,
+Tipo_Capital,tipo_capital,string,"Capital view: Autorizado / Emitido / Subscrito / Integralizado. Views, not addends.",(1),yes,,,
+Data_Autorizacao_Aprovacao,data_autorizacao_aprovacao,string,Authorization/approval date as published.,(1),no,,,
+Valor_Capital,valor_capital,numeric,Capital amount in this view.,(1),no,,BRL,
+Prazo_Integralizacao,prazo_integralizacao,string,Paid-in deadline when published.,(1),no,,,
+Quantidade_Acoes_Ordinarias,quantidade_acao_ordinaria,int64,Ordinary share count in this view.,(1),no,,acao,
+Quantidade_Acoes_Preferenciais,quantidade_acao_preferencial,int64,Preferred share count in this view.,(1),no,,acao,
+Quantidade_Total_Acoes,quantidade_total_acao,int64,Total share count in this view.,(1),no,,acao,

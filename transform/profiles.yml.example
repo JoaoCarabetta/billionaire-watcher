@@ -8,7 +8,10 @@ billionaire_watcher:
       type: bigquery
       method: oauth
       project: billionairewatcher
-      dataset: billionaire_watcher
+      dataset: marts
       location: US
       threads: 4
       timeout_seconds: 300
+    test:
+      type: duckdb
+      path: ":memory:"

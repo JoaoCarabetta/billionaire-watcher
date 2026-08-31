@@ -1,0 +1,8 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,Year of the listed-company pull.,2026(1)2026,no,,,Added in staging.
+cnpj,id_cnpj,string,"Issuer CNPJ, padded to 14. Downloader already zfilled.",(1),no,,,
+codeCVM,id_cvm,string,CVM issuer code.,(1),no,,,
+issuingCompany,codigo_emissor,string,B3 issuing-company code. Joins the supplement code.,(1),no,,,
+companyName,razao_social,string,Legal name from GetInitialCompanies.,(1),no,,,
+tradingName,nome_comercial,string,Trading name.,(1),no,,,
+type,tipo,string,B3 company type. Landed extract is already type=1.,(1),yes,,,

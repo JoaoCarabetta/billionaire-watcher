@@ -26,6 +26,17 @@ Features:
 
 The [Is Agentic CI workflow](.github/workflows/is-agentic-ci.yml) runs automatically to verify agent-readiness on the deployed site at https://billionaire-watcher.pages.dev/
 
+<<<<<<< Updated upstream
 - **Triggers:** Push to main (site files) + weekday schedule
 - **Command:** `npx is-agentic https://billionaire-watcher.pages.dev/ --json`
 - **Failure Policy:** Fails only on Essential tier issues; Recommended API/OAuth/MCP gaps do not block
+
+## Armazém
+
+Três datasets no projeto `billionairewatcher`: `raw`, `staging`, `marts`.
+Ver [transform/README.md](transform/README.md) e
+[docs/spec-fase1-oligarcas.md](docs/spec-fase1-oligarcas.md).
+
+```sh
+cd transform && dbt parse --target test
+```

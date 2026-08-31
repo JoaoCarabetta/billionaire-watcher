@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: stg_susep_dado_cadastral
+    description: >
+      SUSEP DadosCadastrais dump (no $top), typed and renamed. mercodigo in {1,2,3,4,6} is the seed-B cut and is not applied here.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Supervised-entity CNPJ is 14 digits.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Year of the cadastro dump.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Supervised-entity CNPJ, padded to 14.
+        data_tests:
+          - unique
+          - not_null
+      - name: nome
+        data_type: string
+        description: >
+          Supervised-entity name.
+        data_tests:
+          - not_null
+      - name: tipo_mercado
+        data_type: string
+        description: >
+          SUSEP market code. Seed B later keeps {1,2,3,4,6} and drops 5.
+  - name: stg_susep_receita_seguro
+    description: >
+      SUSEP ReceitasSeguros emitted premiums. Not SES premio_ganho. One row per insurer × month × group × ramo.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_cnpj
+              - mes_referencia
+              - grupo
+              - ramo
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "id_cnpj is null or length(id_cnpj) = 14"
+          description: >
+            Insurer CNPJ is 14 digits.
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          ReceitasSeguros year parameter.
+        data_tests:
+          - not_null
+      - name: id_cnpj
+        data_type: string
+        description: >
+          Insurer CNPJ, padded to 14.
+        data_tests:
+          - not_null
+      - name: nome
+        data_type: string
+        description: >
+          Insurer name.
+      - name: mes_referencia
+        data_type: string
+        description: >
+          Reference month as published by Olinda.
+      - name: grupo
+        data_type: string
+        description: >
+          Premium group.
+      - name: ramo
+        data_type: string
+        description: >
+          Insurance branch.
+      - name: valor
+        data_type: numeric
+        description: >
+          Emitted premiums (prêmios emitidos). Not SES premio_ganho.

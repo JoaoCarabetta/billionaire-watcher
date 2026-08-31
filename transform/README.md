@@ -1,90 +1,90 @@
 # dbt Billionaire Watcher
 
-dbt-bigquery project skeleton for the Billionaire Watcher civic archive.
+Three BigQuery datasets in project `billionairewatcher` (location `US`):
 
-## Status
+| Dataset | Role |
+|---|---|
+| `raw` | As ingested. One native table per source file or snapshot. No business filters. |
+| `staging` | Typed, renamed (Base dos Dados style), still one model per origin. Hygiene only — seed-B filters stay for intermediate/marts. |
+| `marts` | Entities ready to serve (`empresas`, `pessoas`, `pessoas_empresas`). Empty until the next pass. |
 
-The old warehouse layer (freeze walk, hops, valor-universo graph, person-money,
-facts, TSE matches and their seeds) was removed. The design of the replacement
-pipeline — the node tables `empresas` and `pessoas`, the written edge table
-`vinculos`, the justifying-path table `percursos`, and the compatibility view
-`pessoas_empresas` with the `e_oligarca` flag — lives in
-[docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md).
-Issues #178, #179, and #181 implement the company door and ownership walk:
+The endpoint remains [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md). This pass owns `raw` and `staging`.
 
-- **`empresas`** (`models/empresas.sql`): one company per `empresa_id`, built
-  from seed A union the CVM, BCB, and SUSEP seed-B registries, plus intermediate
-  holdings cited during the upward walk with `motivo_entrada = subida` and
-  companies found by the one-hop invert with `motivo_entrada = hop`. It
-  left-joins optional size floors without dropping uncovered companies.
-- **`vinculos`** (`models/vinculos.sql`): every cited person-company edge plus
-  each company-company edge traversed by the upward walk. The destination is
-  always the owned company.
-- **`percursos`** (`models/percursos.sql`): one row per step of each concrete
-  cited path from an `e_oligarca` person to a seed Formulário door. Direct
-  seed-Formulário people have a one-step path. Inherited holding partners
-  have a multi-step path with `fonte_documento` and `regra_do_passo` on every
-  step. Hop citations never become a last step.
-- **`pessoas_empresas`** (`models/pessoas_empresas.sql`): compatibility view
-  over person-origin rows in `vinculos`, with the original columns.
-- **`pessoas`** (`models/pessoas.sql`): one natural person per CPF-backed or
-  provisional identity, with `e_oligarca` true on a seed Formulário door and
-  for cited partners of a holding that sits on that door (and the same up
-  the chain). Hop citations never change the flag.
-- **`int_walk_roots`** (`models/int_walk_roots.sql`): the shared one-column set
-  of seed companies allowed to start a walk.
-- **Generic macros** (`macros/`): `generate_schema_name`, `digits_only`,
-  `prefix8_from_cnpj14`, `normalize_company_name`, `normalize_person_name`,
-  `person_id_from_cpf`, plus a cross-adapter empty string-array helper.
+## Staging
 
-- **CVM staging readers** (`models/staging/`): pure type-cast/normalize readers,
-  reusable by the fase 1 pipeline:
+Architecture CSVs in [`architecture/`](architecture/) are the source of truth for names, BigQuery types, units, directories, and dictionary flags. Profiles live in [`models/staging/profiles/`](models/staging/profiles/). Coded values are in the `dicionario` seed.
 
-| Model | Description | Grain |
-|-------|-------------|-------|
-| `stg_cvm_fre_posicao_acionaria_2026` | CVM FRE shareholder positions | (CNPJ_Companhia, Data_Referencia, ID_Acionista) |
-| `stg_cvm_fre_capital_social_2026` | CVM FRE 17.1 capital social | (CNPJ_Companhia, ID_Documento, Tipo_Capital, ID_Capital_Social) |
-| `stg_cvm_cad_cia_aberta` | CVM listed company registry | CNPJ_CIA |
+| Staging model | Raw source | Grain |
+|---|---|---|
+| `stg_valor_empresa_inventario` | `valor.controle_empresas_walk` | one inventory company (`identificador` is not unique) |
+| `stg_cvm_cia_aberta` | `cvm.cad_cia_aberta` | one issuer |
+| `stg_cvm_fre_posicao_acionaria` | `cvm.fre_posicao_acionaria_2026` | company × document × shareholder |
+| `stg_cvm_fre_capital_social` | `cvm.fre_capital_social_2026` | company × document × capital view |
+| `stg_cvm_fca_valor_mobiliario` | `cvm.fca_valor_mobiliario_2026` | one security line |
+| `stg_bcb_entidade_supervisionada` | `bcb.entidades_supervisionadas` | one Unicad entity |
+| `stg_bcb_ifdata_cadastro` | `bcb.ifdata_cadastro` | one reporter / quarter |
+| `stg_bcb_ifdata_ativo_total` | `bcb.ifdata_ativo_total_prudencial` | one prudential Ativo Total |
+| `stg_susep_dado_cadastral` | `susep.dados_cadastrais` | one supervised entity |
+| `stg_susep_receita_seguro` | `susep.receitas_seguros_2026` | insurer × month × group × ramo |
+| `stg_b3_empresa_listada` | `b3.listed_companies` | one listed issuer |
+| `stg_b3_empresa_listada_complemento` | `b3.listed_supplement` | one issuer supplement |
+| `stg_b3_cotahist` | `b3.cotahist_2026` | ticker × session (`PREULT`/100 → BRL) |
+| `stg_rf_socio` | `rf.socios` | one QSA row |
+| `stg_rf_empresa` | `rf.empresas` | one `cnpj_basico` |
+| `stg_rf_estabelecimento` | `rf.estabelecimentos` | one establishment |
 
-- **Frozen v0 seed CSVs** (`seeds/`): `b3_listed_prices.csv`,
-  `listed_prices_fixture.csv`, `energisa_edges_fixture.csv`. These stay only
-  because the shipped site tooling (`metrics/money.ts`,
-  `src/lib/listed-quantities.ts`, `test/grafo-money.test.ts`) reads them from
-  these paths. They are not inputs of the fase 1 pipeline.
+Naming follows the [Base dos Dados style manual](https://basedosdados.org/docs/style_data) (snake_case, singular, no year in the table name, `id_` only for entity keys, `proporcao_` 0–100). Deviations: `stg_` prefix, `NUMERIC` for money, identifiers always STRING. Original source names stay in architecture `original_name` and in the spec citations.
 
-## Data Sources (kept source definitions)
+```bash
+dbt run --select staging --target dev
+dbt test --select staging --target dev
+```
 
-- **RF CNPJ**: Base dos Dados `basedosdados.br_me_cnpj` (`socios`, `empresas`,
-  `estabelecimentos`), partition `{{ var("rf_partition_date") }}` (`2026-01-11`)
-- **CVM**: GCS `gs://billionairewatcher-landing/raw/cvm/fre/2026/`
-  (`fre_cia_aberta_posicao_acionaria_2026.csv`,
-  `fre_cia_aberta_capital_social_2026.csv`, `cad_cia_aberta.csv`;
-  latin-1, semicolon)
-- **Fase 1 landing**: GCS `gs://billionairewatcher-landing/raw/fase1/`
-  (`controle-empresas-walk.csv`, `bcb_entidades_supervisionadas.csv`,
-  `susep_dados_cadastrais.csv`). The corresponding BigQuery external tables
-  are declared under the `fase1_landing` source.
+DuckDB CI only parses. Models that read `raw` need the BigQuery `dev` target.
 
-### Land the company-door inputs
+GCS `gs://billionairewatcher-landing/` is the file archive. dbt **declares** `raw` tables as sources; it does not build them.
 
-The downloader uses only Python's standard library. It copies seed A from the
-repository, fetches CVM using latin-1/semicolon as published, calls BCB with
-`dataBase=@dataBase` inside `EntidadesSupervisionadas(...)`, and fetches the
-full SUSEP dump without `$top`:
+## Raw inventory
+
+All identifier columns (CNPJ, CPF) are STRING. Query `raw._manifest` for source URL, as-of date, GCS URI, sha256, and row count.
+
+| Origin | Table | Landed from |
+|---|---|---|
+| valor | `valor_controle_empresas_walk` | `data/controle-empresas-walk.csv` |
+| cvm | `cvm_cad_cia_aberta` | dados.cvm.gov.br cadastro |
+| cvm | `cvm_fre_posicao_acionaria_2026` | FRE posição acionária 2026 |
+| cvm | `cvm_fre_capital_social_2026` | FRE capital social 2026 |
+| cvm | `cvm_fca_valor_mobiliario_2026` | FCA valor mobiliário 2026 |
+| bcb | `bcb_entidades_supervisionadas` | Unicad EntidadesSupervisionadas |
+| bcb | `bcb_ifdata_cadastro` | IF.data cadastro |
+| bcb | `bcb_ifdata_ativo_total_prudencial` | IF.data Relatorio 2, Conta 140220 |
+| susep | `susep_dados_cadastrais` | DadosCadastrais (no `$top`) |
+| susep | `susep_receitas_seguros_2026` | ReceitasSeguros 2026 |
+| b3 | `b3_listed_companies` | GetInitialCompanies type=1 |
+| b3 | `b3_listed_supplement` | GetListedSupplementCompany |
+| b3 | `b3_cotahist_2026` | COTAHIST_A2026, TPMERC=010, CODBDI=02 |
+| rf | `rf_socios`, `rf_empresas`, `rf_estabelecimentos` | Base dos Dados `br_me_cnpj` partition `{{ var("rf_partition_date") }}` (`2026-01-11`) |
+
+Receita tables are a **copy** of that partition into this project. Do not query `basedosdados.br_me_cnpj` from staging or marts.
+
+`basedosdados.br_b3_cotacoes.cotacoes` is a trade tape, not COTAHIST. Do not use it as a close-price substitute.
+
+## Land files, then load raw
+
+Downloaders only write files. They do not filter seed B or compute floors.
 
 ```bash
 cd transform
 python3 scripts/download_fase1_company_sources.py \
   --bcb-date 08-01-2026 \
   --output-dir landing/fase1
+python3 scripts/download_fase1_floor_sources.py \
+  --year 2026 \
+  --ifdata-period 202603 \
+  --output-dir landing/fase1/pisos
 ```
 
-The BCB extraction fails unless the named `SedesBancoComMultCE` check is 154
-for the reference date. Its raw bank-seat check includes BCB type 11; the dbt
-seed filter then explicitly excludes type 11 together with types 3 and 9.
-`manifest.json` records source URLs, row counts, checksums, and the check.
-
-Upload the generated files to the objects used by `models/sources.yml`:
+Upload to the objects already used by the loader:
 
 ```bash
 gcloud storage cp landing/fase1/cad_cia_aberta.csv \
@@ -94,114 +94,16 @@ gcloud storage cp \
   landing/fase1/bcb_entidades_supervisionadas.csv \
   landing/fase1/susep_dados_cadastrais.csv \
   gs://billionairewatcher-landing/raw/fase1/
+gcloud storage cp landing/fase1/pisos/*.csv \
+  gs://billionairewatcher-landing/raw/fase1/pisos/
 ```
 
-Define the three `fase1_landing` external relations with CNPJ fields as
-`STRING`; never allow schema inference to turn identifiers into integers.
-
-### Land the company size-floor inputs
-
-The floor downloader writes seven raw extracts plus a checksum manifest:
+Load native `raw` tables (STRING schemas) and copy the Receita partition:
 
 ```bash
-cd transform
-python3 scripts/download_fase1_floor_sources.py \
-  --year 2026 \
-  --ifdata-period 202603 \
-  --output-dir landing/fase1/pisos
+export GOOGLE_APPLICATION_CREDENTIALS=/caminho/da-service-account.json
+python3 scripts/load_raw.py --credentials "$GOOGLE_APPLICATION_CREDENTIALS"
 ```
-
-Upload the CSVs under
-`gs://billionairewatcher-landing/raw/fase1/pisos/`, matching
-`models/sources.yml`.
-
-The three floor families and exact sources are:
-
-- **Bolsa:** B3
-  [`GetInitialCompanies`](https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall/GetInitialCompanies)
-  with `type=1` and
-  [`GetListedSupplementCompany`](https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall/GetListedSupplementCompany)
-  for quantities; CVM
-  [`fca_cia_aberta_2026.zip`](https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FCA/DADOS/fca_cia_aberta_2026.zip)
-  maps `Codigo_Negociacao` to CNPJ; B3
-  [`COTAHIST_A2026.ZIP`](https://bvmf.bmfbovespa.com.br/InstDados/SerHist/COTAHIST_A2026.ZIP)
-  supplies official `PREULT` closes for `TPMERC=010`, `CODBDI=02`.
-  `basedosdados.br_b3_cotacoes.cotacoes` is a trade tape and is never used as
-  a COTAHIST substitute.
-- **Banks:** BCB
-  [`IfDataValores`](https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata/)
-  at **prudential grain only** (`TipoInstituicao=1`), `Relatorio='2'`,
-  `Conta=140220`, field `Saldo`. `IfDataCadastro` maps the reporter to its
-  leading `codigoCNPJ8`; the BCB registry supplies the real full headquarters
-  CNPJ. Individual and financial-conglomerate grains are never mixed in.
-- **Insurers:** SUSEP
-  [`ReceitasSeguros(Ano=@Ano)`](https://dados.susep.gov.br/olinda/servico/receitasoperacionais/versao/v1/odata/)
-  field `valor`, summed as annual-to-date emitted premiums. The SES field
-  `premio_ganho` is not used.
-
-`int_empresas_piso` resolves cross-family overlap with deterministic precedence
-Bolsa → IF.data → SUSEP. `empresas` left-joins it: no floor means
-`tem_piso=false`, never removal from the company door.
-
-### CNPJ Normalization
-
-**Critical:** CNPJ fields are normalized as STRING to preserve leading zeros:
-
-- **`cnpj_basico`** (RF): 8-digit STRING, lpad 8 — JBS is `'02916265'`
-- **`CNPJ_Companhia`, `CNPJ_CIA`** (CVM): 14-digit STRING, strip punctuation,
-  lpad 14 — JBS is `'02916265000160'` (from `02.916.265/0001-60`)
-
-### RF Partner Edges: sócio, never dono/UBO
-
-RF CNPJ `socios` lists **sócio** (partner) relationships as recorded in the
-Quadro de Sócios e Administradores. It does **NOT** compute beneficial
-ownership. Any controlador interpretation must come from the CVM FRE
-shareholder-position file, never be inferred from RF alone.
-
-The walk filters QSA to ownership qualifications: administrator-, director-,
-president-, and council-only rows never become owners. QSA has no percentage or
-control signal, so those fields remain null. A closed S.A. (`natureza_juridica`
-2054) stops because QSA is not a public shareholder book. QSA `tipo=3`
-(foreign partner) uses an 11/14-digit document first, then Receita's
-person-specific/legal-person qualification labels. A foreign legal partner
-without CNPJ uses the existing `nome:` company key; a foreign natural partner
-without CPF uses the existing provisional person key. Neither invents a
-document.
-
-### Upward ownership walk
-
-For each seed with `nao_caminha = false`, the recursive walk uses the largest
-`ID_Documento` per company from
-`fre_cia_aberta_posicao_acionaria_2026.csv`. Companies without a FRE position
-use Receita `socios` and `empresas` at `rf_partition_date`. It stops at
-`Outros`, treasury shares, closed S.A.s without a public shareholder book,
-unknown shareholder types, and cycles. It does not use
-`fre_cia_historico_emissor`, the frozen public graph, or hop JSON.
-
-The unit seam in `tests/unit_test_fase1_ownership_walk.yml` uses the three seed
-registries plus FRE and QSA slices. Alice Controladora is true through
-controller `S` on a seed; Camila Citada is false below 10%; Felipe is true as
-a Quadro de Sócios partner of a Formulário-controller holding; Diana Holding
-is true because her holding sits on that seed door; Ines stays false because
-her controller citation is on a `subida` company that is not on a seed door;
-and the two CPF-less JOAO SILVA citations remain separate.
-
-### One-hop downward invert
-
-Only people already identified as `e_oligarca` and carrying a full CPF can
-start the downward hop. FRE rows match the full 11 CPF digits; Receita QSA rows
-match the six-digit mask derived from that stored CPF only when the mask maps
-to exactly one stored oligarch CPF. Colliding masks do not match, and names
-never start an invert. The lookup covers every latest FRE company and every
-QSA row, not only seed companies.
-
-Qualifying FRE companies (controller `S` or at least 10% ON) and every Receita
-company where the oligarch is a partner enter as `motivo_entrada = hop`.
-Receita company CNPJs come from the partitioned `estabelecimentos` source, so
-the pipeline does not invent a `/0001` suffix. Every directly cited natural
-person on a hop company enters `pessoas` and `vinculos` and remains visible
-through `pessoas_empresas`; those new partners do not start another descent and
-do not become oligarchs because of a hop tie.
 
 ## Setup
 
@@ -209,26 +111,25 @@ do not become oligarchs because of a hop tie.
 2. Copy `profiles.yml.example` to `~/.dbt/profiles.yml` and fill in GCP credentials
 3. `dbt deps`
 
-## Usage
-
 ```bash
-dbt parse                              # syntax check
-dbt test --select test_type:unit       # unit tests (fixtures only, no GCP)
-dbt run                                # staging readers (requires BigQuery)
+dbt parse --target test
 ```
 
-### Continuous Integration
+GitHub Actions runs `dbt parse` on every PR and push that touches `transform/`. No GCP credentials required.
 
-GitHub Actions (`.github/workflows/dbt-ci.yml`) runs `dbt parse` and
-`dbt test --select test_type:unit` on every PR and push that touches
-`transform/`. No GCP credentials required — unit tests use fixtures on duckdb.
+Frozen v0 seed CSVs under `seeds/` stay because site tests read those file paths. They are disabled on the warehouse target and are not raw inputs.
 
 ## Warehouse IDs
 
 - **GCP Project**: `billionairewatcher`
-- **Dataset**: `billionairewatcher.billionaire_watcher`
+- **Datasets**: `raw`, `staging`, `marts`
 - **Location**: `US`
 - **GCS Landing**: `gs://billionairewatcher-landing/`
+
+The previous datasets `billionaire_watcher`, `billionaire_watcher_raw`, and
+`graph_probe` were emptied. The loader service account cannot delete dataset
+objects (`bigquery.datasets.delete`). Drop those three empty leftovers from the
+console or an owner account when convenient.
 
 ## License
 
