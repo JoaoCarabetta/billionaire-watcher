@@ -1,4 +1,4 @@
-"""Load public/grafo-publico.json into a running Memgraph (Bolt)."""
+"""Load graph/grafo-publico.json into a running Memgraph (Bolt)."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ from pathlib import Path
 from neo4j import GraphDatabase
 from neo4j.exceptions import ClientError
 
-REPO = Path(__file__).resolve().parents[1]
-DEFAULT_JSON = REPO / "public" / "grafo-publico.json"
+GRAPH_DIR = Path(__file__).resolve().parent
+DEFAULT_JSON = GRAPH_DIR / "grafo-publico.json"
 BATCH = 500
 
 

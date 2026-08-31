@@ -6,10 +6,8 @@ hops, valor-universo, person-money, facts) foi removida do repositório junto co
 esta especificação; a implementação do pipeline descrito aqui é trabalho futuro,
 fora do PR que introduz este arquivo.
 
-O site estático de 4 de outubro (Astro + Cloudflare Pages), com
-`public/grafo-publico.json`, as fichas em `/pessoa/` e `/empresa/` e a página
-`/metodologia`, permanece congelado como artefato v0. Ele **não** é fonte de
-verdade do novo pipeline e não é reescrito por esta fase.
+O grafo v0 congelado vive em `graph/grafo-publico.json`. Ele **não** é fonte de
+verdade do novo pipeline.
 
 ## Problema
 
@@ -263,9 +261,9 @@ Os leitores dbt de staging
 somente higiene (tipos, `lpad`, nomes Base dos Dados). Não aplicam o filtro
 da semente B. Os nomes originais das colunas-fonte (`CNPJ_CIA`,
 `Acionista_Controlador`, …) continuam a ser a citação; o mapa para o nome
-padronizado está em `transform/architecture/`. O JSON `public/grafo-publico.json`
+padronizado está em `transform/architecture/`. O JSON `graph/grafo-publico.json`
 e o grafo de hops de 2189 nós da issue #174 **não** são fonte de verdade —
-permanecem apenas como artefato v0 do site.
+permanecem apenas como artefato v0.
 
 #### Para baixo (um hop, travado)
 
@@ -354,9 +352,8 @@ costura ponta a ponta.
 - **Família** como unidade (a unidade é a pessoa natural).
 - **Livro de acionistas de S.A. fechada**: sem fonte pública; a caminhada para
   em `Outros`/tesouraria/fechada sem livro, e o buraco fica documentado.
-- **Reescrita do `/grafo`** e das fichas do site de 4 de outubro: artefatos v0
-  congelados (`public/grafo-publico.json`, `data/hops/valor-universo.json`,
-  fichas, `/metodologia`). A issue #22 (texto do congelamento) não é reescrita.
+- **Reescrita do grafo v0**: artefato congelado em `graph/grafo-publico.json`.
+  A issue #22 (texto do congelamento) não é reescrita.
 - **Forbes como definição**: no máximo lista de conferência editorial; nunca
   entra no critério `e_oligarca`.
 - **Inventar fortuna**: sem percentual citado não há valor; caminhos

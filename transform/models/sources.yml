@@ -9,7 +9,7 @@ sources:
       - name: controle_empresas_walk
         identifier: valor_controle_empresas_walk
         description: |
-          Repository inventory at data/controle-empresas-walk.csv, landed as-is.
+          Inventory landed at gs://billionairewatcher-landing/raw/fase1/controle-empresas-walk.csv.
           CNPJ lives in identificador and must stay STRING. Staging reader:
           stg_valor_empresa_inventario. identificador=vazio is a sentinel, not unique.
         columns:
