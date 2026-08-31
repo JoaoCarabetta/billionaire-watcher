@@ -47,6 +47,33 @@ MODELS: dict[str, dict] = {
             )
         ],
     },
+    "stg_valor_ranking": {
+        "org": "valor",
+        "description": (
+            "Valor 1000 2025 industrial ranking, typed and renamed. One row per "
+            "magazine company. Hygiene only — all ranks are seed A."
+        ),
+        "unique": ["posicao"],
+        "not_null": ["ano", "posicao", "nome", "razao_social"],
+    },
+    "stg_valor_banco": {
+        "org": "valor",
+        "description": (
+            "Valor 1000 2025 banks ranking, typed and renamed. One row per bank. "
+            "Hygiene only — all rows are seed A."
+        ),
+        "unique": ["posicao"],
+        "not_null": ["ano", "posicao", "nome", "razao_social"],
+    },
+    "stg_valor_seguradora": {
+        "org": "valor",
+        "description": (
+            "Valor 1000 2025 insurers ranking (ramos gerais), typed and renamed. "
+            "One row per insurer. Hygiene only — all rows are seed A."
+        ),
+        "unique": ["posicao"],
+        "not_null": ["ano", "posicao", "nome", "razao_social"],
+    },
     "stg_cvm_cia_aberta": {
         "org": "cvm",
         "description": (

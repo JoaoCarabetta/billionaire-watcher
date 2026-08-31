@@ -1,0 +1,7 @@
+original_name,name,bigquery_type,description,temporal_coverage,covered_by_dictionary,directory_column,measurement_unit,observations
+,ano,int64,Vintage of the Valor 1000 industrial ranking.,2025(1)2025,no,,,Added in staging.
+rank_2024,posicao,int64,Rank in the 2025 industrial list (edition uses FY 2024 figures).,2025(1)2025,no,,,All ranks are seed A.
+empresa,nome,string,Magazine display name.,(1),no,,,
+razao_social,razao_social,string,Legal name as published by Valor.,(1),no,,,No CNPJ in this file.
+source_url,url_fonte,string,Valor ranking page URL.,(1),no,,,
+retrieved_at,data_coleta,date,Date the JSON extract was retrieved.,(1),no,,,

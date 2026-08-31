@@ -76,3 +76,129 @@ models:
         data_type: string
         description: >
           Operator notes; mostly empty.
+
+  - name: stg_valor_ranking
+    description: >
+      Valor 1000 2025 industrial ranking, typed and renamed. One row per magazine
+      company. Hygiene only — all ranks are seed A.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Vintage of the Valor 1000 industrial ranking.
+        data_tests:
+          - not_null
+      - name: posicao
+        data_type: int64
+        description: >
+          Rank in the 2025 industrial list (edition uses FY 2024 figures).
+        data_tests:
+          - not_null
+          - unique
+      - name: nome
+        data_type: string
+        description: >
+          Magazine display name.
+        data_tests:
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name as published by Valor. No CNPJ in this file.
+        data_tests:
+          - not_null
+      - name: url_fonte
+        data_type: string
+        description: >
+          Valor ranking page URL.
+      - name: data_coleta
+        data_type: date
+        description: >
+          Date the JSON extract was retrieved.
+
+  - name: stg_valor_banco
+    description: >
+      Valor 1000 2025 banks ranking, typed and renamed. One row per bank.
+      Hygiene only — all rows are seed A.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Vintage of the Valor 1000 banks ranking.
+        data_tests:
+          - not_null
+      - name: posicao
+        data_type: int64
+        description: >
+          Rank in the 2025 banks list.
+        data_tests:
+          - not_null
+          - unique
+      - name: nome
+        data_type: string
+        description: >
+          Magazine display name.
+        data_tests:
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name as published by Valor. No CNPJ in this file.
+        data_tests:
+          - not_null
+      - name: url_fonte
+        data_type: string
+        description: >
+          Valor ranking page URL.
+      - name: data_coleta
+        data_type: date
+        description: >
+          Date the JSON extract was retrieved.
+
+  - name: stg_valor_seguradora
+    description: >
+      Valor 1000 2025 insurers ranking (ramos gerais), typed and renamed. One
+      row per insurer. Hygiene only — all rows are seed A.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ano
+        data_type: int64
+        description: >
+          Vintage of the Valor 1000 insurers ranking (ramos gerais).
+        data_tests:
+          - not_null
+      - name: posicao
+        data_type: int64
+        description: >
+          Rank in the 2025 insurers list.
+        data_tests:
+          - not_null
+          - unique
+      - name: nome
+        data_type: string
+        description: >
+          Magazine display name.
+        data_tests:
+          - not_null
+      - name: razao_social
+        data_type: string
+        description: >
+          Legal name as published by Valor. No CNPJ in this file.
+        data_tests:
+          - not_null
+      - name: url_fonte
+        data_type: string
+        description: >
+          Valor ranking page URL.
+      - name: data_coleta
+        data_type: date
+        description: >
+          Date the JSON extract was retrieved.
