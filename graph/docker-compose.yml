@@ -1,0 +1,22 @@
+services:
+  memgraph:
+    image: memgraph/memgraph
+    container_name: memgraph
+    ports:
+      - "7687:7687"
+      - "7444:7444"
+    volumes:
+      - ./.memgraph:/var/lib/memgraph
+    restart: unless-stopped
+
+  lab:
+    image: memgraph/lab
+    container_name: memgraph-lab
+    ports:
+      - "3001:3000"
+    environment:
+      QUICK_CONNECT_MG_HOST: memgraph
+      QUICK_CONNECT_MG_PORT: 7687
+    depends_on:
+      - memgraph
+    restart: unless-stopped

@@ -1,0 +1,28 @@
+@NodeStyle {
+  size: 12
+  border-width: 2
+  border-color: #1d1d1d
+  font-size: 9
+}
+
+@NodeStyle HasLabel(node, "Pessoa") {
+  color: #3b6d11
+}
+
+@NodeStyle HasLabel(node, "Empresa") {
+  color: #dd2222
+}
+
+@NodeStyle HasProperty(node, "name") {
+  label: AsText(Property(node, "name"))
+}
+
+@EdgeStyle {
+  width: 1
+  color: #737373
+  font-size: 8
+}
+
+@EdgeStyle HasProperty(edge, "name") {
+  label: AsText(Property(edge, "name"))
+}
