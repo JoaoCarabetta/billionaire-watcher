@@ -10,7 +10,15 @@
 }
 
 @NodeStyle HasLabel(node, "Empresa") {
+  color: #ea580c
+}
+
+@NodeStyle And(HasLabel(node, "Empresa"), Equals(Property(node, "motivo"), "semente")) {
   color: #dd2222
+}
+
+@NodeStyle And(HasLabel(node, "Empresa"), Equals(Property(node, "motivo"), "subida")) {
+  color: #ea580c
 }
 
 @NodeStyle HasLabel(node, "Estado") {

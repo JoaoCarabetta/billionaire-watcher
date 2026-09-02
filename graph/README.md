@@ -23,7 +23,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 - Bolt: `bolt://localhost:7687` (no auth)
 - Lab: http://localhost:3001
 
-Paste [lab-style.gss](lab-style.gss) into Lab’s Graph Style editor so nodes and edges show names instead of ids.
+Paste [lab-style.gss](lab-style.gss) into Lab’s Graph Style editor so nodes and edges show names instead of ids. Seed A companies (`motivo` = `semente`) are red; walk-up holdings (`subida`) are orange.
 
 ```cypher
 MATCH path = (e:Empresa {id: "02916265000160"})<-[*1..4]-(n)
