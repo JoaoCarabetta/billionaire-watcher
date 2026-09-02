@@ -38,15 +38,16 @@ Três tabelas finais, com grão travado, alimentadas por uma porta de empresas
 único hop de inversão para baixo a partir de quem já é oligarca:
 
 - `empresas` — uma linha por empresa;
-- `pessoas` — uma linha por pessoa natural, com a flag `e_oligarca`;
-- `pessoas_empresas` — uma linha por vínculo pessoa–empresa, incluindo sócios
-  sem rótulo de controlador.
+- `pessoas` — uma linha por pessoa natural (`e_oligarca` fica para a próxima passagem);
+- `vinculos` — uma aresta de caminho (pessoa, empresa ou estado → empresa),
+  incluindo sócios sem rótulo de controlador. Sem colunas `via`.
 
 `e_oligarca` é verdadeiro para a pessoa natural citada com
 `Acionista_Controlador` = `S` **ou** com pelo menos 10% das ações ordinárias
 (`Percentual_Acao_Ordinaria_Circulacao` ≥ 10) em pelo menos uma firma da
-semente A ∪ B. O piso de tamanho **não** entra nessa flag: a valoração pode
-melhorar depois sem mudar quem é oligarca.
+semente A ∪ B. Essa citação lê `int_vinculo_propriedade` (grão FRE da
+emissora), não o mart de caminho. O piso de tamanho **não** entra nessa flag:
+a valoração pode melhorar depois sem mudar quem é oligarca.
 
 A unidade é a pessoa natural. Família é uma camada posterior, fora desta
 especificação.
@@ -85,7 +86,7 @@ do projeto dbt (`digits_only`, `prefix8_from_cnpj14`, `normalize_company_name`,
 | `cnpj` | STRING(14), PK | 14 dígitos; nunca inventar sufixo `/0001`. Nesta passagem (só semente A) não é nulo |
 | `razao_social` | STRING | razão social da Receita do `cnpj_basico` casado; senão a razão publicada na fonte que a trouxe |
 | `capital_social` | FLOAT64, nullable | `capital_social` da Receita para esse `cnpj_basico`, em reais |
-| `motivo_entrada_categoria` | STRING | `semente`, `subida` (holding intermediária citada na caminhada para cima) ou `hop` (inversão para baixo). Nesta passagem só `semente` |
+| `motivo_entrada_categoria` | STRING | `semente`, `subida` (holding intermediária citada na caminhada para cima) ou `hop` (inversão para baixo). Nesta passagem `semente` ou `subida` |
 | `motivo_entrada_descricao` | STRING | citação da fonte que a trouxe, p.ex. `Valor 1000 2025, ranking industrial, posição 1` |
 | `motivo_entrada_date` | DATE | data da fonte que justificou a entrada (semente A: publicação do Valor 1000 2025, `2025-09-16`) |
 
@@ -96,48 +97,56 @@ caminhando. O piso só existe para ordenar e para a estimativa de fortuna.
 
 | coluna | tipo | descrição |
 |---|---|---|
-| `pessoa_id` | STRING, PK | quando há CPF: `person_id_from_cpf(cpf)` (`p-` + 8 hex de sha256 do CPF); sem CPF: chave provisória de nome normalizado por empresa citada |
-| `nome` | STRING | nome como citado na fonte |
-| `cpf` | STRING(11), nullable | **somente armazém**; nunca emitir CPF de 11 dígitos em HTML público — a exportação pública usa apenas máscara `***NNN***`, regra já vigiada por `test/cpf-redaction-global.test.ts` |
-| `filiacao` | STRING, nullable | para casamento de identidade (matching), nunca para página pública |
-| `data_nascimento` | DATE, nullable | idem, para matching |
-| `e_oligarca` | BOOL | a coluna chama-se `e_oligarca`, **não** `e_oligarca_fase1`; definição na seção seguinte |
-| `fortuna_valor` | NUMERIC, nullable | estimativa incompleta (ver fortuna) |
-| `fortuna_incompleta` | BOOL | sempre verdadeiro enquanto existir participação citada sem valor no caminho |
+| `pessoa_id` | STRING, PK | `normalize_person_name` dobra acento e hífen. CPF de 11 dígitos → `person_id_from_cpf` (`p-` + 8 hex de sha256). Máscara CVM/QSA cola nesse `p-` se `(nome, 6 dígitos)` ou `(primeiro+último token, 6 dígitos)` aponta para **exatamente um** CPF. Nome dobrado com um único CPF no armazém usa esse `p-` em qualquer empresa. Sem CPF: proximidade (edição ≤ 2 no mesmo número de tokens, ou contenção com o menor nome ≥ 3 tokens) só contra um CPF no bloco primeiro+último. Senão, 3+ tokens ou 2 tokens com a mesma máscara → `nome:` + chave; 2 tokens sem documento comum → `nome:` + chave + `@` + CNPJ |
+| `nome` | STRING | nome como citado na fonte (FRE preferido se ambos citam) |
+| `cpf` | STRING(11), nullable | **somente armazém**; só 11 dígitos; nunca a máscara; nunca emitir CPF de 11 dígitos em HTML público |
 
-Não fundir homônimos sem CPF: duas citações com o mesmo nome e sem CPF são duas
-linhas com `pessoa_id` provisórios distintos. A fusão só acontece quando o CPF
-(ou a máscara derivada dele, ver caminhada para baixo) prova que é a mesma
-pessoa.
+Nesta passagem não há `e_oligarca`, `filiacao`, `data_nascimento` nem fortuna.
+Não fundir homônimos curtos sem documento comum: duas `MARIA SILVA` sem
+máscara igual continuam duas linhas. A mesma máscara (ou o mesmo CPF) em
+empresas diferentes é a mesma pessoa. Máscara sozinha não gera `p-` — só
+cola num CPF já citado. Estado não entra em `pessoas`.
 
-#### `pessoas_empresas` — uma linha por vínculo pessoa–empresa
+#### `vinculos` — uma aresta de caminho
+
+Substitui `pessoas_empresas`. Grão de **caminho**: pessoa no veículo mais
+interno, empresa→empresa só quando o FRE/QSA declara dona, estado→empresa.
+Não há colunas `via` / `via_cnpj`. `Acionista_Relacionado` fica em
+`int_vinculo_propriedade`. Pessoa citada na emissora “via” um veículo some
+dessa emissora e liga no veículo (percentual da emissora **não** copia; se
+o livro do veículo já tem a pessoa, fica essa linha). Empresa que já é dona
+do `via` (fotocópia do bloco) some. `via` de acordo (origem não dona do
+relacionado) permanece na emissora. `via` sem CNPJ resolvido permanece.
+Outros / tesouraria / estrangeiro / não resolvido ficam visíveis.
 
 | coluna | tipo | descrição |
 |---|---|---|
-| `pessoa_id` | STRING, FK | |
-| `empresa_id` | STRING, FK | |
-| `papel` | STRING | `acionista_controlador`, `acionista` ou `socio` |
+| `origem_tipo` | STRING | `pessoa`, `empresa`, `estado`, `outros`, `tesouraria`, `estrangeiro`, `nao_resolvido` |
+| `origem_id` | STRING | `pessoa_id`; CNPJ 14 da holding; CNPJ do ente ou `estado:` + nome; `outros` / `tesouraria` levam `@` + CNPJ da emissora (um nó por empresa); prefixo do tipo nos demais |
+| `origem_nome` | STRING | nome como citado |
+| `origem_documento` | STRING, nullable | somente armazém; `CPF_CNPJ_Acionista` ou QSA `documento` |
+| `cnpj` | STRING(14) | destino da aresta (emissora ou veículo) |
+| `papel` | STRING | `acionista_controlador` (FRE `S`), `acionista` (outro FRE) ou `socio` (todo QSA) |
 | `fonte` | STRING | `fre` ou `qsa` |
 | `acionista_controlador` | BOOL, nullable | do Formulário: `Acionista_Controlador` = `S`/`N`; nulo para Receita |
-| `participante_acordo_acionistas` | BOOL, nullable | do Formulário: `Participante_Acordo_Acionistas` = `S`/`N`; não existe CSV separado de acordo |
-| `percentual_on` | FLOAT, nullable | `Percentual_Acao_Ordinaria_Circulacao`; nulo para Receita (o Quadro de Sócios não tem percentual — nunca inventar) |
+| `participante_acordo_acionistas` | BOOL, nullable | do Formulário: `Participante_Acordo_Acionistas` = `S`/`N` |
+| `percentual_on` | FLOAT, nullable | `Percentual_Acao_Ordinaria_Circulacao`; nulo para Receita e para aresta inventada no veículo — nunca inventar |
 | `percentual_total` | FLOAT, nullable | `Percentual_Total_Acoes_Circulacao` |
 | `qualificacao` | STRING, nullable | código de qualificação do sócio na Receita |
+| `tem_informacao_de_controle` | BOOL | verdadeiro no FRE; falso no QSA |
 | `data_referencia` | DATE | `Data_Referencia` do Formulário ou partição `data` da Receita |
-| `fonte_documento` | STRING | citação exata (arquivo/ID de documento/URL) |
+| `fonte_documento` | STRING | citação exata desta linha |
 
-A tabela inclui **sócios sem rótulo de controlador**: todo sócio citado entra
-como `papel` = `socio`. Sócio da Receita nunca vira `dono`/controlador — o
-Quadro de Sócios não computa beneficiário final e não carrega informação de
-controle (`tem_informacao_de_controle` = não).
+FRE e QSA são sempre unidos na mesma empresa. Sócio da Receita nunca vira
+controlador.
 
 ### A flag `e_oligarca`
 
 `e_oligarca` = verdadeiro se e somente se existe pelo menos uma linha em
-`pessoas_empresas` em que:
+`int_vinculo_propriedade` (origem pessoa) em que:
 
-1. a `empresa_id` pertence à semente A ∪ B (não a empresa que entrou por
-   `subida` ou `hop`); e
+1. o `cnpj` da linha (emissora que citou) pertence à semente A ∪ B (não a
+   empresa que entrou por `subida` ou `hop`); e
 2. o vínculo vem do Formulário de Referência com `Acionista_Controlador` = `S`,
    **ou** `Percentual_Acao_Ordinaria_Circulacao` ≥ 10.
 
@@ -231,9 +240,18 @@ Três fontes, uma por família, gravadas em `valor_do_piso` / `fonte_do_piso` /
 #### Para cima (subida)
 
 De cada empresa em A ∪ B (exceto `nao_caminha`), subir a propriedade até chegar
-a pessoa natural, ou parar em: acionista `Outros`, ações em tesouraria, ou S.A.
-fechada sem livro de acionistas público. Holdings intermediárias citadas entram
-em `empresas` com `motivo_entrada` = `subida`.
+a pessoa natural **ou ao Estado**, ou parar em: acionista `Outros`, ações em
+tesouraria, sócio estrangeiro sem CNPJ, ou nome de PJ sem casamento único na
+Receita. Não parar em holding / controlador pessoa jurídica (Itaúsa, J&F,
+BNDESPAR, Petrobras, BB): esses entram em `empresas` com
+`motivo_entrada_categoria` = `subida` e a caminhada continua. União, Tesouro
+Nacional, Fazenda Nacional, `natureza_juridica` 1xxx e `ente_federativo`
+preenchido são `origem_tipo` = `estado` em `vinculos`, não linhas em `pessoas`.
+Empresa pública (`2011`) e sociedade de economia mista (`2038`) continuam
+caminhando.
+
+Em toda empresa visitada, unir o Formulário **e** o Quadro de Sócios: FRE não
+substitui QSA. Sócio QSA entra mesmo sem percentual (`papel` = `socio`).
 
 - **Companhia listada com Formulário de Referência:** usar
   `fre_cia_aberta_posicao_acionaria_YYYY.csv` dentro de
@@ -276,7 +294,7 @@ companhias, não só a semente) e no Quadro de Sócios da Receita:
 Gravação: toda companhia em que a pessoa é `Acionista_Controlador` = `S` ou tem
 `Percentual_Acao_Ordinaria_Circulacao` ≥ 10 (Formulário), e toda empresa em que
 ela é sócia (Receita), entra em `empresas` com `motivo_entrada` = `hop`; e
-**todos** os sócios citados dessas empresas entram em `pessoas_empresas` (e em
+**todos** os sócios citados dessas empresas entram em `vinculos` (e em
 `pessoas`, quando ainda não existem). O sócio novo **não** é invertido: a
 recursão para no primeiro hop, e empresa de hop não muda `e_oligarca` de
 ninguém.
@@ -311,7 +329,7 @@ a ponta no grão final:
 > Fixtures dos três cadastros (uma fatia de `cad_cia_aberta.csv`, uma de
 > `EntidadesSupervisionadas`, uma de `DadosCadastrais`) + uma fatia do
 > `fre_cia_aberta_posicao_acionaria` + uma fatia do Quadro de Sócios emitem as
-> três tabelas `empresas`, `pessoas`, `pessoas_empresas` com uma pessoa
+> três tabelas `empresas`, `pessoas`, `vinculos` com uma pessoa
 > conhecida de `e_oligarca` = verdadeiro (um controlador `S` na fatia FRE) e
 > uma pessoa conhecida de `e_oligarca` = falso (sócia citada sem controle e sem
 > 10% de ordinárias).
@@ -325,12 +343,12 @@ mesmo seam que a CI existente (`.github/workflows/dbt-ci.yml`, `dbt parse` +
 1. **Ponta a ponta única** (acima): cadastros + FRE + QSA → três tabelas com
    `e_oligarca` conhecido. É o teste que trava a definição.
 2. **Contratos de grão**: `empresas.cnpj` único; `pessoas.pessoa_id`
-   único; `pessoas_empresas` único em (`pessoa_id`, `empresa_id`, `fonte`,
-   `data_referencia`); zeros à esquerda preservados (o exemplo canônico JBS
+   único; `vinculos` é aresta de caminho (pessoa no veículo; sem `via`);
+   zeros à esquerda preservados (o exemplo canônico JBS
    `02916265000160` já está nos testes dos leitores CVM mantidos).
 3. **Regras negativas dentro do teste ponta a ponta**, não como seams novos:
    sócio da Receita nunca emite `papel` = `acionista_controlador`; homônimos
-   sem CPF não se fundem; empresa de hop não flipa `e_oligarca`; `tem_piso` =
+   de 2 tokens sem máscara comum não se fundem; empresa de hop não flipa `e_oligarca`; `tem_piso` =
    falso não remove empresa.
 4. **Redação de CPF na costura pública existente**: os testes do site já
    varrem o HTML construído (`test/cpf-redaction-global.test.ts`); qualquer

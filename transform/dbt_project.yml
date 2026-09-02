@@ -24,6 +24,11 @@ models:
         columns: true
       +contract:
         enforced: true
+    intermediate:
+      +schema: intermediate
+      +persist_docs:
+        relation: true
+        columns: true
     marts:
       +schema: marts
       +persist_docs:

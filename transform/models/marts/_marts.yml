@@ -3,14 +3,9 @@ version: 2
 models:
   - name: empresas
     description: >
-      One row per company (CNPJ) in seed A this pass: Valor 1000 2025
-      industrial 1–1000 ∪ banks ∪ insurers. No walk inventory, no
-      Itaúsa/Folha extras, no seed B. cnpj is the 14-digit headquarters
-      (Receita matriz, else CVM / B3 / BCB / SUSEP). razao_social and
-      capital_social come from Receita when the match has a cnpj_basico.
-      motivo_entrada_date is the Valor 1000 2025 publication date
-      (2025-09-16). One rebrand exception: Valor CCR S.A. is Motiva
-      Infraestrutura 02846056000197. Never invent /0001.
+      One row per company CNPJ: seed A (Valor 1000 2025 lists) union
+      holdings reached by the walk-up (motivo_entrada_categoria = subida).
+      If a CNPJ is both, it stays semente. Never invent /0001.
     config:
       contract:
         enforced: true
@@ -22,123 +17,321 @@ models:
             CNPJ is always 14 digits. Never invent a /0001 suffix.
       - dbt_utils.expression_is_true:
           arguments:
-            expression: "motivo_entrada_categoria = 'semente'"
+            expression: "motivo_entrada_categoria in ('semente', 'subida')"
           description: >
-            This pass every company entered as semente.
+            This pass every company entered as semente or subida.
     columns:
       - name: cnpj
         data_type: string
         description: >
-          14-digit headquarters CNPJ. Primary key. Receita first (real
-          matriz, else an existing estabelecimento); CVM / B3 / BCB /
-          SUSEP if Receita has no name hit. Never null this pass.
+          14-digit headquarters CNPJ. Primary key. Receita matriz when the
+          match has a cnpj_basico; else the CNPJ already on FRE / cadastro.
         data_tests:
           - unique
           - not_null
       - name: razao_social
         data_type: string
         description: >
-          Legal name of that CNPJ. Receita razão when the match found a
-          cnpj_basico; otherwise the Valor published razão.
+          Legal name. Receita razão when matched; else the name cited on
+          the edge that brought a holding.
         data_tests:
           - not_null
       - name: capital_social
         data_type: float64
-        description: >
-          Receita capital_social for the matched cnpj_basico, in BRL.
+        description: Receita capital_social in BRL. Null when no Receita match.
       - name: motivo_entrada_categoria
         data_type: string
-        description: >
-          semente, subida, or hop. This pass is only semente.
+        description: semente or subida. hop is reserved.
         data_tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['semente']
+                values: ['semente', 'subida']
       - name: motivo_entrada_descricao
         data_type: string
         description: >
-          Citeable reason the company entered: Valor 1000 2025 list name
-          and posição, semicolon-separated when more than one list cites
-          the same CNPJ.
+          Seed: Valor list and posição. Subida: FRE id_documento or QSA
+          partition of the child company that cited this holding.
         data_tests:
           - not_null
       - name: motivo_entrada_date
         data_type: date
         description: >
-          As-of date of the source that justified entry. Seed A is the
-          Valor 1000 2025 publication date (var valor_1000_2025_publication_date).
+          Seed: Valor 1000 2025 publication date. Subida: FRE Data_Referencia
+          or Receita partition date.
+        data_tests:
+          - not_null
+
+  - name: pessoas
+    description: >
+      Natural-person terminals of the walk. No state, no company. No
+      e_oligarca this pass. A folded name plus unique CPF or mask is one
+      id across companies. A 2-token homonym without a shared document
+      stays one id per citing CNPJ.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: pessoa_id
+        data_type: string
+        description: >
+          person_id_from_cpf when an 11-digit CPF or unique mask resolves;
+          nome: + folded name when the same undocumented long name (or the
+          same 2-token mask) repeats; otherwise nome: + folded name + @ + CNPJ.
+        data_tests:
+          - unique
+          - not_null
+      - name: nome
+        data_type: string
+        description: Name as cited. FRE preferred when both sources cite.
+        data_tests:
+          - not_null
+      - name: cpf
+        data_type: string
+        description: Full 11 digits, warehouse only. Null when masked or missing.
+
+  - name: vinculos
+    description: >
+      Path edges of visited companies. A person cited through
+      Acionista_Relacionado attaches to the innermost vehicle, not to the
+      issuer. PJ photocopy edges (origem already owns the via) are dropped.
+      Agreement vias stay on the issuer. No via columns. Citation grain for
+      e_oligarca stays on int_vinculo_propriedade.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: origem_tipo
+        data_type: string
+        description: pessoa, empresa, estado, outros, tesouraria, estrangeiro, or nao_resolvido.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - pessoa
+                  - empresa
+                  - estado
+                  - outros
+                  - tesouraria
+                  - estrangeiro
+                  - nao_resolvido
+      - name: origem_id
+        data_type: string
+        description: pessoa_id, 14-digit CNPJ, or prefixed stop/state key.
+        data_tests:
+          - not_null
+      - name: origem_nome
+        data_type: string
+        description: Name as cited.
+        data_tests:
+          - not_null
+      - name: origem_documento
+        data_type: string
+        description: Warehouse only. FRE CPF_CNPJ_Acionista or QSA documento.
+      - name: cnpj
+        data_type: string
+        description: Destination company, 14 digits (issuer or vehicle).
+        data_tests:
+          - not_null
+      - name: papel
+        data_type: string
+        description: acionista_controlador (FRE S), acionista (other FRE), socio (QSA).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['acionista_controlador', 'acionista', 'socio']
+      - name: fonte
+        data_type: string
+        description: fre or qsa.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['fre', 'qsa']
+      - name: acionista_controlador
+        data_type: boolean
+        description: FRE S/N. Null on QSA.
+      - name: participante_acordo_acionistas
+        data_type: boolean
+        description: FRE Participante_Acordo_Acionistas. Null on QSA.
+      - name: percentual_on
+        data_type: float64
+        description: FRE Percentual_Acao_Ordinaria_Circulacao. Always null on QSA.
+      - name: percentual_total
+        data_type: float64
+        description: FRE Percentual_Total_Acoes_Circulacao. Always null on QSA.
+      - name: qualificacao
+        data_type: string
+        description: QSA 2-digit code. Null on FRE.
+      - name: tem_informacao_de_controle
+        data_type: boolean
+        description: True on FRE. False on QSA.
+        data_tests:
+          - not_null
+      - name: data_referencia
+        data_type: date
+        description: FRE Data_Referencia or Receita partition date.
+        data_tests:
+          - not_null
+      - name: fonte_documento
+        data_type: string
+        description: Exact citation of this source row.
         data_tests:
           - not_null
 
 unit_tests:
-  - name: empresas_semente_a_valor_listas
+  - name: walk_up_empresas_semente_e_subida
     description: >
-      Unique Receita razão gets the matriz CNPJ; an ambiguous razão takes
-      the largest capital_social; Cia. matches Companhia. Grain is CNPJ.
+      Seed JBS stays semente; the FRE holding enters as subida. The walk
+      does not stop on the company controller.
     model: empresas
     given:
-      - input: ref('stg_valor_ranking')
+      - input: ref('int_empresas_semente_a')
         format: sql
         rows: |
-          select 1 as posicao, 'Petrobras' as nome, 'Petroleo Brasileiro S.A. Petrobras' as razao_social
+          select '02916265000160' as cnpj, 'JBS S/A' as razao_social, 23631071304.24 as capital_social, 'semente' as motivo_entrada_categoria, 'Valor 1000 2025, ranking industrial, posição 1000' as motivo_entrada_descricao, date '2025-09-16' as motivo_entrada_date
+      - input: ref('int_caminhada')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, 0 as profundidade, cast(null as varchar) as cnpj_origem, 'semente' as fonte_chegada
           union all
-          select 1000, 'JBS', 'JBS S.A.'
-      - input: ref('stg_valor_banco')
+          select '07379937000127', 1, '02916265000160', 'fre'
+      - input: ref('int_vinculo_propriedade')
         format: sql
         rows: |
-          select 1 as posicao, 'Itau Unibanco' as nome, 'Cia. Itau Unibanco Holding S.A.' as razao_social
-      - input: ref('stg_valor_seguradora')
-        format: sql
-        rows: |
-          select 1 as posicao, 'Bradesco Seguros' as nome, 'Bradesco Seguros S.A.' as razao_social
+          select 'empresa' as origem_tipo, '07379937000127' as origem_id, 'J AND F INVESTIMENTOS' as origem_nome, '07379937000127' as origem_documento, '02916265000160' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 85.0 as percentual_on, 85.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100' as fonte_documento, '02916265' as cnpj_basico, '100' as id_documento, cast(null as varchar) as via, cast(null as varchar) as via_cnpj
       - input: ref('stg_rf_empresa')
         format: sql
         rows: |
-          select date '2026-01-11' as data, '33000167' as cnpj_basico, 'Petroleo Brasileiro S.A. Petrobras' as razao_social, 100.0 as capital_social
-          union all
-          select date '2026-01-11', '02916265', 'JBS S/A', 23631071304.24
-          union all
-          select date '2026-01-11', '07452328', 'JBS S.A.', 1000.0
-          union all
-          select date '2026-01-11', '60872504', 'COMPANHIA ITAU UNIBANCO HOLDING S.A.', 90000000000.0
-          union all
-          select date '2026-01-11', '33032580', 'Bradesco Seguros S.A.', 1.0
-      - input: ref('stg_rf_estabelecimento')
+          select date '2026-01-11' as data, '07379937' as cnpj_basico, 'J AND F INVESTIMENTOS SA' as razao_social, 1.0 as capital_social
+    expect:
+      rows:
+        - {cnpj: '02916265000160', razao_social: JBS S/A, capital_social: 23631071304.24, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1000", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '07379937000127', razao_social: J AND F INVESTIMENTOS SA, capital_social: 1.0, motivo_entrada_categoria: subida, motivo_entrada_descricao: "FRE id_documento 100 da companhia 02916265000160", motivo_entrada_date: '2025-12-31'}
+
+  - name: walk_up_vinculos_pessoa_empresa_estado
+    description: >
+      Path of visited companies: holding→JBS, Joesley on J&F (the JBS via
+      J&F photocopy is dropped), União, QSA sócio.
+    model: vinculos
+    given:
+      - input: ref('int_caminhada')
         format: sql
         rows: |
-          select date '2026-01-11' as data, '33000167000158' as cnpj, '33000167' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          select '02916265000160' as cnpj, 0 as profundidade, cast(null as varchar) as cnpj_origem, 'semente' as fonte_chegada
           union all
-          select date '2026-01-11', '02916265000160', '02916265', '0001', '1', '02'
-          union all
-          select date '2026-01-11', '07452328000100', '07452328', '0001', '1', '02'
-          union all
-          select date '2026-01-11', '60872504000123', '60872504', '0001', '1', '02'
-          union all
-          select date '2026-01-11', '33032580000109', '33032580', '0001', '1', '02'
-      - input: ref('stg_cvm_cia_aberta')
+          select '07379937000127', 1, '02916265000160', 'fre'
+      - input: ref('int_vinculo_propriedade')
         format: sql
         rows: |
-          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial, cast(null as varchar) as situacao
-          where false
-      - input: ref('stg_b3_empresa_listada')
+          select 'empresa' as origem_tipo, '07379937000127' as origem_id, 'J AND F INVESTIMENTOS' as origem_nome, '07379937000127' as origem_documento, '02916265000160' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 85.0 as percentual_on, 85.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100' as fonte_documento, '02916265' as cnpj_basico, '100' as id_documento, cast(null as varchar) as via, cast(null as varchar) as via_cnpj
+          union all
+          select 'pessoa' as origem_tipo, 'nome:JOESLEY BATISTA@07379937000127' as origem_id, 'JOESLEY BATISTA' as origem_nome, cast(null as varchar) as origem_documento, '07379937000127' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 60.0 as percentual_on, 60.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200' as fonte_documento, '07379937' as cnpj_basico, '200' as id_documento, cast(null as varchar) as via, cast(null as varchar) as via_cnpj
+          union all
+          select 'pessoa' as origem_tipo, 'nome:JOESLEY BATISTA@07379937000127' as origem_id, 'JOESLEY BATISTA' as origem_nome, cast(null as varchar) as origem_documento, '02916265000160' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 40.0 as percentual_on, 40.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100' as fonte_documento, '02916265' as cnpj_basico, '100' as id_documento, 'J AND F INVESTIMENTOS' as via, '07379937000127' as via_cnpj
+          union all
+          select 'estado' as origem_tipo, 'estado:UNIAOFEDERAL' as origem_id, 'UNIÃO FEDERAL' as origem_nome, cast(null as varchar) as origem_documento, '07379937000127' as cnpj, 'acionista' as papel, 'fre' as fonte, false as acionista_controlador, false as participante_acordo_acionistas, 10.0 as percentual_on, 10.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200' as fonte_documento, '07379937' as cnpj_basico, '200' as id_documento, cast(null as varchar) as via, cast(null as varchar) as via_cnpj
+          union all
+          select 'pessoa' as origem_tipo, 'nome:MARIA SILVA@02916265000160' as origem_id, 'MARIA SILVA' as origem_nome, cast(null as varchar) as origem_documento, '02916265000160' as cnpj, 'socio' as papel, 'qsa' as fonte, cast(null as boolean) as acionista_controlador, cast(null as boolean) as participante_acordo_acionistas, cast(null as double) as percentual_on, cast(null as double) as percentual_total, '22' as qualificacao, false as tem_informacao_de_controle, date '2026-01-11' as data_referencia, 'rf.socios partição 2026-01-11 cnpj_basico=02916265' as fonte_documento, '02916265' as cnpj_basico, cast(null as varchar) as id_documento, cast(null as varchar) as via, cast(null as varchar) as via_cnpj
+    expect:
+      rows:
+        - {origem_tipo: empresa, origem_id: '07379937000127', origem_nome: J AND F INVESTIMENTOS, origem_documento: '07379937000127', cnpj: '02916265000160', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 85.0, percentual_total: 85.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100'}
+        - {origem_tipo: pessoa, origem_id: 'nome:JOESLEY BATISTA@07379937000127', origem_nome: JOESLEY BATISTA, origem_documento: null, cnpj: '07379937000127', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 60.0, percentual_total: 60.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200'}
+        - {origem_tipo: estado, origem_id: 'estado:UNIAOFEDERAL', origem_nome: UNIÃO FEDERAL, origem_documento: null, cnpj: '07379937000127', papel: acionista, fonte: fre, acionista_controlador: false, participante_acordo_acionistas: false, percentual_on: 10.0, percentual_total: 10.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200'}
+        - {origem_tipo: pessoa, origem_id: 'nome:MARIA SILVA@02916265000160', origem_nome: MARIA SILVA, origem_documento: null, cnpj: '02916265000160', papel: socio, fonte: qsa, acionista_controlador: null, participante_acordo_acionistas: null, percentual_on: null, percentual_total: null, qualificacao: '22', tem_informacao_de_controle: false, data_referencia: '2026-01-11', fonte_documento: 'rf.socios partição 2026-01-11 cnpj_basico=02916265'}
+
+  - name: walk_up_vinculos_veiculo_interno
+    description: >
+      Person with two vias keeps only the innermost vehicle. PJ photocopy
+      (origem owns the via) is dropped. PJ owner with an agreement via stays.
+    model: vinculos
+    given:
+      - input: ref('int_caminhada')
         format: sql
         rows: |
-          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial
-          where false
-      - input: ref('stg_bcb_entidade_supervisionada')
+          select '60872504000123' as cnpj, 0 as profundidade, cast(null as varchar) as cnpj_origem, 'semente' as fonte_chegada
+          union all
+          select '61532644000115', 1, '60872504000123', 'fre'
+          union all
+          select '52117397000108', 2, '61532644000115', 'fre'
+      - input: ref('int_vinculo_propriedade')
         format: sql
         rows: |
-          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
-          where false
-      - input: ref('stg_susep_dado_cadastral')
+          select 'empresa' as origem_tipo, '61532644000115' as origem_id, 'ITAUSA' as origem_nome, '61532644000115' as origem_documento, '60872504000123' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 36.7 as percentual_on, 19.4 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre id=1' as fonte_documento, '60872504' as cnpj_basico, '1' as id_documento, 'IUPAR' as via, '60958473000173' as via_cnpj
+          union all
+          select 'empresa', '52117397000108', 'COMPANHIA ESA', '52117397000108', '60872504000123', 'acionista_controlador', 'fre', true, false, 1.7, 0.9, cast(null as varchar), true, date '2025-12-31', 'fre id=1 esa', '60872504', '1', 'ITAUSA', '61532644000115'
+          union all
+          select 'pessoa', 'nome:BRUNO RIZZO SETUBAL@60872504000123', 'BRUNO RIZZO SETUBAL', cast(null as varchar), '60872504000123', 'acionista_controlador', 'fre', true, false, 1.728, 0.85, cast(null as varchar), true, date '2025-12-31', 'fre id=1 bruno esa', '60872504', '1', 'COMPANHIA ESA', '52117397000108'
+          union all
+          select 'pessoa', 'nome:BRUNO RIZZO SETUBAL@60872504000123', 'BRUNO RIZZO SETUBAL', cast(null as varchar), '60872504000123', 'acionista_controlador', 'fre', true, false, 1.084, 0.53, cast(null as varchar), true, date '2025-12-31', 'fre id=1 bruno itausa', '60872504', '1', 'ITAUSA', '61532644000115'
+          union all
+          select 'empresa', '52117397000108', 'COMPANHIA ESA', '52117397000108', '61532644000115', 'acionista_controlador', 'fre', true, false, 19.6, 19.6, cast(null as varchar), true, date '2025-12-31', 'fre id=2', '61532644', '2', cast(null as varchar), cast(null as varchar)
+    expect:
+      rows:
+        - {origem_tipo: empresa, origem_id: '61532644000115', origem_nome: ITAUSA, origem_documento: '61532644000115', cnpj: '60872504000123', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 36.7, percentual_total: 19.4, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre id=1'}
+        - {origem_tipo: empresa, origem_id: '52117397000108', origem_nome: COMPANHIA ESA, origem_documento: '52117397000108', cnpj: '61532644000115', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 19.6, percentual_total: 19.6, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre id=2'}
+        - {origem_tipo: pessoa, origem_id: 'nome:BRUNO RIZZO SETUBAL@60872504000123', origem_nome: BRUNO RIZZO SETUBAL, origem_documento: null, cnpj: '52117397000108', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: null, percentual_total: null, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre id=1 bruno esa'}
+
+  - name: walk_up_pessoas_so_pessoa_natural
+    description: >
+      pessoas has the FRE person and the QSA sócio. União is not a person.
+    model: pessoas
+    given:
+      - input: ref('vinculos')
         format: sql
         rows: |
-          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
+          select 'pessoa' as origem_tipo, 'nome:JOESLEY BATISTA@07379937000127' as origem_id, 'JOESLEY BATISTA' as origem_nome, cast(null as varchar) as origem_documento, '07379937000127' as cnpj, 'acionista_controlador' as papel, 'fre' as fonte, true as acionista_controlador, false as participante_acordo_acionistas, 60.0 as percentual_on, 60.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200' as fonte_documento
+          union all
+          select 'pessoa', 'nome:MARIA SILVA@02916265000160', 'MARIA SILVA', cast(null as varchar), '02916265000160', 'socio', 'qsa', cast(null as boolean), cast(null as boolean), cast(null as double), cast(null as double), '22', false, date '2026-01-11', 'rf.socios partição 2026-01-11 cnpj_basico=02916265'
+          union all
+          select 'estado', 'estado:UNIAOFEDERAL', 'UNIÃO FEDERAL', cast(null as varchar), '07379937000127', 'acionista', 'fre', false, false, 10.0, 10.0, cast(null as varchar), true, date '2025-12-31', 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200'
+      - input: ref('int_vinculo_propriedade')
+        format: sql
+        rows: |
+          select cast(null as varchar) as origem_id, cast(null as varchar) as origem_tipo, cast(null as varchar) as origem_documento
           where false
     expect:
       rows:
-        - {cnpj: '33000167000158', razao_social: Petroleo Brasileiro S.A. Petrobras, capital_social: 100.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1", motivo_entrada_date: '2025-09-16'}
-        - {cnpj: '02916265000160', razao_social: JBS S/A, capital_social: 23631071304.24, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1000", motivo_entrada_date: '2025-09-16'}
-        - {cnpj: '60872504000123', razao_social: COMPANHIA ITAU UNIBANCO HOLDING S.A., capital_social: 90000000000.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, bancos, posição 1", motivo_entrada_date: '2025-09-16'}
-        - {cnpj: '33032580000109', razao_social: Bradesco Seguros S.A., capital_social: 1.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, seguradoras, posição 1", motivo_entrada_date: '2025-09-16'}
+        - {pessoa_id: 'nome:JOESLEY BATISTA@07379937000127', nome: JOESLEY BATISTA, cpf: null}
+        - {pessoa_id: 'nome:MARIA SILVA@02916265000160', nome: MARIA SILVA, cpf: null}
+
+  - name: walk_up_pessoas_mascara_cola_cpf
+    description: >
+      Two vinculos with the same resolved pessoa_id (mask + full CPF) become
+      one pessoas row; cpf is the 11-digit document, not the mask.
+    model: pessoas
+    given:
+      - input: ref('vinculos')
+        format: sql
+        rows: |
+          select 'pessoa' as origem_tipo, 'p-1585ec8c' as origem_id, 'ALDO LUPO NETO' as origem_nome, '***815438**' as origem_documento, '02916265000160' as cnpj, 'acionista' as papel, 'fre' as fonte, false as acionista_controlador, false as participante_acordo_acionistas, 5.0 as percentual_on, 5.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre id=100' as fonte_documento
+          union all
+          select 'pessoa', 'p-1585ec8c', 'ALDO LUPO NETO', '13881543821', '07379937000127', 'acionista_controlador', 'fre', true, false, 10.0, 10.0, cast(null as varchar), true, date '2025-12-31', 'fre id=200'
+      - input: ref('int_vinculo_propriedade')
+        format: sql
+        rows: |
+          select cast(null as varchar) as origem_id, cast(null as varchar) as origem_tipo, cast(null as varchar) as origem_documento
+          where false
+    expect:
+      rows:
+        - {pessoa_id: 'p-1585ec8c', nome: ALDO LUPO NETO, cpf: '13881543821'}
+
+  - name: walk_up_pessoas_cpf_vem_do_int
+    description: >
+      Walked row is only a mask; the 11-digit CPF lives on an unvisited
+      int_vinculo_propriedade line with the same resolved pessoa_id.
+    model: pessoas
+    given:
+      - input: ref('vinculos')
+        format: sql
+        rows: |
+          select 'pessoa' as origem_tipo, 'p-1585ec8c' as origem_id, 'ALDO LUPO NETO' as origem_nome, '***815438**' as origem_documento, '02916265000160' as cnpj, 'acionista' as papel, 'fre' as fonte, false as acionista_controlador, false as participante_acordo_acionistas, 5.0 as percentual_on, 5.0 as percentual_total, cast(null as varchar) as qualificacao, true as tem_informacao_de_controle, date '2025-12-31' as data_referencia, 'fre id=100' as fonte_documento
+      - input: ref('int_vinculo_propriedade')
+        format: sql
+        rows: |
+          select 'p-1585ec8c' as origem_id, 'pessoa' as origem_tipo, '13881543821' as origem_documento
+    expect:
+      rows:
+        - {pessoa_id: 'p-1585ec8c', nome: ALDO LUPO NETO, cpf: '13881543821'}

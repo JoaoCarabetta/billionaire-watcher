@@ -17,9 +17,9 @@ If a past conversation, old issue, or leftover comment talks about Astro, Cloudf
 | Path | Role |
 |---|---|
 | `transform/` | dbt project. Owns `raw` declarations, staging models, future marts. |
-| `graph/` | Local Memgraph copy of the frozen v0 graph. Not a warehouse input. |
+| `graph/` | Local Memgraph. Load marts (`load_marts.py`) or the frozen v0 snapshot. Not a warehouse input. |
 | `docs/spec-fase1-oligarcas.md` | Locked decisions: grains, `e_oligarca`, walk, floors, out of scope. |
-| `.github/workflows/dbt-ci.yml` | `dbt deps` + `dbt parse --target test` (DuckDB). No GCP. |
+| `.github/workflows/dbt-ci.yml` | `dbt deps` + `dbt parse --target test` + unit tests (DuckDB). No GCP. |
 | `service_accounts/` | Local GCP keys. Gitignored. Never commit, never paste. |
 
 ## Warehouse layers
@@ -31,7 +31,7 @@ GCP project `billionairewatcher`, location `US`. Custom schemas are written as-i
 | Landing | `gs://billionairewatcher-landing/` | Files only. Downloaders do not filter seed B or compute floors. |
 | `raw` | `raw` | Native tables, all identifiers STRING. dbt **declares** them in `models/sources.yml`; it does not build them. Loader: `transform/scripts/load_raw.py`. |
 | `staging` | `staging` | One model per origin. Hygiene only: types, `lpad`, Base dos Dados names. **No** seed-B filters, **no** walk, **no** `e_oligarca`. Contracts enforced. |
-| `marts` | `marts` | Endpoint: `empresas`, `pessoas`, `pessoas_empresas`. `empresas` this pass is one row per CNPJ from seed A (Valor lists, no extras): `cnpj`, `razao_social`, `capital_social`, `motivo_entrada_*`. Seed B, walk, and `e_oligarca` live here later, never in staging. |
+| `marts` | `marts` | Endpoint: `empresas`, `pessoas`, `vinculos`. `empresas` is seed A ∪ walk-up holdings (`semente` / `subida`). `vinculos` is the path (pessoa on the innermost vehicle; no `via` columns). `e_oligarca` later reads `int_vinculo_propriedade`. |
 
 Receita tables in this project are a **copy** of Base dos Dados partition `{{ var("rf_partition_date") }}` (`2026-01-11`). Staging and marts query **this** project, not `basedosdados.br_me_cnpj`.
 
@@ -41,10 +41,10 @@ Receita tables in this project are a **copy** of Base dos Dados partition `{{ va
 
 - **Identifiers are STRING.** CNPJ 14, CNPJ básico 8, CPF 11. Digits only, `lpad` to keep leading zeros. Never invent `/0001`. Canonical check: JBS `02916265000160`.
 - **CPF is warehouse-only.** Full 11-digit CPF never goes into public JSON, markdown, HTML, or JSON-LD. Public mask if needed: `***NNN***`. `pessoa_id` with CPF is `person_id_from_cpf` (`p-` + 8 hex of sha256).
-- **Do not merge homonyms without CPF.** Same name, no CPF → two `pessoa_id`s.
+- **Do not merge short homonyms without a shared document.** Same 2-token name and no common mask → two `pessoa_id`s (`nome:…@cnpj`). A CVM/QSA mask is not a CPF; it joins `person_id_from_cpf` when `(folded name, digits 4–9)` or `(first+last token, digits 4–9)` matches exactly one complete CPF. The same mask in two companies is one person. Folded name (`MENDONÇA` = `MENDONCA`, hyphen = space) with one warehouse CPF is one `p-`.
 - **Valor 1000 is seed A, not the definition.** `e_oligarca` is true iff the person is cited with FRE `Acionista_Controlador` = `S` **or** `Percentual_Acao_Ordinaria_Circulacao` ≥ 10 in at least one firm of seed A ∪ B. Size floor does not enter the flag.
 - **Floor is not a gate.** `tem_piso` = false does not drop a company or stop the walk.
-- **Walk up** from A ∪ B except `nao_caminha` (Folha, Globo, Havan, Record, Natura-without-CNPJ). Stop at `Outros`, treasury shares, or closed S.A. without a public shareholder book. QSA links are `socio`; never mint administrators/directors as owners. `tem_informacao_de_controle` = no on Receita edges.
+- **Walk up** from A ∪ B except `nao_caminha` (Folha, Globo, Havan, Record, Natura-without-CNPJ). Stop at a natural person or the state, or at `Outros`, treasury shares, foreign sócio without CNPJ, or unresolved PJ name. Do not stop on a company controller. Always union FRE and RF QSA (QSA percents stay null). QSA links are `socio`; never mint administrators/directors as owners. `tem_informacao_de_controle` = no on Receita edges.
 - **Walk down** is one hop, from `e_oligarca` = true, by **CPF never name**. Hop companies do not flip `e_oligarca`. New partners of hop companies are not inverted.
 - **Unit is the natural person.** Family is later. Forbes is editorial check only. Do not invent fortune; unlabeled paths stay `fortuna_incompleta`.
 - **Cite source column names** (`CNPJ_CIA`, `Acionista_Controlador`, …) in docs. The Base dos Dados rename lives in `transform/architecture/`.
@@ -68,7 +68,7 @@ DuckDB `test` only **parses**. `dbt run` / `dbt test` against models that read `
 
 ## Graph
 
-`graph/` loads `graph/grafo-publico.json` into Memgraph (`Pessoa` / `Empresa` / `OWNS`). It is a frozen v0 snapshot, **not** the warehouse walk and **not** the full Receita QSA. Do not treat it as a source for marts. Do not rewrite it to match the spec.
+`graph/` is a local Memgraph scratch pad, **not** a warehouse input. `load_marts.py --graph complete` copies `marts.empresas` / `pessoas` / `vinculos` 1:1 (no CPF; edges are `CONTROLADOR` / `ACIONISTA` / `SOCIO` with a readable `name`). `--graph simplified` is reserved. `load_grafo_publico.py` loads the frozen v0 snapshot. Do not treat either as a source for marts. Do not rewrite `grafo-publico.json` to match the spec.
 
 ## Commands
 
@@ -77,8 +77,8 @@ DuckDB `test` only **parses**. `dbt run` / `dbt test` against models that read `
 dbt deps
 dbt parse --target test
 dbt test --select test_type:unit --target test
-dbt run --select staging empresas --target dev
-dbt test --select staging empresas --target dev
+dbt run --select staging intermediate marts --target dev
+dbt test --select staging intermediate marts --target dev
 
 # land files (no filters), then load raw
 python3 scripts/download_fase1_company_sources.py --bcb-date 08-01-2026 --output-dir landing/fase1
@@ -89,7 +89,8 @@ python3 scripts/load_raw.py --credentials "$GOOGLE_APPLICATION_CREDENTIALS"
 
 # graph — from graph/
 docker compose up -d
-.venv/bin/python load_grafo_publico.py
+.venv/bin/python load_marts.py --graph complete
+# or the frozen v0 snapshot: .venv/bin/python load_grafo_publico.py
 ```
 
 Setup: `pip install dbt-bigquery`; copy `transform/profiles.yml.example` to `~/.dbt/profiles.yml`.
@@ -98,7 +99,7 @@ After transform edits, run `dbt parse --target test` before calling the work don
 
 ## Tests (when marts exist)
 
-Prefer **few** seams. The required seam is end-to-end on final grain: small slices of the three cadastres + FRE + QSA emit `empresas` / `pessoas` / `pessoas_empresas` with one known `e_oligarca` = true and one known false. Cover negatives **inside** that seam (Receita partner is never `acionista_controlador`; homonyms do not merge; hop does not flip the flag; no floor does not drop). Do not add a unit YAML per intermediate model.
+Prefer **few** seams. This pass: FRE + QSA fixtures emit `empresas` / `pessoas` / `vinculos` with a holding that is not a stop, Joesley on J&F (not the JBS photocopy), a QSA sócio with null percents, União as `estado`, innermost-via (Bruno on ESA), and a mask+CPF person as one `pessoa_id`. Person fixtures also cover accent/hyphen fold, same mask in two companies, token proximity to one CPF, and `MARIA SILVA` staying split. `e_oligarca` is later. Do not add a unit YAML per intermediate model.
 
 ## Do not
 
