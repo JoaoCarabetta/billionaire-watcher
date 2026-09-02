@@ -13,6 +13,14 @@
   color: #dd2222
 }
 
+@NodeStyle HasLabel(node, "Estado") {
+  color: #1d4ed8
+}
+
+@NodeStyle HasLabel(node, "Parada") {
+  color: #737373
+}
+
 @NodeStyle HasProperty(node, "name") {
   label: AsText(Property(node, "name"))
 }

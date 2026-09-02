@@ -1,20 +1,36 @@
 {% macro normalize_person_name(name_expression) -%}
     {%- if target.type == 'duckdb' -%}
-        upper(
-            regexp_replace(
-                trim(cast({{ name_expression }} as varchar)),
-                '\s+',
-                ' ',
-                'g'
-            )
+        regexp_replace(
+            trim(
+                replace(
+                    translate(
+                        upper(trim(coalesce(cast({{ name_expression }} as varchar), ''))),
+                        'ÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑÝ',
+                        'AAAAAEEEEIIIIOOOOOUUUUCNY'
+                    ),
+                    '-',
+                    ' '
+                )
+            ),
+            '\s+',
+            ' ',
+            'g'
         )
     {%- else -%}
-        upper(
-            regexp_replace(
-                trim(cast({{ name_expression }} as string)),
-                r'\s+',
-                ' '
-            )
+        regexp_replace(
+            trim(
+                replace(
+                    translate(
+                        upper(trim(coalesce(cast({{ name_expression }} as string), ''))),
+                        'ÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑÝ',
+                        'AAAAAEEEEIIIIOOOOOUUUUCNY'
+                    ),
+                    '-',
+                    ' '
+                )
+            ),
+            r'\s+',
+            ' '
         )
     {%- endif -%}
 {%- endmacro %}

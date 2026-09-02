@@ -6,7 +6,7 @@ Three BigQuery datasets in project `billionairewatcher` (location `US`):
 |---|---|
 | `raw` | As ingested. One native table per source file or snapshot. No business filters. |
 | `staging` | Typed, renamed (Base dos Dados style), still one model per origin. Hygiene only — seed-B filters stay for intermediate/marts. |
-| `marts` | Entities ready to serve. This pass: `empresas` is seed A only (Valor 1000 2025 industrial 1–1000 ∪ banks ∪ insurers). `pessoas` and `pessoas_empresas` are still empty. |
+| `marts` | Entities ready to serve. This pass: `empresas` (seed A ∪ walk-up holdings), `pessoas` (natural-person terminals), `vinculos` (pessoa / empresa / estado → empresa). `e_oligarca` is later. |
 
 The endpoint remains [docs/spec-fase1-oligarcas.md](../docs/spec-fase1-oligarcas.md). Seed A is the three Valor lists in `data/valor1000-2025/`, not `controle-empresas-walk.csv` and not ad-hoc extras (Itaúsa, Folha). `empresas.motivo_entrada_descricao` cites the list and rank.
 
@@ -39,12 +39,12 @@ Architecture CSVs in [`architecture/`](architecture/) are the source of truth fo
 Naming follows the [Base dos Dados style manual](https://basedosdados.org/docs/style_data) (snake_case, singular, no year in the table name, `id_` only for entity keys, `proporcao_` 0–100). Deviations: `stg_` prefix, `NUMERIC` for money, identifiers always STRING. Original source names stay in architecture `original_name` and in the spec citations.
 
 ```bash
-dbt run --select staging empresas --target dev
-dbt test --select staging empresas --target dev
+dbt run --select staging intermediate marts --target dev
+dbt test --select staging intermediate marts --target dev
 dbt test --select test_type:unit --target test
 ```
 
-`marts.empresas` is seed A only: Valor 1000 2025 industrial ranks 1–1000 ∪ banks ∪ insurers. Grain is `cnpj` (never null; never invent `/0001`). `razao_social` and `capital_social` come from Receita when matched. `motivo_entrada_categoria` is `semente`; `motivo_entrada_descricao` cites the list and rank; `motivo_entrada_date` is the Valor 1000 2025 publication date (`2025-09-16`). No walk inventory, no Itaúsa/Folha extras.
+`marts.empresas` is seed A (Valor 1000 2025 industrial 1–1000 ∪ banks ∪ insurers) plus holdings reached by the walk-up (`motivo_entrada_categoria` = `subida`), including vehicles cited as `Acionista_Relacionado` of a person. `vinculos` is the path: person on the innermost vehicle, no `via` columns. `Acionista_Relacionado` stays on `int_vinculo_propriedade` for `e_oligarca`. QSA has no share size. The walk follows PJ owners and person-via CNPJs until a natural person or the state. No `e_oligarca` this pass.
 
 DuckDB CI only parses. Models that read `raw` need the BigQuery `dev` target.
 

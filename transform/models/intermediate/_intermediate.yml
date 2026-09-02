@@ -1,0 +1,499 @@
+version: 2
+
+models:
+  - name: int_empresas_semente_a
+    description: >
+      Seed A only. Same grain and columns as the previous empresas mart:
+      Valor 1000 2025 industrial 1–1000 ∪ banks ∪ insurers. Walk holdings
+      are added later in empresas.
+    columns:
+      - name: cnpj
+        description: 14-digit headquarters CNPJ.
+        data_tests:
+          - unique
+          - not_null
+      - name: razao_social
+        data_tests:
+          - not_null
+      - name: capital_social
+      - name: motivo_entrada_categoria
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['semente']
+      - name: motivo_entrada_descricao
+        data_tests:
+          - not_null
+      - name: motivo_entrada_date
+        data_tests:
+          - not_null
+
+  - name: int_fre_posicao_recente
+    description: >
+      Latest FRE document per company (max id_documento), then every
+      shareholder line on that document, including Acionista_Relacionado.
+
+  - name: int_vinculo_propriedade
+    description: >
+      FRE latest-document shareholders union RF QSA ownership-qualificacao
+      socios. Classifies origem_tipo. Resolves pessoa_id: 11-digit CPF,
+      unique mask on folded name or first+last block, unique CPF for that
+      name, then token proximity to one CPF. Same mask across companies
+      shares an id. Keeps via / via_cnpj. QSA percents stay null.
+      Administrators are not owners.
+
+  - name: int_aresta_empresa
+    description: >
+      Company-to-company ownership edges only (origem_tipo = empresa, 14-digit
+      CNPJ). The walk reads this instead of scanning all vinculos.
+
+  - name: int_caminhada
+    description: >
+      Companies visited walking up from seed A through PJ owners and through
+      via_cnpj of person lines, depth 0–8. Does not stop on a company
+      controller.
+
+unit_tests:
+  - name: empresas_semente_a_valor_listas
+    description: >
+      Unique Receita razão gets the matriz CNPJ; an ambiguous razão takes
+      the largest capital_social; Cia. matches Companhia. Grain is CNPJ.
+    model: int_empresas_semente_a
+    given:
+      - input: ref('stg_valor_ranking')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Petrobras' as nome, 'Petroleo Brasileiro S.A. Petrobras' as razao_social
+          union all
+          select 1000, 'JBS', 'JBS S.A.'
+      - input: ref('stg_valor_banco')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Itau Unibanco' as nome, 'Cia. Itau Unibanco Holding S.A.' as razao_social
+      - input: ref('stg_valor_seguradora')
+        format: sql
+        rows: |
+          select 1 as posicao, 'Bradesco Seguros' as nome, 'Bradesco Seguros S.A.' as razao_social
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '33000167' as cnpj_basico, 'Petroleo Brasileiro S.A. Petrobras' as razao_social, 100.0 as capital_social
+          union all
+          select date '2026-01-11', '02916265', 'JBS S/A', 23631071304.24
+          union all
+          select date '2026-01-11', '07452328', 'JBS S.A.', 1000.0
+          union all
+          select date '2026-01-11', '60872504', 'COMPANHIA ITAU UNIBANCO HOLDING S.A.', 90000000000.0
+          union all
+          select date '2026-01-11', '33032580', 'Bradesco Seguros S.A.', 1.0
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '33000167000158' as cnpj, '33000167' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '02916265000160', '02916265', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '07452328000100', '07452328', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '60872504000123', '60872504', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '33032580000109', '33032580', '0001', '1', '02'
+      - input: ref('stg_cvm_cia_aberta')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial, cast(null as varchar) as situacao
+          where false
+      - input: ref('stg_b3_empresa_listada')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as razao_social, cast(null as varchar) as nome_comercial
+          where false
+      - input: ref('stg_bcb_entidade_supervisionada')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
+          where false
+      - input: ref('stg_susep_dado_cadastral')
+        format: sql
+        rows: |
+          select cast(null as varchar) as id_cnpj, cast(null as varchar) as nome
+          where false
+    expect:
+      rows:
+        - {cnpj: '33000167000158', razao_social: Petroleo Brasileiro S.A. Petrobras, capital_social: 100.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '02916265000160', razao_social: JBS S/A, capital_social: 23631071304.24, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, ranking industrial, posição 1000", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '60872504000123', razao_social: COMPANHIA ITAU UNIBANCO HOLDING S.A., capital_social: 90000000000.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, bancos, posição 1", motivo_entrada_date: '2025-09-16'}
+        - {cnpj: '33032580000109', razao_social: Bradesco Seguros S.A., capital_social: 1.0, motivo_entrada_categoria: semente, motivo_entrada_descricao: "Valor 1000 2025, seguradoras, posição 1", motivo_entrada_date: '2025-09-16'}
+
+  - name: vinculo_classifica_pessoa_estado_empresa
+    description: >
+      FRE holding is empresa (keep walking); FRE person is pessoa; União is
+      estado; QSA sócio with no percent is kept as socio; admin 05 is dropped.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, '100' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'J AND F INVESTIMENTOS' as nome_acionista, 'Jurídica' as tipo_pessoa_acionista, '07379937000127' as documento_acionista, 85.0 as proporcao_acao_ordinaria_circulacao, 85.0 as proporcao_total_acao_circulacao, 'S' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          union all
+          select '07379937000127', '200', date '2025-12-31', '2', 'JOESLEY BATISTA', 'Física', cast(null as varchar), 60.0, 60.0, 'S', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '07379937000127', '200', date '2025-12-31', '3', 'UNIÃO FEDERAL', 'Jurídica', cast(null as varchar), 10.0, 10.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, '2' as tipo, 'MARIA SILVA' as nome, cast(null as varchar) as documento, '22' as qualificacao
+          union all
+          select date '2026-01-11', '02916265', '2', 'DIRETOR DESCARTADO', cast(null as varchar), '05'
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: empresa, origem_id: '07379937000127', origem_nome: J AND F INVESTIMENTOS, origem_documento: '07379937000127', cnpj: '02916265000160', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 85.0, percentual_total: 85.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100', cnpj_basico: '02916265', id_documento: '100', via: null, via_cnpj: null}
+        - {origem_tipo: pessoa, origem_id: 'nome:JOESLEY BATISTA@07379937000127', origem_nome: JOESLEY BATISTA, origem_documento: null, cnpj: '07379937000127', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 60.0, percentual_total: 60.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200', cnpj_basico: '07379937', id_documento: '200', via: null, via_cnpj: null}
+        - {origem_tipo: estado, origem_id: 'estado:UNIAOFEDERAL', origem_nome: UNIÃO FEDERAL, origem_documento: null, cnpj: '07379937000127', papel: acionista, fonte: fre, acionista_controlador: false, participante_acordo_acionistas: false, percentual_on: 10.0, percentual_total: 10.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200', cnpj_basico: '07379937', id_documento: '200', via: null, via_cnpj: null}
+        - {origem_tipo: pessoa, origem_id: 'nome:MARIA SILVA@02916265000160', origem_nome: MARIA SILVA, origem_documento: null, cnpj: '02916265000160', papel: socio, fonte: qsa, acionista_controlador: null, participante_acordo_acionistas: null, percentual_on: null, percentual_total: null, qualificacao: '22', tem_informacao_de_controle: false, data_referencia: '2026-01-11', fonte_documento: 'rf.socios partição 2026-01-11 cnpj_basico=02916265', cnpj_basico: '02916265', id_documento: null, via: null, via_cnpj: null}
+
+  - name: caminhada_nao_para_em_holding
+    description: >
+      Seed JBS with a PJ controller is visited at depth 0; the holding is
+      visited at depth 1. The walk does not stop on the company controller.
+    model: int_caminhada
+    given:
+      - input: ref('int_empresas_semente_a')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, 'JBS S/A' as razao_social, 1.0 as capital_social, 'semente' as motivo_entrada_categoria, 'Valor 1000 2025, ranking industrial, posição 1000' as motivo_entrada_descricao, date '2025-09-16' as motivo_entrada_date
+      - input: ref('int_aresta_empresa')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, '07379937000127' as origem_id, 'fre' as fonte
+      - input: ref('int_vinculo_propriedade')
+        format: sql
+        rows: |
+          select cast(null as varchar) as origem_tipo, cast(null as varchar) as via_cnpj, cast(null as varchar) as cnpj
+          where false
+    expect:
+      rows:
+        - {cnpj: '02916265000160', profundidade: 0, cnpj_origem: null, fonte_chegada: semente}
+        - {cnpj: '07379937000127', profundidade: 1, cnpj_origem: '02916265000160', fonte_chegada: fre}
+
+  - name: caminhada_visita_via_pessoa
+    description: >
+      A person line with via_cnpj pulls that vehicle into the walk even when
+      it is not a PJ owner of the issuer.
+    model: int_caminhada
+    given:
+      - input: ref('int_empresas_semente_a')
+        format: sql
+        rows: |
+          select '60872504000123' as cnpj, 'ITAU HOLDING' as razao_social, 1.0 as capital_social, 'semente' as motivo_entrada_categoria, 'Valor 1000 2025, bancos, posição 1' as motivo_entrada_descricao, date '2025-09-16' as motivo_entrada_date
+      - input: ref('int_aresta_empresa')
+        format: sql
+        rows: |
+          select '60872504000123' as cnpj, '61532644000115' as origem_id, 'fre' as fonte
+      - input: ref('int_vinculo_propriedade')
+        format: sql
+        rows: |
+          select 'pessoa' as origem_tipo, '52117397000108' as via_cnpj, '60872504000123' as cnpj
+    expect:
+      rows:
+        - {cnpj: '60872504000123', profundidade: 0, cnpj_origem: null, fonte_chegada: semente}
+        - {cnpj: '61532644000115', profundidade: 1, cnpj_origem: '60872504000123', fonte_chegada: fre}
+        - {cnpj: '52117397000108', profundidade: 1, cnpj_origem: '60872504000123', fonte_chegada: via}
+
+  - name: vinculo_pessoa_mascara_cola_cpf
+    description: >
+      CVM mask ***815438** is not a CPF. It reuses person_id_from_cpf of the
+      unique matching 11-digit CPF for the same normalized name.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, '100' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'ALDO LUPO NETO' as nome_acionista, 'Física' as tipo_pessoa_acionista, '***815438**' as documento_acionista, 5.0 as proporcao_acao_ordinaria_circulacao, 5.0 as proporcao_total_acao_circulacao, 'N' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          union all
+          select '07379937000127', '200', date '2025-12-31', '2', 'ALDO LUPO NETO', 'Física', '13881543821', 10.0, 10.0, 'S', 'N', cast(null as varchar), cast(null as varchar)
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, cast(null as varchar) as cnpj_basico, cast(null as varchar) as tipo, cast(null as varchar) as nome, cast(null as varchar) as documento, cast(null as varchar) as qualificacao
+          where false
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'p-1585ec8c', origem_nome: ALDO LUPO NETO, origem_documento: '***815438**', cnpj: '02916265000160', papel: acionista, fonte: fre, acionista_controlador: false, participante_acordo_acionistas: false, percentual_on: 5.0, percentual_total: 5.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=100', cnpj_basico: '02916265', id_documento: '100', via: null, via_cnpj: null}
+        - {origem_tipo: pessoa, origem_id: 'p-1585ec8c', origem_nome: ALDO LUPO NETO, origem_documento: '13881543821', cnpj: '07379937000127', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 10.0, percentual_total: 10.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200', cnpj_basico: '07379937', id_documento: '200', via: null, via_cnpj: null}
+
+  - name: vinculo_outros_tesouraria_por_empresa
+    description: >
+      Outros and treasury shares get a distinct origem_id per citing issuer.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, '100' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'Outros' as nome_acionista, 'Jurídica' as tipo_pessoa_acionista, cast(null as varchar) as documento_acionista, 1.0 as proporcao_acao_ordinaria_circulacao, 1.0 as proporcao_total_acao_circulacao, 'N' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          union all
+          select '07379937000127', '200', date '2025-12-31', '2', 'Outros', 'Jurídica', cast(null as varchar), 2.0, 2.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '02916265000160', '100', date '2025-12-31', '3', 'Ações Tesouraria', 'Jurídica', cast(null as varchar), 0.5, 0.5, 'N', 'N', cast(null as varchar), cast(null as varchar)
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, cast(null as varchar) as cnpj_basico, cast(null as varchar) as tipo, cast(null as varchar) as nome, cast(null as varchar) as documento, cast(null as varchar) as qualificacao
+          where false
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: outros, origem_id: 'outros:OUTROS@02916265000160', origem_nome: Outros, cnpj: '02916265000160'}
+        - {origem_tipo: outros, origem_id: 'outros:OUTROS@07379937000127', origem_nome: Outros, cnpj: '07379937000127'}
+        - {origem_tipo: tesouraria, origem_id: 'tesouraria:ACOESTESOURARIA@02916265000160', origem_nome: Ações Tesouraria, cnpj: '02916265000160'}
+
+  - name: vinculo_pessoa_joesley_acento_mascara
+    description: >
+      Folded name + unique CPF: FRE MENDONÇA with 11 digits and QSA
+      MENDONCA with ***842211** become the same p-.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '07379937000127' as cnpj, '200' as id_documento, date '2025-12-31' as data_referencia, '2' as id_acionista, 'JOESLEY MENDONÇA BATISTA' as nome_acionista, 'Física' as tipo_pessoa_acionista, '37684221191' as documento_acionista, 60.0 as proporcao_acao_ordinaria_circulacao, 60.0 as proporcao_total_acao_circulacao, 'S' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, '2' as tipo, 'JOESLEY MENDONCA BATISTA' as nome, '***842211**' as documento, '22' as qualificacao
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'p-40f90cbf', origem_nome: JOESLEY MENDONÇA BATISTA, origem_documento: '37684221191', cnpj: '07379937000127'}
+        - {origem_tipo: pessoa, origem_id: 'p-40f90cbf', origem_nome: JOESLEY MENDONCA BATISTA, origem_documento: '***842211**', cnpj: '02916265000160'}
+
+  - name: vinculo_pessoa_las_casas_hifen
+    description: >
+      Hyphen folds to space, so LAS-CASAS + CPF and LAS CASAS + mask share p-.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '04972092000122' as cnpj, '100' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'LUIZ LAS-CASAS ALVES' as nome_acionista, 'Física' as tipo_pessoa_acionista, '11846070600' as documento_acionista, 10.0 as proporcao_acao_ordinaria_circulacao, 10.0 as proporcao_total_acao_circulacao, 'N' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '53400808' as cnpj_basico, '2' as tipo, 'LUIZ LAS CASAS ALVES' as nome, '***460706**' as documento, '22' as qualificacao
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '04972092' as cnpj_basico, 'CIA A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '53400808', 'CIA B', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '04972092000122' as cnpj, '04972092' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '53400808000122', '53400808', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'p-89c464ad', origem_nome: 'LUIZ LAS-CASAS ALVES', origem_documento: '11846070600', cnpj: '04972092000122'}
+        - {origem_tipo: pessoa, origem_id: 'p-89c464ad', origem_nome: LUIZ LAS CASAS ALVES, origem_documento: '***460706**', cnpj: '53400808000122'}
+
+  - name: vinculo_pessoa_angeloni_duas_empresas
+    description: >
+      Same 2-token name and the same mask in two companies share nome:CHAVE.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select cast(null as varchar) as cnpj, cast(null as varchar) as id_documento, cast(null as date) as data_referencia, cast(null as varchar) as id_acionista, cast(null as varchar) as nome_acionista, cast(null as varchar) as tipo_pessoa_acionista, cast(null as varchar) as documento_acionista, cast(null as double) as proporcao_acao_ordinaria_circulacao, cast(null as double) as proporcao_total_acao_circulacao, cast(null as varchar) as indicador_acionista_controlador, cast(null as varchar) as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          where false
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '07069480' as cnpj_basico, '2' as tipo, 'ARNALDO ANGELONI' as nome, '***865059**' as documento, '22' as qualificacao
+          union all
+          select date '2026-01-11', '83646984', '2', 'ARNALDO ANGELONI', '***865059**', '22'
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '07069480' as cnpj_basico, 'CIA A' as razao_social, '2062' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '83646984', 'CIA B', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '07069480000196' as cnpj, '07069480' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '83646984000100', '83646984', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'nome:ARNALDO ANGELONI', origem_nome: ARNALDO ANGELONI, origem_documento: '***865059**', cnpj: '07069480000196'}
+        - {origem_tipo: pessoa, origem_id: 'nome:ARNALDO ANGELONI', origem_nome: ARNALDO ANGELONI, origem_documento: '***865059**', cnpj: '83646984000100'}
+
+  - name: vinculo_pessoa_proximidade_e_beltrao
+    description: >
+      JOAO PAULO FRANCO attaches to the unique CPF of JOAO PAULO MOREIRA
+      FRANCO; SOUSA folds to SOUZA via edit distance. The long Beltrão
+      mask hits one CPF in the first+last block; the two Beltrão CPFs stay
+      apart.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '02916265000160' as cnpj, '100' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'JOAO PAULO MOREIRA FRANCO' as nome_acionista, 'Física' as tipo_pessoa_acionista, '75473780725' as documento_acionista, 10.0 as proporcao_acao_ordinaria_circulacao, 10.0 as proporcao_total_acao_circulacao, 'N' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          union all
+          select '07379937000127', '200', date '2025-12-31', '2', 'JOAO PAULO FRANCO', 'Física', cast(null as varchar), 5.0, 5.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '02916265000160', '100', date '2025-12-31', '3', 'ANDREIA DE SOUZA RAMOS VETTORAZZO' as nome_acionista, 'Física', '11122233344', 1.0, 1.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '07379937000127', '200', date '2025-12-31', '4', 'ANDREIA DE SOUSA RAMOS VETTORAZZO', 'Física', cast(null as varchar), 1.0, 1.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '33363896000122', '300', date '2025-12-31', '5', 'MARIA DA CONCEICAO COUTINHO BELTRAO', 'Física', '02996200772', 2.0, 2.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '33363896000122', '300', date '2025-12-31', '6', 'MARIA COUTINHO BELTRAO', 'Física', '02421912741', 2.0, 2.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+          union all
+          select '33363896000122', '300', date '2025-12-31', '7', 'MARIA DA CONCEICAO DE MORAES COUTINHO BELTRAO', 'Física', '***962007**', 2.0, 2.0, 'N', 'N', cast(null as varchar), cast(null as varchar)
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, cast(null as varchar) as cnpj_basico, cast(null as varchar) as tipo, cast(null as varchar) as nome, cast(null as varchar) as documento, cast(null as varchar) as qualificacao
+          where false
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+          union all
+          select date '2026-01-11', '33363896', 'CIA C', '2046', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+          union all
+          select date '2026-01-11', '33363896000122', '33363896', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'p-911d5b43', origem_nome: JOAO PAULO MOREIRA FRANCO, cnpj: '02916265000160'}
+        - {origem_tipo: pessoa, origem_id: 'p-911d5b43', origem_nome: JOAO PAULO FRANCO, cnpj: '07379937000127'}
+        - {origem_tipo: pessoa, origem_id: 'p-ebdca308', origem_nome: ANDREIA DE SOUZA RAMOS VETTORAZZO, cnpj: '02916265000160'}
+        - {origem_tipo: pessoa, origem_id: 'p-ebdca308', origem_nome: ANDREIA DE SOUSA RAMOS VETTORAZZO, cnpj: '07379937000127'}
+        - {origem_tipo: pessoa, origem_id: 'p-4906483b', origem_nome: MARIA DA CONCEICAO COUTINHO BELTRAO, cnpj: '33363896000122'}
+        - {origem_tipo: pessoa, origem_id: 'p-cb00e854', origem_nome: MARIA COUTINHO BELTRAO, cnpj: '33363896000122'}
+        - {origem_tipo: pessoa, origem_id: 'p-4906483b', origem_nome: MARIA DA CONCEICAO DE MORAES COUTINHO BELTRAO, cnpj: '33363896000122'}
+
+  - name: vinculo_pessoa_maria_silva_fica_partida
+    description: >
+      Two-token homonym without a shared mask stays one id per company.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select cast(null as varchar) as cnpj, cast(null as varchar) as id_documento, cast(null as date) as data_referencia, cast(null as varchar) as id_acionista, cast(null as varchar) as nome_acionista, cast(null as varchar) as tipo_pessoa_acionista, cast(null as varchar) as documento_acionista, cast(null as double) as proporcao_acao_ordinaria_circulacao, cast(null as double) as proporcao_total_acao_circulacao, cast(null as varchar) as indicador_acionista_controlador, cast(null as varchar) as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          where false
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, '2' as tipo, 'MARIA SILVA' as nome, cast(null as varchar) as documento, '22' as qualificacao
+          union all
+          select date '2026-01-11', '07379937', '2', 'MARIA SILVA', cast(null as varchar), '22'
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'nome:MARIA SILVA@02916265000160', origem_nome: MARIA SILVA, cnpj: '02916265000160'}
+        - {origem_tipo: pessoa, origem_id: 'nome:MARIA SILVA@07379937000127', origem_nome: MARIA SILVA, cnpj: '07379937000127'}
+
+  - name: vinculo_pessoa_veronica_nome_longo
+    description: >
+      A 3+ token name without a document shares nome:CHAVE across companies.
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select cast(null as varchar) as cnpj, cast(null as varchar) as id_documento, cast(null as date) as data_referencia, cast(null as varchar) as id_acionista, cast(null as varchar) as nome_acionista, cast(null as varchar) as tipo_pessoa_acionista, cast(null as varchar) as documento_acionista, cast(null as double) as proporcao_acao_ordinaria_circulacao, cast(null as double) as proporcao_total_acao_circulacao, cast(null as varchar) as indicador_acionista_controlador, cast(null as varchar) as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          where false
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, '2' as tipo, 'VERONICA VALENTE DANTAS' as nome, cast(null as varchar) as documento, '22' as qualificacao
+          union all
+          select date '2026-01-11', '07379937', '2', 'VERONICA VALENTE DANTAS', cast(null as varchar), '22'
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265' as cnpj_basico, 'JBS S/A' as razao_social, '2046' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '07379937', 'J AND F INVESTIMENTOS SA', '2062', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '02916265000160' as cnpj, '02916265' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '07379937000127', '07379937', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: pessoa, origem_id: 'nome:VERONICA VALENTE DANTAS', origem_nome: VERONICA VALENTE DANTAS, cnpj: '02916265000160'}
+        - {origem_tipo: pessoa, origem_id: 'nome:VERONICA VALENTE DANTAS', origem_nome: VERONICA VALENTE DANTAS, cnpj: '07379937000127'}
