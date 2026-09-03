@@ -16,7 +16,7 @@ dona as (
         cnpj as veiculo_cnpj
     from {{ ref('int_vinculo_propriedade') }}
     where origem_tipo = 'empresa'
-      and length(origem_id) = 14
+      and {{ is_cnpj14('origem_id') }}
       and origem_id != cnpj
 ),
 
@@ -27,8 +27,7 @@ pessoa_via as (
         via_cnpj
     from visitado
     where origem_tipo = 'pessoa'
-      and via_cnpj is not null
-      and length(via_cnpj) = 14
+      and {{ is_cnpj14('via_cnpj') }}
 ),
 
 via_interna as (
@@ -54,13 +53,11 @@ livro as (
     from visitado
     where not (
         origem_tipo = 'pessoa'
-        and via_cnpj is not null
-        and length(via_cnpj) = 14
+        and {{ is_cnpj14('via_cnpj') }}
     )
     and not (
         origem_tipo = 'empresa'
-        and via_cnpj is not null
-        and length(via_cnpj) = 14
+        and {{ is_cnpj14('via_cnpj') }}
         and exists (
             select 1
             from dona
@@ -93,8 +90,7 @@ inventado as (
         and via_interna.emissora = visitado.cnpj
         and via_interna.via_cnpj = visitado.via_cnpj
     where visitado.origem_tipo = 'pessoa'
-      and visitado.via_cnpj is not null
-      and length(visitado.via_cnpj) = 14
+      and {{ is_cnpj14('visitado.via_cnpj') }}
       and not exists (
           select 1
           from livro

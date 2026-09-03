@@ -165,6 +165,41 @@ unit_tests:
         - {origem_tipo: estado, origem_id: 'estado:UNIAOFEDERAL', origem_nome: UNIÃO FEDERAL, origem_documento: null, cnpj: '07379937000127', papel: acionista, fonte: fre, acionista_controlador: false, participante_acordo_acionistas: false, percentual_on: 10.0, percentual_total: 10.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=200', cnpj_basico: '07379937', id_documento: '200', via: null, via_cnpj: null}
         - {origem_tipo: pessoa, origem_id: 'nome:MARIA SILVA@02916265000160', origem_nome: MARIA SILVA, origem_documento: null, cnpj: '02916265000160', papel: socio, fonte: qsa, acionista_controlador: null, participante_acordo_acionistas: null, percentual_on: null, percentual_total: null, qualificacao: '22', tem_informacao_de_controle: false, data_referencia: '2026-01-11', fonte_documento: 'rf.socios partição 2026-01-11 cnpj_basico=02916265', cnpj_basico: '02916265', id_documento: null, via: null, via_cnpj: null}
 
+  - name: vinculo_cnpj_placeholder_e_estrangeiro
+    description: >
+      CVM CPF_CNPJ of 14 zeros is not a company. A PJ with that document is
+      estrangeiro; a person cited via it stays on the issuer, not on
+      00000000000000 (which would steal Banco do Brasil's razão).
+    model: int_vinculo_propriedade
+    given:
+      - input: ref('int_fre_posicao_recente')
+        format: sql
+        rows: |
+          select '49115815000105' as cnpj, '159138' as id_documento, date '2025-12-31' as data_referencia, '1' as id_acionista, 'Colorado Company Ltd' as nome_acionista, 'PJ' as tipo_pessoa_acionista, '00000000000000' as documento_acionista, 100.0 as proporcao_acao_ordinaria_circulacao, 100.0 as proporcao_total_acao_circulacao, 'S' as indicador_acionista_controlador, 'N' as indicador_participante_acordo_acionistas, cast(null as varchar) as nome_acionista_relacionado, cast(null as varchar) as documento_acionista_relacionado
+          union all
+          select '49115815000105', '159138', date '2025-12-31', '2', 'JOESLEY MENDONÇA BATISTA', 'PF', '37684221191', 100.0, 100.0, 'S', 'N', 'Colorado Company Ltd', '00000000000000'
+      - input: ref('stg_rf_socio')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, cast(null as varchar) as cnpj_basico, cast(null as varchar) as tipo, cast(null as varchar) as nome, cast(null as varchar) as documento, cast(null as varchar) as qualificacao
+          where false
+      - input: ref('stg_rf_empresa')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '00000000' as cnpj_basico, 'BANCO DO BRASIL SA' as razao_social, '2038' as natureza_juridica, cast(null as varchar) as ente_federativo
+          union all
+          select date '2026-01-11', '49115815', 'JBS NV', '2054', cast(null as varchar)
+      - input: ref('stg_rf_estabelecimento')
+        format: sql
+        rows: |
+          select date '2026-01-11' as data, '00000000000191' as cnpj, '00000000' as cnpj_basico, '0001' as cnpj_ordem, '1' as identificador_matriz_filial, '02' as situacao_cadastral
+          union all
+          select date '2026-01-11', '49115815000105', '49115815', '0001', '1', '02'
+    expect:
+      rows:
+        - {origem_tipo: estrangeiro, origem_id: 'estrangeiro:COLORADOCOMPANYLTD', origem_nome: Colorado Company Ltd, origem_documento: '00000000000000', cnpj: '49115815000105', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 100.0, percentual_total: 100.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=159138', cnpj_basico: '49115815', id_documento: '159138', via: null, via_cnpj: null}
+        - {origem_tipo: pessoa, origem_id: 'p-40f90cbf', origem_nome: JOESLEY MENDONÇA BATISTA, origem_documento: '37684221191', cnpj: '49115815000105', papel: acionista_controlador, fonte: fre, acionista_controlador: true, participante_acordo_acionistas: false, percentual_on: 100.0, percentual_total: 100.0, qualificacao: null, tem_informacao_de_controle: true, data_referencia: '2025-12-31', fonte_documento: 'fre_cia_aberta_posicao_acionaria_2026 id_documento=159138', cnpj_basico: '49115815', id_documento: '159138', via: 'Colorado Company Ltd', via_cnpj: null}
+
   - name: caminhada_nao_para_em_holding
     description: >
       Seed JBS with a PJ controller is visited at depth 0; the holding is

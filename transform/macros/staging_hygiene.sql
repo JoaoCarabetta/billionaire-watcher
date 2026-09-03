@@ -5,6 +5,7 @@ nullif(trim(cast({{ col }} as string)), '')
 {% macro cnpj14(col) -%}
 case
     when length({{ digits_only(col) }}) between 1 and 14
+        and not {{ is_placeholder_cnpj(col) }}
     then lpad({{ digits_only(col) }}, 14, '0')
     else cast(null as string)
 end

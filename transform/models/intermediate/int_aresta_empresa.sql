@@ -13,5 +13,5 @@ select
     fonte
 from {{ ref('int_vinculo_propriedade') }}
 where origem_tipo = 'empresa'
-  and length(origem_id) = 14
+  and {{ is_cnpj14('origem_id') }}
   and origem_id != cnpj

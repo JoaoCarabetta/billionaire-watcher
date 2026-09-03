@@ -1,44 +1,131 @@
+// Paste into Lab → Graph Style editor (replaces the generated style).
+//
+// Pessoa     green  circle
+// Semente    red    square    seed A company
+// Holding    amber  diamond   walk-up vehicle
+// Estado     blue   triangle
+// Parada     gray   triangleDown  (tesouraria / outros / não resolvido / estrangeiro)
+//
+// Dense views: holdings and stops are unlabeled (click the node).
+// Edge text only appears on small graphs; CONTROLADOR is the thick black line.
+
+Define(MAX_NAME, 24)
+Define(ShortName, Function(n,
+  If(
+    Greater(Size(AsText(Property(n, "name"))), MAX_NAME),
+    Concat(Slice(AsText(Property(n, "name")), 0, MAX_NAME), "…"),
+    AsText(Property(n, "name"))
+  )
+))
+
+@ViewStyle {
+  view: "force"
+  force-physics-enabled: True
+  force-link-distance: 100
+  force-collision-radius: 36
+  force-repel-force: -420
+}
+
 @NodeStyle {
   size: 12
   border-width: 2
   border-color: #1d1d1d
-  font-size: 9
-}
-
-@NodeStyle HasLabel(node, "Pessoa") {
-  color: #3b6d11
+  font-size: 8
+  font-color: #1d1d1d
+  font-background-color: #ffffff
 }
 
 @NodeStyle HasLabel(node, "Empresa") {
-  color: #ea580c
+  color: #a16207
+  color-hover: Darker(#a16207)
+  shape: "square"
 }
 
-@NodeStyle And(HasLabel(node, "Empresa"), Equals(Property(node, "motivo"), "semente")) {
-  color: #dd2222
+@NodeStyle Or(HasLabel(node, "Semente"), Equals(Property(node, "motivo"), "semente")) {
+  color: #dc2626
+  color-hover: Darker(#dc2626)
+  shape: "square"
+  size: 16
 }
 
-@NodeStyle And(HasLabel(node, "Empresa"), Equals(Property(node, "motivo"), "subida")) {
-  color: #ea580c
+@NodeStyle Or(HasLabel(node, "Holding"), Equals(Property(node, "motivo"), "subida")) {
+  color: #d97706
+  color-hover: Darker(#d97706)
+  shape: "diamond"
+  size: 10
+}
+
+@NodeStyle HasLabel(node, "Pessoa") {
+  color: #15803d
+  color-hover: Darker(#15803d)
+  shape: "dot"
+  size: 16
 }
 
 @NodeStyle HasLabel(node, "Estado") {
   color: #1d4ed8
+  color-hover: Darker(#1d4ed8)
+  shape: "triangle"
+  size: 14
 }
 
 @NodeStyle HasLabel(node, "Parada") {
   color: #737373
+  color-hover: Darker(#737373)
+  shape: "triangleDown"
+  size: 8
+}
+
+@NodeStyle Equals(Property(node, "tipo"), "tesouraria") {
+  color: #a8a29e
+}
+
+@NodeStyle Equals(Property(node, "tipo"), "outros") {
+  color: #57534e
+}
+
+@NodeStyle Equals(Property(node, "tipo"), "nao_resolvido") {
+  color: #b45309
+}
+
+@NodeStyle Equals(Property(node, "tipo"), "estrangeiro") {
+  color: #7c3aed
 }
 
 @NodeStyle HasProperty(node, "name") {
-  label: AsText(Property(node, "name"))
+  label: ShortName(node)
+}
+
+@NodeStyle And(Greater(NodeCount(graph), 18), Or(HasLabel(node, "Holding"), HasLabel(node, "Parada"))) {
+  label: ""
 }
 
 @EdgeStyle {
   width: 1
-  color: #737373
-  font-size: 8
+  color: #a8a29e
+  font-size: 7
+  arrow-size: 4
+  label: ""
 }
 
-@EdgeStyle HasProperty(edge, "name") {
-  label: AsText(Property(edge, "name"))
+@EdgeStyle Equals(Type(edge), "CONTROLADOR") {
+  color: #1d1d1d
+  width: 2.2
+  arrow-size: 6
+}
+
+@EdgeStyle Equals(Type(edge), "ACIONISTA") {
+  color: #57534e
+}
+
+@EdgeStyle Equals(Type(edge), "SOCIO") {
+  color: #d6d3d1
+}
+
+@EdgeStyle Less(EdgeCount(graph), 16) {
+  label: If(
+    HasProperty(edge, "percentual_on"),
+    Format("{}%", AsText(Property(edge, "percentual_on"))),
+    Type(edge)
+  )
 }

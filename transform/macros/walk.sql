@@ -19,7 +19,34 @@ translate(
 regexp_matches(cast({{ col }} as varchar), '^[0-9]{11}$')
 {%- else -%}
 regexp_contains(cast({{ col }} as string), r'^[0-9]{11}$')
-{%- endif -%}
+{%- endif %}
+{%- endmacro %}
+
+{% macro is_placeholder_cnpj(col) -%}
+(
+    {{ col }} is not null
+    and length({{ digits_only(col) }}) > 0
+    {%- if target.type == 'duckdb' %}
+    and regexp_matches({{ digits_only(col) }}, '^0+$')
+    {%- else %}
+    and regexp_contains({{ digits_only(col) }}, r'^0+$')
+    {%- endif %}
+)
+{%- endmacro %}
+
+{# 14 digits, not the CVM all-zero placeholder (never Banco do Brasil 00000000000191). False when null. #}
+{% macro is_cnpj14(col) -%}
+(
+    {{ col }} is not null
+    and length({{ col }}) = 14
+    {%- if target.type == 'duckdb' %}
+    and regexp_matches(cast({{ col }} as varchar), '^[0-9]{14}$')
+    and not regexp_matches(cast({{ col }} as varchar), '^0+$')
+    {%- else %}
+    and regexp_contains(cast({{ col }} as string), r'^[0-9]{14}$')
+    and not regexp_contains(cast({{ col }} as string), r'^0+$')
+    {%- endif %}
+)
 {%- endmacro %}
 
 {% macro cpf_mask6(col) -%}

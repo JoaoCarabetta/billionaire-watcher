@@ -23,7 +23,17 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 - Bolt: `bolt://localhost:7687` (no auth)
 - Lab: http://localhost:3001
 
-Paste [lab-style.gss](lab-style.gss) into Lab’s Graph Style editor so nodes and edges show names instead of ids. Seed A companies (`motivo` = `semente`) are red; walk-up holdings (`subida`) are orange.
+Paste [lab-style.gss](lab-style.gss) into Lab’s Graph Style editor (it replaces the style Lab generates from labels). Names are truncated. On a walk with more than 18 nodes, holdings and stops stay unlabeled so the cluster is readable — click a node for the full name. Edge text only appears on small graphs; a thick black line is `CONTROLADOR`.
+
+| Type | Labels | Color | Shape |
+|---|---|---|---|
+| Person | `Pessoa` | green | circle |
+| Seed A company | `Empresa` + `Semente` | red | square |
+| Walk-up holding | `Empresa` + `Holding` | amber | diamond |
+| State | `Estado` | blue | triangle |
+| Stop (Outros, treasury, unresolved, foreign) | `Parada` | gray (brown / purple by `tipo`) | triangle down |
+
+`MATCH (e:Empresa)` still returns both seed companies and holdings. Narrow with `MATCH (h:Holding)` or `MATCH (s:Semente)`.
 
 ```cypher
 MATCH path = (e:Empresa {id: "02916265000160"})<-[*1..4]-(n)

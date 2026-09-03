@@ -176,7 +176,7 @@ com_cnpj as (
     select
         uniao.*,
         case
-            when length(uniao.origem_documento) = 14 then uniao.origem_documento
+            when {{ is_cnpj14('uniao.origem_documento') }} then uniao.origem_documento
             else matriz_nome.cnpj
         end as owner_cnpj
     from uniao
@@ -194,7 +194,8 @@ com_natureza as (
         rf_por_basico.ente_federativo
     from com_cnpj
     left join {{ ref('stg_rf_empresa') }} as rf_por_basico
-        on rf_por_basico.cnpj_basico = left(com_cnpj.owner_cnpj, 8)
+        on {{ is_cnpj14('com_cnpj.owner_cnpj') }}
+        and rf_por_basico.cnpj_basico = left(com_cnpj.owner_cnpj, 8)
         and rf_por_basico.data = date '{{ var("rf_partition_date") }}'
 ),
 
@@ -225,10 +226,12 @@ tipado as (
                 or classificado.qsa_tipo = '2'
                 or length(classificado.origem_documento) = 11
                 then 'pessoa'
+            when {{ is_placeholder_cnpj('classificado.origem_documento') }}
+                then 'estrangeiro'
             when classificado.qsa_tipo = '3'
                 and classificado.owner_cnpj is null
                 then 'estrangeiro'
-            when length(classificado.owner_cnpj) = 14 then 'empresa'
+            when {{ is_cnpj14('classificado.owner_cnpj') }} then 'empresa'
             when classificado.tipo_dobrado like '%JURIDICA%'
                 or classificado.tipo_dobrado = 'PJ'
                 or classificado.qsa_tipo = '1'
@@ -243,7 +246,7 @@ com_via as (
     select
         tipado.*,
         case
-            when length(tipado.via_documento) = 14 then tipado.via_documento
+            when {{ is_cnpj14('tipado.via_documento') }} then tipado.via_documento
             else matriz_via.cnpj
         end as via_cnpj
     from tipado

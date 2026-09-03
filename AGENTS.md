@@ -68,7 +68,7 @@ DuckDB `test` only **parses**. `dbt run` / `dbt test` against models that read `
 
 ## Graph
 
-`graph/` is a local Memgraph scratch pad, **not** a warehouse input. `load_marts.py --graph complete` copies `marts.empresas` / `pessoas` / `vinculos` 1:1 (no CPF; edges are `CONTROLADOR` / `ACIONISTA` / `SOCIO` with a readable `name`). `--graph simplified` is reserved. `load_grafo_publico.py` loads the frozen v0 snapshot. Do not treat either as a source for marts. Do not rewrite `grafo-publico.json` to match the spec.
+`graph/` is a local Memgraph scratch pad, **not** a warehouse input. `load_marts.py --graph complete` copies `marts.empresas` / `pessoas` / `vinculos` 1:1 (no CPF; edges are `CONTROLADOR` / `ACIONISTA` / `SOCIO` with a readable `name`). Seed companies also get `:Semente`, walk-up vehicles `:Holding`. Paste `graph/lab-style.gss` in Lab for the color/shape legend. `--graph simplified` is reserved. `load_grafo_publico.py` loads the frozen v0 snapshot. Do not treat either as a source for marts. Do not rewrite `grafo-publico.json` to match the spec.
 
 ## Commands
 

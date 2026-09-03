@@ -108,7 +108,7 @@ def load(uri: str, credentials: Path | None = None, graph: str = "complete") -> 
     driver.verify_connectivity()
     with driver.session() as session:
         session.run("MATCH (n) DETACH DELETE n")
-        for label in ("Pessoa", "Empresa", "Estado", "Parada"):
+        for label in ("Pessoa", "Empresa", "Estado", "Parada", "Semente", "Holding"):
             ensure_index(session, label)
 
         for batch in chunks(
@@ -118,6 +118,11 @@ def load(uri: str, credentials: Path | None = None, graph: str = "complete") -> 
                     "name": r["razao_social"],
                     "motivo": r["motivo_entrada_categoria"],
                     "motivo_descricao": r["motivo_entrada_descricao"],
+                    "tipo": {
+                        "semente": "semente",
+                        "subida": "holding",
+                        "hop": "hop",
+                    }.get(r["motivo_entrada_categoria"], r["motivo_entrada_categoria"]),
                 }
                 for r in empresas
             ]
@@ -129,7 +134,14 @@ def load(uri: str, credentials: Path | None = None, graph: str = "complete") -> 
                 SET n.name = row.name,
                     n.label = row.name,
                     n.motivo = row.motivo,
-                    n.motivo_descricao = row.motivo_descricao
+                    n.motivo_descricao = row.motivo_descricao,
+                    n.tipo = row.tipo
+                FOREACH (_ IN CASE WHEN row.tipo = 'semente' THEN [1] ELSE [] END |
+                    SET n:Semente
+                )
+                FOREACH (_ IN CASE WHEN row.tipo = 'holding' THEN [1] ELSE [] END |
+                    SET n:Holding
+                )
                 """,
                 rows=batch,
             )
@@ -141,7 +153,7 @@ def load(uri: str, credentials: Path | None = None, graph: str = "complete") -> 
                 """
                 UNWIND $rows AS row
                 MERGE (n:Pessoa {id: row.id})
-                SET n.name = row.name, n.label = row.name
+                SET n.name = row.name, n.label = row.name, n.tipo = 'pessoa'
                 """,
                 rows=batch,
             )
@@ -198,10 +210,16 @@ def load(uri: str, credentials: Path | None = None, graph: str = "complete") -> 
                 """
                 UNWIND $rows AS row
                 FOREACH (_ IN CASE WHEN row.label = 'Empresa' THEN [1] ELSE [] END |
-                    MERGE (n:Empresa {id: row.id}) SET n.name = coalesce(n.name, row.name), n.label = coalesce(n.label, row.name)
+                    MERGE (n:Empresa {id: row.id})
+                    SET n.name = coalesce(n.name, row.name),
+                        n.label = coalesce(n.label, row.name),
+                        n.tipo = coalesce(n.tipo, row.tipo)
                 )
                 FOREACH (_ IN CASE WHEN row.label = 'Pessoa' THEN [1] ELSE [] END |
-                    MERGE (n:Pessoa {id: row.id}) SET n.name = coalesce(n.name, row.name), n.label = coalesce(n.label, row.name)
+                    MERGE (n:Pessoa {id: row.id})
+                    SET n.name = coalesce(n.name, row.name),
+                        n.label = coalesce(n.label, row.name),
+                        n.tipo = coalesce(n.tipo, 'pessoa')
                 )
                 FOREACH (_ IN CASE WHEN row.label = 'Estado' THEN [1] ELSE [] END |
                     MERGE (n:Estado {id: row.id}) SET n.name = row.name, n.label = row.name, n.tipo = row.tipo
@@ -285,7 +303,7 @@ def check(uri: str, expected_edges: int | None = None) -> int:
 
     labels = {
         rec["label"]: rec["n"]
-        for rec in q("MATCH (n) RETURN labels(n)[0] AS label, count(n) AS n")
+        for rec in q("MATCH (n) UNWIND labels(n) AS label RETURN label, count(n) AS n")
     }
     rels = {
         rec["t"]: rec["n"]
@@ -296,6 +314,8 @@ def check(uri: str, expected_edges: int | None = None) -> int:
 
     ok(labels.get("Pessoa", 0) > 0, f"{labels.get('Pessoa', 0)} Pessoa nodes")
     ok(labels.get("Empresa", 0) > 0, f"{labels.get('Empresa', 0)} Empresa nodes")
+    ok(labels.get("Semente", 0) > 0, f"{labels.get('Semente', 0)} Semente companies")
+    ok(labels.get("Holding", 0) > 0, f"{labels.get('Holding', 0)} Holding companies")
     ok(labels.get("Estado", 0) > 0, f"{labels.get('Estado', 0)} Estado nodes")
     ok("CONTROLADOR" in rels, "CONTROLADOR edges exist")
     ok("SOCIO" in rels, "SOCIO edges exist (QSA kept)")
