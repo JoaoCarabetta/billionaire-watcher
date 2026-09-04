@@ -58,8 +58,7 @@ via_citacao as (
         on caminhada.cnpj = vinculo.via_cnpj
         and caminhada.profundidade > 0
     where vinculo.origem_tipo = 'pessoa'
-      and vinculo.via_cnpj is not null
-      and length(vinculo.via_cnpj) = 14
+      and {{ is_cnpj14('vinculo.via_cnpj') }}
     group by vinculo.via_cnpj
 ),
 
@@ -87,6 +86,7 @@ subida as (
         and vinculo.origem_id = caminhada.cnpj
     where caminhada.profundidade > 0
       and semente.cnpj is null
+      and {{ is_cnpj14('caminhada.cnpj') }}
     qualify row_number() over (
         partition by caminhada.cnpj
         order by vinculo.fonte, vinculo.origem_nome

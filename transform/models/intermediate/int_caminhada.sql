@@ -23,8 +23,7 @@ passo as (
         'via' as fonte
     from {{ ref('int_vinculo_propriedade') }}
     where origem_tipo = 'pessoa'
-      and via_cnpj is not null
-      and length(via_cnpj) = 14
+      and {{ is_cnpj14('via_cnpj') }}
       and via_cnpj != cnpj
 ),
 

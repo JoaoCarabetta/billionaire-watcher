@@ -248,7 +248,11 @@ BNDESPAR, Petrobras, BB): esses entram em `empresas` com
 Nacional, Fazenda Nacional, `natureza_juridica` 1xxx e `ente_federativo`
 preenchido são `origem_tipo` = `estado` em `vinculos`, não linhas em `pessoas`.
 Empresa pública (`2011`) e sociedade de economia mista (`2038`) continuam
-caminhando.
+caminhando. `CPF_CNPJ_Acionista` / `CPF_CNPJ_Acionista_Relacionado` iguais a
+14 zeros (`00000000000000`) não são CNPJ — é o placeholder da CVM para
+documento ausente (em geral PJ estrangeira). Não casam com o Banco do Brasil
+(`00000000000191`). A origem é `estrangeiro`; `via` sem CNPJ resolvido fica
+na emissora.
 
 Em toda empresa visitada, unir o Formulário **e** o Quadro de Sócios: FRE não
 substitui QSA. Sócio QSA entra mesmo sem percentual (`papel` = `socio`).
